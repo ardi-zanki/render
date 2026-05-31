@@ -16,6 +16,11 @@ export interface CreatePaymentResult {
   raw?: unknown;
 }
 
+export interface WebhookRequest {
+  headers: Record<string, string | undefined>;
+  body: unknown;
+}
+
 /** Provider webhook normalized to our internal shape (PRD §23.4). */
 export interface NormalizedWebhook {
   providerOrderId: string;
@@ -28,9 +33,6 @@ export interface NormalizedWebhook {
 export interface PaymentProvider {
   readonly name: string;
   createPayment(input: CreatePaymentInput): Promise<CreatePaymentResult>;
-  /** Verify a webhook signature and normalize it; throws if invalid. */
-  verifyAndParseWebhook(
-    headers: Record<string, string | undefined>,
-    body: unknown,
-  ): Promise<NormalizedWebhook>;
+  /** Verify a webhook (signature) and normalize it; throws if invalid. */
+  verifyAndParseWebhook(req: WebhookRequest): Promise<NormalizedWebhook>;
 }

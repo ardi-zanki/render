@@ -157,19 +157,44 @@ pnpm smoke:render   # render pipeline test (credit, storage, provider, assets)
 > **Port:** the dev server runs on **3210** (`pnpm dev`) because port 3000 is
 > used by another local project; `APP_URL`/`BETTER_AUTH_URL` match it.
 
+## Credit purchase & payment (Phase 3)
+
+Buy-credits flow (`src/lib/payments/service.ts`): pick package → create a pending
+`payments` row + provider checkout → provider webhook → **idempotent** credit
+top-up (`applyCreditChange` keyed by `payment:<id>`; a payment already `paid` is
+a no-op, so duplicate webhooks never double-credit).
+
+- `/payments` — package cards with **Beli Paket**, live balance, transaction
+  history; `/payments/finish` (result) and `/payments/simulate` (dev mock).
+- `POST /api/payments/checkout` (auth) → Snap token / redirect URL.
+- `POST /api/payments/webhook` (public; provider signature verified).
+
+**Payment provider** (`src/lib/providers/payment/`): `midtrans` implements Snap
+(`POST {app[.sandbox].midtrans.com}/snap/v1/transactions`, Basic auth) and
+webhook verification (`sha512(order_id + status_code + gross_amount + serverKey)`).
+A `mock` provider routes checkout to the in-app simulate page so the full
+checkout → webhook → credit flow runs locally. Dev default: `PAYMENT_PROVIDER=mock`.
+For production set `PAYMENT_PROVIDER=midtrans` + `MIDTRANS_SERVER_KEY` /
+`MIDTRANS_CLIENT_KEY` and point the Midtrans notification URL at
+`/api/payments/webhook`.
+
+```bash
+pnpm smoke:payment   # checkout → webhook → idempotent top-up
+```
+
 ## Status & langkah berikutnya
 
 - [x] **Phase 1a** — Scaffold + design system + dark mode
 - [x] **Phase 1b** — Better Auth, PostgreSQL/Drizzle, R2, Resend, rate limiter, JWT
 - [x] **Auth UI + dashboard** — login/register/verify/reset, app shell, dashboard
 - [x] **Phase 2** — Project & Render core, Rendr Studio, MyArchitectAI provider
-- [ ] Phase 3 — Credit purchase + Payment (Midtrans webhook → add credits)
-- [ ] Phase 4–5 — Notifications, Admin, account settings
+- [x] **Phase 3** — Credit purchase + Midtrans payment (Snap + webhook)
+- [ ] Phase 4 — Notifications (in-app + email), account settings (edit profile/password)
+- [ ] Phase 5 — Admin (users, renders, audit log)
 
 Still stubbed (by phase): Google OAuth (`GOOGLE_CLIENT_*`), email sending
-(`RESEND_API_KEY`), R2 + Midtrans credentials, and the real MyArchitectAI key.
-Render execution is currently inline in the request; a `render_jobs` queue/worker
-can take over for heavier async providers later.
+(`RESEND_API_KEY`), R2 + Midtrans + MyArchitectAI credentials. Render execution
+is inline in the request; a `render_jobs` queue/worker can take over later.
 
 > **Catatan provider AI:** PRD menyebut "MyArchitectAI API". Perlu diverifikasi
 > apakah API publiknya tersedia; arsitektur provider/adapter (PRD §6.1)

@@ -1,24 +1,7 @@
 import { env } from "@/env";
+import { createMidtransProvider } from "./midtrans";
+import { createMockPaymentProvider } from "./mock";
 import type { PaymentProvider } from "./types";
-
-/**
- * Midtrans provider stub. Snap transaction + webhook verification are wired in
- * Phase 4. Interface and env are in place so the payment flow can drop in.
- */
-function createMidtransProvider(): PaymentProvider {
-  return {
-    name: "midtrans",
-    async createPayment() {
-      if (!env.MIDTRANS_SERVER_KEY) {
-        throw new Error("MIDTRANS_SERVER_KEY belum dikonfigurasi");
-      }
-      throw new Error("Midtrans createPayment belum diimplementasi (Phase 4).");
-    },
-    async verifyAndParseWebhook() {
-      throw new Error("Midtrans webhook belum diimplementasi (Phase 4).");
-    },
-  };
-}
 
 let cached: PaymentProvider | null = null;
 
@@ -28,6 +11,9 @@ export function paymentProvider(): PaymentProvider {
   switch (env.PAYMENT_PROVIDER) {
     case "midtrans":
       cached = createMidtransProvider();
+      break;
+    case "mock":
+      cached = createMockPaymentProvider();
       break;
     case "doku":
       throw new Error("DOKU provider belum diimplementasi (Phase 7).");
@@ -41,4 +27,5 @@ export type {
   PaymentProvider,
   CreatePaymentInput,
   NormalizedWebhook,
+  WebhookRequest,
 } from "./types";

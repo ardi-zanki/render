@@ -1,10 +1,11 @@
 import { asc, eq } from "drizzle-orm";
-import { Check } from "lucide-react";
+import { Check, Gem } from "lucide-react";
 import type { Metadata } from "next";
+import Script from "next/script";
 
+import { BuyButton } from "@/components/app/buy-button";
 import { PageHeader } from "@/components/app/page-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -14,28 +15,66 @@ import {
 } from "@/components/ui/card";
 import { db } from "@/db";
 import { paymentPackages } from "@/db/schema";
+import { env } from "@/env";
+import { getBalance } from "@/lib/credits";
+import { listPayments } from "@/lib/payments/service";
+import type { BadgeVariant } from "@/lib/renders/labels";
+import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Pembayaran" };
 
 const idr = new Intl.NumberFormat("id-ID");
+const dateFmt = new Intl.DateTimeFormat("id-ID", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
+const PAY_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
+  paid: { label: "Lunas", variant: "success" },
+  pending: { label: "Menunggu", variant: "warning" },
+  failed: { label: "Gagal", variant: "destructive" },
+  expired: { label: "Kedaluwarsa", variant: "secondary" },
+  cancelled: { label: "Batal", variant: "secondary" },
+  refunded: { label: "Refund", variant: "info" },
+};
 
 export default async function PaymentsPage() {
-  const packages = await db.query.paymentPackages.findMany({
-    where: eq(paymentPackages.isActive, true),
-    orderBy: asc(paymentPackages.sortOrder),
-  });
+  const { user } = await requireVerifiedUser();
+  const [packages, balance, history] = await Promise.all([
+    db.query.paymentPackages.findMany({
+      where: eq(paymentPackages.isActive, true),
+      orderBy: asc(paymentPackages.sortOrder),
+    }),
+    getBalance(user.id),
+    listPayments(user.id),
+  ]);
+
+  const snapEnabled =
+    env.PAYMENT_PROVIDER === "midtrans" && !!env.MIDTRANS_CLIENT_KEY;
+  const snapUrl = env.MIDTRANS_IS_PRODUCTION
+    ? "https://app.midtrans.com/snap/snap.js"
+    : "https://app.sandbox.midtrans.com/snap/snap.js";
 
   return (
     <>
+      {snapEnabled && (
+        <Script
+          src={snapUrl}
+          data-client-key={env.MIDTRANS_CLIENT_KEY}
+          strategy="afterInteractive"
+        />
+      )}
+
       <PageHeader
         title="Beli Kredit"
-        description="Pilih paket kredit untuk terus berkarya. 1 kredit = 1 render."
+        description={`Sisa kredit kamu: ${idr.format(balance)}. 1 kredit = 1 render.`}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {packages.map((pkg) => {
           const featured = pkg.slug === "creator";
-          const perCredit = Math.round(pkg.price / pkg.credits);
+          const total = pkg.credits + pkg.bonusCredits;
+          const perCredit = Math.round(pkg.price / total);
           return (
             <Card
               key={pkg.id}
@@ -47,8 +86,11 @@ export default async function PaymentsPage() {
                   {featured && <Badge>Populer</Badge>}
                 </div>
                 <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <Check className="size-4 text-success" />
-                  {idr.format(pkg.credits)} kredit
+                  <Gem className="size-4 text-primary" />
+                  {idr.format(total)} kredit
+                  {pkg.bonusCredits > 0 && (
+                    <span className="text-success">+{pkg.bonusCredits} bonus</span>
+                  )}
                 </p>
               </CardHeader>
               <CardContent className="flex flex-col gap-1">
@@ -60,26 +102,61 @@ export default async function PaymentsPage() {
                     {idr.format(pkg.price)}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  ≈ Rp{idr.format(perCredit)} / render
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Check className="size-3 text-success" /> ≈ Rp
+                  {idr.format(perCredit)} / render
                 </p>
               </CardContent>
-              <CardFooter className="flex-col items-stretch gap-2">
-                <Button
-                  variant={featured ? "default" : "outline"}
-                  disabled
-                  className="w-full"
-                >
-                  Beli Paket
-                </Button>
-                <p className="text-center text-[11px] text-muted-foreground">
-                  Pembayaran via Midtrans (Phase 4)
-                </p>
+              <CardFooter>
+                <BuyButton slug={pkg.slug} featured={featured} />
               </CardFooter>
             </Card>
           );
         })}
       </div>
+
+      <section className="mt-10">
+        <h2 className="mb-3 text-lg font-bold text-foreground">
+          Riwayat Transaksi
+        </h2>
+        {history.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
+            Belum ada transaksi.
+          </p>
+        ) : (
+          <Card className="overflow-hidden p-0">
+            <div className="divide-y divide-border">
+              {history.map((p) => {
+                const s = PAY_STATUS[p.status] ?? {
+                  label: p.status,
+                  variant: "secondary" as BadgeVariant,
+                };
+                return (
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between gap-3 px-4 py-3"
+                  >
+                    <div className="flex min-w-0 flex-col">
+                      <span className="truncate text-sm font-semibold text-foreground">
+                        {p.packageName} · {idr.format(p.credits)} kredit
+                      </span>
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {p.orderId} · {dateFmt.format(p.createdAt)}
+                      </span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-3">
+                      <span className="text-sm font-semibold tabular-nums">
+                        Rp{idr.format(p.amount)}
+                      </span>
+                      <Badge variant={s.variant}>{s.label}</Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+      </section>
     </>
   );
 }

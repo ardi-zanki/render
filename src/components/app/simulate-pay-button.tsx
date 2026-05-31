@@ -1,0 +1,56 @@
+"use client";
+
+import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+
+/** Dev-only: simulate a Midtrans notification by posting to our webhook. */
+export function SimulatePayButton({ orderId }: { orderId: string }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState<"pay" | "fail" | null>(null);
+
+  async function notify(transactionStatus: string, redirectStatus: string) {
+    setLoading(transactionStatus === "settlement" ? "pay" : "fail");
+    await fetch("/api/payments/webhook", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        order_id: orderId,
+        transaction_status: transactionStatus,
+        status_code: "200",
+        gross_amount: "0",
+        transaction_id: `mock-${Date.now()}`,
+      }),
+    });
+    router.push(`/payments/finish?status=${redirectStatus}`);
+    router.refresh();
+  }
+
+  return (
+    <div className="flex flex-col gap-2 sm:flex-row">
+      <Button
+        onClick={() => notify("settlement", "success")}
+        disabled={loading !== null}
+        className="flex-1"
+      >
+        {loading === "pay" ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <CheckCircle2 />
+        )}
+        Bayar Sekarang (simulasi)
+      </Button>
+      <Button
+        variant="outline"
+        onClick={() => notify("expire", "failed")}
+        disabled={loading !== null}
+        className="flex-1"
+      >
+        {loading === "fail" ? <Loader2 className="animate-spin" /> : <XCircle />}
+        Batalkan
+      </Button>
+    </div>
+  );
+}
