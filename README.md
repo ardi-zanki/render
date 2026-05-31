@@ -128,18 +128,48 @@ credits + "Project Saya". Forms use the `authClient` (`signUp`, `signIn`,
 
 > Dev demo account (already verified): **demo@renderai.test** / `rahasia123`.
 
+## Render core & Rendr Studio (Phase 2)
+
+The render pipeline (`src/lib/renders/service.ts`) is: check balance → create
+render row → deduct credit (idempotent) → store original → call AI provider →
+persist result asset → mark success. On failure the render is marked failed and
+the credit is refunded. Entry point: `POST /api/renders` (multipart upload).
+
+- **Rendr Studio** (`/renders/new`) — the workspace: mode (Interior/Exterior/
+  Style Transfer/Upscale), style, location, time & weather, image upload,
+  instruction, **Gass Render!**, before/after view, download, and a scene grid.
+- **Riwayat Render** (`/renders`) and **Project** (`/projects`) show real data;
+  the dashboard lists recent renders.
+
+**AI provider** (`src/lib/providers/ai/`): `myarchitectai` implements the real
+API (`POST https://api.myarchitectai.com/v1/render/{interior,exterior}` etc.,
+`x-api-key` header, `{ image: <public url>, prompt, outputFormat }` → `{ output }`;
+outputs are fetched immediately since the CDN expires them in ~5 min). A `mock`
+provider (sharp-based) and a `local` storage provider make the full flow
+testable locally without any cloud credentials. Dev defaults: `AI_PROVIDER=mock`,
+`STORAGE_PROVIDER=local`. For production set `AI_PROVIDER=myarchitectai` +
+`MYARCHITECTAI_API_KEY` and `STORAGE_PROVIDER=r2` + R2 creds.
+
+```bash
+pnpm smoke:render   # render pipeline test (credit, storage, provider, assets)
+```
+
+> **Port:** the dev server runs on **3210** (`pnpm dev`) because port 3000 is
+> used by another local project; `APP_URL`/`BETTER_AUTH_URL` match it.
+
 ## Status & langkah berikutnya
 
 - [x] **Phase 1a** — Scaffold + design system + dark mode
 - [x] **Phase 1b** — Better Auth, PostgreSQL/Drizzle, R2, Resend, rate limiter, JWT
 - [x] **Auth UI + dashboard** — login/register/verify/reset, app shell, dashboard
-- [ ] Phase 2 — Project & Render core (incl. layar "Rendr Studio") + MyArchitectAI provider
-- [ ] Phase 3–5 — Credit purchase, Payment (Midtrans), Admin
+- [x] **Phase 2** — Project & Render core, Rendr Studio, MyArchitectAI provider
+- [ ] Phase 3 — Credit purchase + Payment (Midtrans webhook → add credits)
+- [ ] Phase 4–5 — Notifications, Admin, account settings
 
-Still stubbed (intentionally, by phase): Google OAuth needs real
-`GOOGLE_CLIENT_*`; email sending needs `RESEND_API_KEY` (otherwise links print
-to the dev console); R2/Midtrans/MyArchitectAI need credentials and their
-provider implementations are filled in their phases.
+Still stubbed (by phase): Google OAuth (`GOOGLE_CLIENT_*`), email sending
+(`RESEND_API_KEY`), R2 + Midtrans credentials, and the real MyArchitectAI key.
+Render execution is currently inline in the request; a `render_jobs` queue/worker
+can take over for heavier async providers later.
 
 > **Catatan provider AI:** PRD menyebut "MyArchitectAI API". Perlu diverifikasi
 > apakah API publiknya tersedia; arsitektur provider/adapter (PRD §6.1)

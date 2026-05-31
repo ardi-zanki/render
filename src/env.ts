@@ -43,7 +43,7 @@ const schema = z.object({
   ADMIN_SESSION_MAX_AGE: z.coerce.number().int().default(43200),
   SENSITIVE_ACTION_MAX_AGE: z.coerce.number().int().default(900),
 
-  STORAGE_PROVIDER: z.enum(["r2"]).default("r2"),
+  STORAGE_PROVIDER: z.enum(["r2", "local"]).default("r2"),
   R2_ACCOUNT_ID: optional,
   R2_ACCESS_KEY_ID: optional,
   R2_SECRET_ACCESS_KEY: optional,
@@ -63,7 +63,9 @@ const schema = z.object({
   DOKU_MERCHANT_ID: optional,
   DOKU_ENV: z.enum(["sandbox", "production"]).default("sandbox"),
 
-  AI_PROVIDER: z.enum(["myarchitectai", "openai"]).default("myarchitectai"),
+  AI_PROVIDER: z
+    .enum(["myarchitectai", "openai", "mock"])
+    .default("myarchitectai"),
   MYARCHITECTAI_API_KEY: optional,
   OPENAI_API_KEY: optional,
   OPENAI_IMAGE_MODEL: optional,

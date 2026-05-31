@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { createMockAiProvider } from "./mock";
 import { createMyArchitectAiProvider } from "./myarchitectai";
 import type { AiProvider } from "./types";
 
@@ -11,6 +12,9 @@ export function aiProvider(): AiProvider {
     case "myarchitectai":
       cached = createMyArchitectAiProvider();
       break;
+    case "mock":
+      cached = createMockAiProvider();
+      break;
     case "openai":
       throw new Error("OpenAI image provider belum diimplementasi (Phase 7).");
     default:
@@ -19,4 +23,9 @@ export function aiProvider(): AiProvider {
   return cached;
 }
 
-export type { AiProvider, AiRenderInput, AiRenderResult } from "./types";
+export {
+  AiProviderError,
+  type AiProvider,
+  type AiRenderInput,
+  type AiRenderResult,
+} from "./types";

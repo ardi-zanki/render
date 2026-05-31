@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import type { RenderAssetType } from "@/db/schema";
+import { createLocalProvider } from "./local";
 import { createR2Provider } from "./r2";
 import type { StorageProvider } from "./types";
 
@@ -11,6 +12,9 @@ export function storage(): StorageProvider {
   switch (env.STORAGE_PROVIDER) {
     case "r2":
       cached = createR2Provider();
+      break;
+    case "local":
+      cached = createLocalProvider();
       break;
     default:
       throw new Error(`Storage provider tidak didukung: ${env.STORAGE_PROVIDER}`);

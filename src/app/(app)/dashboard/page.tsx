@@ -12,12 +12,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
+import { RenderImage } from "@/components/app/render-image";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { db } from "@/db";
 import { projects, renders } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
+import { STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
+import { listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -28,8 +32,14 @@ export default async function DashboardPage() {
   const session = await requireVerifiedUser();
   const uid = session.user.id;
 
-  const [balance, renderCount, successCount, projectCount, recentProjects] =
-    await Promise.all([
+  const [
+    balance,
+    renderCount,
+    successCount,
+    projectCount,
+    recentProjects,
+    recentRenders,
+  ] = await Promise.all([
       getBalance(uid),
       db
         .select({ value: count() })
@@ -58,6 +68,7 @@ export default async function DashboardPage() {
         orderBy: desc(projects.updatedAt),
         limit: 4,
       }),
+      listRenders(uid, { limit: 6 }),
     ]);
 
   const firstName = session.user.name.split(" ")[0];
@@ -163,18 +174,42 @@ export default async function DashboardPage() {
             Lihat semua
           </Link>
         </div>
-        <EmptyState
-          icon={ImageIcon}
-          title="Belum ada render"
-          description="Render pertamamu akan muncul di sini. Yuk mulai sekarang."
-          action={
-            <Button asChild>
-              <Link href="/renders/new">
-                <Plus /> Buat Render
-              </Link>
-            </Button>
-          }
-        />
+        {recentRenders.length === 0 ? (
+          <EmptyState
+            icon={ImageIcon}
+            title="Belum ada render"
+            description="Render pertamamu akan muncul di sini. Yuk mulai sekarang."
+            action={
+              <Button asChild>
+                <Link href="/renders/new">
+                  <Plus /> Buat Render
+                </Link>
+              </Button>
+            }
+          />
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            {recentRenders.map((r) => {
+              const thumb = r.resultUrl ?? r.originalUrl;
+              return (
+                <div
+                  key={r.id}
+                  className="relative aspect-square overflow-hidden rounded-xl border border-border bg-muted"
+                >
+                  {thumb && (
+                    <RenderImage src={thumb} alt={r.mode} className="size-full" />
+                  )}
+                  <Badge
+                    variant={statusBadgeVariant(r.status)}
+                    className="absolute left-1.5 top-1.5"
+                  >
+                    {STATUS_LABEL[r.status] ?? r.status}
+                  </Badge>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Projects */}

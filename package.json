@@ -3,16 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3210",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --port 3210",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx --env-file=.env.local src/db/seed.ts",
-    "smoke:auth": "tsx --env-file=.env.local scripts/smoke-auth.ts"
+    "smoke:auth": "tsx --env-file=.env.local scripts/smoke-auth.ts",
+    "smoke:render": "tsx --env-file=.env.local scripts/smoke-render.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1057.0",
@@ -30,6 +31,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.12.4",
+    "sharp": "^0.34.5",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
   },
