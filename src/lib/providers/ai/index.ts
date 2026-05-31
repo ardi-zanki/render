@@ -1,0 +1,22 @@
+import { env } from "@/env";
+import { createMyArchitectAiProvider } from "./myarchitectai";
+import type { AiProvider } from "./types";
+
+let cached: AiProvider | null = null;
+
+/** The active AI render provider (PRD §6.1). */
+export function aiProvider(): AiProvider {
+  if (cached) return cached;
+  switch (env.AI_PROVIDER) {
+    case "myarchitectai":
+      cached = createMyArchitectAiProvider();
+      break;
+    case "openai":
+      throw new Error("OpenAI image provider belum diimplementasi (Phase 7).");
+    default:
+      throw new Error(`AI provider tidak didukung: ${env.AI_PROVIDER}`);
+  }
+  return cached;
+}
+
+export type { AiProvider, AiRenderInput, AiRenderResult } from "./types";

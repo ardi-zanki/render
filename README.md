@@ -1,0 +1,146 @@
+# RenderAI
+
+Platform SaaS render arsitektur berbasis AI untuk pasar Indonesia. Brand &
+UX terinspirasi **Vrendr**, fungsionalitas mengacu **MyArchitectAI**. Lihat
+PRD lengkap di `../RenderAI_PRD_Final/`.
+
+> Upload gambar desain, pilih mode render, dan dapatkan visual arsitektur
+> realistis dalam hitungan detik.
+
+## Tech stack
+
+| Layer        | Teknologi                                          |
+| ------------ | -------------------------------------------------- |
+| Package mgr  | pnpm 11.5                                           |
+| Framework    | Next.js 16.2.6 (App Router, Turbopack)             |
+| UI runtime   | React 19.2                                          |
+| Language     | TypeScript 5.9                                      |
+| CSS          | Tailwind CSS v4                                     |
+| UI primitive | `@base-ui/react` 1.5                               |
+| Komponen     | Pola Shadcn (custom, di `components/ui`)            |
+| Ikon         | `lucide-react` 1.17                                |
+| Tema         | `next-themes` (light/dark, class-based)            |
+| Font         | Plus Jakarta Sans (teks) · Geist Mono (angka/kode) |
+
+Stack lengkap (auth, DB, storage, payment, AI provider) ada di PRD §5.
+
+## Menjalankan
+
+```bash
+pnpm install   # sekali; build script sharp diizinkan via pnpm-workspace.yaml
+pnpm dev       # http://localhost:3000
+pnpm build     # build produksi
+pnpm lint      # eslint
+```
+
+Dari folder induk (`RumAI/`): `pnpm --dir renderai dev`.
+
+## Design system
+
+Halaman beranda (`src/app/page.tsx`) saat ini adalah **showcase brand kit** —
+warna, tipografi, tombol, badge, form, kartu mode render, dan kartu harga.
+
+### Token warna (`src/app/globals.css`)
+
+Semua warna didefinisikan sebagai CSS variable di `:root` (light) dan `.dark`,
+lalu dipetakan ke utility Tailwind via `@theme inline`. Token utama:
+
+- **Brand:** `--primary` navy `#1B2A5E` (dark mode `#3A4F94`) · `--brand-violet` (aksen AI) · `--foreground` ink
+- **Permukaan:** `--background`, `--card`, `--muted`, `--border`
+- **Semantik:** `--success`, `--warning`, `--destructive`, `--info`
+
+Gunakan via kelas: `bg-primary`, `text-foreground`, `border-border`, dll.
+Mode gelap mengikuti kelas `.dark` (di-set `next-themes`) — tidak perlu
+menulis ulang warna, cukup pakai token.
+
+### Komponen
+
+```
+src/components/
+  ui/        button · card · input · textarea · label · badge ·
+             separator · slot · mode-toggle
+  brand/     logo (mark + wordmark) · credit-pill
+  theme-provider.tsx
+src/lib/utils.ts   # cn() — clsx + tailwind-merge
+```
+
+Tombol `<Button>` default berbentuk pill (radius penuh) sesuai gaya Vrendr;
+varian: `default` (navy), `inverse` (ink, auto-adaptif tema), `secondary`,
+`outline`, `ghost`, `destructive`, `link`. Dukung `asChild` untuk render
+sebagai `<Link>`.
+
+## Backend foundation (Phase 1b)
+
+```
+src/
+  env.ts                 # Zod-validated env (core required, creds optional)
+  db/
+    schema/{auth,app}.ts # Drizzle schema — full ERD (18 tables)
+    index.ts             # postgres-js + drizzle client
+    seed.ts              # payment_packages seed (PRD §23.2)
+  lib/
+    auth.ts              # Better Auth: email/pw + Google, verification, sessions
+    auth-client.ts       # client SDK
+    session.ts           # requireUser / requireVerifiedUser / requireAdmin
+    credits.ts           # idempotent credit ledger (row-locked, never negative)
+    provisioning.ts      # profile + balance + default project + 3 free credits
+    jwt.ts               # jose tokens w/ single-use auth_tokens (PRD §11)
+    rate-limit.ts        # DB-backed limiter, all PRD §12 rules
+    email/               # provider layer + Resend + templates + email_logs
+    storage/             # provider layer + R2 (S3) + render asset key builder
+    providers/{ai,payment}/  # adapter interfaces + stubs (wired Phase 2/4)
+    validations/auth.ts  # Zod schemas (Bahasa Indonesia errors)
+  proxy.ts               # edge auth guard for protected routes (Next 16 convention)
+  app/api/auth/[...all]/ # Better Auth route handler
+```
+
+Database commands:
+
+```bash
+pnpm db:generate   # create migration from schema
+pnpm db:migrate    # apply migrations
+pnpm db:seed       # seed credit packages
+pnpm db:studio     # Drizzle Studio
+pnpm smoke:auth    # runtime test: signup → provisioning → credits → rate limit
+```
+
+Auth wiring: a new user gets a profile, a 0 credit balance, and a default
+project ("Project Saya") on creation; the **3 free credits** are granted
+(idempotently) once the email is verified — or immediately for Google OAuth
+users (already verified). Without `RESEND_API_KEY`, verification/reset links
+are printed to the dev console instead of emailed.
+
+## Auth & app UI
+
+Working pages on top of the Phase 1b backend:
+
+- **Public:** `/` (landing), `/design-system` (brand kit), `/login`,
+  `/register`, `/forgot-password`, `/reset-password`, `/verify-email`.
+- **Protected** (app shell w/ sidebar + topbar): `/dashboard` (real data —
+  credit balance, counts, default project), `/payments` (live credit packages
+  from DB), and stubs for `/projects`, `/renders`, `/renders/new`,
+  `/notifications`, `/settings`.
+
+Full flow works in the browser: register → (dev: verification link printed to
+the server console) → click link → auto sign-in → dashboard shows the 3 free
+credits + "Project Saya". Forms use the `authClient` (`signUp`, `signIn`,
+`requestPasswordReset`, `resetPassword`, `sendVerificationEmail`, `signOut`).
+
+> Dev demo account (already verified): **demo@renderai.test** / `rahasia123`.
+
+## Status & langkah berikutnya
+
+- [x] **Phase 1a** — Scaffold + design system + dark mode
+- [x] **Phase 1b** — Better Auth, PostgreSQL/Drizzle, R2, Resend, rate limiter, JWT
+- [x] **Auth UI + dashboard** — login/register/verify/reset, app shell, dashboard
+- [ ] Phase 2 — Project & Render core (incl. layar "Rendr Studio") + MyArchitectAI provider
+- [ ] Phase 3–5 — Credit purchase, Payment (Midtrans), Admin
+
+Still stubbed (intentionally, by phase): Google OAuth needs real
+`GOOGLE_CLIENT_*`; email sending needs `RESEND_API_KEY` (otherwise links print
+to the dev console); R2/Midtrans/MyArchitectAI need credentials and their
+provider implementations are filled in their phases.
+
+> **Catatan provider AI:** PRD menyebut "MyArchitectAI API". Perlu diverifikasi
+> apakah API publiknya tersedia; arsitektur provider/adapter (PRD §6.1)
+> memudahkan ganti ke Replicate / fal.ai / OpenAI image bila perlu.
