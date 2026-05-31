@@ -13,10 +13,13 @@ import {
   getBalance,
   InsufficientCreditsError,
 } from "@/lib/credits";
+import { renderResultEmail } from "@/lib/email";
+import { createNotification, notifyUser } from "@/lib/notifications/service";
 import { aiProvider } from "@/lib/providers/ai";
 import { renderAssetKey, storage } from "@/lib/storage";
 
 export const RENDER_COST = 1;
+const LOW_CREDIT_THRESHOLD = 3;
 
 export interface UploadedFile {
   data: Buffer;
@@ -70,7 +73,7 @@ export async function createRender(
     })
     .returning();
 
-  await applyCreditChange({
+  const deduction = await applyCreditChange({
     userId,
     type: "usage",
     amount: -RENDER_COST,
@@ -200,6 +203,28 @@ export async function createRender(
       .set({ coverImageUrl: firstResultUrl, updatedAt: new Date() })
       .where(and(eq(projects.id, projectId), isNull(projects.coverImageUrl)));
 
+    await notifyUser({
+      userId,
+      type: "render_success",
+      title: "Renderan kamu sudah jadi! 🎉",
+      message: `Render ${mode} berhasil diproses.`,
+      actionUrl: "/renders",
+      email: renderResultEmail({
+        success: true,
+        url: `${env.APP_URL.replace(/\/$/, "")}/renders`,
+      }),
+    });
+
+    if (deduction.applied && deduction.balance <= LOW_CREDIT_THRESHOLD) {
+      await createNotification({
+        userId,
+        type: "low_credit",
+        title: "Kredit kamu menipis",
+        message: `Sisa kredit kamu tinggal ${deduction.balance}. Yuk top up.`,
+        actionUrl: "/payments",
+      });
+    }
+
     return {
       renderId: render.id,
       status: "success",
@@ -231,6 +256,18 @@ export async function createRender(
       description: "Refund render gagal",
       renderId: render.id,
       idempotencyKey: `render-refund:${render.id}`,
+    });
+
+    await notifyUser({
+      userId,
+      type: "render_failed",
+      title: "Render gagal diproses",
+      message: "Kredit kamu sudah dikembalikan. Silakan coba lagi.",
+      actionUrl: "/renders/new",
+      email: renderResultEmail({
+        success: false,
+        url: `${env.APP_URL.replace(/\/$/, "")}/renders/new`,
+      }),
     });
 
     throw err;

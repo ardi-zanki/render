@@ -71,3 +71,35 @@ export function resetPasswordEmail(params: { name?: string; url: string }) {
     }),
   };
 }
+
+export function renderResultEmail(params: {
+  success: boolean;
+  url: string;
+}) {
+  return {
+    subject: params.success
+      ? "Renderan kamu sudah jadi! 🎉"
+      : "Render kamu gagal diproses",
+    html: layout({
+      heading: params.success ? "Renderan kamu sudah jadi!" : "Render gagal",
+      body: params.success
+        ? "Visual arsitektur kamu sudah selesai diproses. Klik untuk melihat & download hasilnya."
+        : "Maaf, render kamu gagal diproses dan <b>kredit sudah dikembalikan</b>. Silakan coba lagi.",
+      cta: {
+        label: params.success ? "Lihat Hasil" : "Coba Lagi",
+        url: params.url,
+      },
+    }),
+  };
+}
+
+export function paymentSuccessEmail(params: { credits: number; url: string }) {
+  return {
+    subject: "Pembayaran berhasil — kredit ditambahkan",
+    html: layout({
+      heading: "Pembayaran berhasil!",
+      body: `<b>${params.credits} kredit</b> sudah ditambahkan ke akun kamu. Yuk lanjut bikin render.`,
+      cta: { label: "Mulai Render", url: params.url },
+    }),
+  };
+}

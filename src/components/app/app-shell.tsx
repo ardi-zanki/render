@@ -16,12 +16,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
+import { NotificationBell } from "@/components/app/notification-bell";
 import { CreditPill } from "@/components/brand/credit-pill";
 import { Logo } from "@/components/brand/logo";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { signOut } from "@/lib/auth-client";
+import type { NotificationItem } from "@/lib/notifications/ui";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -42,10 +44,14 @@ type AppUser = {
 export function AppShell({
   user,
   balance,
+  unreadCount,
+  notifications,
   children,
 }: {
   user: AppUser;
   balance: number;
+  unreadCount: number;
+  notifications: NotificationItem[];
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -104,6 +110,11 @@ export function AppShell({
             >
               <item.icon className="size-4 shrink-0" />
               {item.label}
+              {item.href === "/notifications" && unreadCount > 0 && (
+                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -165,6 +176,7 @@ export function AppShell({
           </div>
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <CreditPill balance={balance} />
+            <NotificationBell initialUnread={unreadCount} items={notifications} />
             <ModeToggle />
           </div>
         </header>

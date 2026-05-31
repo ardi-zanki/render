@@ -6,6 +6,8 @@ import { db } from "@/db";
 import { paymentPackages, payments } from "@/db/schema";
 import { env } from "@/env";
 import { applyCreditChange } from "@/lib/credits";
+import { paymentSuccessEmail } from "@/lib/email";
+import { notifyUser } from "@/lib/notifications/service";
 import {
   paymentProvider,
   type NormalizedWebhook,
@@ -124,6 +126,18 @@ export async function handlePaymentNotification(webhook: NormalizedWebhook) {
       description: `Pembelian ${payment.creditsAdded} kredit`,
       paymentId: payment.id,
       idempotencyKey: `payment:${payment.id}`,
+    });
+
+    await notifyUser({
+      userId: payment.userId,
+      type: "payment_success",
+      title: "Pembayaran berhasil 🎉",
+      message: `${payment.creditsAdded} kredit sudah ditambahkan ke akunmu.`,
+      actionUrl: "/payments",
+      email: paymentSuccessEmail({
+        credits: payment.creditsAdded,
+        url: `${env.APP_URL.replace(/\/$/, "")}/renders/new`,
+      }),
     });
 
     return { handled: true, reason: "paid" as const };

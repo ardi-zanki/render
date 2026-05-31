@@ -182,6 +182,20 @@ For production set `PAYMENT_PROVIDER=midtrans` + `MIDTRANS_SERVER_KEY` /
 pnpm smoke:payment   # checkout → webhook → idempotent top-up
 ```
 
+## Notifications & account settings (Phase 4)
+
+- **Notifications** (`src/lib/notifications/service.ts`): `notifyUser` writes an
+  in-app `notifications` row and, gated by
+  `user_profiles.emailNotificationsEnabled`, sends an email (never throws —
+  notifications can't break the originating flow). Wired into the render flow
+  (success / failed / low-credit) and payment flow (success). UI: a topbar bell
+  with unread badge + panel (mark read / mark all), a `/notifications` page, and
+  `POST /api/notifications/read`.
+- **Account settings** (`/settings`): edit profile (name via Better Auth
+  `updateUser`, display name in `user_profiles`), preferences (email
+  notifications, default render mode/format) via server actions, and change
+  password via Better Auth `changePassword`.
+
 ## Status & langkah berikutnya
 
 - [x] **Phase 1a** — Scaffold + design system + dark mode
@@ -189,8 +203,8 @@ pnpm smoke:payment   # checkout → webhook → idempotent top-up
 - [x] **Auth UI + dashboard** — login/register/verify/reset, app shell, dashboard
 - [x] **Phase 2** — Project & Render core, Rendr Studio, MyArchitectAI provider
 - [x] **Phase 3** — Credit purchase + Midtrans payment (Snap + webhook)
-- [ ] Phase 4 — Notifications (in-app + email), account settings (edit profile/password)
-- [ ] Phase 5 — Admin (users, renders, audit log)
+- [x] **Phase 4** — Notifications (in-app + email) + account settings
+- [ ] Phase 5 — Admin (users, renders, payments, audit log)
 
 Still stubbed (by phase): Google OAuth (`GOOGLE_CLIENT_*`), email sending
 (`RESEND_API_KEY`), R2 + Midtrans + MyArchitectAI credentials. Render execution
