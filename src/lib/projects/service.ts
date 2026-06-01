@@ -36,6 +36,17 @@ export async function listProjects(
   });
 }
 
+export const MAX_PROJECTS = 10;
+
+/** Count a user's non-deleted projects (active + archived). */
+export async function countProjects(userId: string) {
+  const [row] = await db
+    .select({ value: count() })
+    .from(projects)
+    .where(and(eq(projects.userId, userId), isNull(projects.deletedAt)));
+  return row.value;
+}
+
 export async function getProject(userId: string, projectId: string) {
   return db.query.projects.findFirst({
     where: and(

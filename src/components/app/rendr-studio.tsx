@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { RenderImage } from "@/components/app/render-image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -112,7 +113,12 @@ export function RendrStudio({
       body: JSON.stringify({ name: name.trim() }),
     });
     const json = await res.json();
-    if (res.ok && json.id) router.push(`/renders/new?project=${json.id}`);
+    if (res.ok && json.id) {
+      toast.success("Project dibuat");
+      router.push(`/renders/new?project=${json.id}`);
+    } else {
+      toast.error(json.error ?? "Gagal membuat project");
+    }
   }
 
   const [mode, setMode] = useState<RenderMode>("interior");
@@ -183,6 +189,7 @@ export function RendrStudio({
         { id: json.renderId, mode, status: "success", resultUrl: json.resultUrl },
         ...s,
       ]);
+      toast.success("Render selesai!");
       router.refresh();
     } catch {
       setError("Tidak bisa terhubung ke server. Coba lagi.");

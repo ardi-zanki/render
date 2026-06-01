@@ -1,7 +1,8 @@
 "use client";
 
 import { Check, Loader2 } from "lucide-react";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { PasswordInput } from "@/components/auth/password-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -42,6 +43,9 @@ export function ProfileForm({
     updateProfileAction,
     initial,
   );
+  useEffect(() => {
+    if (state.ok) toast.success("Profil diperbarui");
+  }, [state]);
   return (
     <form action={action} className="flex flex-col gap-4">
       {state.error && (
@@ -89,6 +93,9 @@ export function PreferencesForm({
     updatePreferencesAction,
     initial,
   );
+  useEffect(() => {
+    if (state.ok) toast.success("Preferensi disimpan");
+  }, [state]);
   return (
     <form action={action} className="flex flex-col gap-4">
       {state.error && (
@@ -178,6 +185,7 @@ export function PasswordForm() {
     }
     setValues({ currentPassword: "", newPassword: "", confirmPassword: "" });
     setDone(true);
+    toast.success("Password berhasil diganti");
   }
 
   return (

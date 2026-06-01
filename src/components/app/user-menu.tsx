@@ -83,7 +83,7 @@ export function UserMenu({ user }: { user: MenuUser }) {
               onClick={() => setOpen(false)}
               className={itemClass}
             >
-              <Gem /> Topup Kredit
+              <Gem /> Topup
             </Link>
             <button
               type="button"
@@ -100,7 +100,7 @@ export function UserMenu({ user }: { user: MenuUser }) {
               onClick={() => setOpen(false)}
               className={itemClass}
             >
-              <Settings /> Pengaturan Akun
+              <Settings /> Pengaturan
             </Link>
             <a
               href={WA_SUPPORT}

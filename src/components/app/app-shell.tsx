@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: Home },
   { label: "Project", href: "/projects", icon: FolderOpen },
-  { label: "Riwayat Render", href: "/renders", icon: ImageIcon },
+  { label: "Riwayat", href: "/renders", icon: ImageIcon },
   { label: "Pembayaran", href: "/payments", icon: CreditCard },
 ];
 

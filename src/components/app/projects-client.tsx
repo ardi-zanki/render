@@ -15,12 +15,14 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { RenderImage } from "@/components/app/render-image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,6 +49,10 @@ export type ProjectRow = {
 const dateFmt = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" });
 
 type ModalState = { mode: "create" | "edit"; project?: ProjectRow } | null;
+type ConfirmState = {
+  kind: "archive" | "unarchive" | "delete";
+  project: ProjectRow;
+} | null;
 
 function ProjectFormModal({
   state,
@@ -80,6 +86,7 @@ function ProjectFormModal({
       setError(res.error);
       return;
     }
+    toast.success(isEdit ? "Project diperbarui" : "Project dibuat");
     onClose();
     router.refresh();
   }
@@ -147,6 +154,27 @@ function ProjectFormModal({
 const menuItem =
   "flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
+const CONFIRM_COPY = {
+  archive: {
+    title: "Arsipkan project?",
+    confirmLabel: "Arsipkan",
+    note: "akan diarsipkan. Render di dalamnya tetap tersimpan.",
+    success: "Project diarsipkan",
+  },
+  unarchive: {
+    title: "Pulihkan project?",
+    confirmLabel: "Pulihkan",
+    note: "akan dikembalikan ke daftar aktif.",
+    success: "Project dipulihkan",
+  },
+  delete: {
+    title: "Hapus project?",
+    confirmLabel: "Hapus",
+    note: "akan dihapus permanen.",
+    success: "Project dihapus",
+  },
+} as const;
+
 export function ProjectsClient({
   projects,
   status,
@@ -157,8 +185,8 @@ export function ProjectsClient({
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [modal, setModal] = useState<ModalState>(null);
+  const [confirm, setConfirm] = useState<ConfirmState>(null);
   const [menuId, setMenuId] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
 
   const filtered = projects.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),
@@ -168,25 +196,23 @@ export function ProjectsClient({
     router.push(`/projects?status=${s}`);
   }
 
-  async function run(action: () => Promise<{ error?: string }>) {
-    setBusy(true);
-    const res = await action();
-    setBusy(false);
-    setMenuId(null);
+  async function runConfirm() {
+    if (!confirm) return;
+    const { kind, project } = confirm;
+    const action =
+      kind === "archive"
+        ? archiveProjectAction
+        : kind === "unarchive"
+          ? unarchiveProjectAction
+          : deleteProjectAction;
+    const res = await action(project.id);
+    setConfirm(null);
     if (res.error) {
-      window.alert(res.error);
+      toast.error(res.error);
       return;
     }
+    toast.success(CONFIRM_COPY[kind].success);
     router.refresh();
-  }
-
-  function onDelete(p: ProjectRow) {
-    if (p.renderCount > 0) {
-      window.alert("Project masih punya render, tidak bisa dihapus.");
-      return;
-    }
-    if (!window.confirm(`Hapus project "${p.name}"?`)) return;
-    void run(() => deleteProjectAction(p.id));
   }
 
   const tabClass = (active: boolean) =>
@@ -275,7 +301,6 @@ export function ProjectsClient({
                   onClick={() => setMenuId(menuId === p.id ? null : p.id)}
                   className="flex size-8 items-center justify-center rounded-full bg-card/90 text-foreground shadow-sm backdrop-blur hover:bg-card"
                   aria-label="Menu project"
-                  disabled={busy}
                 >
                   <MoreVertical className="size-4" />
                 </button>
@@ -295,31 +320,39 @@ export function ProjectsClient({
                       >
                         <Pencil /> Rename
                       </button>
-                      {status === "active"
-                        ? !p.isDefault && (
-                            <button
-                              className={menuItem}
-                              onClick={() =>
-                                void run(() => archiveProjectAction(p.id))
-                              }
-                            >
-                              <Archive /> Arsipkan
-                            </button>
-                          )
-                        : (
-                            <button
-                              className={menuItem}
-                              onClick={() =>
-                                void run(() => unarchiveProjectAction(p.id))
-                              }
-                            >
-                              <RotateCcw /> Pulihkan
-                            </button>
-                          )}
+                      {status === "active" ? (
+                        !p.isDefault && (
+                          <button
+                            className={menuItem}
+                            onClick={() => {
+                              setConfirm({ kind: "archive", project: p });
+                              setMenuId(null);
+                            }}
+                          >
+                            <Archive /> Arsipkan
+                          </button>
+                        )
+                      ) : (
+                        <button
+                          className={menuItem}
+                          onClick={() => {
+                            setConfirm({ kind: "unarchive", project: p });
+                            setMenuId(null);
+                          }}
+                        >
+                          <RotateCcw /> Pulihkan
+                        </button>
+                      )}
                       {!p.isDefault && (
                         <button
-                          className={cn(menuItem, "text-destructive [&_svg]:text-destructive")}
-                          onClick={() => onDelete(p)}
+                          className={cn(
+                            menuItem,
+                            "text-destructive [&_svg]:text-destructive",
+                          )}
+                          onClick={() => {
+                            setConfirm({ kind: "delete", project: p });
+                            setMenuId(null);
+                          }}
                           disabled={p.renderCount > 0}
                           title={
                             p.renderCount > 0
@@ -341,6 +374,17 @@ export function ProjectsClient({
 
       {modal && (
         <ProjectFormModal state={modal} onClose={() => setModal(null)} />
+      )}
+
+      {confirm && (
+        <ConfirmDialog
+          title={CONFIRM_COPY[confirm.kind].title}
+          description={`Project "${confirm.project.name}" ${CONFIRM_COPY[confirm.kind].note}`}
+          confirmLabel={CONFIRM_COPY[confirm.kind].confirmLabel}
+          destructive={confirm.kind === "delete"}
+          onConfirm={runConfirm}
+          onClose={() => setConfirm(null)}
+        />
       )}
     </>
   );

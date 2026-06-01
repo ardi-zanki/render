@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 
 import {
   archiveProject,
+  countProjects,
   createProject,
   deleteProject,
+  MAX_PROJECTS,
   unarchiveProject,
   updateProject,
 } from "@/lib/projects/service";
@@ -22,6 +24,9 @@ export async function createProjectAction(input: {
   const parsed = createProjectSchema.safeParse(input);
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Input tidak valid" };
+  }
+  if ((await countProjects(user.id)) >= MAX_PROJECTS) {
+    return { error: `Maksimal ${MAX_PROJECTS} project per akun.` };
   }
   const p = await createProject(
     user.id,

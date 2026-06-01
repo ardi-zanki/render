@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
-import { createProject } from "@/lib/projects/service";
+import {
+  countProjects,
+  createProject,
+  MAX_PROJECTS,
+} from "@/lib/projects/service";
 import { createProjectSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
@@ -18,6 +22,13 @@ export async function POST(req: Request) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Nama project tidak valid" },
+      { status: 400 },
+    );
+  }
+
+  if ((await countProjects(session.user.id)) >= MAX_PROJECTS) {
+    return NextResponse.json(
+      { error: `Maksimal ${MAX_PROJECTS} project per akun.` },
       { status: 400 },
     );
   }

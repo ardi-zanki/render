@@ -103,7 +103,7 @@ export default async function DashboardPage() {
   return (
     <>
       <PageHeader
-        title={`Halo, ${firstName} 👋`}
+        title={`Halo, ${firstName}`}
         description="Siap bikin visual arsitektur baru hari ini?"
         action={
           <Button asChild>

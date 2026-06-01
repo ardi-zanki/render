@@ -3,6 +3,7 @@
 import { Camera, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar } from "@/components/ui/avatar";
@@ -54,6 +55,7 @@ export function ProfileModal({
       setLoading(false);
       return;
     }
+    toast.success("Profil diperbarui");
     onClose();
     router.refresh();
   }
