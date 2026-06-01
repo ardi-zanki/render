@@ -31,19 +31,19 @@ export default async function AdminOverviewPage() {
       label: "Total User",
       value: idr.format(stats.users),
       icon: Users,
-      hint: `${disabled} nonaktif`,
+      hint: `${idr.format(stats.verifiedUsers)} verified · ${disabled} nonaktif`,
     },
     {
       label: "Total Render",
       value: idr.format(stats.renders),
       icon: ImageIcon,
-      hint: `${idr.format(stats.rendersSuccess)} sukses`,
+      hint: `${idr.format(stats.rendersSuccess)} sukses · ${idr.format(stats.rendersFailed)} gagal`,
     },
     {
       label: "Pendapatan",
       value: `Rp${idr.format(stats.revenue)}`,
       icon: Wallet,
-      hint: `${idr.format(stats.paidCount)} transaksi lunas`,
+      hint: `${idr.format(stats.paidCount)} lunas · ${idr.format(stats.creditSold)} kredit`,
     },
   ];
 

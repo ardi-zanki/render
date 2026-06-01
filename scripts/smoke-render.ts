@@ -14,7 +14,7 @@ import { renderAssets, renders, user } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
 import { grantSignupBonus } from "@/lib/provisioning";
 import { getDefaultProject } from "@/lib/projects/service";
-import { createRender } from "@/lib/renders/service";
+import { createRender, processRenderJob } from "@/lib/renders/service";
 
 const EMAIL = "demo@renderai.test";
 
@@ -52,11 +52,19 @@ async function main() {
     projectId: project.id,
     mode: "interior",
     prompt: "photorealistic interior, modern, golden hour",
-    original: { data: image, contentType: "image/png", ext: "png", fileName: "test.png" },
+    original: {
+      data: image,
+      contentType: "image/png",
+      ext: "png",
+      fileName: "test.png",
+      size: image.length,
+      width: 768,
+      height: 576,
+    },
   });
 
-  assert(result.status === "success", "render status success");
-  assert(!!result.resultUrl, "result URL returned");
+  assert(result.status === "queued", "render queued");
+  await processRenderJob(result.renderId, "smoke-render");
 
   const after = await getBalance(u.id);
   assert(after === before - 1, `credit deducted (${before} → ${after})`);

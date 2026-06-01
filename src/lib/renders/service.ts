@@ -1,11 +1,15 @@
-import { and, desc, eq, inArray, isNull } from "drizzle-orm";
+import sharp from "sharp";
+import { and, asc, desc, eq, inArray, isNotNull, isNull, lte } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
   projects,
   renderAssets,
+  renderJobs,
   renders,
+  type RenderAssetType,
   type RenderMode,
+  type RenderStatus,
 } from "@/db/schema";
 import { env } from "@/env";
 import {
@@ -17,16 +21,12 @@ import { renderResultEmail } from "@/lib/email";
 import { createNotification, notifyUser } from "@/lib/notifications/service";
 import { aiProvider } from "@/lib/providers/ai";
 import { renderAssetKey, storage } from "@/lib/storage";
+import type { ValidatedImageUpload } from "@/lib/uploads/images";
 
 export const RENDER_COST = 1;
 const LOW_CREDIT_THRESHOLD = 3;
 
-export interface UploadedFile {
-  data: Buffer;
-  contentType: string;
-  ext: string;
-  fileName?: string;
-}
+export type UploadedFile = ValidatedImageUpload;
 
 export interface CreateRenderParams {
   userId: string;
@@ -40,21 +40,165 @@ export interface CreateRenderParams {
 
 export interface CreateRenderResult {
   renderId: string;
-  status: "success";
-  resultUrl: string;
+  status: "queued";
   originalUrl: string;
+  balance: number;
+}
+
+export interface RenderAssetView {
+  id: string;
+  type: RenderAssetType;
+  fileUrl: string;
+  fileKey: string;
+  fileName: string | null;
+  fileSize: number | null;
+  mimeType: string | null;
+  width: number | null;
+  height: number | null;
+}
+
+export interface RenderDetail {
+  id: string;
+  mode: RenderMode;
+  status: RenderStatus;
+  prompt: string | null;
+  outputFormat: string;
+  creditsUsed: number;
+  projectId: string;
+  projectName: string;
+  createdAt: Date;
+  startedAt: Date | null;
+  completedAt: Date | null;
+  failedAt: Date | null;
+  archivedAt: Date | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+  resultUrl: string | null;
+  originalUrl: string | null;
+  referenceUrl: string | null;
+  assets: RenderAssetView[];
+}
+
+export interface RenderListItem {
+  id: string;
+  mode: RenderMode;
+  status: RenderStatus;
+  prompt: string | null;
+  createdAt: Date;
+  projectId: string;
+  projectName: string | null;
+  creditsUsed: number;
+  resultUrl: string | null;
+  originalUrl: string | null;
+}
+
+function isFinal(status: string) {
+  return ["success", "failed", "cancelled", "refunded"].includes(status);
+}
+
+async function imageMeta(data: Buffer) {
+  const meta = await sharp(data).metadata().catch(() => null);
+  return {
+    width: meta?.width ?? null,
+    height: meta?.height ?? null,
+  };
+}
+
+async function storeAsset(params: {
+  renderId: string;
+  userId: string;
+  projectId: string;
+  type: RenderAssetType;
+  file: UploadedFile;
+  index?: number;
+}) {
+  const key = renderAssetKey({
+    userId: params.userId,
+    projectId: params.projectId,
+    renderId: params.renderId,
+    type: params.type,
+    ext: params.file.ext,
+    index: params.index,
+  });
+  const stored = await storage().putObject({
+    key,
+    body: params.file.data,
+    contentType: params.file.contentType,
+  });
+  const [asset] = await db
+    .insert(renderAssets)
+    .values({
+      renderId: params.renderId,
+      userId: params.userId,
+      projectId: params.projectId,
+      type: params.type,
+      fileUrl: stored.url,
+      fileKey: key,
+      fileName: params.file.fileName,
+      fileSize: params.file.size,
+      mimeType: params.file.contentType,
+      width: params.file.width,
+      height: params.file.height,
+    })
+    .returning();
+  return asset;
+}
+
+async function storeResultAsset(params: {
+  renderId: string;
+  userId: string;
+  projectId: string;
+  data: Buffer;
+  contentType: string;
+  index: number;
+}) {
+  const ext = params.contentType.includes("png") ? "png" : "jpg";
+  const key = renderAssetKey({
+    userId: params.userId,
+    projectId: params.projectId,
+    renderId: params.renderId,
+    type: "result",
+    ext,
+    index: params.index,
+  });
+  const stored = await storage().putObject({
+    key,
+    body: params.data,
+    contentType: params.contentType,
+  });
+  const meta = await imageMeta(params.data);
+  const [asset] = await db
+    .insert(renderAssets)
+    .values({
+      renderId: params.renderId,
+      userId: params.userId,
+      projectId: params.projectId,
+      type: "result",
+      fileUrl: stored.url,
+      fileKey: key,
+      fileSize: params.data.length,
+      mimeType: params.contentType,
+      width: meta.width,
+      height: meta.height,
+    })
+    .returning();
+  return asset;
 }
 
 /**
- * Full render pipeline (PRD §18): check balance → create row → deduct credit
- * (idempotent) → store original → call AI provider → persist result → mark
- * success. On any failure the render is marked failed and the credit refunded.
+ * Enqueue a render request. The HTTP request only validates, stores uploaded
+ * assets, reserves credit, and creates a DB-backed job. Provider execution is
+ * handled by `processRenderJob` / worker code.
  */
 export async function createRender(
   params: CreateRenderParams,
 ): Promise<CreateRenderResult> {
   const { userId, projectId, mode } = params;
   const outputFormat = params.outputFormat ?? "jpg";
+
+  if (mode === "style_transfer" && !params.reference) {
+    throw new Error("Reference image wajib diunggah untuk Style Transfer");
+  }
 
   if ((await getBalance(userId)) < RENDER_COST) {
     throw new InsufficientCreditsError();
@@ -73,227 +217,471 @@ export async function createRender(
     })
     .returning();
 
-  const deduction = await applyCreditChange({
-    userId,
-    type: "usage",
-    amount: -RENDER_COST,
-    description: `Render ${mode}`,
-    renderId: render.id,
-    idempotencyKey: `render-usage:${render.id}`,
+  let balanceAfterDeduction = 0;
+  try {
+    const deduction = await applyCreditChange({
+      userId,
+      type: "usage",
+      amount: -RENDER_COST,
+      description: `Render ${mode}`,
+      renderId: render.id,
+      idempotencyKey: `render-usage:${render.id}`,
+    });
+    balanceAfterDeduction = deduction.balance;
+
+    const original = await storeAsset({
+      renderId: render.id,
+      userId,
+      projectId,
+      type: "original",
+      file: params.original,
+    });
+
+    if (params.reference) {
+      await storeAsset({
+        renderId: render.id,
+        userId,
+        projectId,
+        type: "reference",
+        file: params.reference,
+      });
+    }
+
+    await db.insert(renderJobs).values({
+      renderId: render.id,
+      userId,
+      status: "queued",
+      attempts: 0,
+      maxAttempts: 3,
+      availableAt: new Date(),
+    });
+
+    return {
+      renderId: render.id,
+      status: "queued",
+      originalUrl: original.fileUrl,
+      balance: balanceAfterDeduction,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    await db
+      .update(renders)
+      .set({
+        status: "failed",
+        failedAt: new Date(),
+        errorCode: "ENQUEUE_FAILED",
+        errorMessage: message,
+      })
+      .where(eq(renders.id, render.id));
+    await applyCreditChange({
+      userId,
+      type: "refund",
+      amount: RENDER_COST,
+      description: "Refund render gagal dibuat",
+      renderId: render.id,
+      idempotencyKey: `render-refund:${render.id}`,
+    });
+    throw err;
+  }
+}
+
+async function lockJobByRenderId(renderId: string, lockedBy: string) {
+  return db.transaction(async (tx) => {
+    const [job] = await tx
+      .select()
+      .from(renderJobs)
+      .where(and(eq(renderJobs.renderId, renderId), eq(renderJobs.status, "queued")))
+      .for("update");
+
+    if (!job) return null;
+
+    const now = new Date();
+    const [locked] = await tx
+      .update(renderJobs)
+      .set({
+        status: "processing",
+        attempts: job.attempts + 1,
+        lockedAt: now,
+        lockedBy,
+        startedAt: job.startedAt ?? now,
+        updatedAt: now,
+      })
+      .where(eq(renderJobs.id, job.id))
+      .returning();
+    return locked;
   });
+}
+
+async function lockNextJob(lockedBy: string) {
+  const now = new Date();
+  return db.transaction(async (tx) => {
+    const [job] = await tx
+      .select()
+      .from(renderJobs)
+      .where(and(eq(renderJobs.status, "queued"), lte(renderJobs.availableAt, now)))
+      .orderBy(asc(renderJobs.availableAt))
+      .limit(1)
+      .for("update");
+
+    if (!job) return null;
+
+    const [locked] = await tx
+      .update(renderJobs)
+      .set({
+        status: "processing",
+        attempts: job.attempts + 1,
+        lockedAt: now,
+        lockedBy,
+        startedAt: job.startedAt ?? now,
+        updatedAt: now,
+      })
+      .where(eq(renderJobs.id, job.id))
+      .returning();
+    return locked;
+  });
+}
+
+async function finalizeFailedRender(params: {
+  renderId: string;
+  userId: string;
+  jobId: string;
+  message: string;
+  code: string;
+}) {
+  const now = new Date();
+  await db
+    .update(renderJobs)
+    .set({
+      status: "failed",
+      failedAt: now,
+      completedAt: null,
+      errorMessage: params.message,
+      updatedAt: now,
+    })
+    .where(eq(renderJobs.id, params.jobId));
+
+  await db
+    .update(renders)
+    .set({
+      status: "failed",
+      failedAt: now,
+      errorMessage: params.message,
+      errorCode: params.code,
+    })
+    .where(eq(renders.id, params.renderId));
+
+  await applyCreditChange({
+    userId: params.userId,
+    type: "refund",
+    amount: RENDER_COST,
+    description: "Refund render gagal",
+    renderId: params.renderId,
+    idempotencyKey: `render-refund:${params.renderId}`,
+  });
+
+  await notifyUser({
+    userId: params.userId,
+    type: "render_failed",
+    title: "Render gagal diproses",
+    message: "Kredit kamu sudah dikembalikan. Silakan coba lagi.",
+    actionUrl: "/renders/new",
+    email: renderResultEmail({
+      success: false,
+      url: `${env.APP_URL.replace(/\/$/, "")}/renders/new`,
+    }),
+  });
+}
+
+async function rescheduleJob(params: {
+  jobId: string;
+  renderId: string;
+  message: string;
+  attempt: number;
+}) {
+  const now = new Date();
+  const delayMs = Math.min(30_000, params.attempt * 5_000);
+  await db
+    .update(renderJobs)
+    .set({
+      status: "queued",
+      lockedAt: null,
+      lockedBy: null,
+      availableAt: new Date(now.getTime() + delayMs),
+      errorMessage: params.message,
+      updatedAt: now,
+    })
+    .where(eq(renderJobs.id, params.jobId));
+
+  await db
+    .update(renders)
+    .set({
+      status: "queued",
+      errorMessage: params.message,
+      errorCode: "RETRYING",
+    })
+    .where(eq(renders.id, params.renderId));
+}
+
+export async function processRenderJob(
+  renderId: string,
+  lockedBy = `worker-${process.pid}`,
+) {
+  const job = await lockJobByRenderId(renderId, lockedBy);
+  if (!job) return { processed: false, reason: "job_not_available" as const };
+  return processLockedJob(job.id);
+}
+
+export async function processNextRenderJob(lockedBy = `worker-${process.pid}`) {
+  const job = await lockNextJob(lockedBy);
+  if (!job) return { processed: false, reason: "job_not_available" as const };
+  return processLockedJob(job.id);
+}
+
+async function processLockedJob(jobId: string) {
+  const job = await db.query.renderJobs.findFirst({
+    where: eq(renderJobs.id, jobId),
+  });
+  if (!job) return { processed: false, reason: "job_not_found" as const };
+
+  const render = await db.query.renders.findFirst({
+    where: eq(renders.id, job.renderId),
+  });
+  if (!render || render.deletedAt) {
+    await db
+      .update(renderJobs)
+      .set({
+        status: "failed",
+        failedAt: new Date(),
+        errorMessage: "Render tidak ditemukan atau sudah dihapus",
+        updatedAt: new Date(),
+      })
+      .where(eq(renderJobs.id, job.id));
+    return { processed: false, reason: "render_not_found" as const };
+  }
 
   try {
     await db
       .update(renders)
-      .set({ status: "processing", startedAt: new Date() })
+      .set({ status: "processing", startedAt: render.startedAt ?? new Date() })
       .where(eq(renders.id, render.id));
 
-    // Store original.
-    const originalKey = renderAssetKey({
-      userId,
-      projectId,
-      renderId: render.id,
-      type: "original",
-      ext: params.original.ext,
+    const assets = await db.query.renderAssets.findMany({
+      where: and(eq(renderAssets.renderId, render.id), isNull(renderAssets.deletedAt)),
     });
-    const original = await storage().putObject({
-      key: originalKey,
-      body: params.original.data,
-      contentType: params.original.contentType,
-    });
-    await db.insert(renderAssets).values({
-      renderId: render.id,
-      userId,
-      projectId,
-      type: "original",
-      fileUrl: original.url,
-      fileKey: originalKey,
-      fileName: params.original.fileName,
-      fileSize: params.original.data.length,
-      mimeType: params.original.contentType,
-    });
+    const original = assets.find((a) => a.type === "original");
+    const reference = assets.find((a) => a.type === "reference");
+    if (!original) throw new Error("Asset original tidak ditemukan");
 
-    // Optional reference image (style transfer).
-    let referenceUrl: string | undefined;
-    if (params.reference) {
-      const refKey = renderAssetKey({
-        userId,
-        projectId,
-        renderId: render.id,
-        type: "reference",
-        ext: params.reference.ext,
-      });
-      const ref = await storage().putObject({
-        key: refKey,
-        body: params.reference.data,
-        contentType: params.reference.contentType,
-      });
-      referenceUrl = ref.url;
-      await db.insert(renderAssets).values({
-        renderId: render.id,
-        userId,
-        projectId,
-        type: "reference",
-        fileUrl: ref.url,
-        fileKey: refKey,
-        fileSize: params.reference.data.length,
-        mimeType: params.reference.contentType,
-      });
-    }
-
-    // Call the AI provider.
+    const originalBytes = await fetchAssetBytes(original.fileUrl, original.fileKey);
     const result = await aiProvider().createRender({
-      mode,
-      imageUrl: original.url,
-      imageBuffer: params.original.data,
-      referenceUrl,
-      prompt: params.prompt,
-      outputFormat,
+      mode: render.mode,
+      imageUrl: original.fileUrl,
+      imageBuffer: originalBytes,
+      referenceUrl: reference?.fileUrl,
+      prompt: render.prompt ?? "",
+      outputFormat: render.outputFormat === "png" ? "png" : "jpg",
     });
 
     if (result.outputs.length === 0) {
       throw new Error("Provider tidak mengembalikan hasil render");
     }
 
-    // Persist outputs.
+    await db
+      .update(renderAssets)
+      .set({ deletedAt: new Date() })
+      .where(
+        and(
+          eq(renderAssets.renderId, render.id),
+          eq(renderAssets.type, "result"),
+          isNull(renderAssets.deletedAt),
+        ),
+      );
+
     let firstResultUrl = "";
     for (let i = 0; i < result.outputs.length; i++) {
       const out = result.outputs[i];
-      const ext = out.contentType.includes("png") ? "png" : "jpg";
-      const key = renderAssetKey({
-        userId,
-        projectId,
+      const asset = await storeResultAsset({
         renderId: render.id,
-        type: "result",
-        ext,
+        userId: render.userId,
+        projectId: render.projectId,
+        data: out.data,
+        contentType: out.contentType,
         index: i + 1,
       });
-      const stored = await storage().putObject({
-        key,
-        body: out.data,
-        contentType: out.contentType,
-      });
-      await db.insert(renderAssets).values({
-        renderId: render.id,
-        userId,
-        projectId,
-        type: "result",
-        fileUrl: stored.url,
-        fileKey: key,
-        fileSize: out.data.length,
-        mimeType: out.contentType,
-      });
-      if (i === 0) firstResultUrl = stored.url;
+      if (i === 0) firstResultUrl = asset.fileUrl;
     }
 
+    const now = new Date();
     await db
       .update(renders)
       .set({
         status: "success",
-        completedAt: new Date(),
+        completedAt: now,
+        failedAt: null,
         creditsUsed: RENDER_COST,
         providerRequestId: result.providerRequestId,
         providerResponse: result.raw as Record<string, unknown>,
+        errorCode: null,
+        errorMessage: null,
       })
       .where(eq(renders.id, render.id));
 
-    // Use the first result as the project cover if none set yet.
+    await db
+      .update(renderJobs)
+      .set({
+        status: "success",
+        completedAt: now,
+        lockedAt: null,
+        lockedBy: null,
+        errorMessage: null,
+        updatedAt: now,
+      })
+      .where(eq(renderJobs.id, job.id));
+
     await db
       .update(projects)
-      .set({ coverImageUrl: firstResultUrl, updatedAt: new Date() })
-      .where(and(eq(projects.id, projectId), isNull(projects.coverImageUrl)));
+      .set({ coverImageUrl: firstResultUrl, updatedAt: now })
+      .where(and(eq(projects.id, render.projectId), isNull(projects.coverImageUrl)));
 
     await notifyUser({
-      userId,
+      userId: render.userId,
       type: "render_success",
-      title: "Renderan kamu sudah jadi! 🎉",
-      message: `Render ${mode} berhasil diproses.`,
-      actionUrl: "/renders",
+      title: "Render kamu sudah jadi",
+      message: `Render ${render.mode} berhasil diproses.`,
+      actionUrl: `/renders/${render.id}`,
       email: renderResultEmail({
         success: true,
-        url: `${env.APP_URL.replace(/\/$/, "")}/renders`,
+        url: `${env.APP_URL.replace(/\/$/, "")}/renders/${render.id}`,
       }),
     });
 
-    if (deduction.applied && deduction.balance <= LOW_CREDIT_THRESHOLD) {
+    const balance = await getBalance(render.userId);
+    if (balance <= LOW_CREDIT_THRESHOLD) {
       await createNotification({
-        userId,
+        userId: render.userId,
         type: "low_credit",
         title: "Kredit kamu menipis",
-        message: `Sisa kredit kamu tinggal ${deduction.balance}. Yuk top up.`,
+        message: `Sisa kredit kamu tinggal ${balance}. Yuk top up.`,
         actionUrl: "/payments",
       });
     }
 
-    return {
-      renderId: render.id,
-      status: "success",
-      resultUrl: firstResultUrl,
-      originalUrl: original.url,
-    };
+    return { processed: true, renderId: render.id, status: "success" as const };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     const code =
       err && typeof err === "object" && "code" in err
         ? String((err as { code: unknown }).code)
         : "RENDER_FAILED";
+    const finalAttempt = job.attempts >= job.maxAttempts;
 
-    await db
-      .update(renders)
-      .set({
-        status: "failed",
-        failedAt: new Date(),
-        errorMessage: message,
-        errorCode: code,
-      })
-      .where(eq(renders.id, render.id));
+    if (finalAttempt) {
+      await finalizeFailedRender({
+        renderId: render.id,
+        userId: render.userId,
+        jobId: job.id,
+        message,
+        code,
+      });
+      return { processed: true, renderId: render.id, status: "failed" as const };
+    }
 
-    // Refund the deducted credit (idempotent).
-    await applyCreditChange({
-      userId,
-      type: "refund",
-      amount: RENDER_COST,
-      description: "Refund render gagal",
+    await rescheduleJob({
+      jobId: job.id,
       renderId: render.id,
-      idempotencyKey: `render-refund:${render.id}`,
+      message,
+      attempt: job.attempts,
     });
-
-    await notifyUser({
-      userId,
-      type: "render_failed",
-      title: "Render gagal diproses",
-      message: "Kredit kamu sudah dikembalikan. Silakan coba lagi.",
-      actionUrl: "/renders/new",
-      email: renderResultEmail({
-        success: false,
-        url: `${env.APP_URL.replace(/\/$/, "")}/renders/new`,
-      }),
-    });
-
-    throw err;
+    return { processed: true, renderId: render.id, status: "retrying" as const };
   }
 }
 
-export interface RenderListItem {
-  id: string;
-  mode: RenderMode;
-  status: string;
-  prompt: string | null;
-  createdAt: Date;
-  resultUrl: string | null;
-  originalUrl: string | null;
+async function fetchAssetBytes(fileUrl: string, fileKey: string) {
+  if (storage().name === "local") {
+    const { readFile } = await import("node:fs/promises");
+    const { join } = await import("node:path");
+    return readFile(join(process.cwd(), "public", "uploads", fileKey));
+  }
+
+  const url = await storage().getSignedDownloadUrl(fileKey, 60);
+  const res = await fetch(url || fileUrl);
+  if (!res.ok) throw new Error("Gagal membaca asset original");
+  return Buffer.from(await res.arrayBuffer());
+}
+
+export async function getRenderDetail(
+  userId: string,
+  renderId: string,
+): Promise<RenderDetail | null> {
+  const render = await db.query.renders.findFirst({
+    where: and(
+      eq(renders.id, renderId),
+      eq(renders.userId, userId),
+      isNull(renders.deletedAt),
+    ),
+  });
+  if (!render) return null;
+
+  const project = await db.query.projects.findFirst({
+    where: eq(projects.id, render.projectId),
+  });
+  const assets = await db.query.renderAssets.findMany({
+    where: and(eq(renderAssets.renderId, render.id), isNull(renderAssets.deletedAt)),
+    orderBy: asc(renderAssets.createdAt),
+  });
+
+  const views = assets.map((a) => ({
+    id: a.id,
+    type: a.type,
+    fileUrl: a.fileUrl,
+    fileKey: a.fileKey,
+    fileName: a.fileName,
+    fileSize: a.fileSize,
+    mimeType: a.mimeType,
+    width: a.width,
+    height: a.height,
+  }));
+
+  return {
+    id: render.id,
+    mode: render.mode,
+    status: render.status,
+    prompt: render.prompt,
+    outputFormat: render.outputFormat,
+    creditsUsed: render.creditsUsed,
+    projectId: render.projectId,
+    projectName: project?.name ?? "Project",
+    createdAt: render.createdAt,
+    startedAt: render.startedAt,
+    completedAt: render.completedAt,
+    failedAt: render.failedAt,
+    archivedAt: render.archivedAt,
+    errorCode: render.errorCode,
+    errorMessage: render.errorMessage,
+    resultUrl: views.find((a) => a.type === "result")?.fileUrl ?? null,
+    originalUrl: views.find((a) => a.type === "original")?.fileUrl ?? null,
+    referenceUrl: views.find((a) => a.type === "reference")?.fileUrl ?? null,
+    assets: views,
+  };
 }
 
 /** List a user's renders (optionally by project) with thumbnail URLs. */
 export async function listRenders(
   userId: string,
-  opts: { projectId?: string; limit?: number } = {},
+  opts: {
+    projectId?: string;
+    limit?: number;
+    archived?: boolean;
+    status?: RenderStatus;
+  } = {},
 ): Promise<RenderListItem[]> {
   const rows = await db.query.renders.findMany({
     where: and(
       eq(renders.userId, userId),
       isNull(renders.deletedAt),
       opts.projectId ? eq(renders.projectId, opts.projectId) : undefined,
+      opts.archived ? isNotNull(renders.archivedAt) : isNull(renders.archivedAt),
+      opts.status ? eq(renders.status, opts.status) : undefined,
     ),
     orderBy: desc(renders.createdAt),
     limit: opts.limit ?? 50,
@@ -302,12 +690,18 @@ export async function listRenders(
   if (rows.length === 0) return [];
 
   const ids = rows.map((r) => r.id);
-  const assets = await db.query.renderAssets.findMany({
-    where: and(
-      inArray(renderAssets.renderId, ids),
-      isNull(renderAssets.deletedAt),
-    ),
-  });
+  const projectIds = Array.from(new Set(rows.map((r) => r.projectId)));
+  const [assets, projectRows] = await Promise.all([
+    db.query.renderAssets.findMany({
+      where: and(
+        inArray(renderAssets.renderId, ids),
+        isNull(renderAssets.deletedAt),
+      ),
+    }),
+    db.query.projects.findMany({
+      where: inArray(projects.id, projectIds),
+    }),
+  ]);
 
   const resultByRender = new Map<string, string>();
   const originalByRender = new Map<string, string>();
@@ -319,6 +713,7 @@ export async function listRenders(
       originalByRender.set(a.renderId, a.fileUrl);
     }
   }
+  const projectById = new Map(projectRows.map((p) => [p.id, p.name]));
 
   return rows.map((r) => ({
     id: r.id,
@@ -326,7 +721,88 @@ export async function listRenders(
     status: r.status,
     prompt: r.prompt,
     createdAt: r.createdAt,
+    projectId: r.projectId,
+    projectName: projectById.get(r.projectId) ?? null,
+    creditsUsed: r.creditsUsed,
     resultUrl: resultByRender.get(r.id) ?? null,
     originalUrl: originalByRender.get(r.id) ?? null,
   }));
 }
+
+export async function archiveRender(userId: string, renderId: string) {
+  const now = new Date();
+  const [row] = await db
+    .update(renders)
+    .set({ archivedAt: now })
+    .where(
+      and(eq(renders.id, renderId), eq(renders.userId, userId), isNull(renders.deletedAt)),
+    )
+    .returning();
+  return Boolean(row);
+}
+
+export async function restoreRender(userId: string, renderId: string) {
+  const [row] = await db
+    .update(renders)
+    .set({ archivedAt: null })
+    .where(
+      and(eq(renders.id, renderId), eq(renders.userId, userId), isNull(renders.deletedAt)),
+    )
+    .returning();
+  return Boolean(row);
+}
+
+export async function deleteRenderPermanently(
+  userId: string,
+  renderId: string,
+  deletedBy = userId,
+) {
+  const detail = await getRenderDetail(userId, renderId);
+  if (!detail) return false;
+
+  const now = new Date();
+  await Promise.all(
+    detail.assets.map((asset) => storage().deleteObject(asset.fileKey)),
+  );
+  await db
+    .update(renderAssets)
+    .set({ deletedAt: now })
+    .where(and(eq(renderAssets.renderId, renderId), isNull(renderAssets.deletedAt)));
+  await db
+    .update(renderJobs)
+    .set({
+      status: "failed",
+      failedAt: now,
+      errorMessage: "Render dihapus permanen",
+      updatedAt: now,
+    })
+    .where(and(eq(renderJobs.renderId, renderId), eq(renderJobs.status, "queued")));
+  await db
+    .update(renders)
+    .set({ deletedAt: now, deletedBy })
+    .where(and(eq(renders.id, renderId), eq(renders.userId, userId)));
+  return true;
+}
+
+export async function getResultAssetForDownload(userId: string, renderId: string) {
+  const render = await db.query.renders.findFirst({
+    where: and(
+      eq(renders.id, renderId),
+      eq(renders.userId, userId),
+      eq(renders.status, "success"),
+      isNull(renders.deletedAt),
+    ),
+  });
+  if (!render) return null;
+
+  const asset = await db.query.renderAssets.findFirst({
+    where: and(
+      eq(renderAssets.renderId, render.id),
+      eq(renderAssets.type, "result"),
+      isNull(renderAssets.deletedAt),
+    ),
+  });
+  return asset ?? null;
+}
+
+export { isFinal as isFinalRenderStatus };

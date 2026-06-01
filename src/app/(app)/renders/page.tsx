@@ -1,4 +1,4 @@
-import { ImageIcon, Plus } from "lucide-react";
+import { Archive, ImageIcon, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import type { RenderStatus } from "@/db/schema";
 import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
 import { listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
@@ -19,9 +20,40 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", {
   timeStyle: "short",
 });
 
-export default async function RendersPage() {
+const FILTERS: { label: string; href: string }[] = [
+  { label: "Aktif", href: "/renders" },
+  { label: "Arsip", href: "/renders?archived=1" },
+  { label: "Processing", href: "/renders?status=processing" },
+  { label: "Gagal", href: "/renders?status=failed" },
+];
+
+function renderStatus(value?: string): RenderStatus | undefined {
+  if (
+    value === "queued" ||
+    value === "processing" ||
+    value === "success" ||
+    value === "failed" ||
+    value === "cancelled" ||
+    value === "refunded"
+  ) {
+    return value;
+  }
+  return undefined;
+}
+
+export default async function RendersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ archived?: string; status?: string }>;
+}) {
   const { user } = await requireVerifiedUser();
-  const renders = await listRenders(user.id, { limit: 60 });
+  const { archived, status } = await searchParams;
+  const showArchived = archived === "1";
+  const renders = await listRenders(user.id, {
+    limit: 60,
+    archived: showArchived,
+    status: renderStatus(status),
+  });
 
   return (
     <>
@@ -36,6 +68,28 @@ export default async function RendersPage() {
           </Button>
         }
       />
+
+      <div className="mb-5 flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
+          <Button
+            key={f.href}
+            asChild
+            variant={
+              (f.href === "/renders" && !showArchived && !status) ||
+              (f.href.includes("archived") && showArchived) ||
+              (status && f.href.includes(status))
+                ? "default"
+                : "outline"
+            }
+            size="sm"
+          >
+            <Link href={f.href}>
+              {f.href.includes("archived") && <Archive />}
+              {f.label}
+            </Link>
+          </Button>
+        ))}
+      </div>
 
       {renders.length === 0 ? (
         <EmptyState
@@ -55,7 +109,8 @@ export default async function RendersPage() {
           {renders.map((r) => {
             const thumb = r.resultUrl ?? r.originalUrl;
             return (
-              <Card key={r.id} className="gap-0 overflow-hidden p-0">
+              <Link key={r.id} href={`/renders/${r.id}`}>
+              <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
                 <div className="relative flex aspect-square items-center justify-center bg-muted">
                   {thumb ? (
                     <RenderImage src={thumb} alt={r.mode} className="size-full" />
@@ -74,10 +129,12 @@ export default async function RendersPage() {
                     {MODE_LABEL[r.mode]}
                   </p>
                   <p className="text-xs text-muted-foreground">
+                    {r.projectName ? `${r.projectName} · ` : ""}
                     {dateFmt.format(r.createdAt)}
                   </p>
                 </div>
               </Card>
+              </Link>
             );
           })}
         </div>

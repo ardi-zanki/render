@@ -6,6 +6,7 @@ import {
   createProject,
   MAX_PROJECTS,
 } from "@/lib/projects/service";
+import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { createProjectSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
@@ -14,6 +15,18 @@ export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
   if (!session || !session.user.emailVerified) {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
+  }
+
+  try {
+    await assertRateLimit("public_api", session.user.id);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { success: false, code: err.code, message: err.message },
+        { status: 429 },
+      );
+    }
+    throw err;
   }
 
   const parsed = createProjectSchema.safeParse(

@@ -2,12 +2,14 @@
 
 import {
   CreditCard,
+  Bell,
   FolderOpen,
   Home,
   ImageIcon,
   Menu,
   PanelLeft,
   Plus,
+  Settings,
   Shield,
   X,
 } from "lucide-react";
@@ -27,8 +29,10 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: Home },
   { label: "Project", href: "/projects", icon: FolderOpen },
-  { label: "Riwayat", href: "/renders", icon: ImageIcon },
+  { label: "Riwayat Render", href: "/renders", icon: ImageIcon },
   { label: "Pembayaran", href: "/payments", icon: CreditCard },
+  { label: "Notifikasi", href: "/notifications", icon: Bell },
+  { label: "Pengaturan Akun", href: "/settings", icon: Settings },
 ];
 
 type AppUser = {

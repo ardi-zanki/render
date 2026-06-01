@@ -104,6 +104,9 @@ export async function handlePaymentNotification(webhook: NormalizedWebhook) {
   if (payment.status === "paid") {
     return { handled: true, reason: "already_paid" as const };
   }
+  if (payment.status === webhook.status) {
+    return { handled: true, reason: `already_${webhook.status}` as const };
+  }
 
   const now = new Date();
 
@@ -154,6 +157,19 @@ export async function handlePaymentNotification(webhook: NormalizedWebhook) {
   if (webhook.status === "expired") patch.expiredAt = now;
 
   await db.update(payments).set(patch).where(eq(payments.id, payment.id));
+  if (
+    webhook.status === "failed" ||
+    webhook.status === "expired" ||
+    webhook.status === "cancelled"
+  ) {
+    await notifyUser({
+      userId: payment.userId,
+      type: "payment_failed",
+      title: "Pembayaran belum berhasil",
+      message: "Transaksi tidak berhasil. Silakan pilih paket dan coba lagi.",
+      actionUrl: "/payments",
+    });
+  }
   return { handled: true, reason: webhook.status };
 }
 

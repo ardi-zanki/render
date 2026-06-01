@@ -1,24 +1,38 @@
-import { and, count, desc, eq, inArray, isNull, sql, sum } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, sql, sum } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
   adminAuditLogs,
   creditBalances,
+  creditTransactions,
+  notifications,
+  paymentPackages,
   payments,
+  projects,
   renders,
   session,
   user,
   type RenderMode,
+  type RenderStatus,
 } from "@/db/schema";
+import { applyCreditChange } from "@/lib/credits";
 import { writeAuditLog } from "./audit";
 
 export async function getAdminStats() {
   const [users] = await db.select({ v: count() }).from(user);
+  const [verifiedUsers] = await db
+    .select({ v: count() })
+    .from(user)
+    .where(eq(user.emailVerified, true));
   const [rendersTotal] = await db.select({ v: count() }).from(renders);
   const [rendersSuccess] = await db
     .select({ v: count() })
     .from(renders)
     .where(eq(renders.status, "success"));
+  const [rendersFailed] = await db
+    .select({ v: count() })
+    .from(renders)
+    .where(eq(renders.status, "failed"));
   const [revenue] = await db
     .select({ v: sum(payments.amount) })
     .from(payments)
@@ -27,13 +41,22 @@ export async function getAdminStats() {
     .select({ v: count() })
     .from(payments)
     .where(eq(payments.status, "paid"));
+  const [creditSold] = await db
+    .select({ v: sum(payments.creditsAdded) })
+    .from(payments)
+    .where(eq(payments.status, "paid"));
 
   return {
     users: users.v,
+    verifiedUsers: verifiedUsers.v,
     renders: rendersTotal.v,
     rendersSuccess: rendersSuccess.v,
+    rendersFailed: rendersFailed.v,
     revenue: Number(revenue.v ?? 0),
     paidCount: paidCount.v,
+    creditSold: Number(creditSold.v ?? 0),
+    aiProviderErrorRate:
+      rendersTotal.v > 0 ? Math.round((rendersFailed.v / rendersTotal.v) * 100) : 0,
   };
 }
 
@@ -60,20 +83,36 @@ export interface AdminRenderRow {
   mode: RenderMode;
   status: string;
   userName: string;
+  aiProvider: string | null;
+  errorMessage: string | null;
+  providerRequestId: string | null;
   createdAt: Date;
 }
 
-export async function listAllRenders(limit = 100): Promise<AdminRenderRow[]> {
+export async function listAllRenders(
+  limit = 100,
+  filters: { status?: RenderStatus; mode?: RenderMode } = {},
+): Promise<AdminRenderRow[]> {
   return db
     .select({
       id: renders.id,
       mode: renders.mode,
       status: renders.status,
       userName: user.name,
+      aiProvider: renders.aiProvider,
+      errorMessage: renders.errorMessage,
+      providerRequestId: renders.providerRequestId,
       createdAt: renders.createdAt,
     })
     .from(renders)
     .innerJoin(user, eq(user.id, renders.userId))
+    .where(
+      and(
+        isNull(renders.deletedAt),
+        filters.status ? eq(renders.status, filters.status) : undefined,
+        filters.mode ? eq(renders.mode, filters.mode) : undefined,
+      ),
+    )
     .orderBy(desc(renders.createdAt))
     .limit(limit);
 }
@@ -93,6 +132,63 @@ export async function listAllPayments(limit = 100) {
     .from(payments)
     .innerJoin(user, eq(user.id, payments.userId))
     .orderBy(desc(payments.createdAt))
+    .limit(limit);
+}
+
+export async function listAllProjects(limit = 100) {
+  return db
+    .select({
+      id: projects.id,
+      name: projects.name,
+      userName: user.name,
+      isDefault: projects.isDefault,
+      archivedAt: projects.archivedAt,
+      deletedAt: projects.deletedAt,
+      updatedAt: projects.updatedAt,
+    })
+    .from(projects)
+    .innerJoin(user, eq(user.id, projects.userId))
+    .orderBy(desc(projects.updatedAt))
+    .limit(limit);
+}
+
+export async function listCreditTransactions(limit = 100) {
+  return db
+    .select({
+      id: creditTransactions.id,
+      userName: user.name,
+      type: creditTransactions.type,
+      amount: creditTransactions.amount,
+      balanceBefore: creditTransactions.balanceBefore,
+      balanceAfter: creditTransactions.balanceAfter,
+      description: creditTransactions.description,
+      createdAt: creditTransactions.createdAt,
+    })
+    .from(creditTransactions)
+    .innerJoin(user, eq(user.id, creditTransactions.userId))
+    .orderBy(desc(creditTransactions.createdAt))
+    .limit(limit);
+}
+
+export async function listPaymentPackages() {
+  return db.query.paymentPackages.findMany({
+    orderBy: asc(paymentPackages.sortOrder),
+  });
+}
+
+export async function listAllNotifications(limit = 100) {
+  return db
+    .select({
+      id: notifications.id,
+      userName: user.name,
+      type: notifications.type,
+      title: notifications.title,
+      isRead: notifications.isRead,
+      createdAt: notifications.createdAt,
+    })
+    .from(notifications)
+    .innerJoin(user, eq(user.id, notifications.userId))
+    .orderBy(desc(notifications.createdAt))
     .limit(limit);
 }
 
@@ -166,6 +262,35 @@ export async function setUserRole(
     entityType: "user",
     metadata: { role },
   });
+}
+
+export async function manualCreditAdjustment(params: {
+  adminUserId: string;
+  targetUserId: string;
+  amount: number;
+  description?: string;
+}) {
+  const result = await applyCreditChange({
+    userId: params.targetUserId,
+    type: "adjustment",
+    amount: params.amount,
+    description: params.description ?? "Manual credit adjustment",
+    idempotencyKey: `admin-adjustment:${params.adminUserId}:${params.targetUserId}:${Date.now()}`,
+  });
+
+  await writeAuditLog({
+    adminUserId: params.adminUserId,
+    targetUserId: params.targetUserId,
+    action: "credit.adjustment",
+    entityType: "credit_transaction",
+    metadata: {
+      amount: params.amount,
+      balance: result.balance,
+      description: params.description,
+    },
+  });
+
+  return result;
 }
 
 export async function countDisabled() {

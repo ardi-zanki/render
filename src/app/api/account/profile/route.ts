@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
+import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { storage } from "@/lib/storage";
 
 export const runtime = "nodejs";
@@ -16,6 +17,18 @@ export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
   if (!session) {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
+  }
+
+  try {
+    await assertRateLimit("public_api", session.user.id);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { success: false, code: err.code, message: err.message },
+        { status: 429 },
+      );
+    }
+    throw err;
   }
 
   const form = await req.formData();

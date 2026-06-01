@@ -4,7 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { listUsers } from "@/lib/admin/service";
 import { requireAdmin } from "@/lib/session";
-import { setRoleAction, toggleDisableAction } from "./actions";
+import {
+  creditAdjustmentAction,
+  setRoleAction,
+  toggleDisableAction,
+} from "./actions";
 
 export const metadata: Metadata = { title: "Admin · User" };
 
@@ -17,13 +21,14 @@ export default async function AdminUsersPage() {
 
   return (
     <div className="overflow-x-auto rounded-lg border border-border bg-card">
-      <table className="w-full min-w-[720px] text-sm">
+      <table className="w-full min-w-[980px] text-sm">
         <thead className="bg-muted/60 text-left text-xs font-semibold text-muted-foreground">
           <tr>
             <th className="px-4 py-3">User</th>
             <th className="px-4 py-3">Role</th>
             <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3 text-right">Kredit</th>
+            <th className="px-4 py-3">Adjustment</th>
             <th className="px-4 py-3">Gabung</th>
             <th className="px-4 py-3 text-right">Aksi</th>
           </tr>
@@ -64,6 +69,25 @@ export default async function AdminUsersPage() {
                 </td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums">
                   {idr.format(u.balance ?? 0)}
+                </td>
+                <td className="px-4 py-3">
+                  <form action={creditAdjustmentAction} className="flex gap-2">
+                    <input type="hidden" name="userId" value={u.id} />
+                    <input
+                      name="amount"
+                      type="number"
+                      className="h-8 w-20 rounded-md border border-input bg-background px-2 text-xs"
+                      placeholder="+/-"
+                    />
+                    <input
+                      name="description"
+                      className="h-8 w-36 rounded-md border border-input bg-background px-2 text-xs"
+                      placeholder="Catatan"
+                    />
+                    <Button type="submit" variant="outline" size="sm">
+                      Simpan
+                    </Button>
+                  </form>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">
                   {dateFmt.format(u.createdAt)}

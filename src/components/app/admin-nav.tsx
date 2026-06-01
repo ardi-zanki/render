@@ -8,8 +8,13 @@ import { cn } from "@/lib/utils";
 const TABS: [string, string][] = [
   ["/admin", "Ringkasan"],
   ["/admin/users", "User"],
+  ["/admin/projects", "Project"],
   ["/admin/renders", "Render"],
   ["/admin/payments", "Pembayaran"],
+  ["/admin/credits", "Credit Transactions"],
+  ["/admin/packages", "Payment Packages"],
+  ["/admin/notifications", "Notifications"],
+  ["/admin/settings", "Settings"],
   ["/admin/audit", "Audit Log"],
 ];
 

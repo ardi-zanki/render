@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { eq } from "drizzle-orm";
 
 import { PageHeader } from "@/components/app/page-header";
 import { RenderStudio } from "@/components/app/render-studio";
+import { db } from "@/db";
+import { userProfiles } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
 import {
   getDefaultProject,
@@ -16,20 +19,23 @@ export const metadata: Metadata = { title: "Render Studio" };
 export default async function CreateRenderPage({
   searchParams,
 }: {
-  searchParams: Promise<{ project?: string }>;
+  searchParams: Promise<{ project?: string; prompt?: string }>;
 }) {
   const { user } = await requireVerifiedUser();
-  const { project: projectParam } = await searchParams;
+  const { project: projectParam, prompt } = await searchParams;
 
   const selected = projectParam
     ? await getProject(user.id, projectParam)
     : null;
   const project = selected ?? (await getDefaultProject(user.id));
 
-  const [balance, scenes, projects] = await Promise.all([
+  const [balance, scenes, projects, profile] = await Promise.all([
     getBalance(user.id),
     listRenders(user.id, { projectId: project.id, limit: 12 }),
     listProjects(user.id),
+    db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, user.id),
+    }),
   ]);
 
   return (
@@ -50,6 +56,11 @@ export default async function CreateRenderPage({
           status: s.status,
           resultUrl: s.resultUrl,
         }))}
+        defaultRenderMode={profile?.defaultRenderMode ?? "interior"}
+        defaultOutputFormat={
+          profile?.defaultOutputFormat === "png" ? "png" : "jpg"
+        }
+        initialInstruction={prompt ?? ""}
       />
     </>
   );

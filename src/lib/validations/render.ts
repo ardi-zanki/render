@@ -17,7 +17,7 @@ export const createRenderSchema = z.object({
   weather: z
     .enum(["auto", "cerah", "berawan", "mendung", "hujan", "berkabut"])
     .optional(),
-  instruction: z.string().max(500).optional(),
+  instruction: z.string().max(1000, "Prompt maksimal 1.000 karakter").optional(),
   outputFormat: z.enum(["jpg", "png"]).optional(),
 });
 

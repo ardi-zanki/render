@@ -91,15 +91,22 @@ export function RenderStudio({
   projects,
   initialBalance,
   initialScenes,
+  defaultRenderMode = "interior",
+  defaultOutputFormat = "jpg",
+  initialInstruction = "",
 }: {
   projectId: string;
   projectName: string;
   projects: { id: string; name: string }[];
   initialBalance: number;
   initialScenes: Scene[];
+  defaultRenderMode?: RenderMode;
+  defaultOutputFormat?: "jpg" | "png";
+  initialInstruction?: string;
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const referenceRef = useRef<HTMLInputElement>(null);
 
   function switchProject(id: string) {
     if (id !== projectId) router.push(`/renders/new?project=${id}`);
@@ -122,24 +129,33 @@ export function RenderStudio({
     }
   }
 
-  const [mode, setMode] = useState<RenderMode>("interior");
+  const [mode, setMode] = useState<RenderMode>(defaultRenderMode);
   const [style, setStyle] = useState("auto");
   const [location, setLocation] = useState("");
   const [time, setTime] = useState("auto");
   const [weather, setWeather] = useState("auto");
-  const [instruction, setInstruction] = useState("");
+  const [instruction, setInstruction] = useState(initialInstruction);
+  const [outputFormat, setOutputFormat] = useState<"jpg" | "png">(
+    defaultOutputFormat,
+  );
 
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [referenceFile, setReferenceFile] = useState<File | null>(null);
+  const [referencePreviewUrl, setReferencePreviewUrl] = useState<string | null>(
+    null,
+  );
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [resultRenderId, setResultRenderId] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [view, setView] = useState<"hasil" | "asli">("hasil");
 
   const [balance, setBalance] = useState(initialBalance);
   const [scenes, setScenes] = useState<Scene[]>(initialScenes);
   const [loading, setLoading] = useState(false);
+  const [renderStatus, setRenderStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   function pickFile(f: File | null) {
@@ -147,6 +163,7 @@ export function RenderStudio({
     setResultUrl(null);
     setResultRenderId(null);
     setShareUrl(null);
+    setRenderStatus(null);
     setError("");
     if (f) {
       setFile(f);
@@ -157,9 +174,58 @@ export function RenderStudio({
     }
   }
 
+  function pickReference(f: File | null) {
+    if (referencePreviewUrl) URL.revokeObjectURL(referencePreviewUrl);
+    setError("");
+    if (f) {
+      setReferenceFile(f);
+      setReferencePreviewUrl(URL.createObjectURL(f));
+    } else {
+      setReferenceFile(null);
+      setReferencePreviewUrl(null);
+    }
+  }
+
+  async function pollRender(id: string) {
+    for (let attempt = 0; attempt < 90; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const res = await fetch(`/api/renders/${id}`, { cache: "no-store" });
+      if (!res.ok) continue;
+      const json = await res.json();
+      setRenderStatus(json.status);
+      setScenes((items) =>
+        items.map((item) =>
+          item.id === id
+            ? { ...item, status: json.status, resultUrl: json.resultUrl }
+            : item,
+        ),
+      );
+
+      if (json.status === "success") {
+        setResultUrl(json.resultUrl);
+        setView("hasil");
+        toast.success("Render selesai!");
+        router.refresh();
+        return;
+      }
+
+      if (json.status === "failed") {
+        setError(json.errorMessage ?? "Render gagal. Kredit sudah dikembalikan.");
+        router.refresh();
+        return;
+      }
+    }
+
+    setError("Render masih diproses. Cek Riwayat Render beberapa saat lagi.");
+  }
+
   async function onRender() {
     if (!file) {
       setError("Upload gambar desain dulu ya.");
+      return;
+    }
+    if (mode === "style_transfer" && !referenceFile) {
+      setError("Upload reference image untuk Style Transfer.");
       return;
     }
     setLoading(true);
@@ -169,11 +235,13 @@ export function RenderStudio({
       fd.append("image", file);
       fd.append("mode", mode);
       fd.append("projectId", projectId);
+      fd.append("outputFormat", outputFormat);
       if (style !== "auto") fd.append("style", style);
       fd.append("time", time);
       fd.append("weather", weather);
       if (location) fd.append("location", location);
       if (instruction) fd.append("instruction", instruction);
+      if (referenceFile) fd.append("reference", referenceFile);
 
       const res = await fetch("/api/renders", { method: "POST", body: fd });
       const json = await res.json();
@@ -181,16 +249,17 @@ export function RenderStudio({
         setError(json.error ?? "Render gagal. Coba lagi.");
         return;
       }
-      setResultUrl(json.resultUrl);
+      setResultUrl(null);
       setResultRenderId(json.renderId);
       setShareUrl(null);
-      setView("hasil");
-      setBalance((b) => b - 1);
+      setRenderStatus(json.status ?? "queued");
+      setBalance((b) => json.balance ?? b - 1);
       setScenes((s) => [
-        { id: json.renderId, mode, status: "success", resultUrl: json.resultUrl },
+        { id: json.renderId, mode, status: "queued", resultUrl: null },
         ...s,
       ]);
-      toast.success("Render selesai!");
+      toast.success("Render masuk antrean");
+      void pollRender(json.renderId);
       router.refresh();
     } catch {
       setError("Tidak bisa terhubung ke server. Coba lagi.");
@@ -222,7 +291,27 @@ export function RenderStudio({
     }
   }
 
-  const canRender = !!file && balance > 0 && !loading;
+  async function onDownload() {
+    if (!resultRenderId) return;
+    setDownloading(true);
+    try {
+      const res = await fetch(`/api/renders/${resultRenderId}/download-token`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (res.ok && json.url) {
+        window.location.href = json.url;
+      } else {
+        toast.error(json.error ?? "Download belum tersedia");
+      }
+    } finally {
+      setDownloading(false);
+    }
+  }
+
+  const isProcessing =
+    loading || renderStatus === "queued" || renderStatus === "processing";
+  const canRender = !!file && balance > 0 && !isProcessing;
   const shownImage = resultUrl && view === "hasil" ? resultUrl : previewUrl;
 
   return (
@@ -292,6 +381,18 @@ export function RenderStudio({
                   {l}
                 </option>
               ))}
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="outputFormat">Format Output</Label>
+            <Select
+              id="outputFormat"
+              value={outputFormat}
+              onChange={(e) => setOutputFormat(e.target.value as "jpg" | "png")}
+            >
+              <option value="jpg">JPG</option>
+              <option value="png">PNG</option>
             </Select>
           </div>
 
@@ -366,16 +467,18 @@ export function RenderStudio({
                 </button>
               )}
 
-              {loading && (
+              {isProcessing && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 backdrop-blur-sm">
                   <Loader2 className="size-7 animate-spin text-primary" />
                   <p className="text-sm font-medium text-foreground">
-                    Memproses render...
+                    {renderStatus === "queued"
+                      ? "Render masuk antrean..."
+                      : "Memproses render..."}
                   </p>
                 </div>
               )}
 
-              {file && !loading && (
+              {file && !isProcessing && (
                 <button
                   type="button"
                   onClick={() => pickFile(null)}
@@ -394,6 +497,63 @@ export function RenderStudio({
               className="hidden"
               onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
             />
+
+            {mode === "style_transfer" && (
+              <div className="rounded-lg border border-border bg-muted/35 p-3">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <div>
+                    <Label>Reference Image</Label>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Wajib untuk Style Transfer.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => referenceRef.current?.click()}
+                    disabled={isProcessing}
+                  >
+                    <ImagePlus /> Pilih
+                  </Button>
+                </div>
+                {referencePreviewUrl ? (
+                  <div className="relative overflow-hidden rounded-md border border-border bg-muted">
+                    <RenderImage
+                      src={referencePreviewUrl}
+                      alt="Reference"
+                      className="aspect-video size-full"
+                    />
+                    {!isProcessing && (
+                      <button
+                        type="button"
+                        onClick={() => pickReference(null)}
+                        className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-md bg-background/85 text-foreground shadow-sm"
+                        aria-label="Hapus reference"
+                      >
+                        <X className="size-4" />
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => referenceRef.current?.click()}
+                    className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-border px-3 py-5 text-sm text-muted-foreground"
+                  >
+                    <ImagePlus className="size-4" />
+                    Upload gambar referensi style
+                  </button>
+                )}
+                <input
+                  ref={referenceRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => pickReference(e.target.files?.[0] ?? null)}
+                />
+              </div>
+            )}
 
             {error && (
               <Alert variant="destructive">
@@ -415,6 +575,11 @@ export function RenderStudio({
                   <span className="text-muted-foreground">· sisa {balance}</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  {resultRenderId && (
+                    <Button variant="outline" asChild>
+                      <Link href={`/renders/${resultRenderId}`}>Detail</Link>
+                    </Button>
+                  )}
                   {resultUrl && resultRenderId && (
                     <Button
                       variant="outline"
@@ -432,10 +597,17 @@ export function RenderStudio({
                     </Button>
                   )}
                   {resultUrl && (
-                    <Button variant="inverse" asChild>
-                      <a href={resultUrl} download target="_blank" rel="noreferrer">
-                        <Download /> Unduh
-                      </a>
+                    <Button
+                      variant="inverse"
+                      onClick={onDownload}
+                      disabled={downloading}
+                    >
+                      {downloading ? (
+                        <Loader2 className="animate-spin" />
+                      ) : (
+                        <Download />
+                      )}
+                      Unduh
                     </Button>
                   )}
                   {balance <= 0 ? (

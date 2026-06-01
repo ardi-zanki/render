@@ -15,6 +15,7 @@ const ACTION_LABEL: Record<string, string> = {
   "user.disable": "Nonaktifkan user",
   "user.enable": "Aktifkan user",
   "user.set_role": "Ubah role",
+  "credit.adjustment": "Adjustment kredit",
 };
 
 export default async function AdminAuditPage() {

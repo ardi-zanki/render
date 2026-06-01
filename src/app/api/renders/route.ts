@@ -5,30 +5,13 @@ import { auth } from "@/lib/auth";
 import { getDefaultProject, getProject } from "@/lib/projects/service";
 import { AiProviderError } from "@/lib/providers/ai";
 import { buildPrompt } from "@/lib/renders/prompt";
-import { createRender, type UploadedFile } from "@/lib/renders/service";
+import { createRender, processRenderJob } from "@/lib/renders/service";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
+import { ImageUploadError, validateImageFile } from "@/lib/uploads/images";
 import { createRenderSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
-
-const MAX_BYTES = 10 * 1024 * 1024;
-const ALLOWED: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
-
-async function fileToUpload(file: File): Promise<UploadedFile | null> {
-  const ext = ALLOWED[file.type];
-  if (!ext) return null;
-  return {
-    data: Buffer.from(await file.arrayBuffer()),
-    contentType: file.type,
-    ext,
-    fileName: file.name,
-  };
-}
+export const maxDuration = 10;
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
@@ -45,9 +28,18 @@ export async function POST(req: Request) {
 
   try {
     await assertRateLimit("create_render", userId);
+    await assertRateLimit("upload_image", userId);
   } catch (err) {
     if (err instanceof RateLimitError) {
-      return NextResponse.json({ error: err.message }, { status: 429 });
+      return NextResponse.json(
+        {
+          success: false,
+          code: err.code,
+          message: err.message,
+          error: err.message,
+        },
+        { status: 429 },
+      );
     }
     throw err;
   }
@@ -55,22 +47,22 @@ export async function POST(req: Request) {
   const form = await req.formData();
 
   const file = form.get("image");
-  if (!(file instanceof File) || file.size === 0) {
+  if (!(file instanceof File)) {
     return NextResponse.json(
       { error: "Gambar desain wajib diunggah" },
       { status: 400 },
     );
   }
-  if (file.size > MAX_BYTES) {
+
+  let original;
+  try {
+    original = await validateImageFile(file);
+  } catch (err) {
+    if (err instanceof ImageUploadError) {
+      return NextResponse.json({ error: err.message }, { status: err.status });
+    }
     return NextResponse.json(
-      { error: "Ukuran gambar maksimal 10MB" },
-      { status: 400 },
-    );
-  }
-  const original = await fileToUpload(file);
-  if (!original) {
-    return NextResponse.json(
-      { error: "Format gambar harus JPG, PNG, atau WebP" },
+      { error: "File gambar tidak dapat dibaca" },
       { status: 400 },
     );
   }
@@ -111,10 +103,36 @@ export async function POST(req: Request) {
     );
   }
 
-  let reference: UploadedFile | undefined;
+  let reference;
   const refFile = form.get("reference");
   if (refFile instanceof File && refFile.size > 0) {
-    reference = (await fileToUpload(refFile)) ?? undefined;
+    if (input.mode !== "style_transfer") {
+      return NextResponse.json(
+        { error: "Reference image hanya digunakan untuk Style Transfer" },
+        { status: 400 },
+      );
+    }
+    try {
+      reference = await validateImageFile(refFile);
+    } catch (err) {
+      if (err instanceof ImageUploadError) {
+        return NextResponse.json(
+          { error: err.message },
+          { status: err.status },
+        );
+      }
+      return NextResponse.json(
+        { error: "File reference tidak dapat dibaca" },
+        { status: 400 },
+      );
+    }
+  }
+
+  if (input.mode === "style_transfer" && !reference) {
+    return NextResponse.json(
+      { error: "Reference image wajib diunggah untuk Style Transfer" },
+      { status: 400 },
+    );
   }
 
   const prompt = buildPrompt(input);
@@ -129,6 +147,11 @@ export async function POST(req: Request) {
       original,
       reference,
     });
+    setTimeout(() => {
+      void processRenderJob(result.renderId, `api-${userId}`).catch((err) => {
+        console.error("Background render job gagal:", err);
+      });
+    }, 0);
     return NextResponse.json(result);
   } catch (err) {
     if (err instanceof InsufficientCreditsError) {
