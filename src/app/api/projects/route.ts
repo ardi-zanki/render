@@ -22,6 +22,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const project = await createProject(session.user.id, parsed.data.name);
+  const project = await createProject(
+    session.user.id,
+    parsed.data.name,
+    parsed.data.description,
+  );
   return NextResponse.json({ id: project.id, name: project.name });
 }

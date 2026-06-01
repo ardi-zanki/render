@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+/* eslint-disable @next/next/no-img-element */
 import { cn } from "@/lib/utils";
 
 function initials(name: string) {
@@ -25,13 +24,7 @@ function Avatar({ name, src, size = 36, className }: AvatarProps) {
       style={{ width: size, height: size }}
     >
       {src ? (
-        <Image
-          src={src}
-          alt={name}
-          width={size}
-          height={size}
-          className="size-full object-cover"
-        />
+        <img src={src} alt={name} className="size-full object-cover" />
       ) : (
         initials(name)
       )}

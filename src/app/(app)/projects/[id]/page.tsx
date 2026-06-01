@@ -10,12 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
 import { getProject } from "@/lib/projects/service";
 import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
 import { listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
-import { renameProjectAction } from "./actions";
 
 export const metadata: Metadata = { title: "Project" };
 
@@ -54,21 +52,11 @@ export default async function ProjectDetailPage({
         }
       />
 
-      <form
-        action={renameProjectAction}
-        className="mb-6 flex max-w-md items-end gap-2"
-      >
-        <input type="hidden" name="projectId" value={id} />
-        <div className="flex flex-1 flex-col gap-1.5">
-          <label className="text-sm font-medium text-foreground" htmlFor="name">
-            Nama Project
-          </label>
-          <Input id="name" name="name" defaultValue={project.name} maxLength={80} required />
-        </div>
-        <Button type="submit" variant="outline">
-          Simpan
-        </Button>
-      </form>
+      {project.description && (
+        <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
+          {project.description}
+        </p>
+      )}
 
       {renders.length === 0 ? (
         <EmptyState

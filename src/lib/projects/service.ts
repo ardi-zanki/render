@@ -1,7 +1,7 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, count, desc, eq, isNotNull, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { projects } from "@/db/schema";
+import { projects, renders } from "@/db/schema";
 
 export async function getDefaultProject(userId: string) {
   const existing = await db.query.projects.findFirst({
@@ -20,12 +20,17 @@ export async function getDefaultProject(userId: string) {
   return created;
 }
 
-export async function listProjects(userId: string) {
+export async function listProjects(
+  userId: string,
+  opts: { archived?: boolean } = {},
+) {
   return db.query.projects.findMany({
     where: and(
       eq(projects.userId, userId),
       isNull(projects.deletedAt),
-      isNull(projects.archivedAt),
+      opts.archived
+        ? isNotNull(projects.archivedAt)
+        : isNull(projects.archivedAt),
     ),
     orderBy: desc(projects.updatedAt),
   });
@@ -41,26 +46,31 @@ export async function getProject(userId: string, projectId: string) {
   });
 }
 
-export async function createProject(userId: string, name: string) {
+export async function createProject(
+  userId: string,
+  name: string,
+  description?: string,
+) {
   const [created] = await db
     .insert(projects)
-    .values({ userId, name })
+    .values({ userId, name, description })
     .returning();
   return created;
 }
 
-export async function renameProject(
+export async function updateProject(
   userId: string,
   projectId: string,
   name: string,
+  description?: string,
 ) {
   await db
     .update(projects)
-    .set({ name, updatedAt: new Date() })
+    .set({ name, description: description ?? null, updatedAt: new Date() })
     .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
 }
 
-/** Archive a project (hidden from lists). The default project can't be archived. */
+/** Archive a project (hidden from the active list). The default can't be archived. */
 export async function archiveProject(userId: string, projectId: string) {
   const p = await getProject(userId, projectId);
   if (!p || p.isDefault) return false;
@@ -69,4 +79,47 @@ export async function archiveProject(userId: string, projectId: string) {
     .set({ archivedAt: new Date(), updatedAt: new Date() })
     .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
   return true;
+}
+
+export async function unarchiveProject(userId: string, projectId: string) {
+  await db
+    .update(projects)
+    .set({ archivedAt: null, updatedAt: new Date() })
+    .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+}
+
+export type DeleteProjectResult =
+  | { deleted: true }
+  | { deleted: false; reason: "default" | "has_renders" | "not_found" };
+
+/** Soft-delete a project. Only allowed when it has no renders and isn't default. */
+export async function deleteProject(
+  userId: string,
+  projectId: string,
+): Promise<DeleteProjectResult> {
+  const p = await getProject(userId, projectId);
+  if (!p) return { deleted: false, reason: "not_found" };
+  if (p.isDefault) return { deleted: false, reason: "default" };
+
+  const [{ value }] = await db
+    .select({ value: count() })
+    .from(renders)
+    .where(and(eq(renders.projectId, projectId), isNull(renders.deletedAt)));
+  if (value > 0) return { deleted: false, reason: "has_renders" };
+
+  await db
+    .update(projects)
+    .set({ deletedAt: new Date(), updatedAt: new Date() })
+    .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+  return { deleted: true };
+}
+
+/** Render counts per project for the given user (active renders). */
+export async function renderCountsByProject(userId: string) {
+  const rows = await db
+    .select({ projectId: renders.projectId, value: count() })
+    .from(renders)
+    .where(and(eq(renders.userId, userId), isNull(renders.deletedAt)))
+    .groupBy(renders.projectId);
+  return new Map(rows.map((r) => [r.projectId, r.value]));
 }

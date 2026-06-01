@@ -1,29 +1,25 @@
 "use client";
 
 import {
-  Bell,
   CreditCard,
   FolderOpen,
   Home,
   ImageIcon,
-  LogOut,
   Menu,
   Plus,
-  Settings,
   Shield,
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 
 import { NotificationBell } from "@/components/app/notification-bell";
+import { UserMenu } from "@/components/app/user-menu";
 import { CreditPill } from "@/components/brand/credit-pill";
 import { Logo } from "@/components/brand/logo";
-import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
-import { signOut } from "@/lib/auth-client";
 import type { NotificationItem } from "@/lib/notifications/ui";
 import { cn } from "@/lib/utils";
 
@@ -32,8 +28,6 @@ const NAV = [
   { label: "Project", href: "/projects", icon: FolderOpen },
   { label: "Riwayat Render", href: "/renders", icon: ImageIcon },
   { label: "Pembayaran", href: "/payments", icon: CreditCard },
-  { label: "Notifikasi", href: "/notifications", icon: Bell },
-  { label: "Pengaturan Akun", href: "/settings", icon: Settings },
 ];
 
 type AppUser = {
@@ -58,19 +52,10 @@ export function AppShell({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
 
   function isActive(href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);
-  }
-
-  async function handleSignOut() {
-    setSigningOut(true);
-    await signOut();
-    router.push("/login");
-    router.refresh();
   }
 
   const sidebar = (
@@ -113,11 +98,6 @@ export function AppShell({
             >
               <item.icon className="size-4 shrink-0" />
               {item.label}
-              {item.href === "/notifications" && unreadCount > 0 && (
-                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
             </Link>
           );
         })}
@@ -140,25 +120,7 @@ export function AppShell({
       </nav>
 
       <div className="border-t border-border p-3">
-        <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-          <Avatar name={user.name} src={user.image} />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-foreground">
-              {user.name}
-            </p>
-            <p className="truncate text-xs text-muted-foreground">
-              {user.email}
-            </p>
-          </div>
-        </div>
-        <Button
-          variant="ghost"
-          className="mt-1 w-full justify-start text-muted-foreground"
-          onClick={handleSignOut}
-          disabled={signingOut}
-        >
-          <LogOut /> Keluar
-        </Button>
+        <UserMenu user={user} />
       </div>
     </aside>
   );
