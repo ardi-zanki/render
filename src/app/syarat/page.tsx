@@ -1,0 +1,169 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { Logo } from "@/components/brand/logo";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ModeToggle } from "@/components/ui/mode-toggle";
+
+export const metadata: Metadata = {
+  title: "Syarat & Ketentuan",
+  description:
+    "Syarat dan ketentuan penggunaan RenderAI untuk akun, kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan.",
+};
+
+const sections = [
+  {
+    title: "1. Penerimaan Ketentuan",
+    body: [
+      "Dengan membuat akun, mengakses, atau menggunakan RenderAI, Anda menyetujui Syarat & Ketentuan ini. Jika Anda tidak menyetujui salah satu bagian, mohon untuk tidak menggunakan layanan.",
+      "RenderAI dapat memperbarui ketentuan ini dari waktu ke waktu. Perubahan penting akan diinformasikan melalui aplikasi, email, atau kanal komunikasi lain yang relevan.",
+    ],
+  },
+  {
+    title: "2. Akun dan Keamanan",
+    body: [
+      "Anda bertanggung jawab menjaga kerahasiaan email, password, dan akses akun. Semua aktivitas yang terjadi melalui akun Anda dianggap sebagai aktivitas Anda.",
+      "Informasi yang diberikan saat registrasi harus akurat dan tidak boleh menggunakan identitas pihak lain tanpa izin.",
+    ],
+  },
+  {
+    title: "3. Penggunaan Layanan",
+    body: [
+      "RenderAI membantu membuat visual arsitektur dan interior berbasis AI dari materi yang Anda unggah, seperti foto, sketsa, screenshot desain, atau referensi visual.",
+      "Layanan ini ditujukan untuk eksplorasi konsep, presentasi awal, mood approval, dan komunikasi desain. Hasil render tetap perlu ditinjau sebelum digunakan untuk keputusan teknis, konstruksi, legal, atau komersial yang berdampak tinggi.",
+    ],
+  },
+  {
+    title: "4. Kredit, Pembayaran, dan Paket",
+    body: [
+      "Sebagian proses render menggunakan kredit. Jumlah kredit, harga paket, bonus, dan aturan pemakaian dapat berubah sesuai kebijakan RenderAI.",
+      "Kredit yang sudah digunakan untuk proses render yang berhasil tidak dapat dikembalikan. Jika render gagal karena gangguan sistem, RenderAI dapat mengembalikan kredit sesuai status yang tercatat di sistem.",
+      "Pembayaran diproses melalui penyedia pembayaran pihak ketiga. Status transaksi, biaya, dan validasi pembayaran mengikuti data dari penyedia tersebut.",
+    ],
+  },
+  {
+    title: "5. Materi Unggahan dan Hak Penggunaan",
+    body: [
+      "Anda menyatakan memiliki hak, izin, atau kewenangan yang diperlukan atas materi yang diunggah ke RenderAI.",
+      "Anda tetap memiliki hak atas materi yang Anda unggah. Dengan menggunakan layanan, Anda memberi RenderAI izin non-eksklusif untuk memproses, menyimpan, menampilkan, dan menghasilkan output dari materi tersebut sejauh diperlukan untuk menyediakan layanan.",
+    ],
+  },
+  {
+    title: "6. Hasil Render",
+    body: [
+      "Hasil render dapat digunakan oleh Anda untuk kebutuhan presentasi, diskusi, eksplorasi desain, atau kebutuhan bisnis Anda, selama tidak melanggar hukum, hak pihak ketiga, atau ketentuan ini.",
+      "Karena hasil dibuat dengan bantuan AI, RenderAI tidak menjamin seluruh detail, proporsi, material, pencahayaan, teks, atau elemen visual selalu akurat. Anda bertanggung jawab melakukan pengecekan akhir sebelum hasil digunakan.",
+    ],
+  },
+  {
+    title: "7. Batasan Penggunaan",
+    body: [
+      "Anda tidak boleh menggunakan RenderAI untuk mengunggah materi ilegal, melanggar hak cipta, mengandung data sensitif tanpa izin, meniru identitas pihak lain, atau menghasilkan konten yang merugikan pihak lain.",
+      "Anda juga tidak boleh mencoba mengakses sistem secara tidak sah, mengganggu layanan, melakukan penyalahgunaan otomatisasi, atau menggunakan layanan untuk aktivitas yang melanggar hukum.",
+    ],
+  },
+  {
+    title: "8. Ketersediaan Layanan",
+    body: [
+      "RenderAI berupaya menjaga layanan tetap tersedia dan berjalan baik. Namun, layanan dapat terganggu karena pemeliharaan, pembaruan sistem, gangguan jaringan, penyedia AI, penyimpanan, pembayaran, atau faktor lain di luar kendali RenderAI.",
+      "RenderAI tidak bertanggung jawab atas kerugian tidak langsung yang timbul dari gangguan sementara, keterlambatan proses, atau ketidakakuratan hasil AI.",
+    ],
+  },
+  {
+    title: "9. Privasi dan Data",
+    body: [
+      "RenderAI memproses data akun, unggahan, hasil render, pembayaran, dan aktivitas aplikasi untuk menyediakan layanan, menjaga keamanan, meningkatkan pengalaman pengguna, dan memenuhi kewajiban operasional.",
+      "Anda bertanggung jawab memastikan materi yang diunggah tidak berisi data pribadi atau rahasia pihak lain tanpa izin yang sah.",
+    ],
+  },
+  {
+    title: "10. Penghentian Akses",
+    body: [
+      "RenderAI dapat membatasi, menangguhkan, atau menghentikan akses akun jika terdapat indikasi penyalahgunaan, pelanggaran ketentuan, risiko keamanan, pembayaran bermasalah, atau permintaan hukum yang sah.",
+      "Anda dapat berhenti menggunakan layanan kapan saja. Beberapa data mungkin tetap disimpan selama diperlukan untuk kepatuhan, keamanan, audit, atau penyelesaian transaksi.",
+    ],
+  },
+  {
+    title: "11. Kontak",
+    body: [
+      "Jika Anda memiliki pertanyaan tentang Syarat & Ketentuan ini, hubungi tim RenderAI melalui kanal support yang tersedia di aplikasi.",
+    ],
+  },
+];
+
+export default function TermsPage() {
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border/80 bg-background/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-5">
+          <Link href="/" aria-label="RenderAI beranda">
+            <Logo size={28} />
+          </Link>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" asChild className="hidden sm:inline-flex">
+              <Link href="/login">Masuk</Link>
+            </Button>
+            <ModeToggle />
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-5 sm:py-12">
+        <div className="max-w-3xl">
+          <p className="text-sm font-semibold text-primary">
+            Legal RenderAI
+          </p>
+          <h1 className="mt-3 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">
+            Syarat & Ketentuan
+          </h1>
+          <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
+            Ketentuan ini menjelaskan aturan penggunaan RenderAI, termasuk akun,
+            kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan
+            layanan.
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Terakhir diperbarui: 1 Juni 2026
+          </p>
+        </div>
+
+        <Card className="mt-8">
+          <CardContent className="flex flex-col gap-8 py-6 sm:py-7">
+            {sections.map((section) => (
+              <section key={section.title} className="max-w-3xl">
+                <h2 className="text-lg font-bold text-foreground">
+                  {section.title}
+                </h2>
+                <div className="mt-3 space-y-3">
+                  {section.body.map((paragraph) => (
+                    <p
+                      key={paragraph}
+                      className="text-sm leading-7 text-muted-foreground"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </CardContent>
+        </Card>
+
+        <div className="mt-8 flex flex-col gap-3 rounded-lg border border-border bg-muted/45 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-bold text-foreground">
+              Siap mulai menggunakan RenderAI?
+            </p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              Kembali ke halaman registrasi untuk membuat akun dan mencoba
+              workflow render pertama Anda.
+            </p>
+          </div>
+          <Button asChild className="shrink-0">
+            <Link href="/register">Kembali ke daftar</Link>
+          </Button>
+        </div>
+      </main>
+    </div>
+  );
+}
