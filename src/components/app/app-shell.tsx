@@ -6,13 +6,14 @@ import {
   Home,
   ImageIcon,
   Menu,
+  PanelLeft,
   Plus,
   Shield,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useState, type MouseEvent, type ReactNode } from "react";
 
 import { NotificationBell } from "@/components/app/notification-bell";
 import { UserMenu } from "@/components/app/user-menu";
@@ -36,16 +37,35 @@ type AppUser = {
   image?: string | null;
 };
 
+type AppUserPreferences = {
+  displayName: string;
+  emailNotificationsEnabled: boolean;
+  defaultRenderMode: string;
+  defaultOutputFormat: string;
+};
+
+const SIDEBAR_STORAGE_KEY = "renderai.sidebar.expanded";
+const SIDEBAR_COOKIE_KEY = "renderai_sidebar_expanded";
+
+function persistSidebarState(expanded: boolean) {
+  localStorage.setItem(SIDEBAR_STORAGE_KEY, String(expanded));
+  document.cookie = `${SIDEBAR_COOKIE_KEY}=${String(expanded)}; path=/; max-age=31536000; samesite=lax`;
+}
+
 export function AppShell({
   user,
+  preferences,
   balance,
+  initialSidebarExpanded,
   unreadCount,
   notifications,
   isAdmin,
   children,
 }: {
   user: AppUser;
+  preferences: AppUserPreferences;
   balance: number;
+  initialSidebarExpanded: boolean;
   unreadCount: number;
   notifications: NotificationItem[];
   isAdmin: boolean;
@@ -53,83 +73,187 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(
+    initialSidebarExpanded,
+  );
+
+  function updateSidebarExpanded(next: boolean) {
+    setSidebarExpanded(next);
+    try {
+      persistSidebarState(next);
+    } catch {
+      // Ignore persistence failures.
+    }
+  }
 
   function isActive(href: string) {
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  const sidebar = (
-    <aside className="flex h-full flex-col border-r border-border bg-card">
-      <div className="flex h-16 items-center justify-between px-5">
-        <Link href="/dashboard" onClick={() => setOpen(false)}>
-          <Logo size={28} />
-        </Link>
-        <button
-          className="text-muted-foreground lg:hidden"
-          onClick={() => setOpen(false)}
-          aria-label="Tutup menu"
+  function isNavActive(href: string) {
+    if (href === "/renders") return pathname === "/renders";
+    return isActive(href);
+  }
+
+  const renderNewActive = isActive("/renders/new");
+
+  function openCollapsedSidebarFromEmptyArea(
+    e: MouseEvent<HTMLElement>,
+    expanded: boolean,
+  ) {
+    if (expanded) return;
+    const target = e.target as HTMLElement;
+    if (!target.closest("a,button")) updateSidebarExpanded(true);
+  }
+
+  function labelWithTooltip(label: string, expanded: boolean) {
+    if (expanded) return <span className="truncate">{label}</span>;
+    return (
+      <span className="pointer-events-none absolute left-full ml-3 hidden whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background shadow-lg group-hover:block">
+        {label}
+      </span>
+    );
+  }
+
+  function renderSidebar(forceExpanded = false) {
+    const expanded = forceExpanded || sidebarExpanded;
+
+    return (
+      <aside
+        onClick={(e) => openCollapsedSidebarFromEmptyArea(e, expanded)}
+        className={cn(
+          "flex h-full flex-col overflow-visible border-r border-border bg-card transition-[width] duration-200",
+          expanded ? "w-64" : "w-20",
+        )}
+        suppressHydrationWarning
+      >
+        <div
+          className={cn(
+            "flex h-16 items-center px-5",
+            expanded ? "justify-between" : "justify-center",
+          )}
         >
-          <X className="size-5" />
-        </button>
-      </div>
-
-      <div className="px-4 pb-2">
-        <Button asChild className="w-full">
-          <Link href="/renders/new" onClick={() => setOpen(false)}>
-            <Plus /> Buat Render
+          <Link
+            href="/dashboard"
+            onClick={() => setOpen(false)}
+            className={cn(!expanded && "hidden")}
+          >
+            <Logo size={28} />
           </Link>
-        </Button>
-      </div>
+          <button
+            className="text-muted-foreground lg:hidden"
+            onClick={() => setOpen(false)}
+            aria-label="Tutup menu"
+          >
+            <X className="size-5" />
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "hidden rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex",
+              !expanded && "flex",
+            )}
+            onClick={() => updateSidebarExpanded(!sidebarExpanded)}
+            aria-label={expanded ? "Close Sidebar" : "Open Sidebar"}
+            title={expanded ? "Close Sidebar" : "Open Sidebar"}
+          >
+            <PanelLeft className="size-5" />
+          </button>
+        </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-2">
-        {NAV.map((item) => {
-          const active = isActive(item.href);
-          return (
+        <div className={cn("px-3", expanded ? "pb-0.5" : "pb-1")}>
+          <Button
+            asChild
+            variant="ghost"
+            size={expanded ? "default" : "icon"}
+            className={cn(
+              "group relative w-full justify-start rounded-lg px-3 font-medium hover:bg-muted",
+              !expanded && "justify-center px-0",
+              renderNewActive
+                ? "bg-primary/10 text-primary"
+                : "text-foreground",
+            )}
+          >
             <Link
-              key={item.href}
-              href={item.href}
+              href="/renders/new"
               onClick={() => setOpen(false)}
+              title={!expanded ? "Render baru" : undefined}
+            >
+              <Plus className="size-4" />
+              {labelWithTooltip("Render baru", expanded)}
+            </Link>
+          </Button>
+        </div>
+
+        <nav className="flex-1 space-y-1 px-3 pt-1 pb-2">
+          {NAV.map((item) => {
+            const active = isNavActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                title={!expanded ? item.label : undefined}
+                className={cn(
+                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  !expanded && "justify-center px-0",
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <item.icon className="size-4 shrink-0" />
+                {labelWithTooltip(item.label, expanded)}
+              </Link>
+            );
+          })}
+
+          {isAdmin && (
+            <Link
+              href="/admin"
+              onClick={() => setOpen(false)}
+              title={!expanded ? "Admin" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                active
+                "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                !expanded && "justify-center px-0",
+                isActive("/admin")
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
-              <item.icon className="size-4 shrink-0" />
-              {item.label}
+              <Shield className="size-4 shrink-0" />
+              {labelWithTooltip("Admin", expanded)}
             </Link>
-          );
-        })}
+          )}
+        </nav>
 
-        {isAdmin && (
-          <Link
-            href="/admin"
-            onClick={() => setOpen(false)}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-              isActive("/admin")
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            <Shield className="size-4 shrink-0" />
-            Admin
-          </Link>
-        )}
-      </nav>
-
-      <div className="border-t border-border p-3">
-        <UserMenu user={user} />
-      </div>
-    </aside>
-  );
+        <div
+          className={cn(
+            "border-t border-border p-3",
+            !expanded && "pb-16",
+          )}
+        >
+          <UserMenu
+            user={user}
+            preferences={preferences}
+            compact={!expanded}
+          />
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 lg:block">
-        {sidebar}
+      <div
+        className={cn(
+          "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-[2147481000] lg:block",
+          sidebarExpanded ? "lg:w-64" : "lg:w-20",
+        )}
+        suppressHydrationWarning
+      >
+        {renderSidebar()}
       </div>
 
       {/* Mobile drawer */}
@@ -139,11 +263,19 @@ export function AppShell({
             className="absolute inset-0 bg-black/40"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 w-64">{sidebar}</div>
+          <div className="absolute inset-y-0 left-0 w-64">
+            {renderSidebar(true)}
+          </div>
         </div>
       )}
 
-      <div className="lg:pl-64">
+      <div
+        className={cn(
+          "transition-[padding] duration-200",
+          sidebarExpanded ? "lg:pl-64" : "lg:pl-20",
+        )}
+        suppressHydrationWarning
+      >
         <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur sm:px-6">
           <button
             className="text-foreground lg:hidden"
@@ -162,7 +294,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <main className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-5">
           {children}
         </main>
       </div>

@@ -2,7 +2,8 @@
 
 import { Camera, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -27,6 +28,21 @@ export function ProfileModal({
   const [preview, setPreview] = useState<string | null>(user.image ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onClose]);
 
   function pickFile(f: File | null) {
     if (!f) return;
@@ -60,10 +76,12 @@ export function ProfileModal({
     router.refresh();
   }
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[2147483600] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative z-[61] w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+      <div className="relative z-[2147483601] w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-extrabold text-foreground">Edit Profil</h2>
           <button
@@ -125,6 +143,7 @@ export function ProfileModal({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

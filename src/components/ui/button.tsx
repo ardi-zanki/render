@@ -9,7 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Primary navy CTA — the "Gass Render!" / "Daftar Sekarang" style.
+        // Primary navy CTA, used for main actions like "Render" and "Daftar Sekarang".
         default:
           "bg-primary text-primary-foreground shadow-sm hover:brightness-105 hover:shadow-md",
         // Inverted ink button — auto-adapts to light/dark (the dark "Masuk"/"Download" style).

@@ -1,4 +1,5 @@
 import { Gem } from "lucide-react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
@@ -30,12 +31,12 @@ function CreditPill({
       <span className="text-sm font-semibold tabular-nums text-foreground">
         {balance.toLocaleString("id-ID")}
       </span>
-      <button
-        type="button"
+      <Link
+        href="/payments"
         className="ml-1 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
       >
         {actionLabel}
-      </button>
+      </Link>
     </div>
   );
 }

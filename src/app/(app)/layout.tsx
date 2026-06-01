@@ -1,4 +1,9 @@
+import { eq } from "drizzle-orm";
+import { cookies } from "next/headers";
+
 import { AppShell } from "@/components/app/app-shell";
+import { db } from "@/db";
+import { userProfiles } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
 import {
   getUnreadCount,
@@ -12,10 +17,15 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const session = await requireVerifiedUser();
-  const [balance, unreadCount, recent] = await Promise.all([
+  const cookieStore = await cookies();
+  const sidebarCookie = cookieStore.get("renderai_sidebar_expanded")?.value;
+  const [balance, unreadCount, recent, profile] = await Promise.all([
     getBalance(session.user.id),
     getUnreadCount(session.user.id),
     listNotifications(session.user.id, 8),
+    db.query.userProfiles.findFirst({
+      where: eq(userProfiles.userId, session.user.id),
+    }),
   ]);
 
   return (
@@ -25,7 +35,14 @@ export default async function AppLayout({
         email: session.user.email,
         image: session.user.image ?? null,
       }}
+      preferences={{
+        displayName: profile?.displayName ?? "",
+        emailNotificationsEnabled: profile?.emailNotificationsEnabled ?? true,
+        defaultRenderMode: profile?.defaultRenderMode ?? "interior",
+        defaultOutputFormat: profile?.defaultOutputFormat ?? "png",
+      }}
       balance={balance}
+      initialSidebarExpanded={sidebarCookie === "false" ? false : true}
       unreadCount={unreadCount}
       isAdmin={session.user.role === "admin"}
       notifications={recent.map((n) => ({

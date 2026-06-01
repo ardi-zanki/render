@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/app/page-header";
-import { RendrStudio } from "@/components/app/rendr-studio";
+import { RenderStudio } from "@/components/app/render-studio";
 import { getBalance } from "@/lib/credits";
 import {
   getDefaultProject,
@@ -11,7 +11,7 @@ import {
 import { listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Rendr Studio" };
+export const metadata: Metadata = { title: "Render Studio" };
 
 export default async function CreateRenderPage({
   searchParams,
@@ -35,10 +35,10 @@ export default async function CreateRenderPage({
   return (
     <>
       <PageHeader
-        title="Rendr Studio"
-        description="Upload desain, atur konteks & lighting, lalu Gass Render!"
+        title="Render Studio"
+        description="Upload desain, atur konteks & lighting, lalu Render."
       />
-      <RendrStudio
+      <RenderStudio
         key={project.id}
         projectId={project.id}
         projectName={project.name}

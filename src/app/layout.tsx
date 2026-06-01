@@ -37,12 +37,7 @@ export default function RootLayout({
       className={`${jakarta.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           {children}
           <Toaster />
         </ThemeProvider>

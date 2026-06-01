@@ -84,7 +84,7 @@ function Segmented({
   );
 }
 
-export function RendrStudio({
+export function RenderStudio({
   projectId,
   projectName,
   projects,
@@ -445,7 +445,7 @@ export function RendrStudio({
                   ) : (
                     <Button onClick={onRender} disabled={!canRender}>
                       {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                      Gass Render!
+                      Render
                     </Button>
                   )}
                 </div>

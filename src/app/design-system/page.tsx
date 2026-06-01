@@ -196,7 +196,7 @@ export default function DesignSystemPage() {
           <Card>
             <CardContent className="flex flex-col gap-4 py-6">
               <p className="text-4xl font-extrabold tracking-tight text-foreground">
-                Siapin kopi, yok kita ngrender
+                Siapin kopi, yuk kita ngrender
               </p>
               <p className="text-2xl font-bold text-foreground">
                 Heading bagian — Semibold 24
@@ -222,7 +222,7 @@ export default function DesignSystemPage() {
           <Card>
             <CardContent className="flex flex-col gap-6 py-6">
               <div className="flex flex-wrap items-center gap-3">
-                <Button>Gass Render!</Button>
+                <Button>Render</Button>
                 <Button variant="inverse">
                   <Download /> Download
                 </Button>

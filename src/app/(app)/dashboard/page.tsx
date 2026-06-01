@@ -148,7 +148,7 @@ export default async function DashboardPage() {
         <CardContent className="flex flex-col items-start gap-4 py-7 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
             <p className="flex items-center gap-2 text-lg font-extrabold">
-              <Sparkles className="size-5" /> Siapin kopi, yok kita ngrender
+              <Sparkles className="size-5" /> Siapin kopi, yuk kita ngrender
             </p>
             <p className="text-sm text-primary-foreground/80">
               Upload desain, pilih mode, dan dapatkan render realistis dalam

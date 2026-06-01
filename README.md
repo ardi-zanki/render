@@ -128,16 +128,16 @@ credits + "Project Saya". Forms use the `authClient` (`signUp`, `signIn`,
 
 > Dev demo account (already verified): **demo@renderai.test** / `rahasia123`.
 
-## Render core & Rendr Studio (Phase 2)
+## Render core & Render Studio (Phase 2)
 
 The render pipeline (`src/lib/renders/service.ts`) is: check balance → create
 render row → deduct credit (idempotent) → store original → call AI provider →
 persist result asset → mark success. On failure the render is marked failed and
 the credit is refunded. Entry point: `POST /api/renders` (multipart upload).
 
-- **Rendr Studio** (`/renders/new`) — the workspace: mode (Interior/Exterior/
+- **Render Studio** (`/renders/new`) — the workspace: mode (Interior/Exterior/
   Style Transfer/Upscale), style, location, time & weather, image upload,
-  instruction, **Gass Render!**, before/after view, download, and a scene grid.
+  instruction, **Render**, before/after view, download, and a scene grid.
 - **Riwayat Render** (`/renders`) and **Project** (`/projects`) show real data;
   the dashboard lists recent renders.
 
@@ -219,7 +219,7 @@ pnpm make:admin [email] [password]   # promote/create an admin (default admin@re
 - **Admin analytics** — the `/admin` overview adds dependency-free charts
   (`src/components/app/charts.tsx`): renders & revenue over the last 14 days,
   plus render breakdowns by mode and status (`getAdminAnalytics`).
-- **Full project management** — the Rendr Studio has a project picker (+ inline
+- **Full project management** — the Render Studio has a project picker (+ inline
   "create"); renders go to the selected project (`/renders/new?project=<id>`).
   Project detail page `/projects/[id]` lists that project's renders with rename
   and archive (default project can't be archived). `POST /api/projects` creates
@@ -230,7 +230,7 @@ pnpm make:admin [email] [password]   # promote/create an admin (default admin@re
 - [x] **Phase 1a** — Scaffold + design system + dark mode
 - [x] **Phase 1b** — Better Auth, PostgreSQL/Drizzle, R2, Resend, rate limiter, JWT
 - [x] **Auth UI + dashboard** — login/register/verify/reset, app shell, dashboard
-- [x] **Phase 2** — Project & Render core, Rendr Studio, MyArchitectAI provider
+- [x] **Phase 2** — Project & Render core, Render Studio, MyArchitectAI provider
 - [x] **Phase 3** — Credit purchase + Midtrans payment (Snap + webhook)
 - [x] **Phase 4** — Notifications (in-app + email) + account settings
 - [x] **Phase 5** — Admin (users, renders, payments, audit log)
