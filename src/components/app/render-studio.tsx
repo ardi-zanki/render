@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { RenderMode } from "@/db/schema";
+import type { RenderMode, RenderOutputFormat } from "@/db/schema";
 import type { RenderListItem } from "@/lib/renders/service";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +51,12 @@ const STYLES = [
 ];
 const TIMES = ["auto", "pagi", "siang", "sore", "malam"];
 const WEATHERS = ["auto", "cerah", "berawan", "mendung", "hujan", "berkabut"];
+const OUTPUT_FORMATS: { value: RenderOutputFormat; label: string }[] = [
+  { value: "jpg", label: "JPG" },
+  { value: "png", label: "PNG" },
+  { value: "webp", label: "WebP" },
+  { value: "avif", label: "AVIF" },
+];
 const cap = (s: string) => (s === "auto" ? "Otomatis" : s[0].toUpperCase() + s.slice(1));
 
 type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;
@@ -101,7 +107,7 @@ export function RenderStudio({
   initialBalance: number;
   initialScenes: Scene[];
   defaultRenderMode?: RenderMode;
-  defaultOutputFormat?: "jpg" | "png";
+  defaultOutputFormat?: RenderOutputFormat;
   initialInstruction?: string;
 }) {
   const router = useRouter();
@@ -135,9 +141,11 @@ export function RenderStudio({
   const [time, setTime] = useState("auto");
   const [weather, setWeather] = useState("auto");
   const [instruction, setInstruction] = useState(initialInstruction);
-  const [outputFormat, setOutputFormat] = useState<"jpg" | "png">(
+  const [outputFormat, setOutputFormat] = useState<RenderOutputFormat>(
     defaultOutputFormat,
   );
+  const [negativePrompt, setNegativePrompt] = useState("");
+  const [styleTransferStrength, setStyleTransferStrength] = useState(0.65);
 
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -241,7 +249,13 @@ export function RenderStudio({
       fd.append("weather", weather);
       if (location) fd.append("location", location);
       if (instruction) fd.append("instruction", instruction);
-      if (referenceFile) fd.append("reference", referenceFile);
+      if (referenceFile) {
+        fd.append("reference", referenceFile);
+        fd.append("styleTransferStrength", String(styleTransferStrength));
+        if (negativePrompt.trim()) {
+          fd.append("negativePrompt", negativePrompt.trim());
+        }
+      }
 
       const res = await fetch("/api/renders", { method: "POST", body: fd });
       const json = await res.json();
@@ -389,10 +403,15 @@ export function RenderStudio({
             <Select
               id="outputFormat"
               value={outputFormat}
-              onChange={(e) => setOutputFormat(e.target.value as "jpg" | "png")}
+              onChange={(e) =>
+                setOutputFormat(e.target.value as RenderOutputFormat)
+              }
             >
-              <option value="jpg">JPG</option>
-              <option value="png">PNG</option>
+              {OUTPUT_FORMATS.map((format) => (
+                <option key={format.value} value={format.value}>
+                  {format.label}
+                </option>
+              ))}
             </Select>
           </div>
 
@@ -552,6 +571,42 @@ export function RenderStudio({
                   className="hidden"
                   onChange={(e) => pickReference(e.target.files?.[0] ?? null)}
                 />
+                <div className="mt-3 grid gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between gap-3">
+                      <Label htmlFor="styleTransferStrength">
+                        Kekuatan style
+                      </Label>
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {Math.round(styleTransferStrength * 100)}%
+                      </span>
+                    </div>
+                    <Input
+                      id="styleTransferStrength"
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={styleTransferStrength}
+                      onChange={(e) =>
+                        setStyleTransferStrength(Number(e.target.value))
+                      }
+                      disabled={isProcessing}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="negativePrompt">Negative prompt</Label>
+                    <Textarea
+                      id="negativePrompt"
+                      value={negativePrompt}
+                      onChange={(e) => setNegativePrompt(e.target.value)}
+                      placeholder="Elemen yang ingin dihindari: blur, furniture berlebihan, warna terlalu gelap..."
+                      maxLength={1000}
+                      className="min-h-16"
+                      disabled={isProcessing}
+                    />
+                  </div>
+                </div>
               </div>
             )}
 

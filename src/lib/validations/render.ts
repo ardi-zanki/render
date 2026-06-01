@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const outputFormatEnum = z.enum(["jpg", "png", "webp", "avif"]);
+
 export const renderModeEnum = z.enum([
   "interior",
   "exterior",
@@ -18,7 +20,12 @@ export const createRenderSchema = z.object({
     .enum(["auto", "cerah", "berawan", "mendung", "hujan", "berkabut"])
     .optional(),
   instruction: z.string().max(1000, "Prompt maksimal 1.000 karakter").optional(),
-  outputFormat: z.enum(["jpg", "png"]).optional(),
+  outputFormat: outputFormatEnum.optional(),
+  negativePrompt: z
+    .string()
+    .max(1000, "Negative prompt maksimal 1.000 karakter")
+    .optional(),
+  styleTransferStrength: z.coerce.number().min(0).max(1).optional(),
 });
 
 export type CreateRenderInput = z.infer<typeof createRenderSchema>;

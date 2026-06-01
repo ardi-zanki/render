@@ -132,8 +132,10 @@ export function PreferencesForm({
           name="defaultOutputFormat"
           defaultValue={defaultOutputFormat}
         >
-          <option value="png">PNG</option>
           <option value="jpg">JPG</option>
+          <option value="png">PNG</option>
+          <option value="webp">WebP</option>
+          <option value="avif">AVIF</option>
         </Select>
       </div>
       <div className="flex items-center gap-3">

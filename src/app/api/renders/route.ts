@@ -77,6 +77,8 @@ export async function POST(req: Request) {
       "weather",
       "instruction",
       "outputFormat",
+      "negativePrompt",
+      "styleTransferStrength",
       "projectId",
     ]
       .map((k) => [k, form.get(k)] as const)
@@ -144,6 +146,12 @@ export async function POST(req: Request) {
       mode: input.mode,
       prompt,
       outputFormat: input.outputFormat,
+      negativePrompt:
+        input.mode === "style_transfer" ? input.negativePrompt : undefined,
+      styleTransferStrength:
+        input.mode === "style_transfer"
+          ? input.styleTransferStrength
+          : undefined,
       original,
       reference,
     });

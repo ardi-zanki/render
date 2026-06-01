@@ -2,6 +2,13 @@ import sharp from "sharp";
 
 import { AiProviderError, type AiProvider } from "./types";
 
+const CONTENT_TYPE_BY_FORMAT = {
+  jpg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+  avif: "image/avif",
+} as const;
+
 /**
  * Mock AI provider for local dev (no API key / external reachability needed).
  * Fetches the input image and applies a light "enhancement" with sharp so the
@@ -27,21 +34,28 @@ export function createMockAiProvider(): AiProvider {
       }
 
       const isUpscale = input.mode === "upscale";
-      const data = await sharp(inputBuf)
+      const format = input.outputFormat ?? "jpg";
+      const image = sharp(inputBuf)
         .resize(isUpscale ? 2048 : 1024, isUpscale ? 2048 : 1024, {
           fit: "inside",
           withoutEnlargement: false,
         })
         .modulate({ saturation: 1.22, brightness: 1.04 })
-        .sharpen()
-        .jpeg({ quality: 88 })
-        .toBuffer();
+        .sharpen();
+      const data =
+        format === "png"
+          ? await image.png().toBuffer()
+          : format === "webp"
+            ? await image.webp({ quality: 88 }).toBuffer()
+            : format === "avif"
+              ? await image.avif({ quality: 60 }).toBuffer()
+              : await image.jpeg({ quality: 88 }).toBuffer();
 
       // Simulate provider latency.
       await new Promise((r) => setTimeout(r, 1200));
 
       return {
-        outputs: [{ data, contentType: "image/jpeg" }],
+        outputs: [{ data, contentType: CONTENT_TYPE_BY_FORMAT[format] }],
         raw: { provider: "mock", mode: input.mode },
       };
     },

@@ -9,6 +9,7 @@ import {
   renders,
   type RenderAssetType,
   type RenderMode,
+  type RenderOutputFormat,
   type RenderStatus,
 } from "@/db/schema";
 import { env } from "@/env";
@@ -33,7 +34,9 @@ export interface CreateRenderParams {
   projectId: string;
   mode: RenderMode;
   prompt: string;
-  outputFormat?: "jpg" | "png";
+  outputFormat?: RenderOutputFormat;
+  negativePrompt?: string;
+  styleTransferStrength?: number;
   original: UploadedFile;
   reference?: UploadedFile;
 }
@@ -90,6 +93,24 @@ export interface RenderListItem {
   creditsUsed: number;
   resultUrl: string | null;
   originalUrl: string | null;
+}
+
+type ProviderRequestOptions = {
+  negativePrompt?: string;
+  styleTransferStrength?: number;
+};
+
+const OUTPUT_FORMATS = new Set<RenderOutputFormat>([
+  "jpg",
+  "png",
+  "webp",
+  "avif",
+]);
+
+function normalizeOutputFormat(value: string | null | undefined): RenderOutputFormat {
+  return value && OUTPUT_FORMATS.has(value as RenderOutputFormat)
+    ? (value as RenderOutputFormat)
+    : "jpg";
 }
 
 function isFinal(status: string) {
@@ -152,7 +173,13 @@ async function storeResultAsset(params: {
   contentType: string;
   index: number;
 }) {
-  const ext = params.contentType.includes("png") ? "png" : "jpg";
+  const ext = params.contentType.includes("png")
+    ? "png"
+    : params.contentType.includes("webp")
+      ? "webp"
+      : params.contentType.includes("avif")
+        ? "avif"
+        : "jpg";
   const key = renderAssetKey({
     userId: params.userId,
     projectId: params.projectId,
@@ -195,6 +222,15 @@ export async function createRender(
 ): Promise<CreateRenderResult> {
   const { userId, projectId, mode } = params;
   const outputFormat = params.outputFormat ?? "jpg";
+  const providerRequestOptions: ProviderRequestOptions = {};
+  if (params.negativePrompt) {
+    providerRequestOptions.negativePrompt = params.negativePrompt;
+  }
+  if (typeof params.styleTransferStrength === "number") {
+    providerRequestOptions.styleTransferStrength = params.styleTransferStrength;
+  }
+  const hasProviderRequestOptions =
+    Object.keys(providerRequestOptions).length > 0;
 
   if (mode === "style_transfer" && !params.reference) {
     throw new Error("Reference image wajib diunggah untuk Style Transfer");
@@ -214,6 +250,9 @@ export async function createRender(
       outputFormat,
       status: "queued",
       aiProvider: env.AI_PROVIDER,
+      providerResponse: hasProviderRequestOptions
+        ? { requestOptions: providerRequestOptions }
+        : null,
     })
     .returning();
 
@@ -473,13 +512,22 @@ async function processLockedJob(jobId: string) {
     if (!original) throw new Error("Asset original tidak ditemukan");
 
     const originalBytes = await fetchAssetBytes(original.fileUrl, original.fileKey);
+    const requestOptions =
+      render.providerResponse &&
+      typeof render.providerResponse === "object" &&
+      "requestOptions" in render.providerResponse
+        ? ((render.providerResponse as { requestOptions?: ProviderRequestOptions })
+            .requestOptions ?? {})
+        : {};
     const result = await aiProvider().createRender({
       mode: render.mode,
       imageUrl: original.fileUrl,
       imageBuffer: originalBytes,
       referenceUrl: reference?.fileUrl,
       prompt: render.prompt ?? "",
-      outputFormat: render.outputFormat === "png" ? "png" : "jpg",
+      outputFormat: normalizeOutputFormat(render.outputFormat),
+      negativePrompt: requestOptions.negativePrompt,
+      styleTransferStrength: requestOptions.styleTransferStrength,
     });
 
     if (result.outputs.length === 0) {
@@ -520,7 +568,10 @@ async function processLockedJob(jobId: string) {
         failedAt: null,
         creditsUsed: RENDER_COST,
         providerRequestId: result.providerRequestId,
-        providerResponse: result.raw as Record<string, unknown>,
+        providerResponse: {
+          requestOptions,
+          response: result.raw,
+        },
         errorCode: null,
         errorMessage: null,
       })

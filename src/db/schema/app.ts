@@ -14,6 +14,7 @@ import { user } from "./auth";
 
 // ── Shared string unions (stored as text, typed in TS) ──────────────
 export type RenderMode = "interior" | "exterior" | "style_transfer" | "upscale";
+export type RenderOutputFormat = "jpg" | "png" | "webp" | "avif";
 export type RenderStatus =
   | "queued"
   | "processing"

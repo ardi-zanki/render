@@ -13,7 +13,7 @@ export const preferencesSchema = z.object({
     "style_transfer",
     "upscale",
   ]),
-  defaultOutputFormat: z.enum(["png", "jpg"]),
+  defaultOutputFormat: z.enum(["jpg", "png", "webp", "avif"]),
 });
 
 export const changePasswordSchema = z

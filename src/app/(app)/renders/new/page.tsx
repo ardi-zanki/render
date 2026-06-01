@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { PageHeader } from "@/components/app/page-header";
 import { RenderStudio } from "@/components/app/render-studio";
 import { db } from "@/db";
-import { userProfiles } from "@/db/schema";
+import { userProfiles, type RenderOutputFormat } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
 import {
   getDefaultProject,
@@ -15,6 +15,19 @@ import { listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Render Studio" };
+
+const OUTPUT_FORMATS = new Set<RenderOutputFormat>([
+  "jpg",
+  "png",
+  "webp",
+  "avif",
+]);
+
+function defaultOutputFormat(value: string | null | undefined): RenderOutputFormat {
+  return value && OUTPUT_FORMATS.has(value as RenderOutputFormat)
+    ? (value as RenderOutputFormat)
+    : "jpg";
+}
 
 export default async function CreateRenderPage({
   searchParams,
@@ -57,9 +70,7 @@ export default async function CreateRenderPage({
           resultUrl: s.resultUrl,
         }))}
         defaultRenderMode={profile?.defaultRenderMode ?? "interior"}
-        defaultOutputFormat={
-          profile?.defaultOutputFormat === "png" ? "png" : "jpg"
-        }
+        defaultOutputFormat={defaultOutputFormat(profile?.defaultOutputFormat)}
         initialInstruction={prompt ?? ""}
       />
     </>

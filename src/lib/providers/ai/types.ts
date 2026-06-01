@@ -1,4 +1,4 @@
-import type { RenderMode } from "@/db/schema";
+import type { RenderMode, RenderOutputFormat } from "@/db/schema";
 
 export interface AiRenderInput {
   mode: RenderMode;
@@ -9,8 +9,9 @@ export interface AiRenderInput {
   /** Reference image URL (Style Transfer). */
   referenceUrl?: string;
   prompt?: string;
-  outputFormat?: "jpg" | "png";
-  options?: Record<string, unknown>;
+  outputFormat?: RenderOutputFormat;
+  negativePrompt?: string;
+  styleTransferStrength?: number;
 }
 
 export interface AiRenderOutput {
