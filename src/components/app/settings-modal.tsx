@@ -78,8 +78,8 @@ export function SettingsModal({
       aria-modal="true"
       aria-labelledby="settings-title"
     >
-      <div className="absolute inset-0 bg-black/55" onClick={onClose} />
-      <section className="relative z-[2147483001] flex h-[min(720px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl md:grid md:grid-cols-[220px_1fr]">
+      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
+      <section className="relative z-[2147483001] flex h-[min(700px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-[0_24px_80px_rgb(24_33_31/0.18)] md:grid md:grid-cols-[210px_1fr]">
         <button
           type="button"
           onClick={onClose}
@@ -106,7 +106,7 @@ export function SettingsModal({
                   type="button"
                   onClick={() => setActiveTab(tab.value)}
                   className={cn(
-                    "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     selected
                       ? "bg-card text-foreground shadow-sm"
                       : "text-muted-foreground hover:bg-card/70 hover:text-foreground",
@@ -122,15 +122,15 @@ export function SettingsModal({
 
         <div className="min-h-0 overflow-y-auto p-5 sm:p-7">
           {activeTab === "profile" && (
-            <div className="mx-auto flex max-w-xl flex-col gap-6">
+            <div className="mx-auto flex max-w-xl flex-col gap-5">
               <div>
-                <h3 className="text-xl font-bold text-foreground">Profil</h3>
+                <h3 className="text-lg font-bold text-foreground">Profil</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Kelola informasi akun dan identitas yang tampil di aplikasi.
                 </p>
               </div>
 
-              <div className="flex items-center gap-4 rounded-xl border border-border bg-background/60 p-4">
+              <div className="flex items-center gap-4 rounded-lg border border-border bg-background/60 p-4">
                 <Avatar name={user.name} src={user.image} size={64} />
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-foreground">
@@ -154,9 +154,9 @@ export function SettingsModal({
           )}
 
           {activeTab === "preferences" && (
-            <div className="mx-auto flex max-w-xl flex-col gap-6">
+            <div className="mx-auto flex max-w-xl flex-col gap-5">
               <div>
-                <h3 className="text-xl font-bold text-foreground">
+                <h3 className="text-lg font-bold text-foreground">
                   Preferensi
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -190,9 +190,9 @@ export function SettingsModal({
           )}
 
           {activeTab === "security" && (
-            <div className="mx-auto flex max-w-xl flex-col gap-6">
+            <div className="mx-auto flex max-w-xl flex-col gap-5">
               <div>
-                <h3 className="text-xl font-bold text-foreground">Keamanan</h3>
+                <h3 className="text-lg font-bold text-foreground">Keamanan</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Ubah password dan tinjau sesi login aktif.
                 </p>
@@ -200,7 +200,7 @@ export function SettingsModal({
 
               <PasswordForm />
 
-              <div className="rounded-xl border border-border bg-background/60 p-4">
+              <div className="rounded-lg border border-border bg-background/60 p-4">
                 <div className="flex items-start gap-3">
                   <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-foreground">
                     <Monitor className="size-4" />

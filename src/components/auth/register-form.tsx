@@ -63,12 +63,12 @@ export function RegisterForm() {
       )}
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="name">Nama Lengkap</Label>
+        <Label htmlFor="name">Nama lengkap</Label>
         <Input
           id="name"
           value={values.name}
           onChange={update("name")}
-          placeholder="Nama kamu"
+          placeholder="Nama Anda"
           aria-invalid={!!errors.name}
           autoComplete="name"
         />
@@ -82,7 +82,7 @@ export function RegisterForm() {
           type="email"
           value={values.email}
           onChange={update("email")}
-          placeholder="kamu@email.com"
+          placeholder="nama@email.com"
           aria-invalid={!!errors.email}
           autoComplete="email"
         />
@@ -126,11 +126,11 @@ export function RegisterForm() {
 
       <Button type="submit" disabled={loading} className="mt-1 w-full">
         {loading && <Loader2 className="animate-spin" />}
-        Daftar Sekarang
+        Daftar
       </Button>
 
       <OrDivider />
-      <GoogleButton label="Daftar pakai Google" onError={setFormError} />
+      <GoogleButton label="Daftar dengan Google" onError={setFormError} />
     </form>
   );
 }

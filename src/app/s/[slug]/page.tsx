@@ -37,20 +37,20 @@ export default async function PublicRenderPage({ params }: Params) {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border">
-        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-6">
+        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-5">
           <Link href="/">
-            <Logo />
+            <Logo size={28} />
           </Link>
           <div className="flex items-center gap-2">
             <ModeToggle />
             <Button asChild>
-              <Link href="/register">Coba Gratis</Link>
+              <Link href="/register">Coba gratis</Link>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-7 sm:px-5">
         <div className="mb-4 flex items-center gap-2">
           <Badge variant="violet">
             <Sparkles className="size-3" /> Dibuat dengan RenderAI
@@ -58,7 +58,7 @@ export default async function PublicRenderPage({ params }: Params) {
           <Badge variant="secondary">{MODE_LABEL[render.mode]}</Badge>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-border bg-card">
           <RenderImage
             src={render.resultUrl}
             alt={`Render ${MODE_LABEL[render.mode]}`}
@@ -76,17 +76,17 @@ export default async function PublicRenderPage({ params }: Params) {
           {dateFmt.format(render.createdAt)}
         </p>
 
-        <div className="mt-10 flex flex-col items-center gap-3 rounded-2xl border border-border bg-muted/40 px-6 py-8 text-center">
-          <p className="text-lg font-extrabold text-foreground">
-            Bikin render arsitektur kamu sendiri
+        <div className="mt-9 flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/40 px-5 py-8 text-center">
+          <p className="text-lg font-bold text-foreground">
+            Buat render arsitektur Anda sendiri
           </p>
-          <p className="max-w-md text-sm text-muted-foreground">
-            Upload desain, pilih mode, dan dapatkan visual realistis dalam
-            hitungan detik. Gratis 3 kredit untuk akun baru.
+          <p className="max-w-md text-sm leading-6 text-muted-foreground">
+            Upload desain, pilih mode, dan dapatkan visual yang siap dibahas.
+            Akun baru mendapatkan kredit awal.
           </p>
           <Button asChild size="lg">
             <Link href="/register">
-              Mulai Gratis <ArrowRight />
+              Mulai eksplorasi <ArrowRight />
             </Link>
           </Button>
         </div>

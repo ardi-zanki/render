@@ -12,18 +12,18 @@ type CreditPillProps = {
 };
 
 /**
- * Credit balance pill for the app top bar — mirrors the reference's
- * "◇ 30 · Topup" affordance. Shows remaining credits plus a top-up CTA.
+ * Credit balance pill for the app top bar. Shows remaining credits plus a
+ * top-up CTA.
  */
 function CreditPill({
   balance,
-  actionLabel = "Topup",
+  actionLabel = "Top up",
   className,
 }: CreditPillProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-border bg-card py-1 pl-3 pr-1 shadow-sm",
+        "inline-flex items-center gap-1.5 rounded-md border border-border bg-card py-1 pl-2.5 pr-1 shadow-[0_1px_2px_rgb(24_33_31/0.04)]",
         className,
       )}
     >
@@ -33,7 +33,7 @@ function CreditPill({
       </span>
       <Link
         href="/payments"
-        className="ml-1 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+        className="ml-1 rounded-md bg-secondary px-2.5 py-1 text-xs font-semibold text-secondary-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
       >
         {actionLabel}
       </Link>

@@ -6,102 +6,101 @@
 
 /*
   RenderAI Design Tokens
-  Brand primary is navy blue, paired with ink + a clean light-gray app shell
-  and a soft violet AI accent. Generous radii. Full dark mode.
+  A calm professional palette, compact radius scale, and subtle surfaces for
+  one consistent product language across landing, auth, email, and app screens.
 */
 :root {
-  --radius: 0.875rem;
+  --radius: 0.625rem;
 
   /* Surfaces */
-  --background: #f7f7f5;
-  --foreground: #16181d;
+  --background: #f8faf9;
+  --foreground: #18211f;
   --card: #ffffff;
-  --card-foreground: #16181d;
+  --card-foreground: #18211f;
   --popover: #ffffff;
-  --popover-foreground: #16181d;
+  --popover-foreground: #18211f;
 
-  /* Brand primary — navy blue */
-  --primary: #1b2a5e;
+  /* Brand primary */
+  --primary: #255f56;
   --primary-foreground: #ffffff;
 
   /* Secondary neutral surface */
-  --secondary: #f0f0ed;
-  --secondary-foreground: #16181d;
+  --secondary: #eef3f1;
+  --secondary-foreground: #18211f;
 
-  --muted: #f0f0ed;
-  --muted-foreground: #6b6f76;
+  --muted: #eef3f1;
+  --muted-foreground: #66736e;
 
-  /* Accent — soft violet (AI / processing motif) */
-  --accent: #eeebfe;
-  --accent-foreground: #4b40c9;
+  /* Accent */
+  --accent: #e9f2ff;
+  --accent-foreground: #31538b;
 
   /* Semantic */
-  --destructive: #e5484d;
+  --destructive: #c94343;
   --destructive-foreground: #ffffff;
-  --success: #3d9a50;
+  --success: #26804f;
   --success-foreground: #ffffff;
-  --warning: #f5a623;
-  --warning-foreground: #2a1d05;
-  --info: #2f6feb;
+  --warning: #b7791f;
+  --warning-foreground: #ffffff;
+  --info: #2563eb;
   --info-foreground: #ffffff;
 
   /* Lines & focus */
-  --border: #e7e7e3;
-  --input: #e2e2dd;
-  --ring: #1b2a5e;
+  --border: #dde5e1;
+  --input: #d5dfda;
+  --ring: #255f56;
 
   /* Brand accent */
-  --brand-violet: #6d5ef6;
+  --brand-violet: #6e63d8;
 
   /* Charts */
-  --chart-1: #1b2a5e;
-  --chart-2: #6d5ef6;
-  --chart-3: #2f6feb;
-  --chart-4: #f5a623;
-  --chart-5: #3d9a50;
+  --chart-1: #255f56;
+  --chart-2: #6e63d8;
+  --chart-3: #2563eb;
+  --chart-4: #b7791f;
+  --chart-5: #26804f;
 }
 
 .dark {
-  --background: #0b0b0d;
-  --foreground: #f4f4f3;
-  --card: #141417;
-  --card-foreground: #f4f4f3;
-  --popover: #141417;
-  --popover-foreground: #f4f4f3;
+  --background: #101412;
+  --foreground: #f4f7f5;
+  --card: #171d1a;
+  --card-foreground: #f4f7f5;
+  --popover: #171d1a;
+  --popover-foreground: #f4f7f5;
 
-  /* Navy lightened for contrast/pop on dark surfaces */
-  --primary: #3a4f94;
-  --primary-foreground: #ffffff;
+  --primary: #72c8ba;
+  --primary-foreground: #09211d;
 
-  --secondary: #1e1e22;
-  --secondary-foreground: #f4f4f3;
+  --secondary: #202823;
+  --secondary-foreground: #f4f7f5;
 
-  --muted: #1a1a1e;
-  --muted-foreground: #9b9ba2;
+  --muted: #1d2421;
+  --muted-foreground: #a7b3ad;
 
-  --accent: #211f3a;
-  --accent-foreground: #c4befb;
+  --accent: #1f2b3c;
+  --accent-foreground: #b8cdfa;
 
-  --destructive: #ff5a5f;
-  --destructive-foreground: #1a0809;
-  --success: #4cc463;
-  --success-foreground: #06140a;
-  --warning: #ffb43d;
-  --warning-foreground: #251806;
-  --info: #5b9bff;
-  --info-foreground: #06101f;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #240909;
+  --success: #58c982;
+  --success-foreground: #071a10;
+  --warning: #e7b867;
+  --warning-foreground: #201506;
+  --info: #78a8ff;
+  --info-foreground: #071222;
 
-  --border: #26262b;
-  --input: #2a2a30;
-  --ring: #3a4f94;
+  --border: #2b3531;
+  --input: #34403b;
+  --ring: #72c8ba;
 
   --brand-violet: #8b7dff;
 
-  --chart-1: #3a4f94;
+  --chart-1: #72c8ba;
   --chart-2: #8b7dff;
-  --chart-3: #5b9bff;
-  --chart-4: #ffb43d;
-  --chart-5: #4cc463;
+  --chart-3: #78a8ff;
+  --chart-4: #e7b867;
+  --chart-5: #58c982;
 }
 
 @theme inline {
@@ -161,9 +160,8 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Tighter, more confident headings to match the brand wordmark. */
   h1, h2, h3, h4 {
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 }
 

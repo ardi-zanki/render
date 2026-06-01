@@ -5,29 +5,27 @@ import { Slot } from "@/components/ui/slot";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/45 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-[0.99] [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        // Primary navy CTA, used for main actions like "Render" and "Daftar Sekarang".
         default:
-          "bg-primary text-primary-foreground shadow-sm hover:brightness-105 hover:shadow-md",
-        // Inverted ink button — auto-adapts to light/dark (the dark "Masuk"/"Download" style).
-        inverse: "bg-foreground text-background hover:bg-foreground/90 shadow-sm",
+          "bg-primary text-primary-foreground shadow-[0_1px_2px_rgb(24_33_31/0.08)] hover:bg-primary/90",
+        inverse: "bg-foreground text-background hover:bg-foreground/90",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/75",
         outline:
-          "border border-input bg-card text-foreground hover:bg-muted hover:border-foreground/20",
+          "border border-input bg-card text-foreground hover:border-primary/30 hover:bg-muted",
         ghost: "text-foreground hover:bg-muted",
         destructive:
-          "bg-destructive text-destructive-foreground hover:brightness-105 shadow-sm",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         link: "text-foreground underline-offset-4 hover:underline rounded-none px-0",
       },
       size: {
-        sm: "h-8 px-3.5 text-xs",
-        default: "h-10 px-5",
-        lg: "h-12 px-7 text-base",
-        icon: "size-10 p-0",
+        sm: "h-8 px-3 text-xs",
+        default: "h-9 px-4",
+        lg: "h-10 px-5 text-sm",
+        icon: "size-9 p-0",
         "icon-sm": "size-8 p-0",
       },
     },

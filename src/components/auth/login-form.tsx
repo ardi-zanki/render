@@ -77,7 +77,7 @@ export function LoginForm() {
           type="email"
           value={values.email}
           onChange={update("email")}
-          placeholder="kamu@email.com"
+          placeholder="nama@email.com"
           aria-invalid={!!errors.email}
           autoComplete="email"
         />
@@ -92,7 +92,7 @@ export function LoginForm() {
           id="password"
           value={values.password}
           onChange={update("password")}
-          placeholder="Password kamu"
+          placeholder="Masukkan password"
           aria-invalid={!!errors.password}
           autoComplete="current-password"
         />
@@ -126,7 +126,7 @@ export function LoginForm() {
 
       <OrDivider />
       <GoogleButton
-        label="Masuk pakai Google"
+        label="Masuk dengan Google"
         callbackURL={redirectTo}
         onError={setFormError}
       />

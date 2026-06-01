@@ -24,6 +24,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,7 +72,7 @@ function Segmented({
           type="button"
           onClick={() => onChange(o)}
           className={cn(
-            "rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+            "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
             value === o
               ? "bg-primary text-primary-foreground"
               : "bg-secondary text-secondary-foreground hover:bg-muted",
@@ -225,7 +226,7 @@ export function RenderStudio({
   const shownImage = resultUrl && view === "hasil" ? resultUrl : previewUrl;
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[320px_1fr]">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_1fr]">
       {/* Controls */}
       <Card className="h-fit">
         <CardContent className="flex flex-col gap-5 py-5">
@@ -266,7 +267,7 @@ export function RenderStudio({
                   type="button"
                   onClick={() => setMode(m.value)}
                   className={cn(
-                    "flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium transition-colors",
+                    "flex items-center gap-2 rounded-md border px-3 py-2.5 text-sm font-medium transition-colors",
                     mode === m.value
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:bg-muted",
@@ -296,12 +297,11 @@ export function RenderStudio({
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="location">Lokasi Proyek</Label>
-            <input
+            <Input
               id="location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Bandung, Bali, Jakarta…"
-              className="h-11 w-full rounded-full border border-input bg-card px-4 text-sm shadow-sm focus-visible:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+              placeholder="Bandung, Bali, Jakarta"
             />
           </div>
 
@@ -330,7 +330,7 @@ export function RenderStudio({
                     type="button"
                     onClick={() => setView(t)}
                     className={cn(
-                      "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+                      "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
                       view === t
                         ? "bg-secondary text-secondary-foreground"
                         : "text-muted-foreground hover:bg-muted",
@@ -343,7 +343,7 @@ export function RenderStudio({
             )}
 
             {/* canvas */}
-            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-xl border border-dashed border-border bg-muted/40">
+            <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/40">
               {shownImage ? (
                 <RenderImage
                   src={view === "asli" ? previewUrl ?? "" : shownImage}
@@ -356,8 +356,8 @@ export function RenderStudio({
                   onClick={() => fileRef.current?.click()}
                   className="flex flex-col items-center gap-2 text-muted-foreground"
                 >
-                  <div className="flex size-12 items-center justify-center rounded-full bg-secondary">
-                    <ImagePlus className="size-6" />
+                  <div className="flex size-11 items-center justify-center rounded-md bg-secondary">
+                    <ImagePlus className="size-5" />
                   </div>
                   <span className="text-sm font-medium">
                     Klik untuk upload gambar desain
@@ -370,7 +370,7 @@ export function RenderStudio({
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 backdrop-blur-sm">
                   <Loader2 className="size-7 animate-spin text-primary" />
                   <p className="text-sm font-medium text-foreground">
-                    Lagi masak… 🍳
+                    Memproses render...
                   </p>
                 </div>
               )}
@@ -379,7 +379,7 @@ export function RenderStudio({
                 <button
                   type="button"
                   onClick={() => pickFile(null)}
-                  className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-background/80 text-foreground shadow-sm hover:bg-background"
+                  className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-md bg-background/85 text-foreground shadow-sm hover:bg-background"
                   aria-label="Hapus gambar"
                 >
                   <X className="size-4" />
@@ -405,7 +405,7 @@ export function RenderStudio({
               <Textarea
                 value={instruction}
                 onChange={(e) => setInstruction(e.target.value)}
-                placeholder="Instruksi tambahan (boleh kosong): material kayu hangat, banyak tanaman…"
+                placeholder="Instruksi tambahan (boleh kosong): material kayu hangat, banyak tanaman..."
                 className="min-h-20"
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -434,13 +434,13 @@ export function RenderStudio({
                   {resultUrl && (
                     <Button variant="inverse" asChild>
                       <a href={resultUrl} download target="_blank" rel="noreferrer">
-                        <Download /> Download
+                        <Download /> Unduh
                       </a>
                     </Button>
                   )}
                   {balance <= 0 ? (
                     <Button asChild>
-                      <Link href="/payments">Topup Kredit</Link>
+                      <Link href="/payments">Top up kredit</Link>
                     </Button>
                   ) : (
                     <Button onClick={onRender} disabled={!canRender}>
@@ -480,8 +480,8 @@ export function RenderStudio({
             <Badge variant="secondary">{scenes.length}</Badge>
           </div>
           {scenes.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
-              Belum ada renderan di project ini.
+            <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+              Belum ada render di project ini.
             </p>
           ) : (
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">

@@ -40,10 +40,10 @@ export default async function AdminAuditPage() {
           </td>
           <td className="px-4 py-3">{l.adminName}</td>
           <td className="px-4 py-3 text-muted-foreground">
-            {l.targetName ?? "—"}
+            {l.targetName ?? "-"}
           </td>
           <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-            {l.metadata ? JSON.stringify(l.metadata) : "—"}
+            {l.metadata ? JSON.stringify(l.metadata) : "-"}
           </td>
           <td className="px-4 py-3 text-muted-foreground">
             {dateFmt.format(l.createdAt)}

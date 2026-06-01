@@ -104,18 +104,18 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title={`Halo, ${firstName}`}
-        description="Siap bikin visual arsitektur baru hari ini?"
+        description="Mulai render baru, pantau project aktif, dan lanjutkan visual yang terakhir dikerjakan."
         action={
           <Button asChild>
             <Link href="/renders/new">
-              <Plus /> Buat Render
+              <Plus /> Buat render
             </Link>
           </Button>
         }
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.label}>
             <CardContent className="flex flex-col gap-3 py-5">
@@ -133,7 +133,7 @@ export default async function DashboardPage() {
                 )}
               </div>
               <div>
-                <p className="text-2xl font-extrabold text-foreground">
+                <p className="text-2xl font-bold text-foreground">
                   {s.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{s.label}</p>
@@ -144,27 +144,27 @@ export default async function DashboardPage() {
       </div>
 
       {/* CTA banner */}
-      <Card className="mt-6 overflow-hidden border-0 bg-primary text-primary-foreground">
-        <CardContent className="flex flex-col items-start gap-4 py-7 sm:flex-row sm:items-center sm:justify-between">
+      <Card className="mt-5 overflow-hidden border-0 bg-primary text-primary-foreground">
+        <CardContent className="flex flex-col items-start gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
-            <p className="flex items-center gap-2 text-lg font-extrabold">
-              <Sparkles className="size-5" /> Siapin kopi, yuk kita ngrender
+            <p className="flex items-center gap-2 text-base font-bold sm:text-lg">
+              <Sparkles className="size-5" /> Buat opsi visual berikutnya
             </p>
-            <p className="text-sm text-primary-foreground/80">
-              Upload desain, pilih mode, dan dapatkan render realistis dalam
-              hitungan detik.
+            <p className="text-sm leading-6 text-primary-foreground/80">
+              Upload desain, tentukan konteks, lalu simpan hasilnya langsung ke
+              project yang sesuai.
             </p>
           </div>
           <Button asChild variant="secondary" className="shrink-0">
             <Link href="/renders/new">
-              Mulai Render <ArrowRight />
+              Mulai render <ArrowRight />
             </Link>
           </Button>
         </CardContent>
       </Card>
 
       {/* Recent renders */}
-      <section className="mt-8">
+      <section className="mt-7">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground">Render Terbaru</h2>
           <Link
@@ -178,23 +178,23 @@ export default async function DashboardPage() {
           <EmptyState
             icon={ImageIcon}
             title="Belum ada render"
-            description="Render pertamamu akan muncul di sini. Yuk mulai sekarang."
+            description="Render pertama Anda akan muncul di sini."
             action={
               <Button asChild>
                 <Link href="/renders/new">
-                  <Plus /> Buat Render
+                  <Plus /> Buat render
                 </Link>
               </Button>
             }
           />
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {recentRenders.map((r) => {
               const thumb = r.resultUrl ?? r.originalUrl;
               return (
                 <div
                   key={r.id}
-                  className="relative aspect-square overflow-hidden rounded-xl border border-border bg-muted"
+                  className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
                 >
                   {thumb && (
                     <RenderImage src={thumb} alt={r.mode} className="size-full" />
@@ -213,7 +213,7 @@ export default async function DashboardPage() {
       </section>
 
       {/* Projects */}
-      <section className="mt-8">
+      <section className="mt-7">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground">Project</h2>
           <Link
@@ -223,10 +223,10 @@ export default async function DashboardPage() {
             Lihat semua
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {recentProjects.map((p) => (
             <Link key={p.id} href={`/projects/${p.id}`}>
-              <Card className="transition-shadow hover:shadow-md">
+              <Card className="transition-colors hover:border-primary/35">
                 <CardContent className="flex flex-col gap-3 py-5">
                   <div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-muted text-muted-foreground">
                     {p.coverImageUrl ? (

@@ -122,14 +122,14 @@ export function AppShell({
       <aside
         onClick={(e) => openCollapsedSidebarFromEmptyArea(e, expanded)}
         className={cn(
-          "flex h-full flex-col overflow-visible border-r border-border bg-card transition-[width] duration-200",
-          expanded ? "w-64" : "w-20",
+          "flex h-full flex-col overflow-visible border-r border-border/80 bg-card transition-[width] duration-200",
+          expanded ? "w-60" : "w-[72px]",
         )}
         suppressHydrationWarning
       >
         <div
           className={cn(
-            "flex h-16 items-center px-5",
+            "flex h-14 items-center px-4",
             expanded ? "justify-between" : "justify-center",
           )}
         >
@@ -150,7 +150,7 @@ export function AppShell({
           <button
             type="button"
             className={cn(
-              "hidden rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex",
+              "hidden rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex",
               !expanded && "flex",
             )}
             onClick={() => updateSidebarExpanded(!sidebarExpanded)}
@@ -167,7 +167,7 @@ export function AppShell({
             variant="ghost"
             size={expanded ? "default" : "icon"}
             className={cn(
-              "group relative w-full justify-start rounded-lg px-3 font-medium hover:bg-muted",
+              "group relative w-full justify-start rounded-md px-3 font-medium hover:bg-muted",
               !expanded && "justify-center px-0",
               renderNewActive
                 ? "bg-primary/10 text-primary"
@@ -185,7 +185,7 @@ export function AppShell({
           </Button>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 pt-1 pb-2">
+        <nav className="flex-1 space-y-1 px-3 pb-2 pt-1">
           {NAV.map((item) => {
             const active = isNavActive(item.href);
             return (
@@ -195,7 +195,7 @@ export function AppShell({
                 onClick={() => setOpen(false)}
                 title={!expanded ? item.label : undefined}
                 className={cn(
-                  "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   !expanded && "justify-center px-0",
                   active
                     ? "bg-primary/10 text-primary"
@@ -214,7 +214,7 @@ export function AppShell({
               onClick={() => setOpen(false)}
               title={!expanded ? "Admin" : undefined}
               className={cn(
-                "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 !expanded && "justify-center px-0",
                 isActive("/admin")
                   ? "bg-primary/10 text-primary"
@@ -229,7 +229,7 @@ export function AppShell({
 
         <div
           className={cn(
-            "border-t border-border p-3",
+            "border-t border-border/80 p-3",
             !expanded && "pb-16",
           )}
         >
@@ -249,7 +249,7 @@ export function AppShell({
       <div
         className={cn(
           "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-[2147481000] lg:block",
-          sidebarExpanded ? "lg:w-64" : "lg:w-20",
+          sidebarExpanded ? "lg:w-60" : "lg:w-[72px]",
         )}
         suppressHydrationWarning
       >
@@ -272,11 +272,11 @@ export function AppShell({
       <div
         className={cn(
           "transition-[padding] duration-200",
-          sidebarExpanded ? "lg:pl-64" : "lg:pl-20",
+          sidebarExpanded ? "lg:pl-60" : "lg:pl-[72px]",
         )}
         suppressHydrationWarning
       >
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/80 bg-background/85 px-4 backdrop-blur-xl sm:px-5">
           <button
             className="text-foreground lg:hidden"
             onClick={() => setOpen(true)}
@@ -287,14 +287,14 @@ export function AppShell({
           <div className="lg:hidden">
             <Logo size={26} withWordmark={false} />
           </div>
-          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div className="ml-auto flex items-center gap-2">
             <CreditPill balance={balance} />
             <NotificationBell initialUnread={unreadCount} items={notifications} />
             <ModeToggle />
           </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-4 py-4 sm:px-6 sm:py-5">
+        <main className="mx-auto max-w-6xl px-4 py-4 sm:px-5 sm:py-5">
           {children}
         </main>
       </div>

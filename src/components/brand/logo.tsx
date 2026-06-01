@@ -7,7 +7,7 @@ type LogoMarkProps = {
 };
 
 /**
- * RenderAI logo mark — a navy rounded square with two forward-leaning white
+ * RenderAI logo mark: a primary rounded square with two forward-leaning white
  * bars suggesting speed ("render in seconds"). Original mark, brand language
  * inspired by the reference but intentionally distinct.
  */
@@ -53,7 +53,7 @@ function Logo({
       <LogoMark size={size} />
       {withWordmark && (
         <span className="flex flex-col leading-none">
-          <span className="text-xl font-extrabold tracking-tight text-foreground">
+          <span className="text-xl font-extrabold tracking-normal text-foreground">
             RenderAI<span className="text-primary">.</span>
           </span>
           {byline && (

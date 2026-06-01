@@ -12,15 +12,15 @@ export default async function AdminLayout({
 
   return (
     <div>
-      <div className="mb-5 flex items-center gap-2">
-        <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Shield className="size-5" />
+      <div className="mb-5 flex items-center gap-3">
+        <span className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <Shield className="size-4" />
         </span>
         <div className="flex flex-col">
-          <h1 className="text-2xl font-extrabold leading-tight text-foreground">
+          <h1 className="text-xl font-bold leading-tight text-foreground sm:text-2xl">
             Admin
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm leading-6 text-muted-foreground">
             Kelola pengguna, render, pembayaran, dan audit.
           </p>
         </div>

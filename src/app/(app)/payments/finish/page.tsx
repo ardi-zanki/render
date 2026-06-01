@@ -13,14 +13,14 @@ const VARIANTS = {
   success: {
     icon: CheckCircle2,
     color: "text-success",
-    title: "Pembayaran Berhasil!",
-    desc: "Kredit sudah ditambahkan ke akun kamu. Yuk mulai render.",
+    title: "Pembayaran berhasil",
+    desc: "Kredit sudah ditambahkan ke akun Anda dan siap digunakan.",
   },
   pending: {
     icon: Clock,
     color: "text-warning",
     title: "Pembayaran Diproses",
-    desc: "Pembayaran kamu sedang menunggu konfirmasi. Kredit ditambahkan setelah lunas.",
+    desc: "Pembayaran Anda sedang menunggu konfirmasi. Kredit ditambahkan setelah lunas.",
   },
   failed: {
     icon: XCircle,
@@ -51,10 +51,10 @@ export default async function PaymentFinishPage({
         <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
           <Icon className={`size-14 ${v.color}`} />
           <div className="flex flex-col gap-1">
-            <h1 className="text-xl font-extrabold text-foreground">{v.title}</h1>
-            <p className="text-sm text-muted-foreground">{v.desc}</p>
+            <h1 className="text-xl font-bold text-foreground">{v.title}</h1>
+            <p className="text-sm leading-6 text-muted-foreground">{v.desc}</p>
           </div>
-          <div className="rounded-full bg-muted px-4 py-1.5 text-sm">
+          <div className="rounded-md bg-muted px-4 py-1.5 text-sm">
             Sisa kredit:{" "}
             <span className="font-bold text-foreground">
               {balance.toLocaleString("id-ID")}
@@ -62,10 +62,10 @@ export default async function PaymentFinishPage({
           </div>
           <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">
             <Button asChild className="flex-1">
-              <Link href="/renders/new">Mulai Render</Link>
+              <Link href="/renders/new">Mulai render</Link>
             </Button>
             <Button asChild variant="outline" className="flex-1">
-              <Link href="/payments">Riwayat Transaksi</Link>
+              <Link href="/payments">Riwayat transaksi</Link>
             </Button>
           </div>
         </CardContent>

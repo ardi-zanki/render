@@ -18,11 +18,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "RenderAI — Render Arsitektur Berbasis AI",
+    default: "RenderAI - Render Arsitektur Berbasis AI",
     template: "%s · RenderAI",
   },
   description:
     "Upload gambar desain, pilih mode render, dan dapatkan visual arsitektur realistis dalam hitungan detik.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: ["/icon.svg"],
+  },
 };
 
 export default function RootLayout({

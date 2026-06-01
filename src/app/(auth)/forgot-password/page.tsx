@@ -9,8 +9,8 @@ export const metadata: Metadata = { title: "Lupa Password" };
 export default function ForgotPasswordPage() {
   return (
     <AuthCard
-      title="Lupa Password?"
-      subtitle="Masukkan email Anda, kami kirim tautan untuk mengatur ulang."
+      title="Lupa Password"
+      subtitle="Masukkan email akun Anda. Kami akan mengirim tautan reset yang aman."
       footer={
         <Link href="/login" className="font-semibold text-foreground hover:underline">
           Kembali ke Masuk

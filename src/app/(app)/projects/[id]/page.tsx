@@ -45,7 +45,7 @@ export default async function ProjectDetailPage({
             {!project.isDefault && <ArchiveProjectButton projectId={id} />}
             <Button asChild>
               <Link href={`/renders/new?project=${id}`}>
-                <Plus /> Buat Render
+                <Plus /> Buat render
               </Link>
             </Button>
           </div>
@@ -66,7 +66,7 @@ export default async function ProjectDetailPage({
           action={
             <Button asChild>
               <Link href={`/renders/new?project=${id}`}>
-                <Plus /> Buat Render
+                <Plus /> Buat render
               </Link>
             </Button>
           }

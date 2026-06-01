@@ -59,8 +59,8 @@ export default async function AdminOverviewPage() {
   }));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {cards.map((c) => (
           <Card key={c.label}>
             <CardContent className="flex flex-col gap-3 py-5">
@@ -68,7 +68,7 @@ export default async function AdminOverviewPage() {
                 <c.icon className="size-4" />
               </div>
               <div>
-                <p className="text-2xl font-extrabold text-foreground">
+                <p className="text-2xl font-bold text-foreground">
                   {c.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{c.label}</p>
@@ -79,7 +79,7 @@ export default async function AdminOverviewPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Render · 14 hari terakhir</CardTitle>
@@ -98,7 +98,7 @@ export default async function AdminOverviewPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>Render per Mode</CardTitle>

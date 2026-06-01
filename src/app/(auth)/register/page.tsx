@@ -9,8 +9,8 @@ export const metadata: Metadata = { title: "Daftar" };
 export default function RegisterPage() {
   return (
     <AuthCard
-      title="Bikin Akun Baru"
-      subtitle="Daftar gratis & dapatkan 3 kredit untuk mulai render."
+      title="Buat Akun RenderAI"
+      subtitle="Mulai dengan kredit awal untuk mencoba workflow render pertama Anda."
       footer={
         <>
           Sudah punya akun?{" "}

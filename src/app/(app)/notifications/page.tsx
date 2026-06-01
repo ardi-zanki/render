@@ -49,7 +49,7 @@ export default async function NotificationsPage() {
         <EmptyState
           icon={Bell}
           title="Belum ada notifikasi"
-          description="Update render & pembayaran kamu akan muncul di sini."
+          description="Update render dan pembayaran Anda akan muncul di sini."
         />
       ) : (
         <Card className="overflow-hidden p-0">
@@ -61,7 +61,7 @@ export default async function NotificationsPage() {
                   key={n.id}
                   href={n.actionUrl ?? "#"}
                   className={cn(
-                    "flex gap-3 px-4 py-3.5 transition-colors hover:bg-muted",
+                    "flex gap-3 px-4 py-3 transition-colors hover:bg-muted",
                     !n.isRead && "bg-primary/5",
                   )}
                 >

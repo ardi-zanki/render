@@ -67,10 +67,10 @@ export default async function PaymentsPage() {
 
       <PageHeader
         title="Beli Kredit"
-        description={`Sisa kredit kamu: ${idr.format(balance)}. 1 kredit = 1 render.`}
+        description={`Sisa kredit Anda: ${idr.format(balance)}. 1 kredit = 1 render.`}
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {packages.map((pkg) => {
           const featured = pkg.slug === "creator";
           const total = pkg.credits + pkg.bonusCredits;
@@ -78,7 +78,7 @@ export default async function PaymentsPage() {
           return (
             <Card
               key={pkg.id}
-              className={featured ? "border-primary ring-2 ring-primary/30" : ""}
+              className={featured ? "border-primary ring-1 ring-primary/20" : ""}
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -98,7 +98,7 @@ export default async function PaymentsPage() {
                   <span className="text-sm font-medium text-muted-foreground">
                     Rp
                   </span>
-                  <span className="text-3xl font-extrabold text-foreground">
+                  <span className="text-2xl font-bold text-foreground">
                     {idr.format(pkg.price)}
                   </span>
                 </div>
@@ -120,7 +120,7 @@ export default async function PaymentsPage() {
           Riwayat Transaksi
         </h2>
         {history.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
+          <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
             Belum ada transaksi.
           </p>
         ) : (

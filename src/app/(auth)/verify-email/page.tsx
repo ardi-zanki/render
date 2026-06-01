@@ -23,13 +23,13 @@ export default async function VerifyEmailPage({
       }
     >
       <div className="flex flex-col gap-5">
-        <div className="flex flex-col items-center gap-3 rounded-xl bg-muted/60 px-4 py-6 text-center">
-          <div className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <MailOpen className="size-6" />
+        <div className="flex flex-col items-center gap-3 rounded-lg bg-muted/60 px-4 py-5 text-center">
+          <div className="flex size-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <MailOpen className="size-5" />
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm leading-6 text-muted-foreground">
             Klik tautan di email untuk mengaktifkan akun dan mendapatkan{" "}
-            <span className="font-semibold text-foreground">3 kredit gratis</span>.
+            <span className="font-semibold text-foreground">kredit awal</span>.
           </p>
         </div>
         <VerifyEmailActions email={email} />

@@ -93,11 +93,11 @@ function ProjectFormModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative z-[61] w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
+      <div className="relative z-[61] w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-[0_20px_60px_rgb(24_33_31/0.16)]">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-extrabold text-foreground">
-            {isEdit ? "Edit Project" : "Buat Project"}
+          <h2 className="text-base font-bold text-foreground">
+            {isEdit ? "Edit project" : "Buat project"}
           </h2>
           <button
             onClick={onClose}
@@ -137,7 +137,7 @@ function ProjectFormModal({
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-5 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Batal
           </Button>
@@ -217,7 +217,7 @@ export function ProjectsClient({
 
   const tabClass = (active: boolean) =>
     cn(
-      "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+      "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
       active
         ? "bg-primary text-primary-foreground"
         : "bg-secondary text-secondary-foreground hover:bg-muted",
@@ -225,7 +225,7 @@ export function ProjectsClient({
 
   return (
     <>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-2">
           <button className={tabClass(status === "active")} onClick={() => setTab("active")}>
             Aktif
@@ -243,12 +243,12 @@ export function ProjectsClient({
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari project…"
+              placeholder="Cari project..."
               className="pl-9"
             />
           </div>
           <Button onClick={() => setModal({ mode: "create" })} className="shrink-0">
-            <Plus /> Buat Project
+            <Plus /> Buat project
           </Button>
         </div>
       </div>
@@ -268,11 +268,11 @@ export function ProjectsClient({
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((p) => (
             <div key={p.id} className="relative">
               <Link href={`/projects/${p.id}`}>
-                <Card className="gap-0 overflow-hidden p-0 transition-shadow hover:shadow-md">
+                <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
                   <div className="flex aspect-video items-center justify-center bg-muted">
                     {p.coverImageUrl ? (
                       <RenderImage
@@ -299,7 +299,7 @@ export function ProjectsClient({
               <div className="absolute right-2 top-2">
                 <button
                   onClick={() => setMenuId(menuId === p.id ? null : p.id)}
-                  className="flex size-8 items-center justify-center rounded-full bg-card/90 text-foreground shadow-sm backdrop-blur hover:bg-card"
+                  className="flex size-8 items-center justify-center rounded-md bg-card/90 text-foreground shadow-sm backdrop-blur hover:bg-card"
                   aria-label="Menu project"
                 >
                   <MoreVertical className="size-4" />
@@ -310,7 +310,7 @@ export function ProjectsClient({
                       className="fixed inset-0 z-40"
                       onClick={() => setMenuId(null)}
                     />
-                    <div className="absolute right-0 z-50 mt-1 w-44 rounded-lg border border-border bg-popover p-1 shadow-lg">
+                    <div className="absolute right-0 z-50 mt-1 w-44 rounded-lg border border-border bg-popover p-1 shadow-[0_12px_32px_rgb(24_33_31/0.12)]">
                       <button
                         className={menuItem}
                         onClick={() => {

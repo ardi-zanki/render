@@ -54,11 +54,11 @@ export function ProfileForm({
         </Alert>
       )}
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="name">Nama Lengkap</Label>
+        <Label htmlFor="name">Nama lengkap</Label>
         <Input id="name" name="name" defaultValue={name} />
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="displayName">Nama Tampilan</Label>
+        <Label htmlFor="displayName">Nama tampilan</Label>
         <Input
           id="displayName"
           name="displayName"
@@ -72,7 +72,7 @@ export function ProfileForm({
       </div>
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending && <Loader2 className="animate-spin" />} Simpan Profil
+          {pending && <Loader2 className="animate-spin" />} Simpan profil
         </Button>
         {state.ok && <Saved />}
       </div>
@@ -113,7 +113,7 @@ export function PreferencesForm({
         Kirim notifikasi lewat email
       </label>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="defaultRenderMode">Mode Render Default</Label>
+        <Label htmlFor="defaultRenderMode">Mode render default</Label>
         <Select
           id="defaultRenderMode"
           name="defaultRenderMode"
@@ -126,7 +126,7 @@ export function PreferencesForm({
         </Select>
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="defaultOutputFormat">Format Output Default</Label>
+        <Label htmlFor="defaultOutputFormat">Format output default</Label>
         <Select
           id="defaultOutputFormat"
           name="defaultOutputFormat"
@@ -138,7 +138,7 @@ export function PreferencesForm({
       </div>
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending && <Loader2 className="animate-spin" />} Simpan Preferensi
+          {pending && <Loader2 className="animate-spin" />} Simpan preferensi
         </Button>
         {state.ok && <Saved />}
       </div>
@@ -196,7 +196,7 @@ export function PasswordForm() {
         </Alert>
       )}
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="currentPassword">Password Saat Ini</Label>
+        <Label htmlFor="currentPassword">Password saat ini</Label>
         <PasswordInput
           id="currentPassword"
           value={values.currentPassword}
@@ -208,7 +208,7 @@ export function PasswordForm() {
         )}
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="newPassword">Password Baru</Label>
+        <Label htmlFor="newPassword">Password baru</Label>
         <PasswordInput
           id="newPassword"
           value={values.newPassword}
@@ -220,7 +220,7 @@ export function PasswordForm() {
         )}
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+        <Label htmlFor="confirmPassword">Konfirmasi password baru</Label>
         <PasswordInput
           id="confirmPassword"
           value={values.confirmPassword}
@@ -233,7 +233,7 @@ export function PasswordForm() {
       </div>
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={loading}>
-          {loading && <Loader2 className="animate-spin" />} Ganti Password
+          {loading && <Loader2 className="animate-spin" />} Ganti password
         </Button>
         {done && <Saved />}
       </div>

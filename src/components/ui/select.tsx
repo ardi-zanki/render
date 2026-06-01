@@ -9,8 +9,8 @@ function Select({ className, children, ...props }: ComponentProps<"select">) {
     <div className="relative">
       <select
         className={cn(
-          "h-11 w-full appearance-none rounded-full border border-input bg-card pl-4 pr-9 text-sm text-foreground shadow-sm transition-colors",
-          "focus-visible:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+          "h-10 w-full appearance-none rounded-md border border-input bg-card pl-3 pr-9 text-sm text-foreground transition-colors",
+          "focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30",
           "disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}

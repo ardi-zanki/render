@@ -35,12 +35,12 @@ export default async function SettingsPage() {
         description="Kelola profil, preferensi, dan keamanan akun Anda."
       />
 
-      <div className="flex max-w-2xl flex-col gap-6">
+      <div className="flex max-w-2xl flex-col gap-5">
         <Card>
           <CardContent className="flex items-center gap-4 py-5">
             <Avatar name={user.name} src={user.image} size={56} />
             <div className="flex flex-col gap-1">
-              <p className="text-lg font-semibold text-foreground">
+              <p className="text-base font-semibold text-foreground">
                 {user.name}
               </p>
               <p className="text-sm text-muted-foreground">{user.email}</p>

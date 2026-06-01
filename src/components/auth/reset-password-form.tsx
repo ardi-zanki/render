@@ -73,7 +73,7 @@ export function ResetPasswordForm() {
         </Alert>
       )}
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="password">Password Baru</Label>
+        <Label htmlFor="password">Password baru</Label>
         <PasswordInput
           id="password"
           value={values.password}
@@ -87,7 +87,7 @@ export function ResetPasswordForm() {
         )}
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+        <Label htmlFor="confirmPassword">Konfirmasi password</Label>
         <PasswordInput
           id="confirmPassword"
           value={values.confirmPassword}
@@ -102,7 +102,7 @@ export function ResetPasswordForm() {
       </div>
       <Button type="submit" disabled={loading} className="mt-1 w-full">
         {loading && <Loader2 className="animate-spin" />}
-        Simpan Password Baru
+        Simpan password baru
       </Button>
     </form>
   );

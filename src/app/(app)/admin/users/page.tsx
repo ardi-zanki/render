@@ -16,9 +16,9 @@ export default async function AdminUsersPage() {
   const users = await listUsers();
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
+    <div className="overflow-x-auto rounded-lg border border-border bg-card">
       <table className="w-full min-w-[720px] text-sm">
-        <thead className="bg-muted/50 text-left text-xs font-medium text-muted-foreground">
+        <thead className="bg-muted/60 text-left text-xs font-semibold text-muted-foreground">
           <tr>
             <th className="px-4 py-3">User</th>
             <th className="px-4 py-3">Role</th>
@@ -39,7 +39,7 @@ export default async function AdminUsersPage() {
                       {u.name}
                       {isSelf && (
                         <span className="ml-1 text-xs text-muted-foreground">
-                          (kamu)
+                          (Anda)
                         </span>
                       )}
                     </span>
@@ -71,7 +71,7 @@ export default async function AdminUsersPage() {
                 <td className="px-4 py-3">
                   {isSelf ? (
                     <span className="block text-right text-muted-foreground">
-                      —
+                      -
                     </span>
                   ) : (
                     <div className="flex justify-end gap-2">

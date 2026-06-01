@@ -3,8 +3,10 @@
  * All copy in Bahasa Indonesia (PRD §25).
  */
 
-const BRAND_NAVY = "#1b2a5e";
-const INK = "#16181d";
+const BRAND_PRIMARY = "#255f56";
+const INK = "#18211f";
+const MUTED = "#66736e";
+const BORDER = "#dde5e1";
 
 function layout(opts: {
   heading: string;
@@ -15,30 +17,30 @@ function layout(opts: {
   const { heading, body, cta, footnote } = opts;
   return `<!doctype html>
 <html lang="id">
-  <body style="margin:0;background:#f7f7f5;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:${INK};">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 0;">
+  <body style="margin:0;background:#f8faf9;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:${INK};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px;">
       <tr><td align="center">
-        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e7e7e3;border-radius:16px;overflow:hidden;">
-          <tr><td style="padding:28px 32px 8px;">
-            <span style="display:inline-block;width:28px;height:28px;background:${BRAND_NAVY};border-radius:8px;vertical-align:middle;"></span>
-            <span style="font-size:18px;font-weight:800;letter-spacing:-0.02em;vertical-align:middle;margin-left:8px;">RenderAI<span style="color:${BRAND_NAVY}">.</span></span>
+        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:100%;max-width:480px;background:#ffffff;border:1px solid ${BORDER};border-radius:12px;overflow:hidden;">
+          <tr><td style="padding:26px 28px 8px;">
+            <span style="display:inline-block;width:28px;height:28px;background:${BRAND_PRIMARY};border-radius:8px;vertical-align:middle;"></span>
+            <span style="font-size:18px;font-weight:800;letter-spacing:0;vertical-align:middle;margin-left:8px;">RenderAI<span style="color:${BRAND_PRIMARY}">.</span></span>
           </td></tr>
-          <tr><td style="padding:8px 32px 0;">
-            <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.02em;margin:12px 0;">${heading}</h1>
-            <div style="font-size:15px;line-height:1.6;color:#3f434b;">${body}</div>
+          <tr><td style="padding:8px 28px 0;">
+            <h1 style="font-size:21px;line-height:1.35;font-weight:800;letter-spacing:0;margin:12px 0;">${heading}</h1>
+            <div style="font-size:14px;line-height:1.7;color:#3e4a46;">${body}</div>
           </td></tr>
           ${
             cta
-              ? `<tr><td style="padding:24px 32px 8px;">
-            <a href="${cta.url}" style="display:inline-block;background:${BRAND_NAVY};color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 24px;border-radius:9999px;">${cta.label}</a>
+              ? `<tr><td style="padding:24px 28px 8px;">
+            <a href="${cta.url}" style="display:inline-block;background:${BRAND_PRIMARY};color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:11px 18px;border-radius:8px;">${cta.label}</a>
           </td></tr>
-          <tr><td style="padding:4px 32px 0;">
-            <div style="font-size:12px;color:#9096a0;word-break:break-all;">Atau salin tautan ini: ${cta.url}</div>
+          <tr><td style="padding:4px 28px 0;">
+            <div style="font-size:12px;line-height:1.6;color:${MUTED};word-break:break-all;">Atau salin tautan ini: ${cta.url}</div>
           </td></tr>`
               : ""
           }
-          <tr><td style="padding:24px 32px 28px;">
-            <div style="font-size:12px;color:#9096a0;border-top:1px solid #f0f0ed;padding-top:16px;">${footnote ?? "Email ini dikirim otomatis oleh RenderAI. Abaikan jika Anda tidak meminta."}</div>
+          <tr><td style="padding:24px 28px 26px;">
+            <div style="font-size:12px;line-height:1.6;color:${MUTED};border-top:1px solid #eef3f1;padding-top:16px;">${footnote ?? "Email ini dikirim otomatis oleh RenderAI. Abaikan jika Anda tidak meminta."}</div>
           </td></tr>
         </table>
       </td></tr>
@@ -51,8 +53,8 @@ export function verificationEmail(params: { name?: string; url: string }) {
   return {
     subject: "Verifikasi email RenderAI Anda",
     html: layout({
-      heading: `Halo${params.name ? ` ${params.name}` : ""}, yuk verifikasi email`,
-      body: "Satu langkah lagi! Klik tombol di bawah untuk memverifikasi email Anda dan mendapatkan <b>3 kredit gratis</b> untuk mulai render.",
+      heading: `Halo${params.name ? ` ${params.name}` : ""}, verifikasi email Anda`,
+      body: "Klik tombol di bawah untuk mengaktifkan akun RenderAI dan mendapatkan kredit awal untuk mencoba workflow render pertama Anda.",
       cta: { label: "Verifikasi Email", url: params.url },
       footnote: "Tautan ini berlaku 24 jam. Abaikan jika Anda tidak mendaftar.",
     }),
@@ -64,7 +66,7 @@ export function resetPasswordEmail(params: { name?: string; url: string }) {
     subject: "Atur ulang password RenderAI",
     html: layout({
       heading: "Atur ulang password Anda",
-      body: "Kami menerima permintaan untuk mengatur ulang password. Klik tombol di bawah untuk membuat password baru.",
+      body: "Kami menerima permintaan untuk mengatur ulang password akun RenderAI Anda. Klik tombol di bawah untuk membuat password baru.",
       cta: { label: "Atur Ulang Password", url: params.url },
       footnote:
         "Tautan ini berlaku 30 menit dan hanya bisa dipakai sekali. Abaikan jika bukan Anda.",
@@ -78,13 +80,13 @@ export function renderResultEmail(params: {
 }) {
   return {
     subject: params.success
-      ? "Renderan kamu sudah jadi! 🎉"
-      : "Render kamu gagal diproses",
+      ? "Render Anda sudah selesai"
+      : "Render Anda gagal diproses",
     html: layout({
-      heading: params.success ? "Renderan kamu sudah jadi!" : "Render gagal",
+      heading: params.success ? "Render Anda sudah selesai" : "Render gagal",
       body: params.success
-        ? "Visual arsitektur kamu sudah selesai diproses. Klik untuk melihat & download hasilnya."
-        : "Maaf, render kamu gagal diproses dan <b>kredit sudah dikembalikan</b>. Silakan coba lagi.",
+        ? "Visual arsitektur Anda sudah selesai diproses. Buka hasilnya untuk meninjau, mengunduh, atau membagikan preview."
+        : "Maaf, render Anda gagal diproses dan <b>kredit sudah dikembalikan</b>. Silakan coba lagi dari Render Studio.",
       cta: {
         label: params.success ? "Lihat Hasil" : "Coba Lagi",
         url: params.url,
@@ -95,10 +97,10 @@ export function renderResultEmail(params: {
 
 export function paymentSuccessEmail(params: { credits: number; url: string }) {
   return {
-    subject: "Pembayaran berhasil — kredit ditambahkan",
+    subject: "Pembayaran berhasil - kredit ditambahkan",
     html: layout({
       heading: "Pembayaran berhasil!",
-      body: `<b>${params.credits} kredit</b> sudah ditambahkan ke akun kamu. Yuk lanjut bikin render.`,
+      body: `<b>${params.credits} kredit</b> sudah ditambahkan ke akun Anda. Kredit siap digunakan untuk membuat render berikutnya.`,
       cta: { label: "Mulai Render", url: params.url },
     }),
   };

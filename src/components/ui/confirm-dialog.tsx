@@ -33,13 +33,15 @@ export function ConfirmDialog({
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative z-[71] w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-xl">
-        <h2 className="text-lg font-extrabold text-foreground">{title}</h2>
+      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
+      <div className="relative z-[71] w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-[0_20px_60px_rgb(24_33_31/0.16)]">
+        <h2 className="text-base font-bold text-foreground">{title}</h2>
         {description && (
-          <p className="mt-1.5 text-sm text-muted-foreground">{description}</p>
+          <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
+            {description}
+          </p>
         )}
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-5 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Batal
           </Button>

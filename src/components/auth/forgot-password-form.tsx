@@ -40,7 +40,8 @@ export function ForgotPasswordForm() {
           <MailCheck />
           <AlertDescription>
             Jika <span className="font-medium">{email}</span> terdaftar, kami
-            telah mengirim tautan untuk mengatur ulang password. Cek inbox Anda.
+            telah mengirim tautan untuk mengatur ulang password. Silakan cek
+            inbox Anda.
           </AlertDescription>
         </Alert>
         <Button variant="outline" asChild>
@@ -64,13 +65,13 @@ export function ForgotPasswordForm() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="kamu@email.com"
+          placeholder="nama@email.com"
           autoComplete="email"
         />
       </div>
       <Button type="submit" disabled={loading} className="w-full">
         {loading && <Loader2 className="animate-spin" />}
-        Kirim Tautan Reset
+        Kirim tautan reset
       </Button>
     </form>
   );

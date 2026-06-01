@@ -36,7 +36,7 @@ export default async function CreateRenderPage({
     <>
       <PageHeader
         title="Render Studio"
-        description="Upload desain, atur konteks & lighting, lalu Render."
+        description="Upload desain, atur konteks visual, lalu buat hasil render yang tersimpan ke project."
       />
       <RenderStudio
         key={project.id}

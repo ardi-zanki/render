@@ -41,7 +41,7 @@ export default async function ProjectsPage({
     <>
       <PageHeader
         title="Project"
-        description="Kelompokkan render Anda per project."
+        description="Kelompokkan render berdasarkan kebutuhan klien, konsep, atau ruang."
       />
       <ProjectsClient
         projects={rows}

@@ -80,10 +80,10 @@ export function ProfileModal({
 
   return createPortal(
     <div className="fixed inset-0 z-[2147483600] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative z-[2147483601] w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
+      <div className="relative z-[2147483601] w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-[0_20px_60px_rgb(24_33_31/0.16)]">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-extrabold text-foreground">Edit Profil</h2>
+          <h2 className="text-base font-bold text-foreground">Edit Profil</h2>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground"
@@ -134,7 +134,7 @@ export function ProfileModal({
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-5 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Batal
           </Button>

@@ -27,11 +27,11 @@ export default async function RendersPage() {
     <>
       <PageHeader
         title="Riwayat Render"
-        description="Semua render Anda, lengkap dengan status dan hasilnya."
+        description="Semua render Anda, lengkap dengan status, mode, dan waktu pembuatan."
         action={
           <Button asChild>
             <Link href="/renders/new">
-              <Plus /> Buat Render
+              <Plus /> Buat render
             </Link>
           </Button>
         }
@@ -41,11 +41,11 @@ export default async function RendersPage() {
         <EmptyState
           icon={ImageIcon}
           title="Belum ada render"
-          description="Render pertamamu akan muncul di sini."
+          description="Render pertama Anda akan muncul di sini."
           action={
             <Button asChild>
               <Link href="/renders/new">
-                <Plus /> Buat Render
+                <Plus /> Buat render
               </Link>
             </Button>
           }

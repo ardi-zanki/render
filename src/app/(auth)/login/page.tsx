@@ -18,12 +18,12 @@ export default async function LoginPage({
   return (
     <AuthCard
       title="Masuk ke RenderAI"
-      subtitle="Selamat datang kembali! Masuk untuk lanjut render."
+      subtitle="Lanjutkan project visual dan kelola hasil render Anda."
       footer={
         <>
           Belum punya akun?{" "}
           <Link href="/register" className="font-semibold text-foreground hover:underline">
-            Daftar Gratis
+            Daftar
           </Link>
         </>
       }
@@ -38,7 +38,7 @@ export default async function LoginPage({
       {disabled === "1" && (
         <Alert variant="destructive">
           <AlertDescription>
-            Akun kamu dinonaktifkan. Silakan hubungi admin.
+            Akun Anda dinonaktifkan. Silakan hubungi admin.
           </AlertDescription>
         </Alert>
       )}
