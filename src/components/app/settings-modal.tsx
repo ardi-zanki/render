@@ -79,7 +79,7 @@ export function SettingsModal({
       aria-labelledby="settings-title"
     >
       <div className="absolute inset-0 bg-black/45" onClick={onClose} />
-      <section className="relative z-[2147483001] flex h-[min(700px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-[0_24px_80px_rgb(24_33_31/0.18)] md:grid md:grid-cols-[210px_1fr]">
+      <section className="relative z-[2147483001] flex h-[min(700px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-[0_24px_80px_rgb(15_23_42/0.18)] md:grid md:grid-cols-[210px_1fr]">
         <button
           type="button"
           onClick={onClose}

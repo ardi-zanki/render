@@ -94,7 +94,7 @@ function ProjectFormModal({
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/45" onClick={onClose} />
-      <div className="relative z-[61] w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-[0_20px_60px_rgb(24_33_31/0.16)]">
+      <div className="relative z-[61] w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-[0_20px_60px_rgb(15_23_42/0.16)]">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-bold text-foreground">
             {isEdit ? "Edit project" : "Buat project"}
@@ -310,7 +310,7 @@ export function ProjectsClient({
                       className="fixed inset-0 z-40"
                       onClick={() => setMenuId(null)}
                     />
-                    <div className="absolute right-0 z-50 mt-1 w-44 rounded-lg border border-border bg-popover p-1 shadow-[0_12px_32px_rgb(24_33_31/0.12)]">
+                    <div className="absolute right-0 z-50 mt-1 w-44 rounded-lg border border-border bg-popover p-1 shadow-[0_12px_32px_rgb(15_23_42/0.12)]">
                       <button
                         className={menuItem}
                         onClick={() => {

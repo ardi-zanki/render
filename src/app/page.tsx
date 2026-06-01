@@ -27,14 +27,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export const metadata: Metadata = {
-  title: "RenderAI - AI Rendering Workspace untuk Desain Ruang",
+  title: "RenderAI - AI Rendering Workspace untuk Arsitektur & Interior",
   description:
-    "RenderAI membantu tim arsitektur dan interior mengubah draft desain menjadi visual presentasi, variasi mood, dan aset project yang rapi.",
+    "RenderAI membantu tim arsitektur dan interior mengubah draft desain menjadi opsi visual presentasi yang rapi, konsisten, dan siap dibahas.",
 };
 
 const navItems = [
   { label: "Fitur", href: "#fitur" },
-  { label: "Contoh Visual", href: "#showcase" },
+  { label: "Visual", href: "#showcase" },
   { label: "Cara Kerja", href: "#cara-kerja" },
   { label: "Harga", href: "#harga" },
   { label: "FAQ", href: "#faq" },
@@ -43,23 +43,23 @@ const navItems = [
 const features = [
   {
     icon: Camera,
-    title: "Dari Draft ke Visual Presentasi",
-    desc: "Mulai dari screenshot desain, sketsa, atau foto ruang. RenderAI membantu membangun visual yang lebih mudah dibaca klien.",
+    title: "Draft Lebih Mudah Dipahami",
+    desc: "Ubah screenshot desain, sketsa, atau foto ruang menjadi visual yang lebih jelas untuk diskusi internal maupun presentasi klien.",
   },
   {
     icon: Palette,
-    title: "Arahan Visual yang Terstruktur",
-    desc: "Pilih gaya, pencahayaan, suasana, dan detail material lewat kontrol yang jelas, lalu tambah catatan desain seperlunya.",
+    title: "Arahan Visual Lebih Terarah",
+    desc: "Pilih gaya, pencahayaan, suasana, dan detail material lewat kontrol yang konsisten, lalu tambahkan catatan desain seperlunya.",
   },
   {
     icon: CloudSun,
-    title: "Eksplorasi Mood Lebih Cepat",
-    desc: "Bandingkan nuansa hangat, terang, dramatis, atau natural tanpa mengulang proses produksi visual dari awal.",
+    title: "Eksplorasi Mood Tanpa Menunggu Lama",
+    desc: "Bandingkan nuansa hangat, terang, dramatis, atau natural tanpa memulai proses produksi visual dari awal.",
   },
   {
     icon: FolderKanban,
     title: "Riwayat Render Per Project",
-    desc: "Setiap visual tersimpan di project yang sesuai, sehingga revisi, opsi desain, dan hasil final tetap mudah dilacak.",
+    desc: "Setiap visual tersimpan di project yang sesuai, sehingga revisi, opsi desain, dan hasil pilihan tetap mudah dilacak.",
   },
   {
     icon: CreditCard,
@@ -68,27 +68,27 @@ const features = [
   },
   {
     icon: BadgeCheck,
-    title: "Output Siap Dibahas",
-    desc: "Unduh hasil, bagikan preview, dan gunakan visual sebagai bahan diskusi sebelum masuk ke produksi render final.",
+    title: "Output Siap Dipresentasikan",
+    desc: "Unduh hasil, bagikan preview, dan gunakan visual sebagai bahan keputusan sebelum masuk ke produksi render final.",
   },
 ];
 
 const showcase = [
   {
-    title: "Konsep Kamar Hangat",
+    title: "Bedroom Suite Hangat",
     src: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85",
     className: "md:row-span-2",
   },
   {
-    title: "Ruang Kerja Terbuka",
+    title: "Studio Kolaborasi",
     src: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=85",
   },
   {
-    title: "Living Area Modern",
+    title: "Living Area Premium",
     src: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85",
   },
   {
-    title: "Fasad Hunian Kontemporer",
+    title: "Fasad Residence Kontemporer",
     src: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
     className: "md:col-span-2",
   },
@@ -99,14 +99,14 @@ const pricing = [
     name: "Starter",
     credits: "30 kredit",
     price: "Rp49.000",
-    note: "Untuk validasi workflow awal",
+    note: "Untuk mencoba workflow awal",
     features: ["Cukup untuk eksplorasi ringan", "Project dan riwayat render", "Mode interior dan eksterior"],
   },
   {
     name: "Creator",
     credits: "100 kredit",
     price: "Rp129.000",
-    note: "Untuk presentasi rutin",
+    note: "Untuk presentasi dan revisi rutin",
     highlighted: true,
     features: ["Lebih leluasa membuat opsi", "Project dan riwayat render", "Bagikan dan unduh hasil"],
   },
@@ -114,14 +114,14 @@ const pricing = [
     name: "Studio",
     credits: "300 kredit",
     price: "Rp299.000",
-    note: "Untuk beberapa project aktif",
+    note: "Untuk beberapa project berjalan",
     features: ["Cocok untuk tim desain", "Project dan riwayat render", "Bagikan dan unduh hasil"],
   },
   {
     name: "Agency",
     credits: "1.000 kredit",
     price: "Rp799.000",
-    note: "Untuk produksi visual skala besar",
+    note: "Untuk kebutuhan visual volume tinggi",
     features: ["Kapasitas render tinggi", "Project dan riwayat render", "Bagikan dan unduh hasil"],
   },
 ];
@@ -129,7 +129,7 @@ const pricing = [
 const faqs = [
   {
     q: "Apa itu RenderAI?",
-    a: "RenderAI adalah workspace visual berbasis AI untuk membantu tim arsitektur dan interior membuat opsi render, mengelola project, dan menyimpan hasil dalam satu alur kerja.",
+    a: "RenderAI adalah workspace visual berbasis AI untuk membantu tim arsitektur dan interior membuat opsi render, mengelola project, dan menyimpan hasil dalam satu alur kerja yang rapi.",
   },
   {
     q: "Input seperti apa yang bisa digunakan?",
@@ -137,7 +137,7 @@ const faqs = [
   },
   {
     q: "Apa bedanya dengan membuat render manual?",
-    a: "RenderAI ditujukan untuk mempercepat eksplorasi dan komunikasi konsep. Tim bisa membuat beberapa arah visual lebih cepat sebelum menentukan mana yang layak dipoles lebih lanjut.",
+    a: "RenderAI mempercepat eksplorasi dan komunikasi konsep. Tim bisa membuat beberapa arah visual lebih cepat sebelum menentukan opsi yang perlu dipoles lebih lanjut.",
   },
   {
     q: "Apakah hasilnya bisa dipakai untuk diskusi klien?",
@@ -184,25 +184,25 @@ export default function LandingPage() {
       <main>
         <section className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-12 pt-10 text-center sm:px-6 sm:pb-14 sm:pt-14">
           <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-md border border-border/70 bg-card/80 px-3 py-1.5 text-xs font-medium text-muted-foreground">
-            <span>RenderAI untuk tim desain ruang,</span>
+            <span>AI rendering workspace untuk studio desain,</span>
             <span className="font-semibold text-foreground">
-              dari konsep ke visual yang siap dibahas.
+              dari draft ke visual presentasi.
             </span>
           </div>
 
           <h1 className="mt-6 max-w-3xl text-3xl font-extrabold leading-[1.1] tracking-normal text-foreground sm:text-4xl lg:text-5xl">
-            Bangun Visual Arsitektur Lebih Cepat, Tetap Rapi Per Project
+            Render Visual Arsitektur Lebih Cepat, Tetap Terkelola Per Project
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-[17px]">
             RenderAI membantu arsitek, interior designer, dan tim properti
-            mengubah draft desain menjadi opsi visual yang rapi, terukur, dan
-            mudah dipresentasikan sejak tahap konsep.
+            mengubah draft desain menjadi opsi visual yang profesional,
+            konsisten, dan mudah dibawa ke review klien sejak tahap konsep.
           </p>
 
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild className="h-10 px-5 text-sm">
               <Link href="/register">
-                Mulai Eksplorasi <Sparkles />
+                Mulai render pertama <Sparkles />
               </Link>
             </Button>
             <Button
@@ -211,7 +211,7 @@ export default function LandingPage() {
               className="h-10 px-5 text-sm shadow-none"
             >
               <Link href="#showcase">
-                Lihat Contoh Visual <Play />
+                Lihat visual contoh <Play />
               </Link>
             </Button>
           </div>
@@ -225,8 +225,8 @@ export default function LandingPage() {
         <section id="fitur" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
           <SectionHeader
             eyebrow="Workflow RenderAI"
-            title="Satu alur kerja untuk membuat, membandingkan, dan menyimpan opsi visual"
-            description="RenderAI dirancang untuk membantu proses desain yang dinamis: cepat mencoba arah visual, tetap rapi menyimpan hasil, dan mudah membawa output ke percakapan klien."
+            title="Satu workspace untuk membuat, membandingkan, dan menyimpan opsi visual"
+            description="RenderAI dirancang untuk proses desain yang dinamis: cepat mencoba arah visual, rapi menyimpan hasil, dan mudah membawa output ke percakapan klien."
           />
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
@@ -255,8 +255,8 @@ export default function LandingPage() {
         <section id="showcase" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
           <SectionHeader
             eyebrow="Galeri Visual"
-            title="Contoh arah visual untuk membantu keputusan desain"
-            description="Gunakan RenderAI untuk menyiapkan mood awal, membandingkan suasana ruang, atau membuat bahan diskusi sebelum visual final diproduksi."
+            title="Visual yang membantu klien membaca arah desain"
+            description="Gunakan RenderAI untuk menyiapkan mood awal, membandingkan suasana ruang, dan membuat bahan diskusi sebelum visual final diproduksi."
           />
           <div className="mt-8 grid auto-rows-[200px] gap-4 md:grid-cols-2 lg:grid-cols-3 lg:auto-rows-[240px]">
             {showcase.map((item) => (
@@ -282,9 +282,9 @@ export default function LandingPage() {
         <section id="cara-kerja" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
           <div className="grid gap-5 rounded-lg border border-border/70 bg-card/90 p-5 shadow-none md:grid-cols-3">
             {[
-              ["1", "Masukkan materi awal", "Gunakan foto, screenshot model, sketsa, atau referensi visual."],
-              ["2", "Tentukan arah desain", "Pilih mode render, mood, gaya, dan catatan detail yang ingin dijaga."],
-              ["3", "Simpan hasil terbaik", "Kelola opsi visual per project, lalu unduh atau bagikan saat dibutuhkan."],
+              ["1", "Masukkan materi awal", "Gunakan foto, screenshot model, sketsa, atau referensi visual yang relevan."],
+              ["2", "Tentukan arah desain", "Pilih mode render, mood, gaya, dan detail penting yang ingin dijaga."],
+              ["3", "Simpan opsi terbaik", "Kelola hasil per project, lalu unduh atau bagikan saat dibutuhkan."],
             ].map(([step, title, desc]) => (
               <div key={step} className="flex gap-4">
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
@@ -304,8 +304,8 @@ export default function LandingPage() {
         <section id="harga" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
           <SectionHeader
             eyebrow="Paket Kredit"
-            title="Pilih kapasitas render sesuai ritme project"
-            description="Mulai kecil untuk mencoba, tambah kredit saat kebutuhan visual meningkat. Cocok untuk workflow yang berubah dari minggu ke minggu."
+            title="Kapasitas render yang mengikuti ritme project"
+            description="Mulai kecil untuk mencoba, tambah kredit saat kebutuhan visual meningkat. Cocok untuk workflow studio yang berubah dari minggu ke minggu."
           />
           <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {pricing.map((plan) => (
@@ -366,8 +366,8 @@ export default function LandingPage() {
         <section id="faq" className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-14">
           <SectionHeader
             eyebrow="FAQ"
-            title="Hal yang biasanya ditanyakan sebelum mulai"
-            description="Ringkasan praktis tentang bagaimana RenderAI masuk ke workflow desain, bukan menggantikan proses kreatif tim."
+            title="Hal penting sebelum mulai"
+            description="Ringkasan praktis tentang bagaimana RenderAI masuk ke workflow desain tanpa menggantikan proses kreatif tim."
           />
           <div className="mt-8 space-y-3">
             {faqs.map((item, index) => (
@@ -391,15 +391,15 @@ export default function LandingPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:pb-20">
           <div className="rounded-lg bg-primary px-6 py-10 text-center text-primary-foreground shadow-none sm:px-10">
             <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl">
-              Bawa ide ruang ke bentuk visual lebih cepat
+              Bawa konsep ruang ke visual presentasi lebih cepat
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-primary-foreground/80">
               Mulai dari satu project, buat beberapa opsi visual, lalu gunakan
-              hasilnya untuk memperjelas diskusi desain berikutnya.
+              hasilnya untuk membuat diskusi desain lebih jelas dan terarah.
             </p>
             <Button variant="secondary" asChild className="mt-6 h-10 px-5 text-sm shadow-none">
               <Link href="/register">
-              Mulai dengan kredit awal <ArrowRight />
+                Mulai dengan kredit awal <ArrowRight />
               </Link>
             </Button>
           </div>
@@ -456,6 +456,15 @@ function SectionHeader({
 function ProductPreview() {
   return (
     <div className="mt-10 w-full rounded-lg border border-border/70 bg-card p-2 shadow-sm shadow-foreground/5">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md bg-primary px-3 py-2 text-primary-foreground">
+        <div className="flex items-center gap-2 text-sm font-bold">
+          <Sparkles className="size-4" />
+          RenderAI Studio Preview
+        </div>
+        <span className="text-xs font-medium text-primary-foreground/75">
+          Draft, opsi visual, dan review klien dalam satu workspace
+        </span>
+      </div>
       <div className="grid overflow-hidden rounded-md border border-border/70 bg-background text-left lg:grid-cols-[230px_1fr_210px]">
         <aside className="hidden border-r border-border/70 bg-card p-4 lg:block">
           <div className="mb-4 flex items-center gap-2 text-sm font-bold text-foreground">
@@ -526,13 +535,14 @@ function ProductPreview() {
             Opsi Tersimpan
           </div>
           <div className="grid grid-cols-2 gap-2">
-            {showcase.slice(0, 4).map((item) => (
+            {showcase.slice(0, 4).map((item, index) => (
               <Image
                 key={item.title}
                 src={item.src}
                 alt={item.title}
                 width={120}
                 height={120}
+                loading={index === 0 ? "eager" : "lazy"}
                 className="aspect-square rounded-md object-cover"
               />
             ))}

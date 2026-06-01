@@ -40,55 +40,62 @@ const colorGroups = [
   {
     title: "Brand",
     swatches: [
-      { label: "Primary", token: "--primary", note: "CTA, active nav, focus" },
-      { label: "Accent", token: "--accent", note: "AI/context highlights" },
-      { label: "Ink", token: "--foreground", note: "Primary text" },
+      { label: "Navy Blue", token: "--primary", note: "CTA, navigasi aktif, focus" },
+      { label: "Soft Blue", token: "--accent", note: "Highlight AI dan konteks" },
+      { label: "Ink", token: "--foreground", note: "Teks utama" },
     ],
   },
   {
     title: "Surfaces",
     swatches: [
-      { label: "Background", token: "--background", note: "Page shell" },
-      { label: "Card", token: "--card", note: "Raised content" },
-      { label: "Muted", token: "--muted", note: "Subtle panels" },
-      { label: "Border", token: "--border", note: "Dividers and frames" },
+      { label: "Background", token: "--background", note: "Permukaan halaman" },
+      { label: "Card", token: "--card", note: "Konten berbingkai" },
+      { label: "Muted", token: "--muted", note: "Panel subtle" },
+      { label: "Border", token: "--border", note: "Divider dan frame" },
     ],
   },
   {
     title: "Feedback",
     swatches: [
-      { label: "Success", token: "--success", note: "Completed states" },
-      { label: "Warning", token: "--warning", note: "Pending states" },
-      { label: "Info", token: "--info", note: "Neutral updates" },
-      { label: "Destructive", token: "--destructive", note: "Risk actions" },
+      { label: "Success", token: "--success", note: "Status selesai" },
+      { label: "Warning", token: "--warning", note: "Status menunggu" },
+      { label: "Info", token: "--info", note: "Update netral" },
+      { label: "Destructive", token: "--destructive", note: "Aksi berisiko" },
     ],
   },
 ];
 
 const typeScale = [
-  ["Display", "40/48", "Landing headline only"],
-  ["H1", "24/32", "Page titles"],
-  ["H2", "20/28", "Section titles"],
-  ["Body", "14/24", "Forms, cards, tables"],
-  ["Caption", "12/18", "Meta text and helper copy"],
+  ["Display", "40/48", "Headline landing"],
+  ["H1", "24/32", "Judul halaman"],
+  ["H2", "20/28", "Judul section"],
+  ["Body", "14/24", "Form, card, tabel"],
+  ["Caption", "12/18", "Meta dan helper text"],
 ];
 
 const foundations = [
   {
     title: "Spacing",
     icon: Grid3X3,
-    items: ["4px base unit", "12-16px compact controls", "20px card padding", "48-56px landing sections"],
+    items: ["Basis 4px", "Kontrol ringkas 12-16px", "Card padding 20px", "Section landing 48-56px"],
   },
   {
     title: "Radius",
     icon: Layers3,
-    items: ["4px small", "6px input", "8px card", "10px brand mark", "Circle only for avatars"],
+    items: ["4px untuk elemen kecil", "6px untuk input", "8px untuk card", "10px untuk brand mark", "Lingkaran hanya untuk avatar"],
   },
   {
     title: "Elevation",
     icon: PanelTop,
-    items: ["Default cards are flat", "Menus use soft 16-24px shadow", "Modals use focused overlay shadow"],
+    items: ["Card default tetap flat", "Menu memakai shadow 16-24px yang lembut", "Modal memakai overlay shadow yang fokus"],
   },
+];
+
+const visualAssetRules = [
+  "Visual utama harus menunjukkan ruang, project, atau UI produk yang relevan, bukan ilustrasi generik.",
+  "Mockup produk memakai komponen terbaru: radius 8px, Navy Blue sebagai aksen, dan layout yang lapang.",
+  "Gambar showcase menggunakan rasio stabil, crop bersih, kontras cukup, dan caption singkat.",
+  "Preview fitur harus membantu pengguna memahami manfaat workflow, bukan hanya menjadi dekorasi.",
 ];
 
 function Swatch({
@@ -168,7 +175,7 @@ export default function DesignSystemPage() {
       <main className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-10 sm:px-5 sm:py-12">
         <section className="flex flex-col gap-5">
           <Badge variant="violet" className="w-fit">
-            <Sparkles /> RenderAI Product Language
+            <Sparkles /> Bahasa Visual RenderAI
           </Badge>
           <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
             <div>
@@ -189,7 +196,7 @@ export default function DesignSystemPage() {
                   items={[
                     "Konten lebih penting dari dekorasi.",
                     "Komponen padat, tetapi tetap mudah disentuh.",
-                    "Warna halus dengan satu primary action yang jelas.",
+                "Navy Blue menjadi identitas utama dan primary action.",
                     "Shadow hanya muncul saat ada layer atau menu.",
                   ]}
                 />
@@ -201,8 +208,8 @@ export default function DesignSystemPage() {
         <Separator />
 
         <Section
-          title="Color Palette"
-          description="Primary hijau mineral dipakai untuk aksi utama dan status aktif. Neutral surface menjaga app tetap ringan dan profesional."
+          title="Palet Warna"
+          description="Primary Navy Blue dipakai untuk aksi utama, link penting, focus ring, dan status aktif. Neutral surface menjaga app tetap ringan, premium, dan profesional."
         >
           <div className="grid gap-6">
             {colorGroups.map((group) => (
@@ -223,7 +230,7 @@ export default function DesignSystemPage() {
         <Separator />
 
         <Section
-          title="Typography"
+          title="Tipografi"
           description="Plus Jakarta Sans digunakan untuk semua UI. Hierarki dibuat ringkas agar dashboard, form, dan tabel tidak terasa terlalu besar."
         >
           <Card>
@@ -293,7 +300,7 @@ export default function DesignSystemPage() {
         <Separator />
 
         <Section
-          title="Buttons, Badges, Feedback"
+          title="Tombol, Badge, Feedback"
           description="Aksi utama harus jelas. Aksi sekunder memakai outline atau ghost agar tidak bersaing dengan CTA utama."
         >
           <Card>
@@ -347,7 +354,7 @@ export default function DesignSystemPage() {
         <Separator />
 
         <Section
-          title="Forms and Cards"
+          title="Form dan Card"
           description="Form memakai tinggi 40px, radius 6px, label singkat, dan helper text secukupnya."
         >
           <div className="grid gap-4 lg:grid-cols-[420px_1fr]">
@@ -414,14 +421,41 @@ export default function DesignSystemPage() {
         <Separator />
 
         <Section
-          title="Tables, Navigation, Modal, Loading"
+          title="Aset Visual dan Prototype"
+          description="Visual RenderAI harus terasa premium, relevan dengan arsitektur/interior, dan memakai mockup UI terbaru."
+        >
+          <Card>
+            <CardContent className="grid gap-5 py-5 lg:grid-cols-[300px_1fr]">
+              <div className="overflow-hidden rounded-lg border border-border bg-muted">
+                <div className="flex items-center justify-between border-b border-border bg-primary px-3 py-2 text-primary-foreground">
+                  <span className="text-sm font-bold">RenderAI Preview</span>
+                  <Badge variant="secondary">Siap review</Badge>
+                </div>
+                <div className="grid gap-3 p-3">
+                  <div className="aspect-video rounded-md bg-card" />
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="h-12 rounded-md bg-card" />
+                    <div className="h-12 rounded-md bg-card" />
+                    <div className="h-12 rounded-md bg-card" />
+                  </div>
+                </div>
+              </div>
+              <SpecList items={visualAssetRules} />
+            </CardContent>
+          </Card>
+        </Section>
+
+        <Separator />
+
+        <Section
+          title="Tabel, Navigasi, Modal, Loading"
           description="Komponen operasional harus dense, scannable, dan konsisten dengan app shell."
         >
           <div className="grid gap-4 lg:grid-cols-2">
             <Card className="overflow-hidden p-0">
               <div className="border-b border-border px-4 py-3">
                 <p className="flex items-center gap-2 font-bold text-foreground">
-                  <Table2 className="size-4 text-primary" /> Table pattern
+                  <Table2 className="size-4 text-primary" /> Pola tabel
                 </p>
               </div>
               <div className="overflow-x-auto">
@@ -479,8 +513,8 @@ export default function DesignSystemPage() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-border bg-card p-4 shadow-[0_20px_60px_rgb(24_33_31/0.08)]">
-                  <p className="font-bold text-foreground">Modal pattern</p>
+                <div className="rounded-lg border border-border bg-card p-4 shadow-[0_20px_60px_rgb(15_23_42/0.08)]">
+                  <p className="font-bold text-foreground">Pola modal</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Dialog memakai radius 8px, padding 20px, overlay 45%, dan
                     shadow hanya untuk layer aktif.
@@ -505,8 +539,8 @@ export default function DesignSystemPage() {
         <footer className="flex flex-col items-center gap-2 border-t border-border pt-8 text-center text-sm text-muted-foreground">
           <Logo size={24} withWordmark={false} />
           <p>
-            RenderAI Design System - typography, color, spacing, components, and
-            interaction states.
+            RenderAI Design System - tipografi, warna, spacing, komponen, dan
+            interaction state.
           </p>
           <Button asChild variant="outline" size="sm">
             <Link href="/">

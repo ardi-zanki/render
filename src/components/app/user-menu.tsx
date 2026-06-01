@@ -135,7 +135,7 @@ export function UserMenu({
                 left: menuPosition?.left ?? 12,
                 bottom: menuPosition?.bottom ?? 84,
               }}
-              className="fixed z-[2147482000] max-h-[min(520px,calc(100vh-2rem))] w-72 overflow-y-auto rounded-lg border border-border bg-popover p-1.5 shadow-[0_16px_48px_rgb(24_33_31/0.14)]"
+              className="fixed z-[2147482000] max-h-[min(520px,calc(100vh-2rem))] w-72 overflow-y-auto rounded-lg border border-border bg-popover p-1.5 shadow-[0_16px_48px_rgb(15_23_42/0.14)]"
             >
             <div className="flex items-center gap-3 px-2.5 py-2">
               <Avatar name={user.name} src={user.image} size={36} />

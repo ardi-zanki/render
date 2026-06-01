@@ -3,10 +3,10 @@
  * All copy in Bahasa Indonesia (PRD §25).
  */
 
-const BRAND_PRIMARY = "#255f56";
-const INK = "#18211f";
-const MUTED = "#66736e";
-const BORDER = "#dde5e1";
+const BRAND_PRIMARY = "#1b2a5e";
+const INK = "#151a27";
+const MUTED = "#64748b";
+const BORDER = "#dde5ef";
 
 function layout(opts: {
   heading: string;
@@ -17,7 +17,7 @@ function layout(opts: {
   const { heading, body, cta, footnote } = opts;
   return `<!doctype html>
 <html lang="id">
-  <body style="margin:0;background:#f8faf9;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:${INK};">
+  <body style="margin:0;background:#f7f8fb;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:${INK};">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px;">
       <tr><td align="center">
         <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:100%;max-width:480px;background:#ffffff;border:1px solid ${BORDER};border-radius:12px;overflow:hidden;">
@@ -27,7 +27,7 @@ function layout(opts: {
           </td></tr>
           <tr><td style="padding:8px 28px 0;">
             <h1 style="font-size:21px;line-height:1.35;font-weight:800;letter-spacing:0;margin:12px 0;">${heading}</h1>
-            <div style="font-size:14px;line-height:1.7;color:#3e4a46;">${body}</div>
+            <div style="font-size:14px;line-height:1.7;color:#3e4858;">${body}</div>
           </td></tr>
           ${
             cta
@@ -40,7 +40,7 @@ function layout(opts: {
               : ""
           }
           <tr><td style="padding:24px 28px 26px;">
-            <div style="font-size:12px;line-height:1.6;color:${MUTED};border-top:1px solid #eef3f1;padding-top:16px;">${footnote ?? "Email ini dikirim otomatis oleh RenderAI. Abaikan jika Anda tidak meminta."}</div>
+            <div style="font-size:12px;line-height:1.6;color:${MUTED};border-top:1px solid #eef2f7;padding-top:16px;">${footnote ?? "Email ini dikirim otomatis oleh RenderAI. Abaikan jika Anda tidak meminta."}</div>
           </td></tr>
         </table>
       </td></tr>

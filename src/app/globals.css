@@ -6,39 +6,39 @@
 
 /*
   RenderAI Design Tokens
-  A calm professional palette, compact radius scale, and subtle surfaces for
-  one consistent product language across landing, auth, email, and app screens.
+  A premium navy-led palette, compact radius scale, and subtle surfaces for one
+  consistent product language across landing, auth, email, and app screens.
 */
 :root {
   --radius: 0.625rem;
 
   /* Surfaces */
-  --background: #f8faf9;
-  --foreground: #18211f;
+  --background: #f7f8fb;
+  --foreground: #151a27;
   --card: #ffffff;
-  --card-foreground: #18211f;
+  --card-foreground: #151a27;
   --popover: #ffffff;
-  --popover-foreground: #18211f;
+  --popover-foreground: #151a27;
 
-  /* Brand primary */
-  --primary: #255f56;
+  /* Brand primary - navy blue */
+  --primary: #1b2a5e;
   --primary-foreground: #ffffff;
 
   /* Secondary neutral surface */
-  --secondary: #eef3f1;
-  --secondary-foreground: #18211f;
+  --secondary: #eef2f7;
+  --secondary-foreground: #151a27;
 
-  --muted: #eef3f1;
-  --muted-foreground: #66736e;
+  --muted: #eef2f7;
+  --muted-foreground: #64748b;
 
   /* Accent */
-  --accent: #e9f2ff;
-  --accent-foreground: #31538b;
+  --accent: #eef4ff;
+  --accent-foreground: #334f9d;
 
   /* Semantic */
   --destructive: #c94343;
   --destructive-foreground: #ffffff;
-  --success: #26804f;
+  --success: #2f855a;
   --success-foreground: #ffffff;
   --warning: #b7791f;
   --warning-foreground: #ffffff;
@@ -46,61 +46,61 @@
   --info-foreground: #ffffff;
 
   /* Lines & focus */
-  --border: #dde5e1;
-  --input: #d5dfda;
-  --ring: #255f56;
+  --border: #dde5ef;
+  --input: #d4dce8;
+  --ring: #1b2a5e;
 
   /* Brand accent */
   --brand-violet: #6e63d8;
 
   /* Charts */
-  --chart-1: #255f56;
+  --chart-1: #1b2a5e;
   --chart-2: #6e63d8;
   --chart-3: #2563eb;
   --chart-4: #b7791f;
-  --chart-5: #26804f;
+  --chart-5: #2f855a;
 }
 
 .dark {
-  --background: #101412;
-  --foreground: #f4f7f5;
-  --card: #171d1a;
-  --card-foreground: #f4f7f5;
-  --popover: #171d1a;
-  --popover-foreground: #f4f7f5;
+  --background: #0b1020;
+  --foreground: #f4f7fb;
+  --card: #111827;
+  --card-foreground: #f4f7fb;
+  --popover: #111827;
+  --popover-foreground: #f4f7fb;
 
-  --primary: #72c8ba;
-  --primary-foreground: #09211d;
+  --primary: #9badff;
+  --primary-foreground: #071123;
 
-  --secondary: #202823;
-  --secondary-foreground: #f4f7f5;
+  --secondary: #1b2436;
+  --secondary-foreground: #f4f7fb;
 
-  --muted: #1d2421;
-  --muted-foreground: #a7b3ad;
+  --muted: #151d2f;
+  --muted-foreground: #a6b0c2;
 
-  --accent: #1f2b3c;
-  --accent-foreground: #b8cdfa;
+  --accent: #1a2747;
+  --accent-foreground: #c8d5ff;
 
   --destructive: #ff6b6b;
   --destructive-foreground: #240909;
-  --success: #58c982;
+  --success: #65d394;
   --success-foreground: #071a10;
   --warning: #e7b867;
   --warning-foreground: #201506;
   --info: #78a8ff;
   --info-foreground: #071222;
 
-  --border: #2b3531;
-  --input: #34403b;
-  --ring: #72c8ba;
+  --border: #293248;
+  --input: #34405a;
+  --ring: #9badff;
 
   --brand-violet: #8b7dff;
 
-  --chart-1: #72c8ba;
+  --chart-1: #9badff;
   --chart-2: #8b7dff;
   --chart-3: #78a8ff;
   --chart-4: #e7b867;
-  --chart-5: #58c982;
+  --chart-5: #65d394;
 }
 
 @theme inline {

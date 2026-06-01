@@ -22,7 +22,7 @@ function LogoMark({ className, size = 32 }: LogoMarkProps) {
       aria-label="RenderAI"
       className={cn("shrink-0", className)}
     >
-      <rect width="40" height="40" rx="11" fill="var(--primary)" />
+      <rect width="40" height="40" rx="10" fill="var(--primary)" />
       <path
         d="M11.5 28 18 12h4.4l-6.5 16H11.5Z"
         fill="#FFFFFF"
