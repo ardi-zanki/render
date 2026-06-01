@@ -2,11 +2,13 @@
 
 import {
   Building2,
+  Check,
   Download,
   ImagePlus,
   Loader2,
   Maximize2,
   Palette,
+  Share2,
   Sofa,
   Sparkles,
   X,
@@ -104,6 +106,9 @@ export function RendrStudio({
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [resultRenderId, setResultRenderId] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
   const [view, setView] = useState<"hasil" | "asli">("hasil");
 
   const [balance, setBalance] = useState(initialBalance);
@@ -114,6 +119,8 @@ export function RendrStudio({
   function pickFile(f: File | null) {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setResultUrl(null);
+    setResultRenderId(null);
+    setShareUrl(null);
     setError("");
     if (f) {
       setFile(f);
@@ -149,6 +156,8 @@ export function RendrStudio({
         return;
       }
       setResultUrl(json.resultUrl);
+      setResultRenderId(json.renderId);
+      setShareUrl(null);
       setView("hasil");
       setBalance((b) => b - 1);
       setScenes((s) => [
@@ -160,6 +169,29 @@ export function RendrStudio({
       setError("Tidak bisa terhubung ke server. Coba lagi.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function onShare() {
+    if (!resultRenderId) return;
+    setSharing(true);
+    try {
+      const res = await fetch("/api/renders/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ renderId: resultRenderId }),
+      });
+      const json = await res.json();
+      if (res.ok && json.url) {
+        setShareUrl(json.url);
+        try {
+          await navigator.clipboard.writeText(json.url);
+        } catch {
+          // clipboard may be unavailable; the link is shown below regardless.
+        }
+      }
+    } finally {
+      setSharing(false);
     }
   }
 
@@ -329,6 +361,22 @@ export function RendrStudio({
                   <span className="text-muted-foreground">· sisa {balance}</span>
                 </div>
                 <div className="flex items-center gap-2">
+                  {resultUrl && resultRenderId && (
+                    <Button
+                      variant="outline"
+                      onClick={onShare}
+                      disabled={sharing}
+                    >
+                      {sharing ? (
+                        <Loader2 className="animate-spin" />
+                      ) : shareUrl ? (
+                        <Check />
+                      ) : (
+                        <Share2 />
+                      )}
+                      {shareUrl ? "Tersalin" : "Bagikan"}
+                    </Button>
+                  )}
                   {resultUrl && (
                     <Button variant="inverse" asChild>
                       <a href={resultUrl} download target="_blank" rel="noreferrer">
@@ -348,6 +396,23 @@ export function RendrStudio({
                   )}
                 </div>
               </div>
+
+              {shareUrl && (
+                <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs">
+                  <Share2 className="size-3.5 shrink-0 text-primary" />
+                  <span className="truncate font-mono text-muted-foreground">
+                    {shareUrl}
+                  </span>
+                  <a
+                    href={shareUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="ml-auto shrink-0 font-medium text-primary hover:underline"
+                  >
+                    Buka
+                  </a>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

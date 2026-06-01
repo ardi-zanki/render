@@ -1,17 +1,29 @@
 import { ImageIcon, Users, Wallet } from "lucide-react";
 import type { Metadata } from "next";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { countDisabled, getAdminStats } from "@/lib/admin/service";
+import { BarChart, BreakdownBars } from "@/components/app/charts";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  countDisabled,
+  getAdminAnalytics,
+  getAdminStats,
+} from "@/lib/admin/service";
+import { MODE_LABEL, STATUS_LABEL } from "@/lib/renders/labels";
 
 export const metadata: Metadata = { title: "Admin · Ringkasan" };
 
 const idr = new Intl.NumberFormat("id-ID");
 
 export default async function AdminOverviewPage() {
-  const [stats, disabled] = await Promise.all([
+  const [stats, disabled, analytics] = await Promise.all([
     getAdminStats(),
     countDisabled(),
+    getAdminAnalytics(),
   ]);
 
   const cards = [
@@ -35,24 +47,85 @@ export default async function AdminOverviewPage() {
     },
   ];
 
+  const renderBars = analytics.rendersByDay.map((d) => ({
+    label: d.day.slice(8),
+    value: d.value,
+    title: `${d.day}: ${d.value} render`,
+  }));
+  const revenueBars = analytics.revenueByDay.map((d) => ({
+    label: d.day.slice(8),
+    value: d.value,
+    title: `${d.day}: Rp${idr.format(d.value)}`,
+  }));
+
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      {cards.map((c) => (
-        <Card key={c.label}>
-          <CardContent className="flex flex-col gap-3 py-5">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <c.icon className="size-4" />
-            </div>
-            <div>
-              <p className="text-2xl font-extrabold text-foreground">
-                {c.value}
-              </p>
-              <p className="text-sm text-muted-foreground">{c.label}</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">{c.hint}</p>
-            </div>
+    <div className="flex flex-col gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {cards.map((c) => (
+          <Card key={c.label}>
+            <CardContent className="flex flex-col gap-3 py-5">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <c.icon className="size-4" />
+              </div>
+              <div>
+                <p className="text-2xl font-extrabold text-foreground">
+                  {c.value}
+                </p>
+                <p className="text-sm text-muted-foreground">{c.label}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{c.hint}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Render · 14 hari terakhir</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BarChart data={renderBars} />
           </CardContent>
         </Card>
-      ))}
+        <Card>
+          <CardHeader>
+            <CardTitle>Pendapatan · 14 hari terakhir</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BarChart data={revenueBars} />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Render per Mode</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BreakdownBars
+              data={analytics.modeBreakdown.map((m) => ({
+                label: MODE_LABEL[m.mode],
+                value: m.value,
+              }))}
+            />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Status Render</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BreakdownBars
+              data={analytics.statusBreakdown.map((s) => ({
+                label: STATUS_LABEL[s.status] ?? s.status,
+                value: s.value,
+              }))}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

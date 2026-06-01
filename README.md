@@ -208,6 +208,18 @@ are blocked by an `isDisabled` check in `requireUser` (→ `/login?disabled=1`).
 pnpm make:admin [email] [password]   # promote/create an admin (default admin@renderai.test)
 ```
 
+## Extras (beyond the PRD MVP)
+
+- **Public render sharing** — a successful render can be shared via a public,
+  no-auth page at `/s/<slug>` (Open Graph + Twitter card meta for nice link
+  previews). The Studio has a **Bagikan** button that calls
+  `POST /api/renders/share` (idempotent; stores a `share_slug` on the render)
+  and copies the link. Public viewer: `getPublicRender` in
+  `src/lib/renders/share.ts`.
+- **Admin analytics** — the `/admin` overview adds dependency-free charts
+  (`src/components/app/charts.tsx`): renders & revenue over the last 14 days,
+  plus render breakdowns by mode and status (`getAdminAnalytics`).
+
 ## Status
 
 - [x] **Phase 1a** — Scaffold + design system + dark mode

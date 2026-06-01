@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, sum } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, sql, sum } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -174,4 +174,70 @@ export async function countDisabled() {
     .from(user)
     .where(and(eq(user.isDisabled, true)));
   return row.v;
+}
+
+export interface DayValue {
+  day: string; // YYYY-MM-DD
+  value: number;
+}
+
+function last14Days(): string[] {
+  const out: string[] = [];
+  const now = new Date();
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    out.push(d.toISOString().slice(0, 10));
+  }
+  return out;
+}
+
+function fillSeries(rows: { day: string; value: number }[]): DayValue[] {
+  const map = new Map(rows.map((r) => [r.day, Number(r.value)]));
+  return last14Days().map((day) => ({ day, value: map.get(day) ?? 0 }));
+}
+
+export interface AdminAnalytics {
+  rendersByDay: DayValue[];
+  revenueByDay: DayValue[];
+  modeBreakdown: { mode: RenderMode; value: number }[];
+  statusBreakdown: { status: string; value: number }[];
+}
+
+export async function getAdminAnalytics(): Promise<AdminAnalytics> {
+  const renderRows = (await db.execute(
+    sql`select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as day, count(*)::int as value
+        from renders
+        where created_at >= now() - interval '13 days' and deleted_at is null
+        group by 1`,
+  )) as unknown as { day: string; value: number }[];
+
+  const revenueRows = (await db.execute(
+    sql`select to_char(date_trunc('day', created_at), 'YYYY-MM-DD') as day, coalesce(sum(amount),0)::int as value
+        from payments
+        where status = 'paid' and created_at >= now() - interval '13 days'
+        group by 1`,
+  )) as unknown as { day: string; value: number }[];
+
+  const modeRows = await db
+    .select({ mode: renders.mode, value: count() })
+    .from(renders)
+    .where(isNull(renders.deletedAt))
+    .groupBy(renders.mode);
+
+  const statusRows = await db
+    .select({ status: renders.status, value: count() })
+    .from(renders)
+    .where(isNull(renders.deletedAt))
+    .groupBy(renders.status);
+
+  return {
+    rendersByDay: fillSeries(renderRows),
+    revenueByDay: fillSeries(revenueRows),
+    modeBreakdown: modeRows.map((r) => ({ mode: r.mode, value: r.value })),
+    statusBreakdown: statusRows.map((r) => ({
+      status: r.status,
+      value: r.value,
+    })),
+  };
 }

@@ -126,6 +126,8 @@ export const renders = pgTable(
     providerResponse: jsonb("provider_response"),
     errorCode: text("error_code"),
     errorMessage: text("error_message"),
+    // Public share: when set, the render result is viewable at /s/<slug>.
+    shareSlug: text("share_slug").unique(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
