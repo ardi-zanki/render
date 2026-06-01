@@ -9,11 +9,14 @@ export const getServerSession = cache(async () => {
   return auth.api.getSession({ headers: await headers() });
 });
 
-/** Require any logged-in user; redirect to /login otherwise. */
+/** Require any logged-in, non-disabled user; redirect to /login otherwise. */
 export async function requireUser() {
   const session = await getServerSession();
   if (!session) {
     redirect("/login");
+  }
+  if (session.user.isDisabled) {
+    redirect("/login?disabled=1");
   }
   return session;
 }

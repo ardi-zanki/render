@@ -10,6 +10,7 @@ import {
   Menu,
   Plus,
   Settings,
+  Shield,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -46,12 +47,14 @@ export function AppShell({
   balance,
   unreadCount,
   notifications,
+  isAdmin,
   children,
 }: {
   user: AppUser;
   balance: number;
   unreadCount: number;
   notifications: NotificationItem[];
+  isAdmin: boolean;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -118,6 +121,22 @@ export function AppShell({
             </Link>
           );
         })}
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            onClick={() => setOpen(false)}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              isActive("/admin")
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+          >
+            <Shield className="size-4 shrink-0" />
+            Admin
+          </Link>
+        )}
       </nav>
 
       <div className="border-t border-border p-3">

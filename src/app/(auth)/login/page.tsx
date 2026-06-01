@@ -11,9 +11,9 @@ export const metadata: Metadata = { title: "Masuk" };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reset?: string }>;
+  searchParams: Promise<{ reset?: string; disabled?: string }>;
 }) {
-  const { reset } = await searchParams;
+  const { reset, disabled } = await searchParams;
 
   return (
     <AuthCard
@@ -32,6 +32,13 @@ export default async function LoginPage({
         <Alert variant="success">
           <AlertDescription>
             Password berhasil diperbarui. Silakan masuk dengan password baru.
+          </AlertDescription>
+        </Alert>
+      )}
+      {disabled === "1" && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            Akun kamu dinonaktifkan. Silakan hubungi admin.
           </AlertDescription>
         </Alert>
       )}

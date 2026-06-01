@@ -196,7 +196,19 @@ pnpm smoke:payment   # checkout → webhook → idempotent top-up
   notifications, default render mode/format) via server actions, and change
   password via Better Auth `changePassword`.
 
-## Status & langkah berikutnya
+## Admin (Phase 5)
+
+Admin area at `/admin` (guarded by `requireAdmin` in the admin layout; only
+admins see the sidebar link): overview stats, **Users** (disable/enable —
+revokes sessions; promote/demote role), all **Renders**, all **Payments**, and
+the **Audit Log**. Mutations are recorded in `admin_audit_logs`. Disabled users
+are blocked by an `isDisabled` check in `requireUser` (→ `/login?disabled=1`).
+
+```bash
+pnpm make:admin [email] [password]   # promote/create an admin (default admin@renderai.test)
+```
+
+## Status
 
 - [x] **Phase 1a** — Scaffold + design system + dark mode
 - [x] **Phase 1b** — Better Auth, PostgreSQL/Drizzle, R2, Resend, rate limiter, JWT
@@ -204,12 +216,11 @@ pnpm smoke:payment   # checkout → webhook → idempotent top-up
 - [x] **Phase 2** — Project & Render core, Rendr Studio, MyArchitectAI provider
 - [x] **Phase 3** — Credit purchase + Midtrans payment (Snap + webhook)
 - [x] **Phase 4** — Notifications (in-app + email) + account settings
-- [ ] Phase 5 — Admin (users, renders, payments, audit log)
+- [x] **Phase 5** — Admin (users, renders, payments, audit log)
 
-Still stubbed (by phase): Google OAuth (`GOOGLE_CLIENT_*`), email sending
-(`RESEND_API_KEY`), R2 + Midtrans + MyArchitectAI credentials. Render execution
-is inline in the request; a `render_jobs` queue/worker can take over later.
-
-> **Catatan provider AI:** PRD menyebut "MyArchitectAI API". Perlu diverifikasi
-> apakah API publiknya tersedia; arsitektur provider/adapter (PRD §6.1)
-> memudahkan ganti ke Replicate / fal.ai / OpenAI image bila perlu.
+The MVP feature set is complete. Before production, supply real credentials and
+flip providers: Google OAuth (`GOOGLE_CLIENT_*`), email (`RESEND_API_KEY`),
+`STORAGE_PROVIDER=r2` (+ R2 creds), `AI_PROVIDER=myarchitectai`
+(+ `MYARCHITECTAI_API_KEY`), `PAYMENT_PROVIDER=midtrans` (+ Midtrans keys and
+notification URL). Render execution is inline in the request; the `render_jobs`
+table is ready for a queue/worker if heavier async providers are added.

@@ -27,6 +27,7 @@ export default async function AppLayout({
       }}
       balance={balance}
       unreadCount={unreadCount}
+      isAdmin={session.user.role === "admin"}
       notifications={recent.map((n) => ({
         id: n.id,
         type: n.type,
