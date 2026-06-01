@@ -225,21 +225,31 @@ export default async function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {recentProjects.map((p) => (
-            <Card key={p.id} className="transition-shadow hover:shadow-md">
-              <CardContent className="flex flex-col gap-3 py-5">
-                <div className="flex aspect-video items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                  <FolderOpen className="size-6" />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <p className="truncate font-semibold text-foreground">
-                    {p.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Diperbarui {dateFmt.format(p.updatedAt)}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <Link key={p.id} href={`/projects/${p.id}`}>
+              <Card className="transition-shadow hover:shadow-md">
+                <CardContent className="flex flex-col gap-3 py-5">
+                  <div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-muted text-muted-foreground">
+                    {p.coverImageUrl ? (
+                      <RenderImage
+                        src={p.coverImageUrl}
+                        alt={p.name}
+                        className="size-full"
+                      />
+                    ) : (
+                      <FolderOpen className="size-6" />
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <p className="truncate font-semibold text-foreground">
+                      {p.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Diperbarui {dateFmt.format(p.updatedAt)}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </section>

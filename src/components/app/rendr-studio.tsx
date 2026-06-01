@@ -8,6 +8,7 @@ import {
   Loader2,
   Maximize2,
   Palette,
+  Plus,
   Share2,
   Sofa,
   Sparkles,
@@ -85,16 +86,34 @@ function Segmented({
 export function RendrStudio({
   projectId,
   projectName,
+  projects,
   initialBalance,
   initialScenes,
 }: {
   projectId: string;
   projectName: string;
+  projects: { id: string; name: string }[];
   initialBalance: number;
   initialScenes: Scene[];
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+
+  function switchProject(id: string) {
+    if (id !== projectId) router.push(`/renders/new?project=${id}`);
+  }
+
+  async function createProjectInline() {
+    const name = window.prompt("Nama project baru?");
+    if (!name?.trim()) return;
+    const res = await fetch("/api/projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name.trim() }),
+    });
+    const json = await res.json();
+    if (res.ok && json.id) router.push(`/renders/new?project=${json.id}`);
+  }
 
   const [mode, setMode] = useState<RenderMode>("interior");
   const [style, setStyle] = useState("auto");
@@ -203,6 +222,34 @@ export function RendrStudio({
       {/* Controls */}
       <Card className="h-fit">
         <CardContent className="flex flex-col gap-5 py-5">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="project">Project</Label>
+            <div className="flex gap-2">
+              <Select
+                id="project"
+                value={projectId}
+                onChange={(e) => switchProject(e.target.value)}
+                className="flex-1"
+              >
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={createProjectInline}
+                title="Buat project baru"
+                aria-label="Buat project baru"
+              >
+                <Plus />
+              </Button>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-2">
             <Label>Mode Render</Label>
             <div className="grid grid-cols-2 gap-2">

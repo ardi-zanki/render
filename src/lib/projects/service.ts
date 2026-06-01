@@ -22,7 +22,11 @@ export async function getDefaultProject(userId: string) {
 
 export async function listProjects(userId: string) {
   return db.query.projects.findMany({
-    where: and(eq(projects.userId, userId), isNull(projects.deletedAt)),
+    where: and(
+      eq(projects.userId, userId),
+      isNull(projects.deletedAt),
+      isNull(projects.archivedAt),
+    ),
     orderBy: desc(projects.updatedAt),
   });
 }
@@ -43,4 +47,26 @@ export async function createProject(userId: string, name: string) {
     .values({ userId, name })
     .returning();
   return created;
+}
+
+export async function renameProject(
+  userId: string,
+  projectId: string,
+  name: string,
+) {
+  await db
+    .update(projects)
+    .set({ name, updatedAt: new Date() })
+    .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+}
+
+/** Archive a project (hidden from lists). The default project can't be archived. */
+export async function archiveProject(userId: string, projectId: string) {
+  const p = await getProject(userId, projectId);
+  if (!p || p.isDefault) return false;
+  await db
+    .update(projects)
+    .set({ archivedAt: new Date(), updatedAt: new Date() })
+    .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
+  return true;
 }

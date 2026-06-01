@@ -219,6 +219,11 @@ pnpm make:admin [email] [password]   # promote/create an admin (default admin@re
 - **Admin analytics** — the `/admin` overview adds dependency-free charts
   (`src/components/app/charts.tsx`): renders & revenue over the last 14 days,
   plus render breakdowns by mode and status (`getAdminAnalytics`).
+- **Full project management** — the Rendr Studio has a project picker (+ inline
+  "create"); renders go to the selected project (`/renders/new?project=<id>`).
+  Project detail page `/projects/[id]` lists that project's renders with rename
+  and archive (default project can't be archived). `POST /api/projects` creates
+  a project; `renameProject` / `archiveProject` in the project service.
 
 ## Status
 

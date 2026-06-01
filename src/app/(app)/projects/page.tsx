@@ -1,6 +1,7 @@
 import { and, count, eq, isNull } from "drizzle-orm";
 import { FolderOpen } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
 import { RenderImage } from "@/components/app/render-image";
@@ -49,26 +50,33 @@ export default async function ProjectsPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {projects.map((p) => (
-          <Card key={p.id} className="gap-0 overflow-hidden p-0">
-            <div className="flex aspect-video items-center justify-center bg-muted">
-              {p.coverImageUrl ? (
-                <RenderImage src={p.coverImageUrl} alt={p.name} className="size-full" />
-              ) : (
-                <FolderOpen className="size-7 text-muted-foreground" />
-              )}
-            </div>
-            <CardContent className="flex items-start justify-between gap-2 py-4">
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <p className="flex items-center gap-2 truncate font-semibold text-foreground">
-                  {p.name}
-                  {p.isDefault && <Badge variant="secondary">Default</Badge>}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {countMap.get(p.id) ?? 0} render · {dateFmt.format(p.updatedAt)}
-                </p>
+          <Link key={p.id} href={`/projects/${p.id}`}>
+            <Card className="gap-0 overflow-hidden p-0 transition-shadow hover:shadow-md">
+              <div className="flex aspect-video items-center justify-center bg-muted">
+                {p.coverImageUrl ? (
+                  <RenderImage
+                    src={p.coverImageUrl}
+                    alt={p.name}
+                    className="size-full"
+                  />
+                ) : (
+                  <FolderOpen className="size-7 text-muted-foreground" />
+                )}
               </div>
-            </CardContent>
-          </Card>
+              <CardContent className="flex items-start justify-between gap-2 py-4">
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <p className="flex items-center gap-2 truncate font-semibold text-foreground">
+                    {p.name}
+                    {p.isDefault && <Badge variant="secondary">Default</Badge>}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {countMap.get(p.id) ?? 0} render ·{" "}
+                    {dateFmt.format(p.updatedAt)}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
     </>
