@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 };
 
 const packages = [
-  ["Starter", "30 kredit", "Rp79.000"],
-  ["Creator", "100 kredit", "Rp249.000"],
-  ["Studio", "300 kredit", "Rp735.000"],
-  ["Agency", "1.000 kredit", "Rp2.300.000"],
+  ["Starter", "30 kredit", "Rp79.000", "Untuk validasi workflow awal"],
+  ["Creator", "100 kredit", "Rp249.000", "Untuk presentasi dan revisi rutin"],
+  ["Studio", "300 kredit", "Rp735.000", "Untuk beberapa project berjalan"],
+  ["Agency", "1.000 kredit", "Rp2.300.000", "Untuk kebutuhan visual volume tinggi"],
 ];
 
 export default function HargaPage() {
@@ -24,27 +24,32 @@ export default function HargaPage() {
       <PublicHeader />
       <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-primary">Paket Kredit</p>
-          <h1 className="mt-3 text-3xl font-extrabold sm:text-4xl">
-            Harga fleksibel untuk setiap ritme project
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-primary">
+            Paket Kredit
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-normal sm:text-4xl">
+            Harga yang mengikuti ritme project desain
           </h1>
           <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
-            RenderAI memakai sistem kredit. Satu render memakai satu kredit,
-            tanpa subscription wajib untuk MVP.
+            RenderAI memakai sistem kredit. Mulai kecil untuk validasi workflow,
+            lalu tambah kapasitas saat kebutuhan visual meningkat.
           </p>
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {packages.map(([name, credits, price]) => (
-            <Card key={name}>
+          {packages.map(([name, credits, price, note]) => (
+            <Card key={name} className={name === "Creator" ? "border-primary/70 ring-1 ring-primary/15" : ""}>
               <CardContent className="flex h-full flex-col gap-4 py-5">
                 <div>
-                  <h2 className="text-lg font-bold">{name}</h2>
+                  <h2 className="text-base font-semibold">{name}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{credits}</p>
                 </div>
-                <p className="text-2xl font-extrabold">{price}</p>
+                <div>
+                  <p className="text-2xl font-semibold tracking-normal">{price}</p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{note}</p>
+                </div>
                 <Button asChild className="mt-auto">
-                  <Link href="/register">Mulai</Link>
+                  <Link href="/register">Mulai render</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -60,7 +65,7 @@ function PublicHeader() {
     <header className="border-b border-border/80 bg-background/85 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/">
-          <Logo size={28} />
+          <Logo size={28} byline="Pricing" />
         </Link>
         <div className="flex items-center gap-2">
           <Button variant="ghost" asChild>

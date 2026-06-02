@@ -93,8 +93,8 @@ function ProjectFormModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
-      <div className="relative z-[61] w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-[0_20px_60px_rgb(15_23_42/0.16)]">
+      <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]" onClick={onClose} />
+      <div className="relative z-[61] w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-dialog">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-base font-bold text-foreground">
             {isEdit ? "Edit project" : "Buat project"}
@@ -220,7 +220,7 @@ export function ProjectsClient({
       "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
       active
         ? "bg-primary text-primary-foreground"
-        : "bg-secondary text-secondary-foreground hover:bg-muted",
+        : "bg-secondary text-secondary-foreground hover:bg-muted hover:text-primary",
     );
 
   return (

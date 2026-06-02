@@ -66,8 +66,8 @@ const colorGroups = [
 ];
 
 const typeScale = [
-  ["Display", "40/48", "Headline landing"],
-  ["H1", "24/32", "Judul halaman"],
+  ["Display", "46/52", "Headline landing"],
+  ["H1", "24/32", "Judul halaman app"],
   ["H2", "20/28", "Judul section"],
   ["Body", "14/24", "Form, card, tabel"],
   ["Caption", "12/18", "Meta dan helper text"],
@@ -82,12 +82,12 @@ const foundations = [
   {
     title: "Radius",
     icon: Layers3,
-    items: ["4px untuk elemen kecil", "6px untuk input", "8px untuk card", "10px untuk brand mark", "Lingkaran hanya untuk avatar"],
+    items: ["4px untuk elemen kecil", "6px untuk input", "8px untuk card dan modal", "10px untuk brand mark", "Lingkaran hanya untuk avatar"],
   },
   {
     title: "Elevation",
     icon: PanelTop,
-    items: ["Card default tetap flat", "Menu memakai shadow 16-24px yang lembut", "Modal memakai overlay shadow yang fokus"],
+    items: ["Card memakai shadow-soft yang sangat halus", "Menu memakai shadow-elevated", "Modal memakai overlay blur ringan dan shadow-dialog"],
   },
 ];
 
@@ -134,7 +134,7 @@ function Section({
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-bold text-foreground">{title}</h2>
+        <h2 className="text-xl font-semibold text-foreground">{title}</h2>
         {description && (
           <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
             {description}

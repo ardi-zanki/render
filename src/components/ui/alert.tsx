@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 const alertVariants = cva(
-  "relative flex gap-3 rounded-md border px-3.5 py-3 text-sm leading-6 [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:mt-1",
+  "relative flex gap-3 rounded-md border px-3.5 py-3 text-sm leading-6 shadow-[0_1px_1px_rgb(15_23_42/0.02)] [&_svg]:mt-1 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -13,7 +13,7 @@ const alertVariants = cva(
           "border-destructive/30 bg-destructive/10 text-destructive [&_svg]:text-destructive",
         success:
           "border-success/30 bg-success/10 text-success [&_svg]:text-success",
-        info: "border-info/30 bg-info/10 text-info [&_svg]:text-info",
+        info: "border-primary/25 bg-accent text-primary [&_svg]:text-primary",
       },
     },
     defaultVariants: { variant: "default" },

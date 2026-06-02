@@ -3,10 +3,10 @@
  * All copy in Bahasa Indonesia (PRD §25).
  */
 
-const BRAND_PRIMARY = "#1b2a5e";
-const INK = "#151a27";
-const MUTED = "#64748b";
-const BORDER = "#dde5ef";
+const BRAND_NAVY = "#102a56";
+const INK = "#121826";
+const MUTED = "#68758a";
+const BORDER = "#dbe3ef";
 
 function layout(opts: {
   heading: string;
@@ -17,29 +17,30 @@ function layout(opts: {
   const { heading, body, cta, footnote } = opts;
   return `<!doctype html>
 <html lang="id">
-  <body style="margin:0;background:#f7f8fb;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:${INK};">
+  <body style="margin:0;background:#f6f8fb;font-family:'Plus Jakarta Sans',Arial,sans-serif;color:${INK};">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px;">
       <tr><td align="center">
-        <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:100%;max-width:480px;background:#ffffff;border:1px solid ${BORDER};border-radius:12px;overflow:hidden;">
-          <tr><td style="padding:26px 28px 8px;">
-            <span style="display:inline-block;width:28px;height:28px;background:${BRAND_PRIMARY};border-radius:8px;vertical-align:middle;"></span>
-            <span style="font-size:18px;font-weight:800;letter-spacing:0;vertical-align:middle;margin-left:8px;">RenderAI<span style="color:${BRAND_PRIMARY}">.</span></span>
+        <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="width:100%;max-width:520px;background:#ffffff;border:1px solid ${BORDER};border-radius:12px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,0.08);">
+          <tr><td style="height:4px;background:${BRAND_NAVY};font-size:0;line-height:0;">&nbsp;</td></tr>
+          <tr><td style="padding:26px 30px 8px;">
+            <span style="display:inline-block;width:30px;height:30px;background:${BRAND_NAVY};border-radius:8px;vertical-align:middle;"></span>
+            <span style="font-size:18px;font-weight:800;letter-spacing:0;vertical-align:middle;margin-left:9px;">RenderAI<span style="color:${BRAND_NAVY}">.</span></span>
           </td></tr>
-          <tr><td style="padding:8px 28px 0;">
-            <h1 style="font-size:21px;line-height:1.35;font-weight:800;letter-spacing:0;margin:12px 0;">${heading}</h1>
-            <div style="font-size:14px;line-height:1.7;color:#3e4858;">${body}</div>
+          <tr><td style="padding:8px 30px 0;">
+            <h1 style="font-size:21px;line-height:1.35;font-weight:800;letter-spacing:0;margin:12px 0;color:${INK};">${heading}</h1>
+            <div style="font-size:14px;line-height:1.72;color:#3f4a5d;">${body}</div>
           </td></tr>
           ${
             cta
-              ? `<tr><td style="padding:24px 28px 8px;">
-            <a href="${cta.url}" style="display:inline-block;background:${BRAND_PRIMARY};color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:11px 18px;border-radius:8px;">${cta.label}</a>
+              ? `<tr><td style="padding:24px 30px 8px;">
+            <a href="${cta.url}" style="display:inline-block;background:${BRAND_NAVY};color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:11px 18px;border-radius:8px;">${cta.label}</a>
           </td></tr>
-          <tr><td style="padding:4px 28px 0;">
+          <tr><td style="padding:4px 30px 0;">
             <div style="font-size:12px;line-height:1.6;color:${MUTED};word-break:break-all;">Atau salin tautan ini: ${cta.url}</div>
           </td></tr>`
               : ""
           }
-          <tr><td style="padding:24px 28px 26px;">
+          <tr><td style="padding:24px 30px 28px;">
             <div style="font-size:12px;line-height:1.6;color:${MUTED};border-top:1px solid #eef2f7;padding-top:16px;">${footnote ?? "Email ini dikirim otomatis oleh RenderAI. Abaikan jika Anda tidak meminta."}</div>
           </td></tr>
         </table>

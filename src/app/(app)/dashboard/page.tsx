@@ -104,7 +104,7 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title={`Halo, ${firstName}`}
-        description="Mulai render baru, pantau project aktif, dan lanjutkan visual yang terakhir dikerjakan."
+        description="Pantau kredit, project aktif, dan visual terbaru dalam satu workspace."
         action={
           <Button asChild>
             <Link href="/renders/new">
@@ -117,7 +117,7 @@ export default async function DashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.label}>
+          <Card key={s.label} className="transition-colors hover:border-primary/25">
             <CardContent className="flex flex-col gap-3 py-5">
               <div className="flex items-center justify-between">
                 <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -133,7 +133,7 @@ export default async function DashboardPage() {
                 )}
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-semibold tracking-normal text-foreground">
                   {s.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{s.label}</p>
@@ -144,10 +144,10 @@ export default async function DashboardPage() {
       </div>
 
       {/* CTA banner */}
-      <Card className="mt-5 overflow-hidden border-0 bg-primary text-primary-foreground">
-        <CardContent className="flex flex-col items-start gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
+      <Card className="mt-5 overflow-hidden border-0 bg-primary text-primary-foreground shadow-soft">
+        <CardContent className="flex flex-col items-start gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
-            <p className="flex items-center gap-2 text-base font-bold sm:text-lg">
+            <p className="flex items-center gap-2 text-base font-semibold sm:text-lg">
               <Sparkles className="size-5" /> Buat opsi visual berikutnya
             </p>
             <p className="text-sm leading-6 text-primary-foreground/80">
@@ -166,7 +166,7 @@ export default async function DashboardPage() {
       {/* Recent renders */}
       <section className="mt-7">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-foreground">Render Terbaru</h2>
+          <h2 className="text-lg font-semibold text-foreground">Render Terbaru</h2>
           <Link
             href="/renders"
             className="text-sm font-medium text-primary hover:underline"
@@ -215,7 +215,7 @@ export default async function DashboardPage() {
       {/* Projects */}
       <section className="mt-7">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-foreground">Project</h2>
+          <h2 className="text-lg font-semibold text-foreground">Project</h2>
           <Link
             href="/projects"
             className="text-sm font-medium text-primary hover:underline"

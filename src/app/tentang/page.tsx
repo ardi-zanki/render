@@ -18,7 +18,7 @@ export default function TentangPage() {
       <header className="border-b border-border/80 bg-background/85 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-5">
           <Link href="/">
-            <Logo size={28} />
+            <Logo size={28} byline="About" />
           </Link>
           <div className="flex items-center gap-2">
             <Button variant="ghost" asChild>
@@ -31,22 +31,24 @@ export default function TentangPage() {
 
       <main className="mx-auto max-w-5xl px-4 py-12 sm:px-5">
         <div className="max-w-3xl">
-          <p className="text-sm font-semibold text-primary">Tentang RenderAI</p>
-          <h1 className="mt-3 text-3xl font-extrabold sm:text-4xl">
-            Workspace AI rendering untuk arsitektur Indonesia
+          <p className="text-xs font-bold uppercase tracking-[0.08em] text-primary">
+            Tentang RenderAI
+          </p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-normal sm:text-4xl">
+            Workspace render AI untuk visual arsitektur yang lebih tertata
           </h1>
           <p className="mt-4 text-base leading-7 text-muted-foreground">
             RenderAI membantu arsitek, interior designer, kontraktor, developer
-            properti, agen properti, dan pemilik rumah membuat visual
-            arsitektur realistis lebih cepat dari gambar desain awal.
+            properti, dan pemilik rumah mengubah materi desain awal menjadi
+            opsi visual yang lebih jelas untuk diskusi dan pengambilan keputusan.
           </p>
         </div>
 
         <Card className="mt-8">
           <CardContent className="grid gap-5 py-6 md:grid-cols-3">
             {[
-              ["Cepat", "Upload gambar, pilih mode, lalu proses dengan AI."],
-              ["Terkelola", "Hasil tersimpan per project dan mudah dilacak."],
+              ["Cepat", "Upload gambar, pilih mode, lalu buat opsi visual dengan AI."],
+              ["Terkelola", "Hasil, referensi, dan revisi tersimpan per project."],
               ["Lokal", "UI Bahasa Indonesia dan pembayaran Rupiah."],
             ].map(([title, desc]) => (
               <section key={title}>

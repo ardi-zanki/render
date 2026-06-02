@@ -67,7 +67,7 @@ export default async function PaymentsPage() {
 
       <PageHeader
         title="Beli Kredit"
-        description={`Sisa kredit Anda: ${idr.format(balance)}. 1 kredit = 1 render.`}
+        description={`Sisa kredit: ${idr.format(balance)}. Setiap render memakai 1 kredit.`}
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -78,7 +78,7 @@ export default async function PaymentsPage() {
           return (
             <Card
               key={pkg.id}
-              className={featured ? "border-primary ring-1 ring-primary/20" : ""}
+              className={featured ? "border-primary/70 ring-1 ring-primary/15" : ""}
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -98,7 +98,7 @@ export default async function PaymentsPage() {
                   <span className="text-sm font-medium text-muted-foreground">
                     Rp
                   </span>
-                  <span className="text-2xl font-bold text-foreground">
+                  <span className="text-2xl font-semibold tracking-normal text-foreground">
                     {idr.format(pkg.price)}
                   </span>
                 </div>
@@ -116,7 +116,7 @@ export default async function PaymentsPage() {
       </div>
 
       <section className="mt-10">
-        <h2 className="mb-3 text-lg font-bold text-foreground">
+        <h2 className="mb-3 text-lg font-semibold text-foreground">
           Riwayat Transaksi
         </h2>
         {history.length === 0 ? (
@@ -134,7 +134,7 @@ export default async function PaymentsPage() {
                 return (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between gap-3 px-4 py-3"
+                    className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted/35"
                   >
                     <div className="flex min-w-0 flex-col">
                       <span className="truncate text-sm font-semibold text-foreground">

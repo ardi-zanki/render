@@ -10,11 +10,11 @@ export default function RegisterPage() {
   return (
     <AuthCard
       title="Buat Akun RenderAI"
-      subtitle="Mulai dengan kredit awal untuk mencoba workflow render pertama Anda."
+      subtitle="Mulai ruang kerja visual untuk project arsitektur dan interior Anda."
       footer={
         <>
           Sudah punya akun?{" "}
-          <Link href="/login" className="font-semibold text-foreground hover:underline">
+          <Link href="/login" className="font-semibold text-primary hover:underline">
             Masuk
           </Link>
         </>

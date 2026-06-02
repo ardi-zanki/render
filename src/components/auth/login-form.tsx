@@ -113,7 +113,7 @@ export function LoginForm() {
         </label>
         <Link
           href="/forgot-password"
-          className="text-sm font-medium text-foreground hover:underline"
+          className="text-sm font-medium text-primary hover:underline"
         >
           Lupa password?
         </Link>

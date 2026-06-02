@@ -18,11 +18,11 @@ export default async function LoginPage({
   return (
     <AuthCard
       title="Masuk ke RenderAI"
-      subtitle="Lanjutkan project visual dan kelola hasil render Anda."
+      subtitle="Lanjutkan project visual, riwayat render, dan kredit studio Anda."
       footer={
         <>
           Belum punya akun?{" "}
-          <Link href="/register" className="font-semibold text-foreground hover:underline">
+          <Link href="/register" className="font-semibold text-primary hover:underline">
             Daftar
           </Link>
         </>

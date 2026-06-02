@@ -113,7 +113,7 @@ export function AppShell({
   function labelWithTooltip(label: string, expanded: boolean) {
     if (expanded) return <span className="truncate">{label}</span>;
     return (
-      <span className="pointer-events-none absolute left-full ml-3 hidden whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background shadow-lg group-hover:block">
+      <span className="pointer-events-none absolute left-full ml-3 hidden whitespace-nowrap rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background shadow-elevated group-hover:block">
         {label}
       </span>
     );
@@ -133,7 +133,7 @@ export function AppShell({
       >
         <div
           className={cn(
-            "flex h-14 items-center px-4",
+            "flex h-14 items-center border-b border-border/70 px-4",
             expanded ? "justify-between" : "justify-center",
           )}
         >
@@ -154,7 +154,7 @@ export function AppShell({
           <button
             type="button"
             className={cn(
-              "hidden rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex",
+              "hidden rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-primary lg:flex",
               !expanded && "flex",
             )}
             onClick={() => updateSidebarExpanded(!sidebarExpanded)}
@@ -174,8 +174,8 @@ export function AppShell({
               "group relative w-full justify-start rounded-md px-3 font-medium hover:bg-muted",
               !expanded && "justify-center px-0",
               renderNewActive
-                ? "bg-primary/10 text-primary"
-                : "text-foreground",
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                : "text-primary hover:bg-accent",
             )}
           >
             <Link
@@ -202,7 +202,7 @@ export function AppShell({
                   "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   !expanded && "justify-center px-0",
                   active
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
@@ -221,7 +221,7 @@ export function AppShell({
                 "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 !expanded && "justify-center px-0",
                 isActive("/admin")
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-accent text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
@@ -264,7 +264,7 @@ export function AppShell({
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
             onClick={() => setOpen(false)}
           />
           <div className="absolute inset-y-0 left-0 w-64">
@@ -280,7 +280,7 @@ export function AppShell({
         )}
         suppressHydrationWarning
       >
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/80 bg-background/85 px-4 backdrop-blur-xl sm:px-5">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/80 bg-background/90 px-4 backdrop-blur-xl sm:px-5">
           <button
             className="text-foreground lg:hidden"
             onClick={() => setOpen(true)}

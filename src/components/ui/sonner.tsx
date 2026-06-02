@@ -12,6 +12,17 @@ export function Toaster() {
       theme={resolvedTheme === "dark" ? "dark" : "light"}
       richColors
       closeButton
+      toastOptions={{
+        classNames: {
+          toast:
+            "rounded-lg border border-border bg-card text-card-foreground shadow-elevated",
+          title: "text-sm font-semibold",
+          description: "text-sm text-muted-foreground",
+          actionButton: "bg-primary text-primary-foreground",
+          cancelButton: "bg-secondary text-secondary-foreground",
+          closeButton: "border-border bg-card text-muted-foreground",
+        },
+      }}
     />
   );
 }

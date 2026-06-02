@@ -16,10 +16,12 @@ function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
     <div className="flex w-full max-w-md flex-col gap-5">
       <div className="flex flex-col items-center gap-3">
         <Link href="/" aria-label="RenderAI beranda">
-          <Logo size={30} />
+          <Logo size={30} byline="Workspace" />
         </Link>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-xl font-bold text-foreground">{title}</h1>
+          <h1 className="text-xl font-semibold tracking-normal text-foreground">
+            {title}
+          </h1>
           {subtitle && (
             <p className="max-w-sm text-sm leading-6 text-muted-foreground">
               {subtitle}
@@ -28,7 +30,7 @@ function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
         </div>
       </div>
 
-      <Card>
+      <Card className="border-border/80 bg-card/95">
         <CardContent className="flex flex-col gap-5 py-5">
           {children}
         </CardContent>

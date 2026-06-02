@@ -115,7 +115,7 @@ export function RegisterForm() {
         />
         <span>
           Saya setuju dengan{" "}
-          <Link href="/syarat" className="font-medium text-foreground underline">
+          <Link href="/syarat" className="font-medium text-primary underline">
             Syarat &amp; Ketentuan
           </Link>
         </span>

@@ -10,7 +10,7 @@ export default function ResetPasswordPage() {
   return (
     <AuthCard
       title="Buat Password Baru"
-      subtitle="Masukkan password baru untuk akun Anda."
+      subtitle="Gunakan password baru yang aman untuk melindungi akun RenderAI."
     >
       <Suspense fallback={null}>
         <ResetPasswordForm />

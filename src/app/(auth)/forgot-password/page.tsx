@@ -10,9 +10,9 @@ export default function ForgotPasswordPage() {
   return (
     <AuthCard
       title="Lupa Password"
-      subtitle="Masukkan email akun Anda. Kami akan mengirim tautan reset yang aman."
+      subtitle="Masukkan email akun. Kami akan mengirim tautan reset yang aman."
       footer={
-        <Link href="/login" className="font-semibold text-foreground hover:underline">
+        <Link href="/login" className="font-semibold text-primary hover:underline">
           Kembali ke Masuk
         </Link>
       }

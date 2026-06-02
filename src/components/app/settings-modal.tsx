@@ -78,8 +78,8 @@ export function SettingsModal({
       aria-modal="true"
       aria-labelledby="settings-title"
     >
-      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
-      <section className="relative z-[2147483001] flex h-[min(700px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-[0_24px_80px_rgb(15_23_42/0.18)] md:grid md:grid-cols-[210px_1fr]">
+      <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]" onClick={onClose} />
+      <section className="relative z-[2147483001] flex h-[min(700px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-dialog md:grid md:grid-cols-[210px_1fr]">
         <button
           type="button"
           onClick={onClose}
@@ -108,7 +108,7 @@ export function SettingsModal({
                   className={cn(
                     "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                     selected
-                      ? "bg-card text-foreground shadow-sm"
+                      ? "bg-card text-primary shadow-sm"
                       : "text-muted-foreground hover:bg-card/70 hover:text-foreground",
                   )}
                 >
