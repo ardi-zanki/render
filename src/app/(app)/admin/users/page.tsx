@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { listUsers } from "@/lib/admin/service";
+import { Pagination } from "@/components/ui/pagination";
+import { countUsers, listUsers } from "@/lib/admin/service";
 import { requireAdmin } from "@/lib/session";
 import {
   creditAdjustmentAction,
@@ -16,12 +17,24 @@ export const metadata: Metadata = { title: "Admin · User" };
 const idr = new Intl.NumberFormat("id-ID");
 const dateFmt = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" });
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await requireAdmin();
-  const users = await listUsers();
+  const { page: pageParam } = await searchParams;
+  const pageSize = 20;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [users, total] = await Promise.all([
+    listUsers(pageSize, (page - 1) * pageSize),
+    countUsers(),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-card">
+    <div className="flex flex-col gap-4">
+      <div className="overflow-x-auto rounded-lg border border-border bg-card">
       <table className="w-full min-w-[980px] text-sm">
         <thead className="bg-muted/60 text-left text-xs font-semibold text-muted-foreground">
           <tr>
@@ -134,6 +147,8 @@ export default async function AdminUsersPage() {
           })}
         </tbody>
       </table>
+      </div>
+      <Pagination page={page} totalPages={totalPages} />
     </div>
   );
 }

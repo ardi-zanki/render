@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
+import { env } from "@/env";
 import { auth } from "@/lib/auth";
 
 /** Cached per-request session lookup (full validation, server-side). */
@@ -30,11 +31,37 @@ export async function requireVerifiedUser() {
   return session;
 }
 
-/** Require an admin; non-admins are sent back to the dashboard. */
+function sessionAgeSeconds(createdAt: Date | string) {
+  return (Date.now() - new Date(createdAt).getTime()) / 1000;
+}
+
+/**
+ * Require an admin; non-admins are sent back to the dashboard. Admin sessions
+ * also have a shorter effective lifetime than normal sessions (PRD §10.1):
+ * once the session is older than ADMIN_SESSION_MAX_AGE, the admin must re-auth.
+ */
 export async function requireAdmin() {
   const session = await requireVerifiedUser();
   if (session.user.role !== "admin") {
     redirect("/dashboard");
+  }
+  if (sessionAgeSeconds(session.session.createdAt) > env.ADMIN_SESSION_MAX_AGE) {
+    redirect("/login?reauth=admin");
+  }
+  return session;
+}
+
+/**
+ * Require the user to have authenticated recently (PRD §10.1 — sensitive action
+ * re-auth). Gates high-risk operations (e.g. manual credit adjustment): if the
+ * session is older than the window, the user is sent to re-login as a step-up.
+ */
+export async function requireRecentAuth(
+  maxAgeSec: number = env.SENSITIVE_ACTION_MAX_AGE,
+) {
+  const session = await requireUser();
+  if (sessionAgeSeconds(session.session.createdAt) > maxAgeSec) {
+    redirect("/login?reauth=sensitive");
   }
   return session;
 }

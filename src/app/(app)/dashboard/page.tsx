@@ -1,7 +1,9 @@
 import { and, count, desc, eq, isNull } from "drizzle-orm";
 import {
   ArrowRight,
+  Bell,
   CheckCircle2,
+  CreditCard,
   FolderOpen,
   Gem,
   ImageIcon,
@@ -20,13 +22,29 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { db } from "@/db";
 import { projects, renders } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
-import { STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
+import {
+  STATUS_LABEL,
+  statusBadgeVariant,
+  type BadgeVariant,
+} from "@/lib/renders/labels";
+import { getUnreadCount } from "@/lib/notifications/service";
+import { listPayments } from "@/lib/payments/service";
 import { listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 const dateFmt = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" });
+const idr = new Intl.NumberFormat("id-ID");
+
+const PAY_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
+  paid: { label: "Lunas", variant: "success" },
+  pending: { label: "Menunggu", variant: "warning" },
+  failed: { label: "Gagal", variant: "destructive" },
+  expired: { label: "Kedaluwarsa", variant: "secondary" },
+  cancelled: { label: "Batal", variant: "secondary" },
+  refunded: { label: "Refund", variant: "info" },
+};
 
 export default async function DashboardPage() {
   const session = await requireVerifiedUser();
@@ -39,6 +57,8 @@ export default async function DashboardPage() {
     projectCount,
     recentProjects,
     recentRenders,
+    unreadCount,
+    latestPaymentRows,
   ] = await Promise.all([
       getBalance(uid),
       db
@@ -69,8 +89,11 @@ export default async function DashboardPage() {
         limit: 4,
       }),
       listRenders(uid, { limit: 6 }),
+      getUnreadCount(uid),
+      listPayments(uid, { limit: 1 }),
     ]);
 
+  const latestPayment = latestPaymentRows[0] ?? null;
   const firstName = session.user.name.split(" ")[0];
 
   const stats = [
@@ -162,6 +185,74 @@ export default async function DashboardPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Status: latest payment + notifications */}
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Card>
+          <CardContent className="flex items-center justify-between gap-3 py-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <CreditCard className="size-4" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-foreground">
+                  Pembayaran terakhir
+                </p>
+                {latestPayment ? (
+                  <p className="truncate text-xs text-muted-foreground">
+                    {latestPayment.packageName} · Rp
+                    {idr.format(latestPayment.amount)} ·{" "}
+                    {dateFmt.format(latestPayment.createdAt)}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Belum ada transaksi
+                  </p>
+                )}
+              </div>
+            </div>
+            {latestPayment ? (
+              <Badge
+                variant={PAY_STATUS[latestPayment.status]?.variant ?? "secondary"}
+              >
+                {PAY_STATUS[latestPayment.status]?.label ?? latestPayment.status}
+              </Badge>
+            ) : (
+              <Link
+                href="/payments"
+                className="shrink-0 text-xs font-medium text-primary hover:underline"
+              >
+                Top up
+              </Link>
+            )}
+          </CardContent>
+        </Card>
+
+        <Link href="/notifications">
+          <Card className="transition-colors hover:border-primary/25">
+            <CardContent className="flex items-center justify-between gap-3 py-4">
+              <div className="flex items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Bell className="size-4" />
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">
+                    Notifikasi
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {unreadCount > 0
+                      ? `${unreadCount} belum dibaca`
+                      : "Semua sudah dibaca"}
+                  </p>
+                </div>
+              </div>
+              {unreadCount > 0 && (
+                <Badge>{unreadCount > 9 ? "9+" : unreadCount}</Badge>
+              )}
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
 
       {/* Recent renders */}
       <section className="mt-7">

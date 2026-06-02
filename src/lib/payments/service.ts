@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { paymentPackages, payments } from "@/db/schema";
@@ -173,11 +173,23 @@ export async function handlePaymentNotification(webhook: NormalizedWebhook) {
   return { handled: true, reason: webhook.status };
 }
 
-export async function listPayments(userId: string) {
+export async function countPayments(userId: string): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(payments)
+    .where(eq(payments.userId, userId));
+  return row.value;
+}
+
+export async function listPayments(
+  userId: string,
+  opts: { limit?: number; offset?: number } = {},
+) {
   const rows = await db.query.payments.findMany({
     where: eq(payments.userId, userId),
     orderBy: desc(payments.createdAt),
-    limit: 50,
+    limit: opts.limit ?? 50,
+    offset: opts.offset,
   });
 
   const pkgs = await db.query.paymentPackages.findMany();

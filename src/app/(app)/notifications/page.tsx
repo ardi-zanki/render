@@ -14,8 +14,13 @@ import { MarkAllReadButton } from "@/components/app/mark-all-read-button";
 import { PageHeader } from "@/components/app/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
 import type { NotificationType } from "@/db/schema";
-import { listNotifications } from "@/lib/notifications/service";
+import {
+  countNotifications,
+  getUnreadCount,
+  listNotifications,
+} from "@/lib/notifications/service";
 import { timeAgo } from "@/lib/notifications/ui";
 import { requireVerifiedUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -32,10 +37,22 @@ const ICONS: Record<NotificationType, LucideIcon> = {
   system: Bell,
 };
 
-export default async function NotificationsPage() {
+export default async function NotificationsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { user } = await requireVerifiedUser();
-  const items = await listNotifications(user.id, 100);
-  const hasUnread = items.some((n) => !n.isRead);
+  const { page: pageParam } = await searchParams;
+  const pageSize = 20;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [items, total, unread] = await Promise.all([
+    listNotifications(user.id, pageSize, (page - 1) * pageSize),
+    countNotifications(user.id),
+    getUnreadCount(user.id),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
+  const hasUnread = unread > 0;
 
   return (
     <>
@@ -90,6 +107,8 @@ export default async function NotificationsPage() {
           </div>
         </Card>
       )}
+
+      <Pagination page={page} totalPages={totalPages} />
     </>
   );
 }

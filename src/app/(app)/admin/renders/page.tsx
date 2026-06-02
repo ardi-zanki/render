@@ -1,13 +1,16 @@
+import { RotateCcw } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { AdminTable } from "@/components/app/admin-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 import type { RenderMode, RenderStatus } from "@/db/schema";
-import { listAllRenders } from "@/lib/admin/service";
+import { countAllRenders, listAllRenders } from "@/lib/admin/service";
 import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
 import { requireAdmin } from "@/lib/session";
+import { retryRenderAction } from "./actions";
 
 export const metadata: Metadata = { title: "Admin · Render" };
 
@@ -45,14 +48,18 @@ function parseStatus(value?: string): RenderStatus | undefined {
 export default async function AdminRendersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; mode?: string }>;
+  searchParams: Promise<{ status?: string; mode?: string; page?: string }>;
 }) {
   await requireAdmin();
-  const { status, mode } = await searchParams;
-  const rows = await listAllRenders(100, {
-    status: parseStatus(status),
-    mode: parseMode(mode),
-  });
+  const { status, mode, page: pageParam } = await searchParams;
+  const filters = { status: parseStatus(status), mode: parseMode(mode) };
+  const pageSize = 20;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [rows, total] = await Promise.all([
+    listAllRenders(pageSize, filters, (page - 1) * pageSize),
+    countAllRenders(filters),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <div className="flex flex-col gap-4">
@@ -77,6 +84,7 @@ export default async function AdminRendersPage({
           { label: "Provider" },
           { label: "Error" },
           { label: "Waktu" },
+          { label: "Aksi", align: "right" },
         ]}
         isEmpty={rows.length === 0}
         empty="Belum ada render."
@@ -101,9 +109,22 @@ export default async function AdminRendersPage({
             <td className="px-4 py-3 text-muted-foreground">
               {dateFmt.format(r.createdAt)}
             </td>
+            <td className="px-4 py-3 text-right">
+              {r.status === "failed" ? (
+                <form action={retryRenderAction} className="inline-flex">
+                  <input type="hidden" name="renderId" value={r.id} />
+                  <Button type="submit" variant="outline" size="sm">
+                    <RotateCcw /> Retry
+                  </Button>
+                </form>
+              ) : (
+                <span className="text-muted-foreground">-</span>
+              )}
+            </td>
           </tr>
         ))}
       </AdminTable>
+      <Pagination page={page} totalPages={totalPages} />
     </div>
   );
 }

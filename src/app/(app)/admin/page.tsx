@@ -2,6 +2,7 @@ import { ImageIcon, Users, Wallet } from "lucide-react";
 import type { Metadata } from "next";
 
 import { BarChart, BreakdownBars } from "@/components/app/charts";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -77,6 +78,58 @@ export default async function AdminOverviewPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Card>
+          <CardContent className="flex items-center justify-between gap-3 py-5">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                AI provider error rate
+              </p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
+                {stats.aiProviderErrorRate}%
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {idr.format(stats.rendersFailed)} gagal dari{" "}
+                {idr.format(stats.renders)} render
+              </p>
+            </div>
+            <Badge
+              variant={
+                stats.aiProviderErrorRate > 20
+                  ? "destructive"
+                  : stats.aiProviderErrorRate > 0
+                    ? "warning"
+                    : "success"
+              }
+            >
+              {stats.aiProviderErrorRate > 20
+                ? "Perlu cek"
+                : stats.aiProviderErrorRate > 0
+                  ? "Wajar"
+                  : "Sehat"}
+            </Badge>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="flex items-center justify-between gap-3 py-5">
+            <div>
+              <p className="text-sm text-muted-foreground">Payment webhook</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
+                {idr.format(stats.webhookReceived)}
+              </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                webhook diterima · {idr.format(stats.pendingPayments)} pembayaran
+                pending
+              </p>
+            </div>
+            <Badge variant={stats.pendingPayments > 0 ? "warning" : "success"}>
+              {stats.pendingPayments > 0 ? "Ada pending" : "Lancar"}
+            </Badge>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">

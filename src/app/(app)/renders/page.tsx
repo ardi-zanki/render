@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
 import type { RenderStatus } from "@/db/schema";
 import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
-import { listRenders } from "@/lib/renders/service";
+import { countRenders, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Riwayat Render" };
@@ -44,16 +45,24 @@ function renderStatus(value?: string): RenderStatus | undefined {
 export default async function RendersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ archived?: string; status?: string }>;
+  searchParams: Promise<{ archived?: string; status?: string; page?: string }>;
 }) {
   const { user } = await requireVerifiedUser();
-  const { archived, status } = await searchParams;
+  const { archived, status, page: pageParam } = await searchParams;
   const showArchived = archived === "1";
-  const renders = await listRenders(user.id, {
-    limit: 60,
-    archived: showArchived,
-    status: renderStatus(status),
-  });
+  const statusFilter = renderStatus(status);
+  const pageSize = 24;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [renders, total] = await Promise.all([
+    listRenders(user.id, {
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+      archived: showArchived,
+      status: statusFilter,
+    }),
+    countRenders(user.id, { archived: showArchived, status: statusFilter }),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <>
@@ -139,6 +148,8 @@ export default async function RendersPage({
           })}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} />
     </>
   );
 }

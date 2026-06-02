@@ -1,5 +1,15 @@
 import sharp from "sharp";
-import { and, asc, desc, eq, inArray, isNotNull, isNull, lte } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lte,
+} from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -722,6 +732,7 @@ export async function listRenders(
   opts: {
     projectId?: string;
     limit?: number;
+    offset?: number;
     archived?: boolean;
     status?: RenderStatus;
   } = {},
@@ -736,6 +747,7 @@ export async function listRenders(
     ),
     orderBy: desc(renders.createdAt),
     limit: opts.limit ?? 50,
+    offset: opts.offset,
   });
 
   if (rows.length === 0) return [];
@@ -778,6 +790,28 @@ export async function listRenders(
     resultUrl: resultByRender.get(r.id) ?? null,
     originalUrl: originalByRender.get(r.id) ?? null,
   }));
+}
+
+/** Total non-deleted renders for a user, matching the same filters as listRenders. */
+export async function countRenders(
+  userId: string,
+  opts: { projectId?: string; archived?: boolean; status?: RenderStatus } = {},
+): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(renders)
+    .where(
+      and(
+        eq(renders.userId, userId),
+        isNull(renders.deletedAt),
+        opts.projectId ? eq(renders.projectId, opts.projectId) : undefined,
+        opts.archived
+          ? isNotNull(renders.archivedAt)
+          : isNull(renders.archivedAt),
+        opts.status ? eq(renders.status, opts.status) : undefined,
+      ),
+    );
+  return row.value;
 }
 
 export async function archiveRender(userId: string, renderId: string) {

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 import { AdminTable } from "@/components/app/admin-table";
-import { listAuditLogs } from "@/lib/admin/service";
+import { Pagination } from "@/components/ui/pagination";
+import { countAuditLogs, listAuditLogs } from "@/lib/admin/service";
 import { requireAdmin } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Admin · Audit Log" };
@@ -18,12 +19,24 @@ const ACTION_LABEL: Record<string, string> = {
   "credit.adjustment": "Adjustment kredit",
 };
 
-export default async function AdminAuditPage() {
+export default async function AdminAuditPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireAdmin();
-  const logs = await listAuditLogs();
+  const { page: pageParam } = await searchParams;
+  const pageSize = 20;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [logs, total] = await Promise.all([
+    listAuditLogs(pageSize, (page - 1) * pageSize),
+    countAuditLogs(),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <AdminTable
+    <div className="flex flex-col gap-4">
+      <AdminTable
       headers={[
         { label: "Aksi" },
         { label: "Admin" },
@@ -52,5 +65,7 @@ export default async function AdminAuditPage() {
         </tr>
       ))}
     </AdminTable>
+      <Pagination page={page} totalPages={totalPages} />
+    </div>
   );
 }

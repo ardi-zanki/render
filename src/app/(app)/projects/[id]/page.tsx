@@ -10,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Pagination } from "@/components/ui/pagination";
 import { getProject } from "@/lib/projects/service";
 import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
-import { listRenders } from "@/lib/renders/service";
+import { countRenders, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Project" };
@@ -24,22 +25,35 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", {
 
 export default async function ProjectDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const { user } = await requireVerifiedUser();
   const { id } = await params;
+  const { page: pageParam } = await searchParams;
 
   const project = await getProject(user.id, id);
   if (!project) notFound();
 
-  const renders = await listRenders(user.id, { projectId: id, limit: 100 });
+  const pageSize = 24;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [renders, total] = await Promise.all([
+    listRenders(user.id, {
+      projectId: id,
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+    }),
+    countRenders(user.id, { projectId: id }),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <>
       <PageHeader
         title={project.name}
-        description={`${renders.length} render${project.isDefault ? " · Project default" : ""}`}
+        description={`${total} render${project.isDefault ? " · Project default" : ""}`}
         action={
           <div className="flex gap-2">
             {!project.isDefault && <ArchiveProjectButton projectId={id} />}
@@ -58,7 +72,7 @@ export default async function ProjectDetailPage({
         </p>
       )}
 
-      {renders.length === 0 ? (
+      {total === 0 ? (
         <EmptyState
           icon={ImageIcon}
           title="Belum ada render di project ini"
@@ -103,6 +117,8 @@ export default async function ProjectDetailPage({
           })}
         </div>
       )}
+
+      <Pagination page={page} totalPages={totalPages} />
     </>
   );
 }

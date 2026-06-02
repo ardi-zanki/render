@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { AdminTable } from "@/components/app/admin-table";
 import { Badge } from "@/components/ui/badge";
-import { listAllProjects } from "@/lib/admin/service";
+import { Pagination } from "@/components/ui/pagination";
+import { countAllProjects, listAllProjects } from "@/lib/admin/service";
 import { requireAdmin } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Admin · Project" };
@@ -12,12 +13,24 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", {
   timeStyle: "short",
 });
 
-export default async function AdminProjectsPage() {
+export default async function AdminProjectsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireAdmin();
-  const rows = await listAllProjects();
+  const { page: pageParam } = await searchParams;
+  const pageSize = 20;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [rows, total] = await Promise.all([
+    listAllProjects(pageSize, (page - 1) * pageSize),
+    countAllProjects(),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <AdminTable
+    <div className="flex flex-col gap-4">
+      <AdminTable
       headers={[
         { label: "Project" },
         { label: "User" },
@@ -53,5 +66,7 @@ export default async function AdminProjectsPage() {
         </tr>
       ))}
     </AdminTable>
+      <Pagination page={page} totalPages={totalPages} />
+    </div>
   );
 }

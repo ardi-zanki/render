@@ -13,11 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
 import { db } from "@/db";
 import { paymentPackages } from "@/db/schema";
 import { env } from "@/env";
 import { getBalance } from "@/lib/credits";
-import { listPayments } from "@/lib/payments/service";
+import { countPayments, listPayments } from "@/lib/payments/service";
 import type { BadgeVariant } from "@/lib/renders/labels";
 import { requireVerifiedUser } from "@/lib/session";
 
@@ -38,16 +39,25 @@ const PAY_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
   refunded: { label: "Refund", variant: "info" },
 };
 
-export default async function PaymentsPage() {
+export default async function PaymentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { user } = await requireVerifiedUser();
-  const [packages, balance, history] = await Promise.all([
+  const { page: pageParam } = await searchParams;
+  const pageSize = 10;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [packages, balance, history, historyTotal] = await Promise.all([
     db.query.paymentPackages.findMany({
       where: eq(paymentPackages.isActive, true),
       orderBy: asc(paymentPackages.sortOrder),
     }),
     getBalance(user.id),
-    listPayments(user.id),
+    listPayments(user.id, { limit: pageSize, offset: (page - 1) * pageSize }),
+    countPayments(user.id),
   ]);
+  const totalPages = Math.ceil(historyTotal / pageSize);
 
   const snapEnabled =
     env.PAYMENT_PROVIDER === "midtrans" && !!env.MIDTRANS_CLIENT_KEY;
@@ -156,6 +166,8 @@ export default async function PaymentsPage() {
             </div>
           </Card>
         )}
+
+        <Pagination page={page} totalPages={totalPages} />
       </section>
     </>
   );

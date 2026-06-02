@@ -8,7 +8,7 @@ import {
   setUserRole,
 } from "@/lib/admin/service";
 import { assertRateLimit } from "@/lib/rate-limit";
-import { requireAdmin } from "@/lib/session";
+import { requireAdmin, requireRecentAuth } from "@/lib/session";
 
 export async function toggleDisableAction(formData: FormData) {
   const session = await requireAdmin();
@@ -32,6 +32,8 @@ export async function setRoleAction(formData: FormData) {
 
 export async function creditAdjustmentAction(formData: FormData) {
   const session = await requireAdmin();
+  // Manual credit adjustment moves money — require a recent login (PRD §10.1).
+  await requireRecentAuth();
   await assertRateLimit("admin_action", session.user.id);
   const targetId = String(formData.get("userId") ?? "");
   const amount = Number(formData.get("amount") ?? 0);

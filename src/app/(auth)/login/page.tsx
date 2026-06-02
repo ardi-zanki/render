@@ -11,9 +11,9 @@ export const metadata: Metadata = { title: "Masuk" };
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reset?: string; disabled?: string }>;
+  searchParams: Promise<{ reset?: string; disabled?: string; reauth?: string }>;
 }) {
-  const { reset, disabled } = await searchParams;
+  const { reset, disabled, reauth } = await searchParams;
 
   return (
     <AuthCard
@@ -39,6 +39,15 @@ export default async function LoginPage({
         <Alert variant="destructive">
           <AlertDescription>
             Akun Anda dinonaktifkan. Silakan hubungi admin.
+          </AlertDescription>
+        </Alert>
+      )}
+      {reauth && (
+        <Alert variant="default">
+          <AlertDescription>
+            {reauth === "admin"
+              ? "Sesi admin sudah berakhir. Masuk lagi untuk melanjutkan."
+              : "Demi keamanan, masuk lagi sebelum melanjutkan aksi ini."}
           </AlertDescription>
         </Alert>
       )}

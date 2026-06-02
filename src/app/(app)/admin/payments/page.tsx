@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { AdminTable } from "@/components/app/admin-table";
 import { Badge } from "@/components/ui/badge";
-import { listAllPayments } from "@/lib/admin/service";
+import { Pagination } from "@/components/ui/pagination";
+import { countAllPayments, listAllPayments } from "@/lib/admin/service";
 import type { BadgeVariant } from "@/lib/renders/labels";
 import { requireAdmin } from "@/lib/session";
 
@@ -23,12 +24,24 @@ const PAY_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
   refunded: { label: "Refund", variant: "info" },
 };
 
-export default async function AdminPaymentsPage() {
+export default async function AdminPaymentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   await requireAdmin();
-  const rows = await listAllPayments();
+  const { page: pageParam } = await searchParams;
+  const pageSize = 20;
+  const page = Math.max(1, Number(pageParam) || 1);
+  const [rows, total] = await Promise.all([
+    listAllPayments(pageSize, (page - 1) * pageSize),
+    countAllPayments(),
+  ]);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <AdminTable
+    <div className="flex flex-col gap-4">
+      <AdminTable
       headers={[
         { label: "Order" },
         { label: "User" },
@@ -67,5 +80,7 @@ export default async function AdminPaymentsPage() {
         );
       })}
     </AdminTable>
+      <Pagination page={page} totalPages={totalPages} />
+    </div>
   );
 }

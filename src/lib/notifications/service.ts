@@ -69,12 +69,25 @@ export async function notifyUser(p: NotifyParams) {
   }
 }
 
-export async function listNotifications(userId: string, limit = 50) {
+export async function listNotifications(
+  userId: string,
+  limit = 50,
+  offset = 0,
+) {
   return db.query.notifications.findMany({
     where: eq(notifications.userId, userId),
     orderBy: desc(notifications.createdAt),
     limit,
+    offset,
   });
+}
+
+export async function countNotifications(userId: string): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(notifications)
+    .where(eq(notifications.userId, userId));
+  return row.value;
 }
 
 export async function getUnreadCount(userId: string): Promise<number> {

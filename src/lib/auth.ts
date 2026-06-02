@@ -105,7 +105,11 @@ export const auth = betterAuth({
   },
 
   session: {
-    expiresIn: env.SESSION_DEFAULT_MAX_AGE,
+    // Max persisted lifetime (PRD §10.1). "Remember me" keeps a persistent
+    // cookie for this full window; without it Better Auth issues a session
+    // cookie that ends when the browser closes. Admin areas are additionally
+    // capped to ADMIN_SESSION_MAX_AGE in `requireAdmin`.
+    expiresIn: env.SESSION_REMEMBER_ME_MAX_AGE,
     updateAge: 60 * 60 * 24, // perpanjang sesi setiap hari aktif
     cookieCache: {
       enabled: true,

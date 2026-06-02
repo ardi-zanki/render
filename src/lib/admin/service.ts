@@ -1,4 +1,15 @@
-import { and, asc, count, desc, eq, inArray, isNull, sql, sum } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  sql,
+  sum,
+} from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -9,6 +20,7 @@ import {
   paymentPackages,
   payments,
   projects,
+  renderJobs,
   renders,
   session,
   user,
@@ -45,6 +57,14 @@ export async function getAdminStats() {
     .select({ v: sum(payments.creditsAdded) })
     .from(payments)
     .where(eq(payments.status, "paid"));
+  const [pendingPayments] = await db
+    .select({ v: count() })
+    .from(payments)
+    .where(eq(payments.status, "pending"));
+  const [webhookReceived] = await db
+    .select({ v: count() })
+    .from(payments)
+    .where(isNotNull(payments.rawWebhook));
 
   return {
     users: users.v,
@@ -57,10 +77,12 @@ export async function getAdminStats() {
     creditSold: Number(creditSold.v ?? 0),
     aiProviderErrorRate:
       rendersTotal.v > 0 ? Math.round((rendersFailed.v / rendersTotal.v) * 100) : 0,
+    pendingPayments: pendingPayments.v,
+    webhookReceived: webhookReceived.v,
   };
 }
 
-export async function listUsers(limit = 100) {
+export async function listUsers(limit = 100, offset = 0) {
   return db
     .select({
       id: user.id,
@@ -75,7 +97,13 @@ export async function listUsers(limit = 100) {
     .from(user)
     .leftJoin(creditBalances, eq(creditBalances.userId, user.id))
     .orderBy(desc(user.createdAt))
-    .limit(limit);
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function countUsers(): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(user);
+  return row.value;
 }
 
 export interface AdminRenderRow {
@@ -92,6 +120,7 @@ export interface AdminRenderRow {
 export async function listAllRenders(
   limit = 100,
   filters: { status?: RenderStatus; mode?: RenderMode } = {},
+  offset = 0,
 ): Promise<AdminRenderRow[]> {
   return db
     .select({
@@ -114,10 +143,27 @@ export async function listAllRenders(
       ),
     )
     .orderBy(desc(renders.createdAt))
-    .limit(limit);
+    .limit(limit)
+    .offset(offset);
 }
 
-export async function listAllPayments(limit = 100) {
+export async function countAllRenders(
+  filters: { status?: RenderStatus; mode?: RenderMode } = {},
+): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(renders)
+    .where(
+      and(
+        isNull(renders.deletedAt),
+        filters.status ? eq(renders.status, filters.status) : undefined,
+        filters.mode ? eq(renders.mode, filters.mode) : undefined,
+      ),
+    );
+  return row.value;
+}
+
+export async function listAllPayments(limit = 100, offset = 0) {
   return db
     .select({
       id: payments.id,
@@ -132,10 +178,16 @@ export async function listAllPayments(limit = 100) {
     .from(payments)
     .innerJoin(user, eq(user.id, payments.userId))
     .orderBy(desc(payments.createdAt))
-    .limit(limit);
+    .limit(limit)
+    .offset(offset);
 }
 
-export async function listAllProjects(limit = 100) {
+export async function countAllPayments(): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(payments);
+  return row.value;
+}
+
+export async function listAllProjects(limit = 100, offset = 0) {
   return db
     .select({
       id: projects.id,
@@ -149,10 +201,16 @@ export async function listAllProjects(limit = 100) {
     .from(projects)
     .innerJoin(user, eq(user.id, projects.userId))
     .orderBy(desc(projects.updatedAt))
-    .limit(limit);
+    .limit(limit)
+    .offset(offset);
 }
 
-export async function listCreditTransactions(limit = 100) {
+export async function countAllProjects(): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(projects);
+  return row.value;
+}
+
+export async function listCreditTransactions(limit = 100, offset = 0) {
   return db
     .select({
       id: creditTransactions.id,
@@ -167,7 +225,13 @@ export async function listCreditTransactions(limit = 100) {
     .from(creditTransactions)
     .innerJoin(user, eq(user.id, creditTransactions.userId))
     .orderBy(desc(creditTransactions.createdAt))
-    .limit(limit);
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function countCreditTransactions(): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(creditTransactions);
+  return row.value;
 }
 
 export async function listPaymentPackages() {
@@ -176,7 +240,7 @@ export async function listPaymentPackages() {
   });
 }
 
-export async function listAllNotifications(limit = 100) {
+export async function listAllNotifications(limit = 100, offset = 0) {
   return db
     .select({
       id: notifications.id,
@@ -189,13 +253,20 @@ export async function listAllNotifications(limit = 100) {
     .from(notifications)
     .innerJoin(user, eq(user.id, notifications.userId))
     .orderBy(desc(notifications.createdAt))
-    .limit(limit);
+    .limit(limit)
+    .offset(offset);
 }
 
-export async function listAuditLogs(limit = 100) {
+export async function countAllNotifications(): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(notifications);
+  return row.value;
+}
+
+export async function listAuditLogs(limit = 100, offset = 0) {
   const logs = await db.query.adminAuditLogs.findMany({
     orderBy: desc(adminAuditLogs.createdAt),
     limit,
+    offset,
   });
   if (logs.length === 0) return [];
 
@@ -220,6 +291,11 @@ export async function listAuditLogs(limit = 100) {
     metadata: l.metadata as Record<string, unknown> | null,
     createdAt: l.createdAt,
   }));
+}
+
+export async function countAuditLogs(): Promise<number> {
+  const [row] = await db.select({ value: count() }).from(adminAuditLogs);
+  return row.value;
 }
 
 export async function setUserDisabled(
@@ -291,6 +367,65 @@ export async function manualCreditAdjustment(params: {
   });
 
   return result;
+}
+
+/** Re-queue a failed render for another attempt (PRD §27.4). */
+export async function retryRender(adminUserId: string, renderId: string) {
+  const render = await db.query.renders.findFirst({
+    where: eq(renders.id, renderId),
+  });
+  if (!render || render.deletedAt || render.status !== "failed") return false;
+
+  const now = new Date();
+  await db
+    .update(renders)
+    .set({
+      status: "queued",
+      errorCode: null,
+      errorMessage: null,
+      failedAt: null,
+      startedAt: null,
+    })
+    .where(eq(renders.id, renderId));
+
+  const existing = await db.query.renderJobs.findFirst({
+    where: eq(renderJobs.renderId, renderId),
+  });
+  if (existing) {
+    await db
+      .update(renderJobs)
+      .set({
+        status: "queued",
+        attempts: 0,
+        lockedAt: null,
+        lockedBy: null,
+        availableAt: now,
+        startedAt: null,
+        completedAt: null,
+        failedAt: null,
+        errorMessage: null,
+        updatedAt: now,
+      })
+      .where(eq(renderJobs.id, existing.id));
+  } else {
+    await db.insert(renderJobs).values({
+      renderId,
+      userId: render.userId,
+      status: "queued",
+      attempts: 0,
+      maxAttempts: 3,
+      availableAt: now,
+    });
+  }
+
+  await writeAuditLog({
+    adminUserId,
+    targetUserId: render.userId,
+    action: "render.retry",
+    entityType: "render",
+    metadata: { renderId },
+  });
+  return true;
 }
 
 export async function countDisabled() {
