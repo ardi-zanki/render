@@ -17,7 +17,7 @@ export default async function AdminLayout({
           <Shield className="size-4" />
         </span>
         <div className="flex flex-col">
-          <h1 className="text-xl font-bold leading-tight text-foreground sm:text-2xl">
+          <h1 className="text-xl font-semibold leading-tight text-foreground sm:text-2xl">
             Admin
           </h1>
           <p className="text-sm leading-6 text-muted-foreground">

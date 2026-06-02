@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { listUsers } from "@/lib/admin/service";
 import { requireAdmin } from "@/lib/session";
 import {
@@ -73,15 +74,15 @@ export default async function AdminUsersPage() {
                 <td className="px-4 py-3">
                   <form action={creditAdjustmentAction} className="flex gap-2">
                     <input type="hidden" name="userId" value={u.id} />
-                    <input
+                    <Input
                       name="amount"
                       type="number"
-                      className="h-8 w-20 rounded-md border border-input bg-background px-2 text-xs"
+                      className="h-8 w-20 bg-background px-2 text-xs"
                       placeholder="+/-"
                     />
-                    <input
+                    <Input
                       name="description"
-                      className="h-8 w-36 rounded-md border border-input bg-background px-2 text-xs"
+                      className="h-8 w-36 bg-background px-2 text-xs"
                       placeholder="Catatan"
                     />
                     <Button type="submit" variant="outline" size="sm">

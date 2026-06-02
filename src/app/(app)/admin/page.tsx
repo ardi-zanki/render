@@ -68,7 +68,7 @@ export default async function AdminOverviewPage() {
                 <c.icon className="size-4" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-semibold text-foreground">
                   {c.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{c.label}</p>

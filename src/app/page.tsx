@@ -20,17 +20,24 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { Logo } from "@/components/brand/logo";
+import { asc, eq } from "drizzle-orm";
+
+import { PublicFooter } from "@/components/brand/public-footer";
+import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ModeToggle } from "@/components/ui/mode-toggle";
+import { db } from "@/db";
+import { paymentPackages } from "@/db/schema";
+import { PACKAGE_COPY, formatCredits, formatPrice } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "RenderAI - Workspace Render AI untuk Arsitektur & Interior",
   description:
     "RenderAI membantu arsitek dan interior designer mengubah draft desain menjadi visual presentasi yang rapi, cepat, dan mudah dikelola per project.",
 };
+
+export const revalidate = 3600;
 
 const navItems = [
   { label: "Fitur", href: "#fitur" },
@@ -94,38 +101,6 @@ const showcase = [
   },
 ];
 
-const pricing = [
-  {
-    name: "Starter",
-    credits: "30 kredit",
-    price: "Rp79.000",
-    note: "Untuk validasi workflow awal",
-    features: ["Eksplorasi ringan", "Project dan riwayat render", "Mode interior dan eksterior"],
-  },
-  {
-    name: "Creator",
-    credits: "100 kredit",
-    price: "Rp249.000",
-    note: "Untuk presentasi dan revisi rutin",
-    highlighted: true,
-    features: ["Lebih leluasa membuat opsi", "Riwayat render tertata", "Bagikan dan unduh hasil"],
-  },
-  {
-    name: "Studio",
-    credits: "300 kredit",
-    price: "Rp735.000",
-    note: "Untuk beberapa project berjalan",
-    features: ["Cocok untuk tim desain", "Manajemen project", "Bagikan dan unduh hasil"],
-  },
-  {
-    name: "Agency",
-    credits: "1.000 kredit",
-    price: "Rp2.300.000",
-    note: "Untuk kebutuhan visual volume tinggi",
-    features: ["Kapasitas render tinggi", "Workflow multi-project", "Bagikan dan unduh hasil"],
-  },
-];
-
 const faqs = [
   {
     q: "Apa itu RenderAI?",
@@ -149,37 +124,26 @@ const faqs = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const dbPackages = await db.query.paymentPackages.findMany({
+    where: eq(paymentPackages.isActive, true),
+    orderBy: asc(paymentPackages.sortOrder),
+  });
+  const pricing = dbPackages.map((pkg) => {
+    const copy = PACKAGE_COPY[pkg.slug] ?? { note: "", features: [] };
+    return {
+      name: pkg.name,
+      credits: formatCredits(pkg.credits, pkg.bonusCredits),
+      price: formatPrice(pkg.price),
+      note: copy.note,
+      highlighted: copy.highlighted,
+      features: copy.features,
+    };
+  });
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur-xl">
-        <div className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-4 sm:px-6">
-          <Link href="/" aria-label="RenderAI beranda" className="justify-self-start">
-            <Logo size={28} byline="by Ruma Interior" />
-          </Link>
-          <nav className="hidden items-center justify-center gap-7 text-sm font-medium text-muted-foreground md:flex">
-            {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="transition-colors hover:text-foreground"
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="ghost" asChild className="hidden h-9 px-4 sm:inline-flex">
-              <Link href="/login">Masuk</Link>
-            </Button>
-            <Button asChild className="h-9 px-4 text-sm">
-              <Link href="/register">
-                Mulai <ArrowRight />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <PublicHeader nav={navItems} />
 
       <main>
         <section className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-12 pt-10 text-center sm:px-6 sm:pb-14 sm:pt-14">
@@ -239,7 +203,7 @@ export default function LandingPage() {
                     <feature.icon className="size-4" />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-base font-bold tracking-normal text-foreground">
+                    <h3 className="text-base font-semibold tracking-normal text-foreground">
                       {feature.title}
                     </h3>
                     <p className="text-sm leading-6 text-muted-foreground">
@@ -287,11 +251,11 @@ export default function LandingPage() {
               ["3", "Simpan opsi terbaik", "Kelola hasil per project, lalu unduh atau bagikan untuk review."],
             ].map(([step, title, desc]) => (
               <div key={step} className="flex gap-4">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
                   {step}
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold tracking-normal sm:text-base">{title}</h3>
+                  <h3 className="text-sm font-semibold tracking-normal sm:text-base">{title}</h3>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     {desc}
                   </p>
@@ -320,7 +284,7 @@ export default function LandingPage() {
                 <CardContent className="flex h-full flex-col py-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="font-bold text-foreground">{plan.name}</p>
+                      <p className="font-semibold text-foreground">{plan.name}</p>
                       <p className="mt-2 flex items-center gap-2 text-muted-foreground">
                         <Layers3 className="size-4 text-primary" />
                         {plan.credits}
@@ -333,7 +297,7 @@ export default function LandingPage() {
                     )}
                   </div>
                   <div className="mt-6">
-                    <p className="text-2xl font-extrabold tracking-normal text-foreground">
+                    <p className="text-2xl font-semibold tracking-normal text-foreground">
                       {plan.price}
                     </p>
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -376,7 +340,7 @@ export default function LandingPage() {
                 open={index === 0}
                 className="group rounded-lg border border-border/70 bg-card/90 px-5 py-4 shadow-none"
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold tracking-normal text-foreground">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold tracking-normal text-foreground">
                   {item.q}
                   <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90" />
                 </summary>
@@ -406,25 +370,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>Copyright ©{new Date().getFullYear()} RenderAI. All rights reserved.</p>
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex gap-5">
-              <Link href="/login" className="hover:text-foreground">
-                Masuk
-              </Link>
-              <Link href="/register" className="hover:text-foreground">
-                Mulai eksplorasi
-              </Link>
-              <a href="#faq" className="hover:text-foreground">
-                FAQ
-              </a>
-            </div>
-            <ModeToggle />
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
@@ -440,10 +386,10 @@ function SectionHeader({
 }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      <p className="text-xs font-bold uppercase tracking-[0.08em] text-primary">
+      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
         {eyebrow}
       </p>
-      <h2 className="mt-2.5 text-2xl font-extrabold leading-tight tracking-normal text-foreground sm:text-3xl">
+      <h2 className="mt-2.5 text-2xl font-semibold leading-tight tracking-normal text-foreground sm:text-3xl">
         {title}
       </h2>
       <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -457,7 +403,7 @@ function ProductPreview() {
   return (
     <div className="mt-10 w-full rounded-lg border border-border/70 bg-card p-2 shadow-sm shadow-foreground/5">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md bg-primary px-3 py-2 text-primary-foreground">
-        <div className="flex items-center gap-2 text-sm font-bold">
+        <div className="flex items-center gap-2 text-sm font-semibold">
           <Sparkles className="size-4" />
           RenderAI Studio Preview
         </div>
@@ -467,7 +413,7 @@ function ProductPreview() {
       </div>
       <div className="grid overflow-hidden rounded-md border border-border/70 bg-background text-left lg:grid-cols-[230px_1fr_210px]">
         <aside className="hidden border-r border-border/70 bg-card p-4 lg:block">
-          <div className="mb-4 flex items-center gap-2 text-sm font-bold text-foreground">
+          <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-foreground">
             <Wand2 className="size-4 text-primary" />
             Arahan Visual
           </div>
@@ -494,7 +440,7 @@ function ProductPreview() {
               <p className="text-xs font-medium text-muted-foreground">
                 Project Interior Klien
               </p>
-              <h3 className="font-bold tracking-normal text-foreground">
+              <h3 className="font-semibold tracking-normal text-foreground">
                 Opsi Kamar Utama
               </h3>
             </div>
@@ -530,7 +476,7 @@ function ProductPreview() {
         </div>
 
         <aside className="hidden border-l border-border/70 bg-card p-4 lg:block">
-          <div className="mb-4 flex items-center gap-2 text-sm font-bold text-foreground">
+          <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-foreground">
             <Building2 className="size-4 text-primary" />
             Opsi Tersimpan
           </div>

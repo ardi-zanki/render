@@ -1,30 +1,35 @@
+import { asc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Logo } from "@/components/brand/logo";
+import { PublicFooter } from "@/components/brand/public-footer";
+import { PublicHeader } from "@/components/brand/public-header";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ModeToggle } from "@/components/ui/mode-toggle";
+import { db } from "@/db";
+import { paymentPackages } from "@/db/schema";
+import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Harga RenderAI",
   description: "Paket kredit RenderAI untuk membuat render arsitektur AI.",
 };
 
-const packages = [
-  ["Starter", "30 kredit", "Rp79.000", "Untuk validasi workflow awal"],
-  ["Creator", "100 kredit", "Rp249.000", "Untuk presentasi dan revisi rutin"],
-  ["Studio", "300 kredit", "Rp735.000", "Untuk beberapa project berjalan"],
-  ["Agency", "1.000 kredit", "Rp2.300.000", "Untuk kebutuhan visual volume tinggi"],
-];
+export const revalidate = 3600;
 
-export default function HargaPage() {
+export default async function HargaPage() {
+  const packages = await db.query.paymentPackages.findMany({
+    where: eq(paymentPackages.isActive, true),
+    orderBy: asc(paymentPackages.sortOrder),
+  });
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader />
-      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6">
         <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-[0.08em] text-primary">
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
             Paket Kredit
           </p>
           <h1 className="mt-3 text-3xl font-semibold tracking-normal sm:text-4xl">
@@ -37,43 +42,45 @@ export default function HargaPage() {
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {packages.map(([name, credits, price, note]) => (
-            <Card key={name} className={name === "Creator" ? "border-primary/70 ring-1 ring-primary/15" : ""}>
-              <CardContent className="flex h-full flex-col gap-4 py-5">
-                <div>
-                  <h2 className="text-base font-semibold">{name}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{credits}</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-semibold tracking-normal">{price}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{note}</p>
-                </div>
-                <Button asChild className="mt-auto">
-                  <Link href="/register">Mulai render</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          {packages.map((pkg) => {
+            const copy = packageCopy(pkg.slug);
+            return (
+              <Card
+                key={pkg.id}
+                className={
+                  copy.highlighted
+                    ? "border-primary/70 ring-1 ring-primary/15"
+                    : ""
+                }
+              >
+                <CardContent className="flex h-full flex-col gap-4 py-5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h2 className="text-base font-semibold">{pkg.name}</h2>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {formatCredits(pkg.credits, pkg.bonusCredits)}
+                      </p>
+                    </div>
+                    {copy.highlighted && <Badge>Populer</Badge>}
+                  </div>
+                  <div>
+                    <p className="text-2xl font-semibold tracking-normal">
+                      {formatPrice(pkg.price)}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {copy.note}
+                    </p>
+                  </div>
+                  <Button asChild className="mt-auto">
+                    <Link href="/register">Mulai render</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </main>
+      <PublicFooter />
     </div>
-  );
-}
-
-function PublicHeader() {
-  return (
-    <header className="border-b border-border/80 bg-background/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/">
-          <Logo size={28} byline="Pricing" />
-        </Link>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Masuk</Link>
-          </Button>
-          <ModeToggle />
-        </div>
-      </div>
-    </header>
   );
 }

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -104,11 +105,9 @@ export function PreferencesForm({
         </Alert>
       )}
       <label className="flex items-center gap-2 text-sm text-foreground">
-        <input
-          type="checkbox"
+        <Checkbox
           name="emailNotificationsEnabled"
           defaultChecked={emailNotificationsEnabled}
-          className="size-4 accent-primary"
         />
         Kirim notifikasi lewat email
       </label>

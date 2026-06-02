@@ -6,12 +6,10 @@ import {
   LogOut,
   MessageCircle,
   Settings,
-  UserRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
-import { ProfileModal } from "@/components/app/profile-modal";
 import { SettingsModal } from "@/components/app/settings-modal";
 import { Avatar } from "@/components/ui/avatar";
 import { Popover } from "@/components/ui/popover";
@@ -43,7 +41,6 @@ export function UserMenu({
   const router = useRouter();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -126,16 +123,6 @@ export function UserMenu({
         </button>
         <button
           type="button"
-          className={itemClass}
-          onClick={() => {
-            setProfileOpen(true);
-            setOpen(false);
-          }}
-        >
-          <UserRound /> Profil
-        </button>
-        <button
-          type="button"
           onClick={() => {
             setSettingsOpen(true);
             setOpen(false);
@@ -166,9 +153,6 @@ export function UserMenu({
         </button>
       </Popover>
 
-      {profileOpen && (
-        <ProfileModal user={user} onClose={() => setProfileOpen(false)} />
-      )}
       {settingsOpen && (
         <SettingsModal
           user={user}

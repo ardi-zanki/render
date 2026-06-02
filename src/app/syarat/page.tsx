@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Logo } from "@/components/brand/logo";
+import { PublicFooter } from "@/components/brand/public-footer";
+import { PublicHeader } from "@/components/brand/public-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export const metadata: Metadata = {
   title: "Syarat & Ketentuan",
@@ -94,27 +94,15 @@ const sections = [
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/80 bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-5">
-          <Link href="/" aria-label="RenderAI beranda">
-            <Logo size={28} />
-          </Link>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link href="/login">Masuk</Link>
-            </Button>
-            <ModeToggle />
-          </div>
-        </div>
-      </header>
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <PublicHeader />
 
-      <main className="mx-auto max-w-5xl px-4 py-10 sm:px-5 sm:py-12">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold text-primary">
             Legal RenderAI
           </p>
-          <h1 className="mt-3 text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">
+          <h1 className="mt-3 text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
             Syarat & Ketentuan
           </h1>
           <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
@@ -131,7 +119,7 @@ export default function TermsPage() {
           <CardContent className="flex flex-col gap-8 py-6 sm:py-7">
             {sections.map((section) => (
               <section key={section.title} className="max-w-3xl">
-                <h2 className="text-lg font-bold text-foreground">
+                <h2 className="text-lg font-semibold text-foreground">
                   {section.title}
                 </h2>
                 <div className="mt-3 space-y-3">
@@ -151,7 +139,7 @@ export default function TermsPage() {
 
         <div className="mt-8 flex flex-col gap-3 rounded-lg border border-border bg-muted/45 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-bold text-foreground">
+            <p className="font-semibold text-foreground">
               Siap mulai menggunakan RenderAI?
             </p>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -164,6 +152,8 @@ export default function TermsPage() {
           </Button>
         </div>
       </main>
+
+      <PublicFooter />
     </div>
   );
 }

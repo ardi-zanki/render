@@ -168,7 +168,7 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    font-size: 15px;
+    font-size: 14px;
   }
 
   h1, h2, h3, h4 {

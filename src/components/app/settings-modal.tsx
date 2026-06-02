@@ -9,7 +9,7 @@ import {
   ProfileForm,
 } from "@/components/app/settings-forms";
 import { useTheme, type Theme } from "@/components/theme-provider";
-import { Avatar } from "@/components/ui/avatar";
+import { AvatarUpload } from "@/components/app/avatar-upload";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/ui/modal";
@@ -66,7 +66,7 @@ export function SettingsModal({
 
       <aside className="border-b border-border bg-muted/35 p-3 pr-12 md:border-b-0 md:border-r">
         <div className="px-2 py-1 md:mb-4">
-          <h2 id="settings-title" className="text-base font-bold text-foreground">
+          <h2 id="settings-title" className="text-base font-semibold text-foreground">
             Pengaturan
           </h2>
         </div>
@@ -99,25 +99,14 @@ export function SettingsModal({
         {activeTab === "profile" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-lg font-bold text-foreground">Profil</h3>
+              <h3 className="text-lg font-semibold text-foreground">Profil</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Kelola informasi akun dan identitas yang tampil di aplikasi.
               </p>
             </div>
 
-            <div className="flex items-center gap-4 rounded-lg border border-border bg-background/60 p-4">
-              <Avatar name={user.name} src={user.image} size={64} />
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-foreground">
-                  {user.name}
-                </p>
-                <p className="truncate text-sm text-muted-foreground">
-                  {user.email}
-                </p>
-                <Badge variant="secondary" className="mt-2">
-                  Foto profil
-                </Badge>
-              </div>
+            <div className="rounded-lg border border-border bg-background/60 p-4">
+              <AvatarUpload name={user.name} image={user.image} />
             </div>
 
             <ProfileForm
@@ -131,7 +120,7 @@ export function SettingsModal({
         {activeTab === "preferences" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-lg font-bold text-foreground">Preferensi</h3>
+              <h3 className="text-lg font-semibold text-foreground">Preferensi</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Atur tampilan, tema, notifikasi, dan default render.
               </p>
@@ -161,7 +150,7 @@ export function SettingsModal({
         {activeTab === "security" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-lg font-bold text-foreground">Keamanan</h3>
+              <h3 className="text-lg font-semibold text-foreground">Keamanan</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Ubah password dan tinjau sesi login aktif.
               </p>

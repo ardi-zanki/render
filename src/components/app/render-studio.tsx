@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Modal } from "@/components/ui/modal";
+import { Segmented } from "@/components/ui/segmented";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { RenderMode, RenderOutputFormat } from "@/db/schema";
@@ -61,7 +63,7 @@ const cap = (s: string) => (s === "auto" ? "Otomatis" : s[0].toUpperCase() + s.s
 
 type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;
 
-function Segmented({
+function ChipGroup({
   options,
   value,
   onChange,
@@ -118,20 +120,27 @@ export function RenderStudio({
     if (id !== projectId) router.push(`/renders/new?project=${id}`);
   }
 
-  async function createProjectInline() {
-    const name = window.prompt("Nama project baru?");
-    if (!name?.trim()) return;
-    const res = await fetch("/api/projects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: name.trim() }),
-    });
-    const json = await res.json();
-    if (res.ok && json.id) {
-      toast.success("Project dibuat");
-      router.push(`/renders/new?project=${json.id}`);
-    } else {
-      toast.error(json.error ?? "Gagal membuat project");
+  async function submitCreateProject() {
+    const name = newProjectName.trim();
+    if (!name) return;
+    setCreatingProject(true);
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const json = await res.json();
+      if (res.ok && json.id) {
+        toast.success("Project dibuat");
+        setCreateOpen(false);
+        setNewProjectName("");
+        router.push(`/renders/new?project=${json.id}`);
+      } else {
+        toast.error(json.error ?? "Gagal membuat project");
+      }
+    } finally {
+      setCreatingProject(false);
     }
   }
 
@@ -165,6 +174,9 @@ export function RenderStudio({
   const [loading, setLoading] = useState(false);
   const [renderStatus, setRenderStatus] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
+  const [creatingProject, setCreatingProject] = useState(false);
 
   function pickFile(f: File | null) {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -352,7 +364,7 @@ export function RenderStudio({
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={createProjectInline}
+                onClick={() => setCreateOpen(true)}
                 title="Buat project baru"
                 aria-label="Buat project baru"
               >
@@ -427,12 +439,12 @@ export function RenderStudio({
 
           <div className="flex flex-col gap-2">
             <Label>Waktu</Label>
-            <Segmented options={TIMES} value={time} onChange={setTime} />
+            <ChipGroup options={TIMES} value={time} onChange={setTime} />
           </div>
 
           <div className="flex flex-col gap-2">
             <Label>Cuaca</Label>
-            <Segmented options={WEATHERS} value={weather} onChange={setWeather} />
+            <ChipGroup options={WEATHERS} value={weather} onChange={setWeather} />
           </div>
         </CardContent>
       </Card>
@@ -443,23 +455,15 @@ export function RenderStudio({
           <CardContent className="flex flex-col gap-4 py-5">
             {/* tabs */}
             {resultUrl && (
-              <div className="flex gap-2">
-                {(["hasil", "asli"] as const).map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setView(t)}
-                    className={cn(
-                      "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
-                      view === t
-                        ? "bg-secondary text-secondary-foreground"
-                        : "text-muted-foreground hover:bg-muted",
-                    )}
-                  >
-                    {t === "hasil" ? "Hasil" : "Asli"}
-                  </button>
-                ))}
-              </div>
+              <Segmented
+                options={[
+                  { value: "hasil", label: "Hasil" },
+                  { value: "asli", label: "Asli" },
+                ]}
+                value={view}
+                onChange={setView}
+                size="sm"
+              />
             )}
 
             {/* canvas */}
@@ -701,7 +705,7 @@ export function RenderStudio({
         {/* Scenes */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-foreground">
+            <h2 className="text-sm font-semibold text-foreground">
               Scene · {projectName}
             </h2>
             <Badge variant="secondary">{scenes.length}</Badge>
@@ -730,6 +734,54 @@ export function RenderStudio({
           )}
         </div>
       </div>
+
+      {createOpen && (
+        <Modal
+          onClose={() => setCreateOpen(false)}
+          labelledBy="rs-create-project-title"
+          panelClassName="w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-dialog"
+        >
+          <h2
+            id="rs-create-project-title"
+            className="text-base font-semibold text-foreground"
+          >
+            Buat project baru
+          </h2>
+          <div className="mt-4 flex flex-col gap-1.5">
+            <Label htmlFor="rs-new-project">Nama project</Label>
+            <Input
+              id="rs-new-project"
+              value={newProjectName}
+              onChange={(e) => setNewProjectName(e.target.value)}
+              placeholder="Nama project"
+              maxLength={80}
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void submitCreateProject();
+                }
+              }}
+            />
+          </div>
+          <div className="mt-5 flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCreateOpen(false)}
+              disabled={creatingProject}
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={submitCreateProject}
+              disabled={creatingProject || !newProjectName.trim()}
+            >
+              {creatingProject && <Loader2 className="animate-spin" />}
+              Buat
+            </Button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

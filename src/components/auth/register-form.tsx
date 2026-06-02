@@ -10,6 +10,7 @@ import { OrDivider } from "@/components/auth/or-divider";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signUp } from "@/lib/auth-client";
@@ -107,11 +108,10 @@ export function RegisterForm() {
       </div>
 
       <label className="flex items-start gap-2 text-sm text-muted-foreground">
-        <input
-          type="checkbox"
+        <Checkbox
           checked={agree}
           onChange={(e) => setAgree(e.target.checked)}
-          className="mt-0.5 size-4 accent-primary"
+          className="mt-0.5"
         />
         <span>
           Saya setuju dengan{" "}

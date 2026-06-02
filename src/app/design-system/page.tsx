@@ -82,7 +82,7 @@ const foundations = [
   {
     title: "Radius",
     icon: Layers3,
-    items: ["4px untuk elemen kecil", "6px untuk input", "8px untuk card dan modal", "10px untuk brand mark", "Lingkaran hanya untuk avatar"],
+    items: ["4px untuk tombol, input, dan badge", "6px untuk card, modal, dan popover", "10px untuk brand mark", "Lingkaran penuh untuk avatar"],
   },
   {
     title: "Elevation",
@@ -93,7 +93,7 @@ const foundations = [
 
 const visualAssetRules = [
   "Visual utama harus menunjukkan ruang, project, atau UI produk yang relevan, bukan ilustrasi generik.",
-  "Mockup produk memakai komponen terbaru: radius 8px, Navy Blue sebagai aksen, dan layout yang lapang.",
+  "Mockup produk memakai komponen terbaru: radius konsisten, Navy Blue sebagai aksen, dan layout yang lapang.",
   "Gambar showcase menggunakan rasio stabil, crop bersih, kontras cukup, dan caption singkat.",
   "Preview fitur harus membantu pengguna memahami manfaat workflow, bukan hanya menjadi dekorasi.",
 ];
@@ -179,7 +179,7 @@ export default function DesignSystemPage() {
           </Badge>
           <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
             <div>
-              <h1 className="max-w-3xl text-3xl font-extrabold leading-tight text-foreground sm:text-4xl">
+              <h1 className="max-w-3xl text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
                 Fondasi UI yang clean, sederhana, profesional, dan konsisten
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
@@ -236,10 +236,10 @@ export default function DesignSystemPage() {
           <Card>
             <CardContent className="grid gap-5 py-5 lg:grid-cols-[1fr_320px]">
               <div className="space-y-4">
-                <p className="text-4xl font-extrabold leading-tight text-foreground">
+                <p className="text-4xl font-semibold leading-tight text-foreground">
                   Visual arsitektur siap dibahas
                 </p>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-2xl font-semibold text-foreground">
                   Dashboard project
                 </p>
                 <p className="text-base leading-7 text-foreground">
@@ -286,7 +286,7 @@ export default function DesignSystemPage() {
                     <item.icon className="size-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-foreground">{item.title}</h3>
+                    <h3 className="font-semibold text-foreground">{item.title}</h3>
                     <div className="mt-3">
                       <SpecList items={item.items} />
                     </div>
@@ -355,7 +355,7 @@ export default function DesignSystemPage() {
 
         <Section
           title="Form dan Card"
-          description="Form memakai tinggi 40px, radius 6px, label singkat, dan helper text secukupnya."
+          description="Form memakai tinggi 36px, radius 4px, label singkat, dan helper text secukupnya."
         >
           <div className="grid gap-4 lg:grid-cols-[420px_1fr]">
             <Card>
@@ -399,7 +399,7 @@ export default function DesignSystemPage() {
                     <ImageIcon className="size-4" />
                   </div>
                   <div>
-                    <p className="font-bold text-foreground">
+                    <p className="font-semibold text-foreground">
                       Draft ke visual presentasi
                     </p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -428,7 +428,7 @@ export default function DesignSystemPage() {
             <CardContent className="grid gap-5 py-5 lg:grid-cols-[300px_1fr]">
               <div className="overflow-hidden rounded-lg border border-border bg-muted">
                 <div className="flex items-center justify-between border-b border-border bg-primary px-3 py-2 text-primary-foreground">
-                  <span className="text-sm font-bold">RenderAI Preview</span>
+                  <span className="text-sm font-semibold">RenderAI Preview</span>
                   <Badge variant="secondary">Siap review</Badge>
                 </div>
                 <div className="grid gap-3 p-3">
@@ -454,7 +454,7 @@ export default function DesignSystemPage() {
           <div className="grid gap-4 lg:grid-cols-2">
             <Card className="overflow-hidden p-0">
               <div className="border-b border-border px-4 py-3">
-                <p className="flex items-center gap-2 font-bold text-foreground">
+                <p className="flex items-center gap-2 font-semibold text-foreground">
                   <Table2 className="size-4 text-primary" /> Pola tabel
                 </p>
               </div>
@@ -492,7 +492,7 @@ export default function DesignSystemPage() {
             <Card>
               <CardContent className="flex flex-col gap-4 py-5">
                 <div className="rounded-lg border border-border bg-muted/45 p-3">
-                  <p className="mb-2 flex items-center gap-2 text-sm font-bold">
+                  <p className="mb-2 flex items-center gap-2 text-sm font-semibold">
                     <PanelTop className="size-4 text-primary" /> Navigation
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -514,9 +514,9 @@ export default function DesignSystemPage() {
                 </div>
 
                 <div className="rounded-lg border border-border bg-card p-4 shadow-[0_20px_60px_rgb(15_23_42/0.08)]">
-                  <p className="font-bold text-foreground">Pola modal</p>
+                  <p className="font-semibold text-foreground">Pola modal</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Dialog memakai radius 8px, padding 20px, overlay 45%, dan
+                    Dialog memakai radius 6px, padding 20px, overlay 45%, dan
                     shadow hanya untuk layer aktif.
                   </p>
                   <div className="mt-4 flex justify-end gap-2">

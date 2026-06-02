@@ -51,12 +51,12 @@ export default async function PaymentFinishPage({
         <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
           <Icon className={`size-14 ${v.color}`} />
           <div className="flex flex-col gap-1">
-            <h1 className="text-xl font-bold text-foreground">{v.title}</h1>
+            <h1 className="text-xl font-semibold text-foreground">{v.title}</h1>
             <p className="text-sm leading-6 text-muted-foreground">{v.desc}</p>
           </div>
           <div className="rounded-md bg-muted px-4 py-1.5 text-sm">
             Sisa kredit:{" "}
-            <span className="font-bold text-foreground">
+            <span className="font-semibold text-foreground">
               {balance.toLocaleString("id-ID")}
             </span>
           </div>

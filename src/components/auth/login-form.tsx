@@ -10,6 +10,7 @@ import { OrDivider } from "@/components/auth/or-divider";
 import { PasswordInput } from "@/components/auth/password-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth-client";
@@ -103,11 +104,9 @@ export function LoginForm() {
 
       <div className="flex items-center justify-between">
         <label className="flex items-center gap-2 text-sm text-muted-foreground">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={remember}
             onChange={(e) => setRemember(e.target.checked)}
-            className="size-4 accent-primary"
           />
           Ingat saya
         </label>

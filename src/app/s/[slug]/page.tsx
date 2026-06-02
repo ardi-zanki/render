@@ -77,7 +77,7 @@ export default async function PublicRenderPage({ params }: Params) {
         </p>
 
         <div className="mt-9 flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/40 px-5 py-8 text-center">
-          <p className="text-lg font-bold text-foreground">
+          <p className="text-lg font-semibold text-foreground">
             Buat render arsitektur Anda sendiri
           </p>
           <p className="max-w-md text-sm leading-6 text-muted-foreground">

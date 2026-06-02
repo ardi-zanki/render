@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/ui/modal";
 import { Popover } from "@/components/ui/popover";
+import { Segmented } from "@/components/ui/segmented";
 import { Textarea } from "@/components/ui/textarea";
 import {
   archiveProjectAction,
@@ -102,7 +103,7 @@ function ProjectFormModal({
       <div className="mb-4 flex items-center justify-between">
         <h2
           id="project-modal-title"
-          className="text-base font-bold text-foreground"
+          className="text-base font-semibold text-foreground"
         >
           {isEdit ? "Edit project" : "Buat project"}
         </h2>
@@ -225,28 +226,17 @@ export function ProjectsClient({
     router.refresh();
   }
 
-  const tabClass = (active: boolean) =>
-    cn(
-      "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
-      active
-        ? "bg-primary text-primary-foreground"
-        : "bg-secondary text-secondary-foreground hover:bg-muted hover:text-primary",
-    );
-
   return (
     <>
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-2">
-          <button className={tabClass(status === "active")} onClick={() => setTab("active")}>
-            Aktif
-          </button>
-          <button
-            className={tabClass(status === "archived")}
-            onClick={() => setTab("archived")}
-          >
-            Arsip
-          </button>
-        </div>
+        <Segmented
+          options={[
+            { value: "active", label: "Aktif" },
+            { value: "archived", label: "Arsip" },
+          ]}
+          value={status}
+          onChange={setTab}
+        />
         <div className="flex gap-2">
           <div className="relative flex-1 sm:w-64 sm:flex-none">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

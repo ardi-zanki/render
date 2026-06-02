@@ -7,15 +7,15 @@ import { cn } from "@/lib/utils";
 
 const TABS: [string, string][] = [
   ["/admin", "Ringkasan"],
-  ["/admin/users", "User"],
+  ["/admin/users", "Pengguna"],
   ["/admin/projects", "Project"],
   ["/admin/renders", "Render"],
   ["/admin/payments", "Pembayaran"],
-  ["/admin/credits", "Credit Transactions"],
-  ["/admin/packages", "Payment Packages"],
-  ["/admin/notifications", "Notifications"],
-  ["/admin/settings", "Settings"],
-  ["/admin/audit", "Audit Log"],
+  ["/admin/credits", "Transaksi Kredit"],
+  ["/admin/packages", "Paket Kredit"],
+  ["/admin/notifications", "Notifikasi"],
+  ["/admin/settings", "Pengaturan"],
+  ["/admin/audit", "Log Audit"],
 ];
 
 export function AdminNav() {

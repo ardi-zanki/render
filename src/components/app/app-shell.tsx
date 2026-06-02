@@ -178,10 +178,10 @@ export function AppShell({
             <Link
               href="/renders/new"
               onClick={() => setOpen(false)}
-              title={!expanded ? "Render baru" : undefined}
+              title={!expanded ? "Buat render" : undefined}
             >
               <Plus className="size-4" />
-              {labelWithTooltip("Render baru", expanded)}
+              {labelWithTooltip("Buat render", expanded)}
             </Link>
           </Button>
         </div>
