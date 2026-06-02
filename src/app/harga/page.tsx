@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 };
 
 const packages = [
-  ["Starter", "30 kredit", "Rp49.000"],
-  ["Creator", "100 kredit", "Rp129.000"],
-  ["Studio", "300 kredit", "Rp299.000"],
-  ["Agency", "1.000 kredit", "Rp799.000"],
+  ["Starter", "30 kredit", "Rp79.000"],
+  ["Creator", "100 kredit", "Rp249.000"],
+  ["Studio", "300 kredit", "Rp735.000"],
+  ["Agency", "1.000 kredit", "Rp2.300.000"],
 ];
 
 export default function HargaPage() {

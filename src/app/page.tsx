@@ -98,14 +98,14 @@ const pricing = [
   {
     name: "Starter",
     credits: "30 kredit",
-    price: "Rp49.000",
+    price: "Rp79.000",
     note: "Untuk mencoba workflow awal",
     features: ["Cukup untuk eksplorasi ringan", "Project dan riwayat render", "Mode interior dan eksterior"],
   },
   {
     name: "Creator",
     credits: "100 kredit",
-    price: "Rp129.000",
+    price: "Rp249.000",
     note: "Untuk presentasi dan revisi rutin",
     highlighted: true,
     features: ["Lebih leluasa membuat opsi", "Project dan riwayat render", "Bagikan dan unduh hasil"],
@@ -113,14 +113,14 @@ const pricing = [
   {
     name: "Studio",
     credits: "300 kredit",
-    price: "Rp299.000",
+    price: "Rp735.000",
     note: "Untuk beberapa project berjalan",
     features: ["Cocok untuk tim desain", "Project dan riwayat render", "Bagikan dan unduh hasil"],
   },
   {
     name: "Agency",
     credits: "1.000 kredit",
-    price: "Rp799.000",
+    price: "Rp2.300.000",
     note: "Untuk kebutuhan visual volume tinggi",
     features: ["Kapasitas render tinggi", "Project dan riwayat render", "Bagikan dan unduh hasil"],
   },
