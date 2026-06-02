@@ -61,6 +61,7 @@ export function AppShell({
   unreadCount,
   notifications,
   isAdmin,
+  googleConnected,
   children,
 }: {
   user: AppUser;
@@ -70,6 +71,7 @@ export function AppShell({
   unreadCount: number;
   notifications: NotificationItem[];
   isAdmin: boolean;
+  googleConnected: boolean;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -237,6 +239,7 @@ export function AppShell({
           <UserMenu
             user={user}
             preferences={preferences}
+            googleConnected={googleConnected}
             compact={!expanded}
           />
         </div>

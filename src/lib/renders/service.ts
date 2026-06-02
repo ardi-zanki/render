@@ -28,8 +28,8 @@ import {
   getBalance,
   InsufficientCreditsError,
 } from "@/lib/credits";
-import { renderResultEmail } from "@/lib/email";
-import { createNotification, notifyUser } from "@/lib/notifications/service";
+import { lowCreditEmail, renderResultEmail } from "@/lib/email";
+import { notifyUser } from "@/lib/notifications/service";
 import { aiProvider } from "@/lib/providers/ai";
 import { renderAssetKey, storage } from "@/lib/storage";
 import type { ValidatedImageUpload } from "@/lib/uploads/images";
@@ -618,12 +618,22 @@ async function processLockedJob(jobId: string) {
 
     const balance = await getBalance(render.userId);
     if (balance <= LOW_CREDIT_THRESHOLD) {
-      await createNotification({
+      // Email only when the balance first crosses into the low zone (PRD §25.3:
+      // no repeated email for the same event). The in-app notification still
+      // fires on every render while credits are low.
+      const justCrossed = balance + RENDER_COST > LOW_CREDIT_THRESHOLD;
+      await notifyUser({
         userId: render.userId,
         type: "low_credit",
         title: "Kredit kamu menipis",
         message: `Sisa kredit kamu tinggal ${balance}. Yuk top up.`,
         actionUrl: "/payments",
+        email: justCrossed
+          ? lowCreditEmail({
+              balance,
+              url: `${env.APP_URL.replace(/\/$/, "")}/payments`,
+            })
+          : undefined,
       });
     }
 

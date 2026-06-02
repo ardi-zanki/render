@@ -106,3 +106,16 @@ export function paymentSuccessEmail(params: { credits: number; url: string }) {
     }),
   };
 }
+
+export function lowCreditEmail(params: { balance: number; url: string }) {
+  return {
+    subject: "Kredit RenderAI Anda menipis",
+    html: layout({
+      heading: "Kredit Anda menipis",
+      body: `Sisa kredit Anda tinggal <b>${params.balance}</b>. Top up sekarang agar bisa melanjutkan render tanpa terputus.`,
+      cta: { label: "Top up Kredit", url: params.url },
+      footnote:
+        "Email ini hanya dikirim sekali saat kredit Anda mulai menipis.",
+    }),
+  };
+}

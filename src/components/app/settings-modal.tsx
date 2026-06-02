@@ -39,10 +39,12 @@ const TABS: Array<{
 export function SettingsModal({
   user,
   preferences,
+  googleConnected,
   onClose,
 }: {
   user: SettingsUser;
   preferences: SettingsPreferences;
+  googleConnected: boolean;
   onClose: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
@@ -172,6 +174,25 @@ export function SettingsModal({
                   </p>
                 </div>
                 <Badge variant="success">Aktif</Badge>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-background/60 p-4">
+              <div className="flex items-start gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground">
+                  G
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-foreground">Akun Google</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {googleConnected
+                      ? "Akun Google Anda terhubung untuk login cepat."
+                      : "Belum terhubung. Anda login dengan email dan password."}
+                  </p>
+                </div>
+                <Badge variant={googleConnected ? "success" : "secondary"}>
+                  {googleConnected ? "Terhubung" : "Belum"}
+                </Badge>
               </div>
             </div>
           </div>

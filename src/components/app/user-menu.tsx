@@ -32,10 +32,12 @@ const itemClass =
 export function UserMenu({
   user,
   preferences,
+  googleConnected,
   compact = false,
 }: {
   user: MenuUser;
   preferences: MenuPreferences;
+  googleConnected: boolean;
   compact?: boolean;
 }) {
   const router = useRouter();
@@ -157,6 +159,7 @@ export function UserMenu({
         <SettingsModal
           user={user}
           preferences={preferences}
+          googleConnected={googleConnected}
           onClose={() => setSettingsOpen(false)}
         />
       )}

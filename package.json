@@ -16,6 +16,7 @@
     "smoke:render": "tsx --env-file=.env.local scripts/smoke-render.ts",
     "smoke:payment": "tsx --env-file=.env.local scripts/smoke-payment.ts",
     "render:worker": "tsx --env-file=.env.local scripts/render-worker.ts",
+    "worker": "tsx scripts/render-worker.ts",
     "make:admin": "tsx --env-file=.env.local scripts/make-admin.ts"
   },
   "dependencies": {

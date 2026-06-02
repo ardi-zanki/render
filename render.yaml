@@ -1,0 +1,108 @@
+# Render.com Blueprint — RenderAI
+# Web service + background render worker + managed Postgres.
+#
+# The worker is mandatory (PRD §19): without it, render jobs stay "queued".
+# Fill secret values (sync:false) in the Render dashboard after first deploy,
+# then run migrations + seed once (see DEPLOYMENT.md).
+databases:
+  - name: renderai-db
+    region: singapore
+    plan: basic-256mb
+
+envVarGroups:
+  - name: renderai-shared
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: RATE_LIMIT_DRIVER
+        value: database
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: STORAGE_PROVIDER
+        value: r2
+      - key: EMAIL_PROVIDER
+        value: resend
+      - key: PAYMENT_PROVIDER
+        value: midtrans
+      - key: AI_PROVIDER
+        value: myarchitectai
+      - key: JWT_ISSUER
+        value: renderai
+      - key: JWT_AUDIENCE
+        value: renderai-app
+      - key: SESSION_DEFAULT_MAX_AGE
+        value: "604800"
+      - key: SESSION_REMEMBER_ME_MAX_AGE
+        value: "2592000"
+      - key: ADMIN_SESSION_MAX_AGE
+        value: "43200"
+      - key: SENSITIVE_ACTION_MAX_AGE
+        value: "900"
+      - key: MIDTRANS_IS_PRODUCTION
+        value: "true"
+      # Secrets / credentials — set these in the Render dashboard:
+      - key: APP_URL
+        sync: false
+      - key: BETTER_AUTH_URL
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: MYARCHITECTAI_API_KEY
+        sync: false
+      - key: MIDTRANS_SERVER_KEY
+        sync: false
+      - key: MIDTRANS_CLIENT_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET_NAME
+        sync: false
+      - key: R2_PUBLIC_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+
+services:
+  - type: web
+    name: renderai-web
+    runtime: node
+    region: singapore
+    plan: starter
+    # --prod=false keeps devDeps (typescript/tailwind/tsx) available for build.
+    buildCommand: pnpm install --prod=false && pnpm build
+    startCommand: pnpm exec next start -p $PORT
+    healthCheckPath: /login
+    autoDeploy: true
+    envVars:
+      - fromGroup: renderai-shared
+      - key: DATABASE_URL
+        fromDatabase:
+          name: renderai-db
+          property: connectionString
+
+  - type: worker
+    name: renderai-worker
+    runtime: node
+    region: singapore
+    plan: starter
+    buildCommand: pnpm install --prod=false
+    startCommand: pnpm worker
+    autoDeploy: true
+    envVars:
+      - fromGroup: renderai-shared
+      - key: DATABASE_URL
+        fromDatabase:
+          name: renderai-db
+          property: connectionString

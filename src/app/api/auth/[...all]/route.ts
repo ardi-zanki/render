@@ -34,8 +34,24 @@ export const GET = handlers.GET;
 export async function POST(req: Request) {
   const action = authAction(new URL(req.url).pathname);
   if (action) {
+    let identifier = clientIp(req);
+    // Login, forgot-password, and resend are scoped to IP + email (PRD §12.1).
+    if (
+      action === "login" ||
+      action === "forgot_password" ||
+      action === "resend_verification"
+    ) {
+      try {
+        const body = (await req.clone().json()) as { email?: unknown };
+        const email =
+          typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+        if (email) identifier = `${identifier}:${email}`;
+      } catch {
+        // Body not JSON / unreadable — fall back to IP-only scope.
+      }
+    }
     try {
-      await assertRateLimit(action, clientIp(req));
+      await assertRateLimit(action, identifier);
     } catch (err) {
       if (err instanceof RateLimitError) {
         return NextResponse.json(

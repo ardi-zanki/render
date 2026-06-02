@@ -54,16 +54,17 @@ export function createMyArchitectAiProvider(): AiProvider {
       }
 
       const outputFormat = input.outputFormat ?? "jpg";
+      // MyArchitectAI uses snake_case request fields (see API reference).
       const body: Record<string, unknown> = {
         image: input.imageUrl,
-        outputFormat,
+        output_format: outputFormat,
       };
 
       if (input.prompt) body.prompt = input.prompt;
-      if (input.referenceUrl) body.referenceImage = input.referenceUrl;
-      if (input.negativePrompt) body.negativePrompt = input.negativePrompt;
+      if (input.referenceUrl) body.reference_image = input.referenceUrl;
+      if (input.negativePrompt) body.negative_prompt = input.negativePrompt;
       if (typeof input.styleTransferStrength === "number") {
-        body.styleTransferStrength = input.styleTransferStrength;
+        body.style_transfer_strength = input.styleTransferStrength;
       }
 
       const res = await fetch(`${BASE_URL}${ENDPOINT[input.mode]}`, {
