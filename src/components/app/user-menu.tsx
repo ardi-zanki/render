@@ -9,12 +9,12 @@ import {
   UserRound,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useRef, useState } from "react";
 
 import { ProfileModal } from "@/components/app/profile-modal";
 import { SettingsModal } from "@/components/app/settings-modal";
 import { Avatar } from "@/components/ui/avatar";
+import { Popover } from "@/components/ui/popover";
 import { signOut } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -43,38 +43,9 @@ export function UserMenu({
   const router = useRouter();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
-  const [menuPosition, setMenuPosition] = useState<{
-    left: number;
-    bottom: number;
-  } | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-
-  const updateMenuPosition = useCallback(() => {
-    const rect = buttonRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const width = 288;
-    const left = compact ? rect.left + 8 : rect.left;
-    setMenuPosition({
-      left: Math.max(12, Math.min(left, window.innerWidth - width - 12)),
-      bottom: Math.max(window.innerHeight - rect.top + 8, 12),
-    });
-  }, [compact]);
-
-  useEffect(() => {
-    if (!open) return;
-    const id = window.setTimeout(updateMenuPosition, 0);
-    window.addEventListener("resize", updateMenuPosition);
-    window.addEventListener("scroll", updateMenuPosition, true);
-
-    return () => {
-      window.clearTimeout(id);
-      window.removeEventListener("resize", updateMenuPosition);
-      window.removeEventListener("scroll", updateMenuPosition, true);
-    };
-  }, [open, updateMenuPosition]);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -98,11 +69,10 @@ export function UserMenu({
     <div className="relative">
       <button
         ref={buttonRef}
-        onClick={() => {
-          updateMenuPosition();
-          setOpen((o) => !o);
-        }}
+        onClick={() => setOpen((o) => !o)}
         title={compact ? user.name : undefined}
+        aria-haspopup="menu"
+        aria-expanded={open}
         className={cn(
           "group relative flex w-full items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted",
           compact && "justify-center px-0",
@@ -122,87 +92,79 @@ export function UserMenu({
         )}
       </button>
 
-      {open &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <>
-            <div
-              className="fixed inset-0 z-[2147481900]"
-              onClick={() => setOpen(false)}
-            />
-            <div
-              style={{
-                left: menuPosition?.left ?? 12,
-                bottom: menuPosition?.bottom ?? 84,
-              }}
-              className="fixed z-[2147482000] max-h-[min(520px,calc(100vh-2rem))] w-72 overflow-y-auto rounded-lg border border-border bg-popover p-1.5 shadow-[0_16px_48px_rgb(15_23_42/0.14)]"
-            >
-            <div className="flex items-center gap-3 px-2.5 py-2">
-              <Avatar name={user.name} src={user.image} size={36} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-foreground">
-                  {user.name}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">Free</p>
-              </div>
-            </div>
-
-            <div className="my-1 h-px bg-border" />
-
-            <button
-              type="button"
-              onClick={() => {
-                router.push("/payments");
-                setOpen(false);
-              }}
-              className={itemClass}
-            >
-              <Gem /> Top up
-            </button>
-            <button
-              type="button"
-              className={itemClass}
-              onClick={() => {
-                setProfileOpen(true);
-                setOpen(false);
-              }}
-            >
-              <UserRound /> Profil
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSettingsOpen(true);
-                setOpen(false);
-              }}
-              className={itemClass}
-            >
-              <Settings /> Pengaturan
-            </button>
-            <a
-              href={WA_SUPPORT}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => setOpen(false)}
-              className={itemClass}
-            >
-              <MessageCircle /> Support
-            </a>
-            <div className="my-1 h-px bg-border" />
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className={itemClass}
-            >
-              {loggingOut ? <Loader2 className="animate-spin" /> : <LogOut />}
-              Keluar
-            </button>
+      <Popover
+        anchorRef={buttonRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        width={288}
+        placement="top"
+        align="start"
+        alignOffset={compact ? 8 : 0}
+        className="max-h-[min(520px,calc(100vh-2rem))] overflow-y-auto rounded-lg border border-border bg-popover p-1.5 shadow-[0_16px_48px_rgb(15_23_42/0.14)]"
+      >
+        <div className="flex items-center gap-3 px-2.5 py-2">
+          <Avatar name={user.name} src={user.image} size={36} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-foreground">
+              {user.name}
+            </p>
+            <p className="truncate text-xs text-muted-foreground">Free</p>
           </div>
-          </>,
-          document.body,
-        )}
+        </div>
+
+        <div className="my-1 h-px bg-border" />
+
+        <button
+          type="button"
+          onClick={() => {
+            router.push("/payments");
+            setOpen(false);
+          }}
+          className={itemClass}
+        >
+          <Gem /> Top up
+        </button>
+        <button
+          type="button"
+          className={itemClass}
+          onClick={() => {
+            setProfileOpen(true);
+            setOpen(false);
+          }}
+        >
+          <UserRound /> Profil
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSettingsOpen(true);
+            setOpen(false);
+          }}
+          className={itemClass}
+        >
+          <Settings /> Pengaturan
+        </button>
+        <a
+          href={WA_SUPPORT}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => setOpen(false)}
+          className={itemClass}
+        >
+          <MessageCircle /> Support
+        </a>
+        <div className="my-1 h-px bg-border" />
+
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className={itemClass}
+        >
+          {loggingOut ? <Loader2 className="animate-spin" /> : <LogOut />}
+          Keluar
+        </button>
+      </Popover>
 
       {profileOpen && (
         <ProfileModal user={user} onClose={() => setProfileOpen(false)} />

@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { Modal } from "@/components/ui/modal";
 
 export function ConfirmDialog({
   title,
@@ -32,29 +33,35 @@ export function ConfirmDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]" onClick={onClose} />
-      <div className="relative z-[71] w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-dialog">
-        <h2 className="text-base font-bold text-foreground">{title}</h2>
-        {description && (
-          <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
-            {description}
-          </p>
-        )}
-        <div className="mt-5 flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            Batal
-          </Button>
-          <Button
-            variant={destructive ? "destructive" : "default"}
-            onClick={confirm}
-            disabled={loading}
-          >
-            {loading && <Loader2 className="animate-spin" />}
-            {confirmLabel}
-          </Button>
-        </div>
+    <Modal
+      onClose={onClose}
+      labelledBy="confirm-dialog-title"
+      panelClassName="w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-dialog"
+    >
+      <h2
+        id="confirm-dialog-title"
+        className="text-base font-bold text-foreground"
+      >
+        {title}
+      </h2>
+      {description && (
+        <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      )}
+      <div className="mt-5 flex justify-end gap-2">
+        <Button variant="outline" onClick={onClose} disabled={loading}>
+          Batal
+        </Button>
+        <Button
+          variant={destructive ? "destructive" : "default"}
+          onClick={confirm}
+          disabled={loading}
+        >
+          {loading && <Loader2 className="animate-spin" />}
+          {confirmLabel}
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -2,14 +2,12 @@
 
 import {
   CreditCard,
-  Bell,
   FolderOpen,
   Home,
   ImageIcon,
   Menu,
   PanelLeft,
   Plus,
-  Settings,
   Shield,
   X,
 } from "lucide-react";
@@ -25,14 +23,13 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import type { NotificationItem } from "@/lib/notifications/ui";
 import { cn } from "@/lib/utils";
+import { zLayer } from "@/lib/z-layers";
 
 const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: Home },
   { label: "Project", href: "/projects", icon: FolderOpen },
   { label: "Riwayat Render", href: "/renders", icon: ImageIcon },
   { label: "Pembayaran", href: "/payments", icon: CreditCard },
-  { label: "Notifikasi", href: "/notifications", icon: Bell },
-  { label: "Pengaturan Akun", href: "/settings", icon: Settings },
 ];
 
 type AppUser = {
@@ -252,7 +249,8 @@ export function AppShell({
       {/* Desktop sidebar */}
       <div
         className={cn(
-          "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-[2147481000] lg:block",
+          "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:block",
+          zLayer.sidebar,
           sidebarExpanded ? "lg:w-60" : "lg:w-[72px]",
         )}
         suppressHydrationWarning

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { RenderImage } from "@/components/app/render-image";
@@ -26,6 +26,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Modal } from "@/components/ui/modal";
+import { Popover } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import {
   archiveProjectAction,
@@ -92,62 +94,66 @@ function ProjectFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]" onClick={onClose} />
-      <div className="relative z-[61] w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-dialog">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-base font-bold text-foreground">
-            {isEdit ? "Edit project" : "Buat project"}
-          </h2>
-          <button
-            onClick={onClose}
-            aria-label="Tutup"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <X className="size-5" />
-          </button>
-        </div>
+    <Modal
+      onClose={onClose}
+      labelledBy="project-modal-title"
+      panelClassName="w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-dialog"
+    >
+      <div className="mb-4 flex items-center justify-between">
+        <h2
+          id="project-modal-title"
+          className="text-base font-bold text-foreground"
+        >
+          {isEdit ? "Edit project" : "Buat project"}
+        </h2>
+        <button
+          onClick={onClose}
+          aria-label="Tutup"
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <X className="size-5" />
+        </button>
+      </div>
 
-        <div className="flex flex-col gap-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="project-name">Nama</Label>
-            <Input
-              id="project-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nama project"
-              maxLength={80}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="project-desc">Deskripsi</Label>
-            <Textarea
-              id="project-desc"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Opsional"
-              maxLength={500}
-              className="min-h-20"
-            />
-          </div>
+      <div className="flex flex-col gap-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="project-name">Nama</Label>
+          <Input
+            id="project-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nama project"
+            maxLength={80}
+          />
         </div>
-
-        <div className="mt-5 flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
-            Batal
-          </Button>
-          <Button onClick={onSave} disabled={loading}>
-            {loading && <Loader2 className="animate-spin" />}
-            {isEdit ? "Simpan" : "Buat"}
-          </Button>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="project-desc">Deskripsi</Label>
+          <Textarea
+            id="project-desc"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Opsional"
+            maxLength={500}
+            className="min-h-20"
+          />
         </div>
       </div>
-    </div>
+
+      <div className="mt-5 flex justify-end gap-2">
+        <Button variant="outline" onClick={onClose} disabled={loading}>
+          Batal
+        </Button>
+        <Button onClick={onSave} disabled={loading}>
+          {loading && <Loader2 className="animate-spin" />}
+          {isEdit ? "Simpan" : "Buat"}
+        </Button>
+      </div>
+    </Modal>
   );
 }
 
@@ -187,10 +193,14 @@ export function ProjectsClient({
   const [modal, setModal] = useState<ModalState>(null);
   const [confirm, setConfirm] = useState<ConfirmState>(null);
   const [menuId, setMenuId] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const filtered = projects.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),
   );
+  const activeProject = menuId
+    ? (filtered.find((p) => p.id === menuId) ?? null)
+    : null;
 
   function setTab(s: "active" | "archived") {
     router.push(`/projects?status=${s}`);
@@ -298,78 +308,84 @@ export function ProjectsClient({
 
               <div className="absolute right-2 top-2">
                 <button
-                  onClick={() => setMenuId(menuId === p.id ? null : p.id)}
+                  onClick={(e) => {
+                    triggerRef.current = e.currentTarget;
+                    setMenuId(menuId === p.id ? null : p.id);
+                  }}
                   className="flex size-8 items-center justify-center rounded-md bg-card/90 text-foreground shadow-sm backdrop-blur hover:bg-card"
                   aria-label="Menu project"
+                  aria-haspopup="menu"
+                  aria-expanded={menuId === p.id}
                 >
                   <MoreVertical className="size-4" />
                 </button>
-                {menuId === p.id && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setMenuId(null)}
-                    />
-                    <div className="absolute right-0 z-50 mt-1 w-44 rounded-lg border border-border bg-popover p-1 shadow-[0_12px_32px_rgb(15_23_42/0.12)]">
-                      <button
-                        className={menuItem}
-                        onClick={() => {
-                          setModal({ mode: "edit", project: p });
-                          setMenuId(null);
-                        }}
-                      >
-                        <Pencil /> Rename
-                      </button>
-                      {status === "active" ? (
-                        !p.isDefault && (
-                          <button
-                            className={menuItem}
-                            onClick={() => {
-                              setConfirm({ kind: "archive", project: p });
-                              setMenuId(null);
-                            }}
-                          >
-                            <Archive /> Arsipkan
-                          </button>
-                        )
-                      ) : (
-                        <button
-                          className={menuItem}
-                          onClick={() => {
-                            setConfirm({ kind: "unarchive", project: p });
-                            setMenuId(null);
-                          }}
-                        >
-                          <RotateCcw /> Pulihkan
-                        </button>
-                      )}
-                      {!p.isDefault && (
-                        <button
-                          className={cn(
-                            menuItem,
-                            "text-destructive [&_svg]:text-destructive",
-                          )}
-                          onClick={() => {
-                            setConfirm({ kind: "delete", project: p });
-                            setMenuId(null);
-                          }}
-                          disabled={p.renderCount > 0}
-                          title={
-                            p.renderCount > 0
-                              ? "Tidak bisa dihapus karena ada render"
-                              : undefined
-                          }
-                        >
-                          <Trash2 /> Hapus
-                        </button>
-                      )}
-                    </div>
-                  </>
-                )}
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {activeProject && (
+        <Popover
+          anchorRef={triggerRef}
+          open
+          onClose={() => setMenuId(null)}
+          width={176}
+          className="rounded-lg border border-border bg-popover p-1 shadow-[0_12px_32px_rgb(15_23_42/0.12)]"
+        >
+          <button
+            className={menuItem}
+            onClick={() => {
+              setModal({ mode: "edit", project: activeProject });
+              setMenuId(null);
+            }}
+          >
+            <Pencil /> Rename
+          </button>
+          {status === "active" ? (
+            !activeProject.isDefault && (
+              <button
+                className={menuItem}
+                onClick={() => {
+                  setConfirm({ kind: "archive", project: activeProject });
+                  setMenuId(null);
+                }}
+              >
+                <Archive /> Arsipkan
+              </button>
+            )
+          ) : (
+            <button
+              className={menuItem}
+              onClick={() => {
+                setConfirm({ kind: "unarchive", project: activeProject });
+                setMenuId(null);
+              }}
+            >
+              <RotateCcw /> Pulihkan
+            </button>
+          )}
+          {!activeProject.isDefault && (
+            <button
+              className={cn(
+                menuItem,
+                "text-destructive [&_svg]:text-destructive",
+              )}
+              onClick={() => {
+                setConfirm({ kind: "delete", project: activeProject });
+                setMenuId(null);
+              }}
+              disabled={activeProject.renderCount > 0}
+              title={
+                activeProject.renderCount > 0
+                  ? "Tidak bisa dihapus karena ada render"
+                  : undefined
+              }
+            >
+              <Trash2 /> Hapus
+            </button>
+          )}
+        </Popover>
       )}
 
       {modal && (
