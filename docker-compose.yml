@@ -1,0 +1,57 @@
+# VPS deployment (deployment PRD §3, §7, §8). One image, two roles + Caddy.
+#
+#   cp .env.example .env.production   # fill PRODUCTION values
+#   export DOMAIN=app.renderai.com
+#   docker compose build
+#   docker compose run --rm web pnpm db:migrate   # first deploy only
+#   docker compose run --rm web pnpm db:seed      # first deploy only
+#   docker compose up -d
+#   # scale workers (deployment PRD §13): docker compose up -d --scale worker=2
+#
+# Queue is PostgreSQL-backed, so no Redis container is required. A Redis service
+# is left commented for a future BullMQ migration.
+name: renderai
+
+services:
+  web:
+    build:
+      context: .
+    image: renderai:latest
+    env_file: .env.production
+    environment:
+      PORT: "3000"
+    expose:
+      - "3000"
+    restart: unless-stopped
+
+  worker:
+    image: renderai:latest
+    command: pnpm worker
+    env_file: .env.production
+    restart: unless-stopped
+    depends_on:
+      - web
+
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN to your production hostname}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  # redis:                       # only needed if you migrate the queue to BullMQ
+  #   image: redis:7-alpine
+  #   command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "noeviction"]
+  #   restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

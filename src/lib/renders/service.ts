@@ -370,7 +370,9 @@ async function lockNextJob(lockedBy: string) {
       .where(and(eq(renderJobs.status, "queued"), lte(renderJobs.availableAt, now)))
       .orderBy(asc(renderJobs.availableAt))
       .limit(1)
-      .for("update");
+      // SKIP LOCKED lets multiple worker containers pull different jobs in
+      // parallel without blocking each other (deployment PRD §13 — 2+ workers).
+      .for("update", { skipLocked: true });
 
     if (!job) return null;
 

@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Standalone server output → small, portable Docker image (deployment PRD §9).
+  output: "standalone",
   // Load Better Auth (and its optional adapters) at runtime instead of letting
   // the bundler statically analyze its internals — avoids a transitive Kysely
   // version mismatch in @better-auth/kysely-adapter (we use the Drizzle adapter).

@@ -1,0 +1,6 @@
+# Caddy reverse proxy + automatic HTTPS (deployment PRD §10).
+# DOMAIN is injected by docker-compose (e.g. app.renderai.com).
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:3000
+}
