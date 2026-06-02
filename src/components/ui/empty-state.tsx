@@ -26,8 +26,16 @@ function EmptyState({
         className,
       )}
     >
-      <div className="flex size-10 items-center justify-center rounded-md bg-accent text-primary">
-        <Icon className="size-5" />
+      <div className="relative flex size-14 items-center justify-center">
+        <span
+          className="absolute inset-0 rounded-full bg-accent/50"
+          aria-hidden
+        />
+        <span
+          className="absolute inset-[6px] rounded-full bg-accent"
+          aria-hidden
+        />
+        <Icon className="relative size-6 text-primary" />
       </div>
       <div className="flex flex-col gap-1">
         <p className="font-semibold text-foreground">{title}</p>

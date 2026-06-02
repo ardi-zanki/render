@@ -29,7 +29,7 @@ export function BarChart({ data }: { data: BarPoint[] }) {
         {data.map((d, i) => (
           <div
             key={i}
-            className="flex-1 text-center text-[9px] text-muted-foreground"
+            className="flex-1 text-center text-[10px] text-muted-foreground"
           >
             {d.label}
           </div>
