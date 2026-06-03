@@ -146,20 +146,20 @@ export default async function LandingPage() {
       <PublicHeader nav={navItems} />
 
       <main>
-        <section className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-12 pt-10 text-center sm:px-6 sm:pb-14 sm:pt-14">
+        <section className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-10 pt-8 text-center sm:px-6 sm:pb-12 sm:pt-10">
           <div className="inline-flex items-center justify-center rounded-md border border-border/70 bg-card/85 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-[0_1px_1px_rgb(15_23_42/0.03)]">
-            Render AI untuk studio desain
+            RenderAI
           </div>
 
-          <h1 className="mt-6 max-w-3xl text-3xl font-semibold leading-[1.12] tracking-normal text-foreground sm:text-4xl lg:text-[46px]">
-            Dari Draft Desain ke Visual Presentasi, Tanpa Alur Kerja yang Berantakan
+          <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-[1.12] tracking-normal text-foreground sm:text-4xl lg:text-[46px]">
+            Render Visual Arsitektur dari Draft Desain
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-[17px]">
-            Buat opsi visual lebih cepat, simpan per project, dan bawa hasilnya
-            ke review klien dengan rapi.
+          <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground sm:text-[17px]">
+            Upload desain, pilih gaya, dan dapatkan visual presentasi yang siap
+            direview klien.
           </p>
 
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild className="h-10 px-5 text-sm">
               <Link href="/register">
                 Mulai render <Sparkles />
