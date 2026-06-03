@@ -64,9 +64,12 @@ const schema = z.object({
   DOKU_ENV: z.enum(["sandbox", "production"]).default("sandbox"),
 
   AI_PROVIDER: z
-    .enum(["myarchitectai", "openai", "mock"])
+    .enum(["myarchitectai", "openai", "mock", "selfhost-stablediffusion"])
     .default("myarchitectai"),
   MYARCHITECTAI_API_KEY: optional,
+  SELFHOST_SD_API_URL: optional,
+  SELFHOST_SD_API_KEY: optional,
+  SELFHOST_SD_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
   OPENAI_API_KEY: optional,
   OPENAI_IMAGE_MODEL: optional,
   OPENAI_TEXT_MODEL: optional,

@@ -4,10 +4,14 @@ export interface AiRenderInput {
   mode: RenderMode;
   /** Public URL of the uploaded original image (real providers fetch it). */
   imageUrl: string;
+  imageContentType?: string;
   /** Raw original bytes — lets the mock provider work without a reachable URL. */
   imageBuffer?: Buffer;
   /** Reference image URL (Style Transfer). */
   referenceUrl?: string;
+  referenceContentType?: string;
+  /** Raw reference bytes for self-hosted providers that cannot reach storage URLs. */
+  referenceBuffer?: Buffer;
   prompt?: string;
   outputFormat?: RenderOutputFormat;
   negativePrompt?: string;

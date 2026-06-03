@@ -1,0 +1,50 @@
+# Local test stack — run the production Docker image on your machine.
+# Self-contained Postgres + mock AI/payment + local storage → no external keys.
+#
+#   docker compose -f docker-compose.local.yml build
+#   docker compose -f docker-compose.local.yml up -d db
+#   docker compose -f docker-compose.local.yml run --rm web pnpm db:migrate
+#   docker compose -f docker-compose.local.yml run --rm web pnpm db:seed
+#   docker compose -f docker-compose.local.yml up -d
+#   open http://localhost:3000
+name: renderai-local
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: renderai
+      POSTGRES_PASSWORD: renderai
+      POSTGRES_DB: renderai
+    ports:
+      - "5433:5432" # host 5433 so it won't clash with your local Postgres on 5432
+    volumes:
+      - renderai_pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+    image: renderai-local:latest
+    env_file: .env.docker
+    ports:
+      - "3000:3000"
+    volumes:
+      - renderai_uploads:/app/public/uploads
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  worker:
+    image: renderai-local:latest
+    command: pnpm worker
+    env_file: .env.docker
+    volumes:
+      - renderai_uploads:/app/public/uploads
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  renderai_pgdata:
+  renderai_uploads:

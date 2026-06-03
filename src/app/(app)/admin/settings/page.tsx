@@ -18,6 +18,7 @@ export default async function AdminSettingsPage() {
     ["R2 Configured", env.R2_BUCKET_NAME ? "Yes" : "No"],
     ["Midtrans Configured", env.MIDTRANS_SERVER_KEY ? "Yes" : "No"],
     ["MyArchitectAI Configured", env.MYARCHITECTAI_API_KEY ? "Yes" : "No"],
+    ["Self-host SD Configured", env.SELFHOST_SD_API_URL ? "Yes" : "No"],
   ];
 
   return (

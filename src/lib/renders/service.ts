@@ -524,6 +524,9 @@ async function processLockedJob(jobId: string) {
     if (!original) throw new Error("Asset original tidak ditemukan");
 
     const originalBytes = await fetchAssetBytes(original.fileUrl, original.fileKey);
+    const referenceBytes = reference
+      ? await fetchAssetBytes(reference.fileUrl, reference.fileKey)
+      : undefined;
     const requestOptions =
       render.providerResponse &&
       typeof render.providerResponse === "object" &&
@@ -534,8 +537,11 @@ async function processLockedJob(jobId: string) {
     const result = await aiProvider().createRender({
       mode: render.mode,
       imageUrl: original.fileUrl,
+      imageContentType: original.mimeType ?? undefined,
       imageBuffer: originalBytes,
       referenceUrl: reference?.fileUrl,
+      referenceContentType: reference?.mimeType ?? undefined,
+      referenceBuffer: referenceBytes,
       prompt: render.prompt ?? "",
       outputFormat: normalizeOutputFormat(render.outputFormat),
       negativePrompt: requestOptions.negativePrompt,

@@ -49,6 +49,12 @@ envVarGroups:
         sync: false
       - key: MYARCHITECTAI_API_KEY
         sync: false
+      - key: SELFHOST_SD_API_URL
+        sync: false
+      - key: SELFHOST_SD_API_KEY
+        sync: false
+      - key: SELFHOST_SD_TIMEOUT_SECONDS
+        value: "300"
       - key: MIDTRANS_SERVER_KEY
         sync: false
       - key: MIDTRANS_CLIENT_KEY
