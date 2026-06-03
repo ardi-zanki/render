@@ -122,8 +122,12 @@ export function RenderStudio({
 
   async function submitCreateProject() {
     const name = newProjectName.trim();
-    if (!name) return;
+    if (!name) {
+      setNewProjectErrors({ name: "Nama project wajib diisi" });
+      return;
+    }
     setCreatingProject(true);
+    setNewProjectErrors({});
     try {
       const res = await fetch("/api/projects", {
         method: "POST",
@@ -135,8 +139,10 @@ export function RenderStudio({
         toast.success("Project dibuat");
         setCreateOpen(false);
         setNewProjectName("");
+        setNewProjectErrors({});
         router.push(`/renders/new?project=${json.id}`);
       } else {
+        if (json.fieldErrors) setNewProjectErrors(json.fieldErrors);
         toast.error(json.error ?? "Gagal membuat project");
       }
     } finally {
@@ -176,6 +182,9 @@ export function RenderStudio({
   const [error, setError] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
+  const [newProjectErrors, setNewProjectErrors] = useState<
+    Record<string, string>
+  >({});
   const [creatingProject, setCreatingProject] = useState(false);
 
   function pickFile(f: File | null) {
@@ -364,7 +373,10 @@ export function RenderStudio({
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => setCreateOpen(true)}
+                onClick={() => {
+                  setCreateOpen(true);
+                  setNewProjectErrors({});
+                }}
                 title="Buat project baru"
                 aria-label="Buat project baru"
               >
@@ -752,9 +764,13 @@ export function RenderStudio({
             <Input
               id="rs-new-project"
               value={newProjectName}
-              onChange={(e) => setNewProjectName(e.target.value)}
+              onChange={(e) => {
+                setNewProjectName(e.target.value);
+                setNewProjectErrors((prev) => ({ ...prev, name: "" }));
+              }}
               placeholder="Nama project"
               maxLength={80}
+              aria-invalid={!!newProjectErrors.name}
               autoFocus
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -763,6 +779,11 @@ export function RenderStudio({
                 }
               }}
             />
+            {newProjectErrors.name && (
+              <p className="text-xs text-destructive">
+                {newProjectErrors.name}
+              </p>
+            )}
           </div>
           <div className="mt-5 flex justify-end gap-2">
             <Button
@@ -774,7 +795,7 @@ export function RenderStudio({
             </Button>
             <Button
               onClick={submitCreateProject}
-              disabled={creatingProject || !newProjectName.trim()}
+              disabled={creatingProject}
             >
               {creatingProject && <Loader2 className="animate-spin" />}
               Buat

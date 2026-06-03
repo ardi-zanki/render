@@ -37,7 +37,9 @@ import {
   unarchiveProjectAction,
   updateProjectAction,
 } from "@/app/(app)/projects/actions";
+import { zodFieldErrors } from "@/lib/form";
 import { cn } from "@/lib/utils";
+import { createProjectSchema } from "@/lib/validations/render";
 
 export type ProjectRow = {
   id: string;
@@ -71,22 +73,29 @@ function ProjectFormModal({
     state.project?.description ?? "",
   );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [formError, setFormError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   async function onSave() {
-    if (!name.trim()) {
-      setError("Nama project wajib diisi");
+    const parsed = createProjectSchema.safeParse({
+      name: name.trim(),
+      description: description.trim() || undefined,
+    });
+    if (!parsed.success) {
+      setErrors(zodFieldErrors(parsed.error));
+      setFormError("");
       return;
     }
     setLoading(true);
-    setError("");
-    const desc = description.trim() || undefined;
+    setErrors({});
+    setFormError("");
+    const desc = parsed.data.description;
     const res = isEdit
-      ? await updateProjectAction(state.project!.id, name.trim(), desc)
-      : await createProjectAction({ name: name.trim(), description: desc });
+      ? await updateProjectAction(state.project!.id, parsed.data.name, desc)
+      : await createProjectAction({ name: parsed.data.name, description: desc });
     setLoading(false);
     if (res.error) {
-      setError(res.error);
+      setFormError(res.error);
       return;
     }
     toast.success(isEdit ? "Project diperbarui" : "Project dibuat");
@@ -117,9 +126,9 @@ function ProjectFormModal({
       </div>
 
       <div className="flex flex-col gap-4">
-        {error && (
+        {formError && (
           <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{formError}</AlertDescription>
           </Alert>
         )}
         <div className="flex flex-col gap-1.5">
@@ -127,10 +136,17 @@ function ProjectFormModal({
           <Input
             id="project-name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              setErrors((prev) => ({ ...prev, name: "" }));
+            }}
             placeholder="Nama project"
             maxLength={80}
+            aria-invalid={!!errors.name}
           />
+          {errors.name && (
+            <p className="text-xs text-destructive">{errors.name}</p>
+          )}
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="project-desc">Deskripsi</Label>
@@ -141,7 +157,11 @@ function ProjectFormModal({
             placeholder="Opsional"
             maxLength={500}
             className="min-h-20"
+            aria-invalid={!!errors.description}
           />
+          {errors.description && (
+            <p className="text-xs text-destructive">{errors.description}</p>
+          )}
         </div>
       </div>
 

@@ -147,26 +147,22 @@ export default async function LandingPage() {
 
       <main>
         <section className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-12 pt-10 text-center sm:px-6 sm:pb-14 sm:pt-14">
-          <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-md border border-border/70 bg-card/85 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-[0_1px_1px_rgb(15_23_42/0.03)]">
-            <span>Workspace render AI untuk studio desain,</span>
-            <span className="font-semibold text-foreground">
-              dari draft ke visual siap review.
-            </span>
+          <div className="inline-flex items-center justify-center rounded-md border border-border/70 bg-card/85 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-[0_1px_1px_rgb(15_23_42/0.03)]">
+            Render AI untuk studio desain
           </div>
 
           <h1 className="mt-6 max-w-3xl text-3xl font-semibold leading-[1.12] tracking-normal text-foreground sm:text-4xl lg:text-[46px]">
             Dari Draft Desain ke Visual Presentasi, Tanpa Alur Kerja yang Berantakan
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-[17px]">
-            RenderAI membantu arsitek dan interior designer membuat opsi visual
-            lebih cepat, menyimpannya per project, lalu membawanya ke review
-            klien dengan konteks yang tetap rapi.
+            Buat opsi visual lebih cepat, simpan per project, dan bawa hasilnya
+            ke review klien dengan rapi.
           </p>
 
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild className="h-10 px-5 text-sm">
               <Link href="/register">
-                Buat visual pertama <Sparkles />
+                Mulai render <Sparkles />
               </Link>
             </Button>
             <Button
@@ -175,13 +171,10 @@ export default async function LandingPage() {
               className="h-10 px-5 text-sm shadow-none"
             >
               <Link href="#showcase">
-                Lihat contoh output <Play />
+                Lihat galeri <Play />
               </Link>
             </Button>
           </div>
-          <p className="mt-3 text-sm text-muted-foreground/90">
-            Mulai dari project kecil, lalu scale saat kebutuhan visual meningkat.
-          </p>
 
           <ProductPreview />
         </section>

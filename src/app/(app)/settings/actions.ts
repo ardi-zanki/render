@@ -7,10 +7,15 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { zodFieldErrors } from "@/lib/form";
 import { requireVerifiedUser } from "@/lib/session";
 import { preferencesSchema, profileSchema } from "@/lib/validations/account";
 
-export type ActionState = { ok?: boolean; error?: string };
+export type ActionState = {
+  ok?: boolean;
+  error?: string;
+  fieldErrors?: Record<string, string>;
+};
 
 export async function updateProfileAction(
   _prev: ActionState,
@@ -22,7 +27,7 @@ export async function updateProfileAction(
     displayName: formData.get("displayName") || undefined,
   });
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Input tidak valid" };
+    return { fieldErrors: zodFieldErrors(parsed.error) };
   }
 
   // Update name through Better Auth so the session reflects it immediately.

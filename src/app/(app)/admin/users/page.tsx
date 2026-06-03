@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
 
+import { AdminUserActions } from "@/components/app/admin-user-actions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { countUsers, listUsers } from "@/lib/admin/service";
 import { requireAdmin } from "@/lib/session";
-import {
-  creditAdjustmentAction,
-  setRoleAction,
-  toggleDisableAction,
-} from "./actions";
 
 export const metadata: Metadata = { title: "Admin · User" };
 
@@ -42,7 +36,6 @@ export default async function AdminUsersPage({
             <th className="px-4 py-3">Role</th>
             <th className="px-4 py-3">Status</th>
             <th className="px-4 py-3 text-right">Kredit</th>
-            <th className="px-4 py-3">Adjustment</th>
             <th className="px-4 py-3">Gabung</th>
             <th className="px-4 py-3 text-right">Aksi</th>
           </tr>
@@ -84,25 +77,6 @@ export default async function AdminUsersPage({
                 <td className="px-4 py-3 text-right font-mono tabular-nums">
                   {idr.format(u.balance ?? 0)}
                 </td>
-                <td className="px-4 py-3">
-                  <form action={creditAdjustmentAction} className="flex gap-2">
-                    <input type="hidden" name="userId" value={u.id} />
-                    <Input
-                      name="amount"
-                      type="number"
-                      className="h-8 w-20 bg-background px-2 text-xs"
-                      placeholder="+/-"
-                    />
-                    <Input
-                      name="description"
-                      className="h-8 w-36 bg-background px-2 text-xs"
-                      placeholder="Catatan"
-                    />
-                    <Button type="submit" variant="outline" size="sm">
-                      Simpan
-                    </Button>
-                  </form>
-                </td>
                 <td className="px-4 py-3 text-muted-foreground">
                   {dateFmt.format(u.createdAt)}
                 </td>
@@ -112,34 +86,7 @@ export default async function AdminUsersPage({
                       -
                     </span>
                   ) : (
-                    <div className="flex justify-end gap-2">
-                      <form action={setRoleAction}>
-                        <input type="hidden" name="userId" value={u.id} />
-                        <input
-                          type="hidden"
-                          name="role"
-                          value={u.role === "admin" ? "user" : "admin"}
-                        />
-                        <Button type="submit" variant="outline" size="sm">
-                          {u.role === "admin" ? "Jadikan User" : "Jadikan Admin"}
-                        </Button>
-                      </form>
-                      <form action={toggleDisableAction}>
-                        <input type="hidden" name="userId" value={u.id} />
-                        <input
-                          type="hidden"
-                          name="disabled"
-                          value={u.isDisabled ? "false" : "true"}
-                        />
-                        <Button
-                          type="submit"
-                          variant={u.isDisabled ? "outline" : "destructive"}
-                          size="sm"
-                        >
-                          {u.isDisabled ? "Aktifkan" : "Nonaktifkan"}
-                        </Button>
-                      </form>
-                    </div>
+                    <AdminUserActions user={u} />
                   )}
                 </td>
               </tr>

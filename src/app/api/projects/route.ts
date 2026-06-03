@@ -6,6 +6,7 @@ import {
   createProject,
   MAX_PROJECTS,
 } from "@/lib/projects/service";
+import { zodFieldErrors } from "@/lib/form";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { createProjectSchema } from "@/lib/validations/render";
 
@@ -34,7 +35,10 @@ export async function POST(req: Request) {
   );
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Nama project tidak valid" },
+      {
+        error: parsed.error.issues[0]?.message ?? "Input tidak valid",
+        fieldErrors: zodFieldErrors(parsed.error),
+      },
       { status: 400 },
     );
   }

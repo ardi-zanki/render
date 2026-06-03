@@ -48,7 +48,7 @@ export function ProfileForm({
     if (state.ok) toast.success("Profil diperbarui");
   }, [state]);
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form action={action} className="flex flex-col gap-4" noValidate>
       {state.error && (
         <Alert variant="destructive">
           <AlertDescription>{state.error}</AlertDescription>
@@ -56,7 +56,15 @@ export function ProfileForm({
       )}
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="name">Nama lengkap</Label>
-        <Input id="name" name="name" defaultValue={name} />
+        <Input
+          id="name"
+          name="name"
+          defaultValue={name}
+          aria-invalid={!!state.fieldErrors?.name}
+        />
+        {state.fieldErrors?.name && (
+          <p className="text-xs text-destructive">{state.fieldErrors.name}</p>
+        )}
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="displayName">Nama tampilan</Label>
@@ -65,7 +73,13 @@ export function ProfileForm({
           name="displayName"
           defaultValue={displayName}
           placeholder="Opsional"
+          aria-invalid={!!state.fieldErrors?.displayName}
         />
+        {state.fieldErrors?.displayName && (
+          <p className="text-xs text-destructive">
+            {state.fieldErrors.displayName}
+          </p>
+        )}
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="email">Email</Label>
@@ -203,6 +217,7 @@ export function PasswordForm() {
           value={values.currentPassword}
           onChange={update("currentPassword")}
           autoComplete="current-password"
+          aria-invalid={!!errors.currentPassword}
         />
         {errors.currentPassword && (
           <p className="text-xs text-destructive">{errors.currentPassword}</p>
@@ -215,6 +230,7 @@ export function PasswordForm() {
           value={values.newPassword}
           onChange={update("newPassword")}
           autoComplete="new-password"
+          aria-invalid={!!errors.newPassword}
         />
         {errors.newPassword && (
           <p className="text-xs text-destructive">{errors.newPassword}</p>
@@ -227,6 +243,7 @@ export function PasswordForm() {
           value={values.confirmPassword}
           onChange={update("confirmPassword")}
           autoComplete="new-password"
+          aria-invalid={!!errors.confirmPassword}
         />
         {errors.confirmPassword && (
           <p className="text-xs text-destructive">{errors.confirmPassword}</p>
