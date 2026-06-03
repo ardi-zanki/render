@@ -25,8 +25,15 @@ export function ResetPasswordForm() {
   const [loading, setLoading] = useState(false);
 
   function update(field: keyof typeof values) {
-    return (e: React.ChangeEvent<HTMLInputElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
       setValues((v) => ({ ...v, [field]: e.target.value }));
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+        ...(field === "password" ? { confirmPassword: "" } : {}),
+      }));
+      setFormError("");
+    };
   }
 
   async function onSubmit(e: React.FormEvent) {

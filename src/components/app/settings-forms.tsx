@@ -44,11 +44,18 @@ export function ProfileForm({
     updateProfileAction,
     initial,
   );
+  const [clearedFields, setClearedFields] = useState<Record<string, boolean>>({});
+  const fieldErrors = state.fieldErrors ?? {};
   useEffect(() => {
     if (state.ok) toast.success("Profil diperbarui");
   }, [state]);
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
+    <form
+      action={action}
+      className="flex flex-col gap-4"
+      noValidate
+      onSubmit={() => setClearedFields({})}
+    >
       {state.error && (
         <Alert variant="destructive">
           <AlertDescription>{state.error}</AlertDescription>
@@ -60,10 +67,13 @@ export function ProfileForm({
           id="name"
           name="name"
           defaultValue={name}
-          aria-invalid={!!state.fieldErrors?.name}
+          onChange={() =>
+            setClearedFields((prev) => ({ ...prev, name: true }))
+          }
+          aria-invalid={!!fieldErrors.name && !clearedFields.name}
         />
-        {state.fieldErrors?.name && (
-          <p className="text-xs text-destructive">{state.fieldErrors.name}</p>
+        {fieldErrors.name && !clearedFields.name && (
+          <p className="text-xs text-destructive">{fieldErrors.name}</p>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -73,11 +83,16 @@ export function ProfileForm({
           name="displayName"
           defaultValue={displayName}
           placeholder="Opsional"
-          aria-invalid={!!state.fieldErrors?.displayName}
+          onChange={() =>
+            setClearedFields((prev) => ({ ...prev, displayName: true }))
+          }
+          aria-invalid={
+            !!fieldErrors.displayName && !clearedFields.displayName
+          }
         />
-        {state.fieldErrors?.displayName && (
+        {fieldErrors.displayName && !clearedFields.displayName && (
           <p className="text-xs text-destructive">
-            {state.fieldErrors.displayName}
+            {fieldErrors.displayName}
           </p>
         )}
       </div>
@@ -173,8 +188,15 @@ export function PasswordForm() {
   const [loading, setLoading] = useState(false);
 
   function update(field: keyof typeof values) {
-    return (e: React.ChangeEvent<HTMLInputElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
       setValues((v) => ({ ...v, [field]: e.target.value }));
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+        ...(field === "newPassword" ? { confirmPassword: "" } : {}),
+      }));
+      setFormError("");
+    };
   }
 
   async function onSubmit(e: React.FormEvent) {

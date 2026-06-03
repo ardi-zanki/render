@@ -27,8 +27,11 @@ export function RegisterForm() {
   const [loading, setLoading] = useState(false);
 
   function update(field: keyof typeof values) {
-    return (e: React.ChangeEvent<HTMLInputElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
       setValues((v) => ({ ...v, [field]: e.target.value }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+      setFormError("");
+    };
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -110,7 +113,11 @@ export function RegisterForm() {
       <label className="flex items-start gap-2 text-sm text-muted-foreground">
         <Checkbox
           checked={agree}
-          onChange={(e) => setAgree(e.target.checked)}
+          onChange={(e) => {
+            setAgree(e.target.checked);
+            setErrors((prev) => ({ ...prev, agreeTerms: "" }));
+            setFormError("");
+          }}
           className="mt-0.5"
         />
         <span>

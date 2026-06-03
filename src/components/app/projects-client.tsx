@@ -153,7 +153,10 @@ function ProjectFormModal({
           <Textarea
             id="project-desc"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setErrors((prev) => ({ ...prev, description: "" }));
+            }}
             placeholder="Opsional"
             maxLength={500}
             className="min-h-20"

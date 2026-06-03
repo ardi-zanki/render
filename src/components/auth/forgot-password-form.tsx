@@ -14,18 +14,20 @@ import { forgotPasswordSchema } from "@/lib/validations/auth";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
+    setFormError("");
     const parsed = forgotPasswordSchema.safeParse({ email });
     if (!parsed.success) {
-      setError(zodFieldErrors(parsed.error).email ?? "Email tidak valid");
+      setErrors(zodFieldErrors(parsed.error));
       return;
     }
+    setErrors({});
     setLoading(true);
     // Always show success — never reveal whether the email is registered.
     await requestPasswordReset({ email, redirectTo: "/reset-password" });
@@ -53,9 +55,9 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
-      {error && (
+      {formError && (
         <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{formError}</AlertDescription>
         </Alert>
       )}
       <div className="flex flex-col gap-1.5">
@@ -64,10 +66,18 @@ export function ForgotPasswordForm() {
           id="email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setErrors((prev) => ({ ...prev, email: "" }));
+            setFormError("");
+          }}
           placeholder="nama@email.com"
+          aria-invalid={!!errors.email}
           autoComplete="email"
         />
+        {errors.email && (
+          <p className="text-xs text-destructive">{errors.email}</p>
+        )}
       </div>
       <Button type="submit" disabled={loading} className="w-full">
         {loading && <Loader2 className="animate-spin" />}
