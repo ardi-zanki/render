@@ -37,16 +37,16 @@ production; the shared image keeps you free to move later (no lock-in).
 - **Cloudflare R2** bucket(s): `renderai-staging`, `renderai-production`.
 - **Resend** API key + verified sender domain.
 - **Midtrans** server/client keys; set webhook → `https://<domain>/api/payments/webhook/midtrans`.
-- **MyArchitectAI** API key.
+- **fal.ai** API key with enough balance for storage uploads and inference.
 - (Optional) Google OAuth client id/secret.
 - Strong, **separate** `BETTER_AUTH_SECRET` and `JWT_SECRET`.
 
 Full variable list: `.env.example`.
 
-> ⚠️ **Verify MyArchitectAI live once.** The provider now sends snake_case
-> fields (`output_format`, `reference_image`, …) but hasn't been run against the
-> real API. Do one live render per mode (interior / exterior / style_transfer /
-> upscale) after wiring the key, and confirm endpoint paths + response shape.
+> ⚠️ **Verify fal.ai live once after funding the account.** The API key can be
+> valid while the account is still locked for exhausted balance. Do one live
+> render per mode (interior / exterior / style_transfer / upscale) after wiring
+> `FAL_KEY`, and confirm worker logs plus output persistence in R2.
 
 ---
 
@@ -82,7 +82,7 @@ firewall: 80/443/22, auto-updates) per deployment PRD §25.
    from the same `Dockerfile`.
 2. Fill every `sync:false` secret in the **renderai-shared** env group —
    including `DATABASE_URL` (Neon pooled URL), `APP_URL`, `BETTER_AUTH_URL`,
-   and all provider keys.
+   `FAL_KEY`, and all storage/payment/email secrets.
 3. First deploy — run once in a Render Shell (or locally against the Neon URL):
    ```bash
    pnpm db:migrate
@@ -120,7 +120,7 @@ pricing first — it's a newer product. DNS + R2 stay on Cloudflare either way.
 
 ## 6. Post-deploy smoke checklist (deployment PRD §30)
 
-- [ ] HTTPS live; landing/login reachable.
+- [ ] HTTPS live; `/api/health` returns `ok: true`; landing/login reachable.
 - [ ] Register → verify email (Resend) → 3 free credits granted.
 - [ ] Render each mode → worker processes → output stored in R2 → download works.
 - [ ] Force a provider error → credit auto-refunded after 3 attempts.

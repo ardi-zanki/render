@@ -21,7 +21,15 @@ envVarGroups:
       - key: PAYMENT_PROVIDER
         value: midtrans
       - key: AI_PROVIDER
-        value: myarchitectai
+        value: fal
+      - key: FAL_RENDER_MODEL
+        value: fal-ai/flux-kontext/dev
+      - key: FAL_STYLE_TRANSFER_MODEL
+        value: fal-ai/uso
+      - key: FAL_UPSCALE_MODEL
+        value: fal-ai/aura-sr
+      - key: FAL_START_TIMEOUT_SECONDS
+        value: "300"
       - key: JWT_ISSUER
         value: renderai
       - key: JWT_AUDIENCE
@@ -47,14 +55,8 @@ envVarGroups:
         sync: false
       - key: JWT_SECRET
         sync: false
-      - key: MYARCHITECTAI_API_KEY
+      - key: FAL_KEY
         sync: false
-      - key: SELFHOST_SD_API_URL
-        sync: false
-      - key: SELFHOST_SD_API_KEY
-        sync: false
-      - key: SELFHOST_SD_TIMEOUT_SECONDS
-        value: "300"
       - key: MIDTRANS_SERVER_KEY
         sync: false
       - key: MIDTRANS_CLIENT_KEY
@@ -85,7 +87,7 @@ services:
     region: singapore
     plan: starter
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /login
+    healthCheckPath: /api/health
     autoDeploy: true
     envVars:
       - fromGroup: renderai-shared

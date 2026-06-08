@@ -155,11 +155,34 @@ function baseEditPrompt(prompt: string | undefined, mode: string) {
   return "Create a polished architectural exterior render while preserving the building structure.";
 }
 
+function apiErrorDetail(body: unknown) {
+  if (!body || typeof body !== "object") return null;
+  const obj = body as Record<string, unknown>;
+  for (const key of ["detail", "error", "message"]) {
+    const value = obj[key];
+    if (typeof value === "string" && value.trim()) return value;
+  }
+  if (Array.isArray(obj.detail)) {
+    const detail = obj.detail
+      .map((item) =>
+        item && typeof item === "object" && "msg" in item
+          ? String((item as { msg: unknown }).msg)
+          : String(item),
+      )
+      .filter(Boolean)
+      .join("; ");
+    return detail || null;
+  }
+  return null;
+}
+
 function providerError(err: unknown) {
   if (err instanceof AiProviderError) return err;
   if (err instanceof ApiError) {
+    const detail = apiErrorDetail(err.body);
+    const message = detail ? `${err.message}: ${detail}` : err.message;
     return new AiProviderError(
-      `fal.ai error (${err.status}): ${err.message.slice(0, 200)}`,
+      `fal.ai error (${err.status}): ${message.slice(0, 300)}`,
       err.isUserTimeout ? "PROVIDER_TIMEOUT" : "PROVIDER_HTTP_ERROR",
     );
   }
