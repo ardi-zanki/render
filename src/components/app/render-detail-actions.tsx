@@ -1,6 +1,13 @@
 "use client";
 
-import { Archive, Download, Loader2, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import {
+  Archive,
+  Download,
+  Loader2,
+  RotateCcw,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -69,10 +76,12 @@ export function RenderDetailActions({
     prompt ? `&prompt=${encodeURIComponent(prompt)}` : ""
   }`;
 
+  const actionClass = "w-full justify-start";
+
   return (
     <>
-      <div className="flex flex-wrap gap-2">
-        <Button asChild variant="outline">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <Button asChild variant="outline" className={actionClass}>
           <Link href={reuseHref}>
             <Sparkles /> Reuse prompt
           </Link>
@@ -81,20 +90,33 @@ export function RenderDetailActions({
           variant="inverse"
           onClick={download}
           disabled={!canDownload || downloading}
+          className={actionClass}
         >
           {downloading ? <Loader2 className="animate-spin" /> : <Download />}
           Download
         </Button>
         {archived ? (
-          <Button variant="outline" onClick={() => setConfirm("restore")}>
+          <Button
+            variant="outline"
+            onClick={() => setConfirm("restore")}
+            className={actionClass}
+          >
             <RotateCcw /> Pulihkan
           </Button>
         ) : (
-          <Button variant="outline" onClick={() => setConfirm("archive")}>
+          <Button
+            variant="outline"
+            onClick={() => setConfirm("archive")}
+            className={actionClass}
+          >
             <Archive /> Arsipkan
           </Button>
         )}
-        <Button variant="destructive" onClick={() => setConfirm("delete")}>
+        <Button
+          variant="destructive"
+          onClick={() => setConfirm("delete")}
+          className={actionClass}
+        >
           <Trash2 /> Hapus permanen
         </Button>
       </div>

@@ -28,7 +28,7 @@ type MenuPreferences = {
 };
 
 const itemClass =
-  "flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted [&_svg]:size-4 [&_svg]:text-muted-foreground";
+  "flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
 export function UserMenu({
   user,
@@ -76,7 +76,7 @@ export function UserMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
-          "group relative flex w-full items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted",
+          "group relative flex w-full cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted",
           compact && "justify-center px-0",
         )}
       >
@@ -98,7 +98,7 @@ export function UserMenu({
         anchorRef={buttonRef}
         open={open}
         onClose={() => setOpen(false)}
-        width={288}
+        width={248}
         placement="top"
         align="start"
         alignOffset={compact ? 8 : 0}
