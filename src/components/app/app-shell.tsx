@@ -168,7 +168,7 @@ export function AppShell({
           </button>
         </div>
 
-        <div className={cn("px-3", expanded ? "pb-0.5" : "pb-1")}>
+        <div className={cn("px-3 pt-3", expanded ? "pb-0.5" : "pb-1")}>
           <Button
             asChild
             variant="ghost"

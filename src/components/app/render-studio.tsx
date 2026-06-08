@@ -561,7 +561,7 @@ export function RenderStudio({
 
           <div className="flex flex-col gap-3 border-t border-border pt-4">
             <Label className="text-base font-semibold text-foreground">
-              Objek & Asset
+              Objek
             </Label>
             <button
               type="button"
@@ -634,22 +634,23 @@ export function RenderStudio({
               )}
 
               {shownImage && (
-                <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+                <div className="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-lg bg-muted p-1">
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     onClick={zoomOut}
                     disabled={zoom <= 0.5}
                     aria-label="Zoom out"
                     title="Zoom out"
+                    className="size-7"
                   >
                     <ZoomOut />
                   </Button>
                   <button
                     type="button"
                     onClick={resetZoom}
-                    className="h-8 min-w-14 rounded-md px-2 text-xs font-semibold text-foreground hover:bg-card"
+                    className="h-7 min-w-11 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card"
                     title="Reset zoom"
                   >
                     {Math.round(zoom * 100)}%
@@ -657,11 +658,12 @@ export function RenderStudio({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon-sm"
+                    size="icon"
                     onClick={zoomIn}
                     disabled={zoom >= 3}
                     aria-label="Zoom in"
                     title="Zoom in"
+                    className="size-7"
                   >
                     <ZoomIn />
                   </Button>
