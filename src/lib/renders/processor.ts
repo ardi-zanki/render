@@ -1,0 +1,227 @@
+import { and, eq, isNull } from "drizzle-orm";
+
+import { db } from "@/db";
+import { projects, renderAssets, renderJobs, renders } from "@/db/schema";
+import { env } from "@/env";
+import { getBalance } from "@/lib/credits";
+import { lowCreditEmail, renderResultEmail } from "@/lib/email";
+import { notifyUser } from "@/lib/notifications/service";
+import { aiProvider } from "@/lib/providers/ai";
+import {
+  fetchAssetBytes,
+  normalizeOutputFormat,
+  storeResultAsset,
+} from "./assets";
+import {
+  finalizeFailedRender,
+  lockJobByRenderId,
+  lockNextJob,
+  rescheduleJob,
+} from "./jobs";
+import {
+  LOW_CREDIT_THRESHOLD,
+  RENDER_COST,
+  type ProviderRequestOptions,
+} from "./types";
+
+export async function processRenderJob(
+  renderId: string,
+  lockedBy = `worker-${process.pid}`,
+) {
+  const job = await lockJobByRenderId(renderId, lockedBy);
+  if (!job) return { processed: false, reason: "job_not_available" as const };
+  return processLockedJob(job.id);
+}
+
+export async function processNextRenderJob(lockedBy = `worker-${process.pid}`) {
+  const job = await lockNextJob(lockedBy);
+  if (!job) return { processed: false, reason: "job_not_available" as const };
+  return processLockedJob(job.id);
+}
+
+async function processLockedJob(jobId: string) {
+  const job = await db.query.renderJobs.findFirst({
+    where: eq(renderJobs.id, jobId),
+  });
+  if (!job) return { processed: false, reason: "job_not_found" as const };
+
+  const render = await db.query.renders.findFirst({
+    where: eq(renders.id, job.renderId),
+  });
+  if (!render || render.deletedAt) {
+    await db
+      .update(renderJobs)
+      .set({
+        status: "failed",
+        failedAt: new Date(),
+        errorMessage: "Render tidak ditemukan atau sudah dihapus",
+        updatedAt: new Date(),
+      })
+      .where(eq(renderJobs.id, job.id));
+    return { processed: false, reason: "render_not_found" as const };
+  }
+
+  try {
+    await db
+      .update(renders)
+      .set({ status: "processing", startedAt: render.startedAt ?? new Date() })
+      .where(eq(renders.id, render.id));
+
+    const assets = await db.query.renderAssets.findMany({
+      where: and(eq(renderAssets.renderId, render.id), isNull(renderAssets.deletedAt)),
+    });
+    const original = assets.find((a) => a.type === "original");
+    const reference = assets.find((a) => a.type === "reference");
+    if (!original) throw new Error("Asset original tidak ditemukan");
+
+    const originalBytes = await fetchAssetBytes(original.fileUrl, original.fileKey);
+    const referenceBytes = reference
+      ? await fetchAssetBytes(reference.fileUrl, reference.fileKey)
+      : undefined;
+    const requestOptions =
+      render.providerResponse &&
+      typeof render.providerResponse === "object" &&
+      "requestOptions" in render.providerResponse
+        ? ((render.providerResponse as { requestOptions?: ProviderRequestOptions })
+            .requestOptions ?? {})
+        : {};
+    const result = await aiProvider().createRender({
+      mode: render.mode,
+      imageUrl: original.fileUrl,
+      imageContentType: original.mimeType ?? undefined,
+      imageBuffer: originalBytes,
+      referenceUrl: reference?.fileUrl,
+      referenceContentType: reference?.mimeType ?? undefined,
+      referenceBuffer: referenceBytes,
+      prompt: render.prompt ?? "",
+      outputFormat: normalizeOutputFormat(render.outputFormat),
+      negativePrompt: requestOptions.negativePrompt,
+      styleTransferStrength: requestOptions.styleTransferStrength,
+    });
+
+    if (result.outputs.length === 0) {
+      throw new Error("Provider tidak mengembalikan hasil render");
+    }
+
+    await db
+      .update(renderAssets)
+      .set({ deletedAt: new Date() })
+      .where(
+        and(
+          eq(renderAssets.renderId, render.id),
+          eq(renderAssets.type, "result"),
+          isNull(renderAssets.deletedAt),
+        ),
+      );
+
+    let firstResultUrl = "";
+    for (let i = 0; i < result.outputs.length; i++) {
+      const out = result.outputs[i];
+      const asset = await storeResultAsset({
+        renderId: render.id,
+        userId: render.userId,
+        projectId: render.projectId,
+        data: out.data,
+        contentType: out.contentType,
+        index: i + 1,
+      });
+      if (i === 0) firstResultUrl = asset.fileUrl;
+    }
+
+    const now = new Date();
+    await db
+      .update(renders)
+      .set({
+        status: "success",
+        completedAt: now,
+        failedAt: null,
+        creditsUsed: RENDER_COST,
+        providerRequestId: result.providerRequestId,
+        providerResponse: {
+          requestOptions,
+          response: result.raw,
+        },
+        errorCode: null,
+        errorMessage: null,
+      })
+      .where(eq(renders.id, render.id));
+
+    await db
+      .update(renderJobs)
+      .set({
+        status: "success",
+        completedAt: now,
+        lockedAt: null,
+        lockedBy: null,
+        errorMessage: null,
+        updatedAt: now,
+      })
+      .where(eq(renderJobs.id, job.id));
+
+    await db
+      .update(projects)
+      .set({ coverImageUrl: firstResultUrl, updatedAt: now })
+      .where(and(eq(projects.id, render.projectId), isNull(projects.coverImageUrl)));
+
+    await notifyUser({
+      userId: render.userId,
+      type: "render_success",
+      title: "Render kamu sudah jadi",
+      message: `Render ${render.mode} berhasil diproses.`,
+      actionUrl: `/renders/${render.id}`,
+      email: renderResultEmail({
+        success: true,
+        url: `${env.APP_URL.replace(/\/$/, "")}/renders/${render.id}`,
+      }),
+    });
+
+    const balance = await getBalance(render.userId);
+    if (balance <= LOW_CREDIT_THRESHOLD) {
+      // Email only when the balance first crosses into the low zone (PRD §25.3:
+      // no repeated email for the same event). The in-app notification still
+      // fires on every render while credits are low.
+      const justCrossed = balance + RENDER_COST > LOW_CREDIT_THRESHOLD;
+      await notifyUser({
+        userId: render.userId,
+        type: "low_credit",
+        title: "Kredit kamu menipis",
+        message: `Sisa kredit kamu tinggal ${balance}. Yuk top up.`,
+        actionUrl: "/payments",
+        email: justCrossed
+          ? lowCreditEmail({
+              balance,
+              url: `${env.APP_URL.replace(/\/$/, "")}/payments`,
+            })
+          : undefined,
+      });
+    }
+
+    return { processed: true, renderId: render.id, status: "success" as const };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const code =
+      err && typeof err === "object" && "code" in err
+        ? String((err as { code: unknown }).code)
+        : "RENDER_FAILED";
+    const finalAttempt = job.attempts >= job.maxAttempts;
+
+    if (finalAttempt) {
+      await finalizeFailedRender({
+        renderId: render.id,
+        userId: render.userId,
+        jobId: job.id,
+        message,
+        code,
+      });
+      return { processed: true, renderId: render.id, status: "failed" as const };
+    }
+
+    await rescheduleJob({
+      jobId: job.id,
+      renderId: render.id,
+      message,
+      attempt: job.attempts,
+    });
+    return { processed: true, renderId: render.id, status: "retrying" as const };
+  }
+}
