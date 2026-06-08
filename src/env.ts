@@ -64,12 +64,19 @@ const schema = z.object({
   DOKU_ENV: z.enum(["sandbox", "production"]).default("sandbox"),
 
   AI_PROVIDER: z
-    .enum(["myarchitectai", "openai", "mock", "selfhost-stablediffusion"])
+    .enum(["myarchitectai", "openai", "mock", "selfhost-stablediffusion", "fal"])
     .default("myarchitectai"),
   MYARCHITECTAI_API_KEY: optional,
   SELFHOST_SD_API_URL: optional,
   SELFHOST_SD_API_KEY: optional,
   SELFHOST_SD_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
+  FAL_KEY: optional,
+  FAL_KEY_ID: optional,
+  FAL_KEY_SECRET: optional,
+  FAL_RENDER_MODEL: z.string().default("fal-ai/flux-kontext/dev"),
+  FAL_STYLE_TRANSFER_MODEL: z.string().default("fal-ai/uso"),
+  FAL_UPSCALE_MODEL: z.string().default("fal-ai/aura-sr"),
+  FAL_START_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
   OPENAI_API_KEY: optional,
   OPENAI_IMAGE_MODEL: optional,
   OPENAI_TEXT_MODEL: optional,

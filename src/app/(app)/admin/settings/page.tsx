@@ -18,6 +18,13 @@ export default async function AdminSettingsPage() {
     ["R2 Configured", env.R2_BUCKET_NAME ? "Yes" : "No"],
     ["Midtrans Configured", env.MIDTRANS_SERVER_KEY ? "Yes" : "No"],
     ["MyArchitectAI Configured", env.MYARCHITECTAI_API_KEY ? "Yes" : "No"],
+    [
+      "fal.ai Configured",
+      env.FAL_KEY || (env.FAL_KEY_ID && env.FAL_KEY_SECRET) ? "Yes" : "No",
+    ],
+    ["fal Render Model", env.FAL_RENDER_MODEL],
+    ["fal Style Model", env.FAL_STYLE_TRANSFER_MODEL],
+    ["fal Upscale Model", env.FAL_UPSCALE_MODEL],
     ["Self-host SD Configured", env.SELFHOST_SD_API_URL ? "Yes" : "No"],
   ];
 

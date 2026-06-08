@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { createFalAiProvider } from "./fal";
 import { createMockAiProvider } from "./mock";
 import { createMyArchitectAiProvider } from "./myarchitectai";
 import { createSelfHostedStableDiffusionProvider } from "./selfhost-stablediffusion";
@@ -18,6 +19,9 @@ export function aiProvider(): AiProvider {
       break;
     case "selfhost-stablediffusion":
       cached = createSelfHostedStableDiffusionProvider();
+      break;
+    case "fal":
+      cached = createFalAiProvider();
       break;
     case "openai":
       throw new Error("OpenAI image provider belum diimplementasi (Phase 7).");
