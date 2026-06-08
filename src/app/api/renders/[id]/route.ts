@@ -5,6 +5,8 @@ import {
   deleteRenderPermanently,
   getRenderDetail,
 } from "@/lib/renders/service";
+import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
+import { renderDeleteSchema, renderIdSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";
 
@@ -13,12 +15,29 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth.api.getSession({ headers: req.headers });
-  if (!session) {
+  if (!session || !session.user.emailVerified) {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
   const { id } = await params;
-  const render = await getRenderDetail(session.user.id, id);
+  const parsedId = renderIdSchema.safeParse(id);
+  if (!parsedId.success) {
+    return NextResponse.json({ error: "ID render tidak valid" }, { status: 400 });
+  }
+
+  try {
+    await assertRateLimit("public_api", session.user.id);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: 429 },
+      );
+    }
+    throw err;
+  }
+
+  const render = await getRenderDetail(session.user.id, parsedId.data);
   if (!render) {
     return NextResponse.json({ error: "Render tidak ditemukan" }, { status: 404 });
   }
@@ -35,9 +54,22 @@ export async function DELETE(
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
-  const body = await req.json().catch(() => null);
-  const note = typeof body?.note === "string" ? body.note.trim() : "";
-  if (!note) {
+  try {
+    await assertRateLimit("public_api", session.user.id);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: 429 },
+      );
+    }
+    throw err;
+  }
+
+  const parsed = renderDeleteSchema.safeParse(
+    await req.json().catch(() => ({})),
+  );
+  if (!parsed.success) {
     return NextResponse.json(
       { error: "Catatan wajib diisi sebelum menghapus render" },
       { status: 400 },
@@ -45,7 +77,12 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const ok = await deleteRenderPermanently(session.user.id, id);
+  const parsedId = renderIdSchema.safeParse(id);
+  if (!parsedId.success) {
+    return NextResponse.json({ error: "ID render tidak valid" }, { status: 400 });
+  }
+
+  const ok = await deleteRenderPermanently(session.user.id, parsedId.data);
   if (!ok) {
     return NextResponse.json({ error: "Render tidak ditemukan" }, { status: 404 });
   }

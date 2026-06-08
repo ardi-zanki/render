@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { projects, renderJobs, renders } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,19 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
   const userId = session.user.id;
+
+  try {
+    await assertRateLimit("public_api", userId);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: 429 },
+      );
+    }
+    throw err;
+  }
+
   const activeQueueWhere = and(
     eq(renderJobs.userId, userId),
     inArray(renderJobs.status, ["queued", "processing"]),

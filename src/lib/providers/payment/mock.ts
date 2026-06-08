@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { mockPaymentWebhookSchema } from "@/lib/validations/payment";
 import { mapMidtransStatus } from "./status";
 import type { PaymentProvider } from "./types";
 
@@ -25,9 +26,13 @@ export function createMockPaymentProvider(): PaymentProvider {
     },
 
     async verifyAndParseWebhook({ body }) {
-      const b = (body ?? {}) as Record<string, string | undefined>;
+      const parsed = mockPaymentWebhookSchema.safeParse(body ?? {});
+      if (!parsed.success) {
+        throw new Error("Payload webhook pembayaran mock tidak valid");
+      }
+      const b = parsed.data;
       return {
-        providerOrderId: b.order_id ?? "",
+        providerOrderId: b.order_id,
         providerTransactionId: b.transaction_id ?? `mock-${Date.now()}`,
         status: mapMidtransStatus(b.transaction_status ?? "settlement"),
         raw: b,

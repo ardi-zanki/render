@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { env } from "@/env";
+import { midtransWebhookSchema } from "@/lib/validations/payment";
 import { mapMidtransStatus } from "./status";
 import type { PaymentProvider } from "./types";
 
@@ -73,10 +74,14 @@ export function createMidtransProvider(): PaymentProvider {
     },
 
     async verifyAndParseWebhook({ body }) {
-      const b = (body ?? {}) as Record<string, string | undefined>;
+      const parsed = midtransWebhookSchema.safeParse(body ?? {});
+      if (!parsed.success) {
+        throw new Error("Payload webhook Midtrans tidak valid");
+      }
+      const b = parsed.data;
       const expected = createHash("sha512")
         .update(
-          `${b.order_id ?? ""}${b.status_code ?? ""}${b.gross_amount ?? ""}${
+          `${b.order_id}${b.status_code}${b.gross_amount}${
             env.MIDTRANS_SERVER_KEY ?? ""
           }`,
         )
@@ -87,12 +92,9 @@ export function createMidtransProvider(): PaymentProvider {
       }
 
       return {
-        providerOrderId: b.order_id ?? "",
+        providerOrderId: b.order_id,
         providerTransactionId: b.transaction_id,
-        status: mapMidtransStatus(
-          b.transaction_status ?? "",
-          b.fraud_status,
-        ),
+        status: mapMidtransStatus(b.transaction_status, b.fraud_status),
         raw: b,
       };
     },

@@ -9,12 +9,21 @@ import {
 } from "@/lib/admin/service";
 import { assertRateLimit } from "@/lib/rate-limit";
 import { requireAdmin, requireRecentAuth } from "@/lib/session";
+import {
+  adminCreditAdjustmentSchema,
+  adminSetRoleSchema,
+  adminToggleDisableSchema,
+} from "@/lib/validations/api";
 
 export async function toggleDisableAction(formData: FormData) {
   const session = await requireAdmin();
   await assertRateLimit("admin_action", session.user.id);
-  const targetId = String(formData.get("userId") ?? "");
-  const disabled = formData.get("disabled") === "true";
+  const parsed = adminToggleDisableSchema.safeParse({
+    userId: formData.get("userId"),
+    disabled: formData.get("disabled"),
+  });
+  if (!parsed.success) return;
+  const { userId: targetId, disabled } = parsed.data;
   if (!targetId || targetId === session.user.id) return; // never disable self
   await setUserDisabled(session.user.id, targetId, disabled);
   revalidatePath("/admin/users");
@@ -23,8 +32,12 @@ export async function toggleDisableAction(formData: FormData) {
 export async function setRoleAction(formData: FormData) {
   const session = await requireAdmin();
   await assertRateLimit("admin_action", session.user.id);
-  const targetId = String(formData.get("userId") ?? "");
-  const role = formData.get("role") === "admin" ? "admin" : "user";
+  const parsed = adminSetRoleSchema.safeParse({
+    userId: formData.get("userId"),
+    role: formData.get("role"),
+  });
+  if (!parsed.success) return;
+  const { userId: targetId, role } = parsed.data;
   if (!targetId || targetId === session.user.id) return; // never demote self
   await setUserRole(session.user.id, targetId, role);
   revalidatePath("/admin/users");
@@ -35,16 +48,19 @@ export async function creditAdjustmentAction(formData: FormData) {
   // Manual credit adjustment moves money — require a recent login (PRD §10.1).
   await requireRecentAuth();
   await assertRateLimit("admin_action", session.user.id);
-  const targetId = String(formData.get("userId") ?? "");
-  const amount = Number(formData.get("amount") ?? 0);
-  const description = String(formData.get("description") ?? "").trim();
-  if (!targetId || !Number.isInteger(amount) || amount === 0) return;
+  const parsed = adminCreditAdjustmentSchema.safeParse({
+    userId: formData.get("userId"),
+    amount: formData.get("amount"),
+    description: formData.get("description"),
+  });
+  if (!parsed.success) return;
+  const { userId: targetId, amount, description } = parsed.data;
 
   await manualCreditAdjustment({
     adminUserId: session.user.id,
     targetUserId: targetId,
     amount,
-    description: description || undefined,
+    description,
   });
   revalidatePath("/admin/users");
   revalidatePath("/admin/credits");

@@ -3,12 +3,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { markAllRead, markRead } from "@/lib/notifications/service";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
+import { notificationReadSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
-  if (!session) {
+  if (!session || !session.user.emailVerified) {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
@@ -24,17 +25,18 @@ export async function POST(req: Request) {
     throw err;
   }
 
-  const body = (await req.json().catch(() => ({}))) as {
-    id?: string;
-    all?: boolean;
-  };
+  const parsed = notificationReadSchema.safeParse(
+    await req.json().catch(() => ({})),
+  );
+  if (!parsed.success) {
+    return NextResponse.json({ error: "id atau all wajib" }, { status: 400 });
+  }
+  const body = parsed.data;
 
   if (body.all) {
     await markAllRead(session.user.id);
-  } else if (typeof body.id === "string") {
-    await markRead(session.user.id, body.id);
   } else {
-    return NextResponse.json({ error: "id atau all wajib" }, { status: 400 });
+    await markRead(session.user.id, body.id);
   }
 
   return NextResponse.json({ ok: true });

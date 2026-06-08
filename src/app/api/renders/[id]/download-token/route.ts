@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { issueToken } from "@/lib/jwt";
+import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { getResultAssetForDownload } from "@/lib/renders/service";
+import { renderIdSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";
 
@@ -16,7 +18,25 @@ export async function POST(
   }
 
   const { id } = await params;
-  const asset = await getResultAssetForDownload(session.user.id, id);
+  const parsed = renderIdSchema.safeParse(id);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "ID render tidak valid" }, { status: 400 });
+  }
+
+  try {
+    await assertRateLimit("public_api", session.user.id);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: 429 },
+      );
+    }
+    throw err;
+  }
+
+  const renderId = parsed.data;
+  const asset = await getResultAssetForDownload(session.user.id, renderId);
   if (!asset) {
     return NextResponse.json(
       { error: "Hasil render belum tersedia" },
@@ -27,11 +47,11 @@ export async function POST(
   const { token } = await issueToken({
     type: "signed_download",
     userId: session.user.id,
-    claims: { renderId: id, fileKey: asset.fileKey },
+    claims: { renderId, fileKey: asset.fileKey },
   });
 
   return NextResponse.json({
     token,
-    url: `/api/renders/${id}/download?token=${encodeURIComponent(token)}`,
+    url: `/api/renders/${renderId}/download?token=${encodeURIComponent(token)}`,
   });
 }

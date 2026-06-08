@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { userProfiles } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { zodFieldErrors } from "@/lib/form";
+import { assertRateLimit } from "@/lib/rate-limit";
 import { requireVerifiedUser } from "@/lib/session";
 import { preferencesSchema, profileSchema } from "@/lib/validations/account";
 
@@ -22,6 +23,7 @@ export async function updateProfileAction(
   formData: FormData,
 ): Promise<ActionState> {
   const { user } = await requireVerifiedUser();
+  await assertRateLimit("public_api", user.id);
   const parsed = profileSchema.safeParse({
     name: formData.get("name"),
     displayName: formData.get("displayName") || undefined,
@@ -51,6 +53,7 @@ export async function updatePreferencesAction(
   formData: FormData,
 ): Promise<ActionState> {
   const { user } = await requireVerifiedUser();
+  await assertRateLimit("public_api", user.id);
   const parsed = preferencesSchema.safeParse({
     emailNotificationsEnabled: formData.get("emailNotificationsEnabled") === "on",
     defaultRenderMode: formData.get("defaultRenderMode"),

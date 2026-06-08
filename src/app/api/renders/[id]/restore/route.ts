@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
+import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { restoreRender } from "@/lib/renders/service";
+import { renderIdSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";
 
@@ -14,8 +16,25 @@ export async function POST(
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
+  try {
+    await assertRateLimit("public_api", session.user.id);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: 429 },
+      );
+    }
+    throw err;
+  }
+
   const { id } = await params;
-  const ok = await restoreRender(session.user.id, id);
+  const parsedId = renderIdSchema.safeParse(id);
+  if (!parsedId.success) {
+    return NextResponse.json({ error: "ID render tidak valid" }, { status: 400 });
+  }
+
+  const ok = await restoreRender(session.user.id, parsedId.data);
   if (!ok) {
     return NextResponse.json({ error: "Render tidak ditemukan" }, { status: 404 });
   }

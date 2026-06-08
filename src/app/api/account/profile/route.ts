@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { storage } from "@/lib/storage";
+import { profileUploadSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";
 
@@ -15,7 +16,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
-  if (!session) {
+  if (!session || !session.user.emailVerified) {
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
@@ -32,33 +33,36 @@ export async function POST(req: Request) {
   }
 
   const form = await req.formData();
-  const name = String(form.get("name") ?? "").trim();
-  if (!name || name.length > 120) {
-    return NextResponse.json({ error: "Nama tidak valid" }, { status: 400 });
+  const parsed = profileUploadSchema.safeParse({
+    name: form.get("name"),
+    avatar: form.get("avatar"),
+  });
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Input profil tidak valid" }, { status: 400 });
   }
+  const { name, avatar } = parsed.data;
 
   let imageUrl: string | undefined;
-  const file = form.get("avatar");
-  if (file instanceof File && file.size > 0) {
-    const ext = ALLOWED[file.type];
+  if (avatar && avatar.size > 0) {
+    const ext = ALLOWED[avatar.type];
     if (!ext) {
       return NextResponse.json(
         { error: "Avatar harus JPG, PNG, atau WebP" },
         { status: 400 },
       );
     }
-    if (file.size > MAX_BYTES) {
+    if (avatar.size > MAX_BYTES) {
       return NextResponse.json(
         { error: "Ukuran avatar maksimal 5MB" },
         { status: 400 },
       );
     }
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const buffer = Buffer.from(await avatar.arrayBuffer());
     const key = `users/${session.user.id}/avatar-${Date.now()}.${ext}`;
     const stored = await storage().putObject({
       key,
       body: buffer,
-      contentType: file.type,
+      contentType: avatar.type,
     });
     imageUrl = stored.url;
   }
