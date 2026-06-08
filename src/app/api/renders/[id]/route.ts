@@ -35,6 +35,15 @@ export async function DELETE(
     return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
   }
 
+  const body = await req.json().catch(() => null);
+  const note = typeof body?.note === "string" ? body.note.trim() : "";
+  if (!note) {
+    return NextResponse.json(
+      { error: "Catatan wajib diisi sebelum menghapus render" },
+      { status: 400 },
+    );
+  }
+
   const { id } = await params;
   const ok = await deleteRenderPermanently(session.user.id, id);
   if (!ok) {

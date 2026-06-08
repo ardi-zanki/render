@@ -40,7 +40,7 @@ export function Segmented<T extends string>({
             aria-selected={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              "rounded-md font-medium transition-colors",
+              "cursor-pointer rounded-md font-medium transition-colors",
               size === "sm" ? "px-3 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
               active
                 ? "bg-card text-primary shadow-sm"

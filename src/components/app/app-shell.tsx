@@ -2,6 +2,7 @@
 
 import {
   CreditCard,
+  ClipboardList,
   FolderOpen,
   Home,
   ImageIcon,
@@ -216,21 +217,38 @@ export function AppShell({
           })}
 
           {isAdmin && (
-            <Link
-              href="/admin"
-              onClick={() => setOpen(false)}
-              title={!expanded ? "Admin" : undefined}
-              className={cn(
-                "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                !expanded && "justify-center px-0",
-                isActive("/admin")
-                  ? "bg-accent text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              <Shield className="size-4 shrink-0" />
-              {labelWithTooltip("Admin", expanded)}
-            </Link>
+            <>
+              <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                title={!expanded ? "Admin" : undefined}
+                className={cn(
+                  "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  !expanded && "justify-center px-0",
+                  isActive("/admin") && !isActive("/admin/audit")
+                    ? "bg-accent text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <Shield className="size-4 shrink-0" />
+                {labelWithTooltip("Admin", expanded)}
+              </Link>
+              <Link
+                href="/admin/audit"
+                onClick={() => setOpen(false)}
+                title={!expanded ? "Log Audit" : undefined}
+                className={cn(
+                  "group relative flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  !expanded && "justify-center px-0",
+                  isActive("/admin/audit")
+                    ? "bg-accent text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <ClipboardList className="size-4 shrink-0" />
+                {labelWithTooltip("Log Audit", expanded)}
+              </Link>
+            </>
           )}
         </nav>
 

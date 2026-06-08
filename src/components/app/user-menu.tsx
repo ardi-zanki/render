@@ -28,7 +28,7 @@ type MenuPreferences = {
 };
 
 const itemClass =
-  "flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
+  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
 export function UserMenu({
   user,
@@ -98,14 +98,14 @@ export function UserMenu({
         anchorRef={buttonRef}
         open={open}
         onClose={() => setOpen(false)}
-        width={248}
+        width={220}
         placement="top"
         align="start"
         alignOffset={compact ? 8 : 0}
         className="max-h-[min(520px,calc(100vh-2rem))] overflow-y-auto rounded-lg border border-border bg-popover p-1.5 shadow-[0_16px_48px_rgb(15_23_42/0.14)]"
       >
-        <div className="flex items-center gap-3 px-2.5 py-2">
-          <Avatar name={user.name} src={user.image} size={36} />
+        <div className="flex items-center gap-2.5 px-2.5 py-2">
+          <Avatar name={user.name} src={user.image} size={32} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-foreground">
               {user.name}

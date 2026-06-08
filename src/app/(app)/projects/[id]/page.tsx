@@ -90,29 +90,35 @@ export default async function ProjectDetailPage({
           {renders.map((r) => {
             const thumb = r.resultUrl ?? r.originalUrl;
             return (
-              <Card key={r.id} className="gap-0 overflow-hidden p-0">
-                <div className="relative flex aspect-square items-center justify-center bg-muted">
-                  {thumb ? (
-                    <RenderImage src={thumb} alt={r.mode} className="size-full" />
-                  ) : (
-                    <ImageIcon className="size-6 text-muted-foreground" />
-                  )}
-                  <Badge
-                    variant={statusBadgeVariant(r.status)}
-                    className="absolute left-2 top-2"
-                  >
-                    {STATUS_LABEL[r.status] ?? r.status}
-                  </Badge>
-                </div>
-                <div className="flex flex-col gap-0.5 p-3">
-                  <p className="text-sm font-semibold text-foreground">
-                    {MODE_LABEL[r.mode]}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {dateFmt.format(r.createdAt)}
-                  </p>
-                </div>
-              </Card>
+              <Link key={r.id} href={`/renders/${r.id}`} className="group">
+                <Card className="gap-0 overflow-hidden p-0 transition-colors group-hover:border-primary/35">
+                  <div className="relative flex aspect-square items-center justify-center bg-muted">
+                    {thumb ? (
+                      <RenderImage
+                        src={thumb}
+                        alt={r.mode}
+                        className="size-full"
+                      />
+                    ) : (
+                      <ImageIcon className="size-6 text-muted-foreground" />
+                    )}
+                    <Badge
+                      variant={statusBadgeVariant(r.status)}
+                      className="absolute left-2 top-2"
+                    >
+                      {STATUS_LABEL[r.status] ?? r.status}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-col gap-0.5 p-3">
+                    <p className="text-sm font-semibold text-foreground">
+                      {MODE_LABEL[r.mode]}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {dateFmt.format(r.createdAt)}
+                    </p>
+                  </div>
+                </Card>
+              </Link>
             );
           })}
         </div>

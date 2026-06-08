@@ -182,7 +182,7 @@ function ProjectFormModal({
 }
 
 const menuItem =
-  "flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
+  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
 const CONFIRM_COPY = {
   archive: {
@@ -325,7 +325,7 @@ export function ProjectsClient({
                     triggerRef.current = e.currentTarget;
                     setMenuId(menuId === p.id ? null : p.id);
                   }}
-                  className="flex size-8 items-center justify-center rounded-md bg-card/90 text-foreground shadow-sm backdrop-blur hover:bg-card"
+                  className="flex size-8 cursor-pointer items-center justify-center rounded-md bg-card/90 text-foreground shadow-sm backdrop-blur hover:bg-card"
                   aria-label="Menu project"
                   aria-haspopup="menu"
                   aria-expanded={menuId === p.id}

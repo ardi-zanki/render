@@ -69,7 +69,7 @@ export function RenderQueueButton() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          "relative flex size-9 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-primary",
+          "relative flex size-9 cursor-pointer items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-primary",
           count > 0 && "text-primary",
         )}
         aria-label="Antrian render"

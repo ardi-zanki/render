@@ -37,34 +37,34 @@ export default async function AdminAuditPage({
   return (
     <div className="flex flex-col gap-4">
       <AdminTable
-      headers={[
-        { label: "Aksi" },
-        { label: "Admin" },
-        { label: "Target" },
-        { label: "Detail" },
-        { label: "Waktu" },
-      ]}
-      isEmpty={logs.length === 0}
-      empty="Belum ada aktivitas admin."
-    >
-      {logs.map((l) => (
-        <tr key={l.id} className="hover:bg-muted/30">
-          <td className="px-4 py-3 font-medium text-foreground">
-            {ACTION_LABEL[l.action] ?? l.action}
-          </td>
-          <td className="px-4 py-3">{l.adminName}</td>
-          <td className="px-4 py-3 text-muted-foreground">
-            {l.targetName ?? "-"}
-          </td>
-          <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-            {l.metadata ? JSON.stringify(l.metadata) : "-"}
-          </td>
-          <td className="px-4 py-3 text-muted-foreground">
-            {dateFmt.format(l.createdAt)}
-          </td>
-        </tr>
-      ))}
-    </AdminTable>
+        headers={[
+          { label: "Aksi" },
+          { label: "Admin" },
+          { label: "Target" },
+          { label: "Detail" },
+          { label: "Waktu" },
+        ]}
+        isEmpty={logs.length === 0}
+        empty="Belum ada aktivitas admin."
+      >
+        {logs.map((l) => (
+          <tr key={l.id} className="hover:bg-muted/30">
+            <td className="px-4 py-3 font-medium text-foreground">
+              {ACTION_LABEL[l.action] ?? l.action}
+            </td>
+            <td className="px-4 py-3">{l.adminName}</td>
+            <td className="px-4 py-3 text-muted-foreground">
+              {l.targetName ?? "-"}
+            </td>
+            <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+              {l.metadata ? JSON.stringify(l.metadata) : "-"}
+            </td>
+            <td className="px-4 py-3 text-muted-foreground">
+              {dateFmt.format(l.createdAt)}
+            </td>
+          </tr>
+        ))}
+      </AdminTable>
       <Pagination page={page} totalPages={totalPages} />
     </div>
   );

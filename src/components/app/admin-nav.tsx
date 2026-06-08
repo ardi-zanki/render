@@ -15,7 +15,6 @@ const TABS: [string, string][] = [
   ["/admin/packages", "Paket Kredit"],
   ["/admin/notifications", "Notifikasi"],
   ["/admin/settings", "Pengaturan"],
-  ["/admin/audit", "Log Audit"],
 ];
 
 export function AdminNav() {
