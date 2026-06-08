@@ -14,6 +14,7 @@ import { SettingsModal } from "@/components/app/settings-modal";
 import { Avatar } from "@/components/ui/avatar";
 import { Popover } from "@/components/ui/popover";
 import { signOut } from "@/lib/auth-client";
+import type { UserStorageUsage } from "@/lib/storage/usage";
 import { cn } from "@/lib/utils";
 
 const WA_SUPPORT = "https://wa.me/6200012340001";
@@ -33,11 +34,13 @@ export function UserMenu({
   user,
   preferences,
   googleConnected,
+  storageUsage,
   compact = false,
 }: {
   user: MenuUser;
   preferences: MenuPreferences;
   googleConnected: boolean;
+  storageUsage: UserStorageUsage;
   compact?: boolean;
 }) {
   const router = useRouter();
@@ -160,6 +163,7 @@ export function UserMenu({
           user={user}
           preferences={preferences}
           googleConnected={googleConnected}
+          storageUsage={storageUsage}
           onClose={() => setSettingsOpen(false)}
         />
       )}

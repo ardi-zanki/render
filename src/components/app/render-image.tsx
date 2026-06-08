@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
+import type { CSSProperties } from "react";
+
 import { cn } from "@/lib/utils";
 
 /**
@@ -10,10 +12,12 @@ export function RenderImage({
   src,
   alt,
   className,
+  style,
 }: {
   src: string;
   alt: string;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
     <img
@@ -21,6 +25,7 @@ export function RenderImage({
       alt={alt}
       loading="lazy"
       className={cn("object-cover", className)}
+      style={style}
     />
   );
 }

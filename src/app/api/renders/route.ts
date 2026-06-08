@@ -7,6 +7,7 @@ import { AiProviderError } from "@/lib/providers/ai";
 import { buildPrompt } from "@/lib/renders/prompt";
 import { createRender, processRenderJob } from "@/lib/renders/service";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
+import { StorageQuotaExceededError } from "@/lib/storage/usage";
 import { ImageUploadError, validateImageFile } from "@/lib/uploads/images";
 import { createRenderSchema } from "@/lib/validations/render";
 
@@ -172,6 +173,12 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: `Render gagal: ${err.message}`, code: err.code },
         { status: 502 },
+      );
+    }
+    if (err instanceof StorageQuotaExceededError) {
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: err.status },
       );
     }
     const msg = err instanceof Error ? err.message : "Render gagal";

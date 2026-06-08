@@ -10,6 +10,7 @@ import {
   listNotifications,
 } from "@/lib/notifications/service";
 import { requireVerifiedUser } from "@/lib/session";
+import { getUserStorageUsage } from "@/lib/storage/usage";
 
 export default async function AppLayout({
   children,
@@ -19,7 +20,7 @@ export default async function AppLayout({
   const session = await requireVerifiedUser();
   const cookieStore = await cookies();
   const sidebarCookie = cookieStore.get("renderai_sidebar_expanded")?.value;
-  const [balance, unreadCount, recent, profile, googleAccount] =
+  const [balance, unreadCount, recent, profile, googleAccount, storageUsage] =
     await Promise.all([
       getBalance(session.user.id),
       getUnreadCount(session.user.id),
@@ -37,6 +38,7 @@ export default async function AppLayout({
           ),
         )
         .limit(1),
+      getUserStorageUsage(session.user.id),
     ]);
 
   return (
@@ -57,6 +59,7 @@ export default async function AppLayout({
       unreadCount={unreadCount}
       isAdmin={session.user.role === "admin"}
       googleConnected={googleAccount.length > 0}
+      storageUsage={storageUsage}
       notifications={recent.map((n) => ({
         id: n.id,
         type: n.type,

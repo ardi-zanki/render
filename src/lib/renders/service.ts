@@ -32,6 +32,7 @@ import { lowCreditEmail, renderResultEmail } from "@/lib/email";
 import { notifyUser } from "@/lib/notifications/service";
 import { aiProvider } from "@/lib/providers/ai";
 import { renderAssetKey, storage } from "@/lib/storage";
+import { assertUserStorageCapacity } from "@/lib/storage/usage";
 import type { ValidatedImageUpload } from "@/lib/uploads/images";
 
 export const RENDER_COST = 1;
@@ -245,6 +246,11 @@ export async function createRender(
   if (mode === "style_transfer" && !params.reference) {
     throw new Error("Reference image wajib diunggah untuk Style Transfer");
   }
+
+  await assertUserStorageCapacity(
+    userId,
+    params.original.size + (params.reference?.size ?? 0),
+  );
 
   if ((await getBalance(userId)) < RENDER_COST) {
     throw new InsufficientCreditsError();

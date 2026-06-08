@@ -16,12 +16,14 @@ import { usePathname } from "next/navigation";
 import { useState, type MouseEvent, type ReactNode } from "react";
 
 import { NotificationBell } from "@/components/app/notification-bell";
+import { RenderQueueButton } from "@/components/app/render-queue-button";
 import { UserMenu } from "@/components/app/user-menu";
 import { CreditPill } from "@/components/brand/credit-pill";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import type { NotificationItem } from "@/lib/notifications/ui";
+import type { UserStorageUsage } from "@/lib/storage/usage";
 import { cn } from "@/lib/utils";
 import { zLayer } from "@/lib/z-layers";
 
@@ -62,6 +64,7 @@ export function AppShell({
   notifications,
   isAdmin,
   googleConnected,
+  storageUsage,
   children,
 }: {
   user: AppUser;
@@ -72,6 +75,7 @@ export function AppShell({
   notifications: NotificationItem[];
   isAdmin: boolean;
   googleConnected: boolean;
+  storageUsage: UserStorageUsage;
   children: ReactNode;
 }) {
   const pathname = usePathname();
@@ -240,6 +244,7 @@ export function AppShell({
             user={user}
             preferences={preferences}
             googleConnected={googleConnected}
+            storageUsage={storageUsage}
             compact={!expanded}
           />
         </div>
@@ -294,6 +299,7 @@ export function AppShell({
           </div>
           <div className="ml-auto flex items-center gap-2">
             <CreditPill balance={balance} />
+            <RenderQueueButton />
             <NotificationBell initialUnread={unreadCount} items={notifications} />
             <ModeToggle />
           </div>

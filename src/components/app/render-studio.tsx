@@ -13,6 +13,8 @@ import {
   Sofa,
   Sparkles,
   X,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -53,6 +55,46 @@ const STYLES = [
 ];
 const TIMES = ["auto", "pagi", "siang", "sore", "malam"];
 const WEATHERS = ["auto", "cerah", "berawan", "mendung", "hujan", "berkabut"];
+const SURROUNDINGS = {
+  exterior: [
+    { value: "auto", label: "Otomatis" },
+    {
+      value: "urban street context with neighboring buildings",
+      label: "Kawasan Urban",
+    },
+    {
+      value: "quiet residential neighborhood context",
+      label: "Perumahan",
+    },
+    {
+      value: "tropical garden and lush greenery around the building",
+      label: "Taman Tropis",
+    },
+    {
+      value: "commercial streetscape context",
+      label: "Area Komersial",
+    },
+  ],
+  interior: [
+    { value: "auto", label: "Otomatis" },
+    {
+      value: "large window view with natural daylight",
+      label: "Jendela Besar",
+    },
+    {
+      value: "city view through the window",
+      label: "View Kota",
+    },
+    {
+      value: "garden view through the window",
+      label: "View Taman",
+    },
+    {
+      value: "no visible window, controlled interior lighting",
+      label: "Tanpa Jendela",
+    },
+  ],
+};
 const OUTPUT_FORMATS: { value: RenderOutputFormat; label: string }[] = [
   { value: "jpg", label: "JPG" },
   { value: "png", label: "PNG" },
@@ -153,6 +195,7 @@ export function RenderStudio({
   const [mode, setMode] = useState<RenderMode>(defaultRenderMode);
   const [style, setStyle] = useState("auto");
   const [location, setLocation] = useState("");
+  const [surrounding, setSurrounding] = useState("auto");
   const [time, setTime] = useState("auto");
   const [weather, setWeather] = useState("auto");
   const [instruction, setInstruction] = useState(initialInstruction);
@@ -173,7 +216,9 @@ export function RenderStudio({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [view, setView] = useState<"hasil" | "asli">("hasil");
+  const [view, setView] = useState<"asli" | "komparasi" | "hasil">("hasil");
+  const [comparisonPosition, setComparisonPosition] = useState(50);
+  const [zoom, setZoom] = useState(1);
 
   const [balance, setBalance] = useState(initialBalance);
   const [scenes, setScenes] = useState<Scene[]>(initialScenes);
@@ -269,6 +314,7 @@ export function RenderStudio({
       fd.append("time", time);
       fd.append("weather", weather);
       if (location) fd.append("location", location);
+      if (surrounding !== "auto") fd.append("surrounding", surrounding);
       if (instruction) fd.append("instruction", instruction);
       if (referenceFile) {
         fd.append("reference", referenceFile);
@@ -347,7 +393,25 @@ export function RenderStudio({
   const isProcessing =
     loading || renderStatus === "queued" || renderStatus === "processing";
   const canRender = !!file && balance > 0 && !isProcessing;
-  const shownImage = resultUrl && view === "hasil" ? resultUrl : previewUrl;
+  const shownImage = view === "hasil" && resultUrl ? resultUrl : previewUrl;
+  const canCompare = Boolean(previewUrl && resultUrl);
+  const styleLabel = mode === "interior" ? "Style Interior" : "Style Arsitektur";
+  const surroundingOptions =
+    mode === "interior" ? SURROUNDINGS.interior : SURROUNDINGS.exterior;
+  const surroundingLabel =
+    mode === "interior" ? "View Jendela" : "Lingkungan Sekitar";
+
+  function zoomOut() {
+    setZoom((value) => Math.max(0.5, Number((value - 0.25).toFixed(2))));
+  }
+
+  function zoomIn() {
+    setZoom((value) => Math.min(3, Number((value + 0.25).toFixed(2))));
+  }
+
+  function resetZoom() {
+    setZoom(1);
+  }
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_1fr]">
@@ -392,7 +456,10 @@ export function RenderStudio({
                 <button
                   key={m.value}
                   type="button"
-                  onClick={() => setMode(m.value)}
+                  onClick={() => {
+                    setMode(m.value);
+                    setSurrounding("auto");
+                  }}
                   className={cn(
                     "flex items-center gap-2 rounded-md border px-3 py-2.5 text-sm font-medium transition-colors",
                     mode === m.value
@@ -408,7 +475,7 @@ export function RenderStudio({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="style">Style Arsitektur</Label>
+            <Label htmlFor="style">{styleLabel}</Label>
             <Select
               id="style"
               value={style}
@@ -449,6 +516,21 @@ export function RenderStudio({
             />
           </div>
 
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="surrounding">{surroundingLabel}</Label>
+            <Select
+              id="surrounding"
+              value={surrounding}
+              onChange={(e) => setSurrounding(e.target.value)}
+            >
+              {surroundingOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+
           <div className="flex flex-col gap-2">
             <Label>Waktu</Label>
             <ChipGroup options={TIMES} value={time} onChange={setTime} />
@@ -465,27 +547,115 @@ export function RenderStudio({
       <div className="flex flex-col gap-4">
         <Card className="overflow-hidden">
           <CardContent className="flex flex-col gap-4 py-5">
-            {/* tabs */}
-            {resultUrl && (
-              <Segmented
-                options={[
-                  { value: "hasil", label: "Hasil" },
-                  { value: "asli", label: "Asli" },
-                ]}
-                value={view}
-                onChange={setView}
-                size="sm"
-              />
-            )}
+            {/* tabs + zoom */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {resultUrl ? (
+                <Segmented
+                  options={[
+                    { value: "asli", label: "Mentahan" },
+                    { value: "komparasi", label: "Komparasi" },
+                    { value: "hasil", label: "Hasil" },
+                  ]}
+                  value={view}
+                  onChange={(next) => setView(canCompare ? next : "hasil")}
+                  size="sm"
+                />
+              ) : (
+                <div />
+              )}
+
+              {shownImage && (
+                <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={zoomOut}
+                    disabled={zoom <= 0.5}
+                    aria-label="Zoom out"
+                    title="Zoom out"
+                  >
+                    <ZoomOut />
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={resetZoom}
+                    className="h-8 min-w-14 rounded-md px-2 text-xs font-semibold text-foreground hover:bg-card"
+                    title="Reset zoom"
+                  >
+                    {Math.round(zoom * 100)}%
+                  </button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={zoomIn}
+                    disabled={zoom >= 3}
+                    aria-label="Zoom in"
+                    title="Zoom in"
+                  >
+                    <ZoomIn />
+                  </Button>
+                </div>
+              )}
+            </div>
 
             {/* canvas */}
             <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/40">
-              {shownImage ? (
-                <RenderImage
-                  src={view === "asli" ? previewUrl ?? "" : shownImage}
-                  alt="Render"
-                  className="size-full"
-                />
+              {canCompare && view === "komparasi" ? (
+                <div className="relative size-full overflow-hidden bg-background">
+                  <RenderImage
+                    src={resultUrl ?? ""}
+                    alt="Hasil render"
+                    className="size-full"
+                    style={{ transform: `scale(${zoom})` }}
+                  />
+                  <div
+                    className="absolute inset-0 overflow-hidden"
+                    style={{
+                      clipPath: `inset(0 ${100 - comparisonPosition}% 0 0)`,
+                    }}
+                  >
+                    <RenderImage
+                      src={previewUrl ?? ""}
+                      alt="Gambar mentahan"
+                      className="size-full"
+                      style={{ transform: `scale(${zoom})` }}
+                    />
+                  </div>
+                  <div
+                    className="absolute inset-y-0 w-px bg-background/90 shadow-[0_0_0_1px_rgb(15_23_42/0.12)]"
+                    style={{ left: `${comparisonPosition}%` }}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={comparisonPosition}
+                    onChange={(event) =>
+                      setComparisonPosition(Number(event.target.value))
+                    }
+                    className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
+                    aria-label="Geser komparasi"
+                  />
+                  <div
+                    className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
+                    style={{ left: `${comparisonPosition}%` }}
+                  >
+                    <span>Mentahan</span>
+                    <span className="text-muted-foreground">|</span>
+                    <span>Hasil</span>
+                  </div>
+                </div>
+              ) : shownImage ? (
+                <div className="size-full overflow-hidden">
+                  <RenderImage
+                    src={shownImage}
+                    alt={view === "hasil" ? "Hasil render" : "Gambar mentahan"}
+                    className="size-full transition-transform"
+                    style={{ transform: `scale(${zoom})` }}
+                  />
+                </div>
               ) : (
                 <button
                   type="button"
