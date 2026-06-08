@@ -74,6 +74,7 @@ export async function POST(req: Request) {
       "style",
       "location",
       "surrounding",
+      "lightsOn",
       "time",
       "weather",
       "instruction",

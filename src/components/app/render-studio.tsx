@@ -5,6 +5,7 @@ import {
   Check,
   Download,
   ImagePlus,
+  Lightbulb,
   Loader2,
   Maximize2,
   Palette,
@@ -29,7 +30,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/ui/modal";
-import { Segmented } from "@/components/ui/segmented";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { RenderMode, RenderOutputFormat } from "@/db/schema";
@@ -104,6 +104,7 @@ const OUTPUT_FORMATS: { value: RenderOutputFormat; label: string }[] = [
 const cap = (s: string) => (s === "auto" ? "Otomatis" : s[0].toUpperCase() + s.slice(1));
 
 type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;
+type StudioView = "asli" | "komparasi" | "hasil";
 
 function ChipGroup({
   options,
@@ -196,6 +197,7 @@ export function RenderStudio({
   const [style, setStyle] = useState("auto");
   const [location, setLocation] = useState("");
   const [surrounding, setSurrounding] = useState("auto");
+  const [lightsOn, setLightsOn] = useState(false);
   const [time, setTime] = useState("auto");
   const [weather, setWeather] = useState("auto");
   const [instruction, setInstruction] = useState(initialInstruction);
@@ -216,7 +218,7 @@ export function RenderStudio({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [view, setView] = useState<"asli" | "komparasi" | "hasil">("hasil");
+  const [view, setView] = useState<StudioView>("asli");
   const [comparisonPosition, setComparisonPosition] = useState(50);
   const [zoom, setZoom] = useState(1);
 
@@ -242,9 +244,11 @@ export function RenderStudio({
     if (f) {
       setFile(f);
       setPreviewUrl(URL.createObjectURL(f));
+      setView("asli");
     } else {
       setFile(null);
       setPreviewUrl(null);
+      setView("asli");
     }
   }
 
@@ -312,9 +316,10 @@ export function RenderStudio({
       fd.append("outputFormat", outputFormat);
       if (style !== "auto") fd.append("style", style);
       fd.append("time", time);
-      fd.append("weather", weather);
+      if (mode !== "interior") fd.append("weather", weather);
       if (location) fd.append("location", location);
       if (surrounding !== "auto") fd.append("surrounding", surrounding);
+      if (lightsOn) fd.append("lightsOn", "true");
       if (instruction) fd.append("instruction", instruction);
       if (referenceFile) {
         fd.append("reference", referenceFile);
@@ -393,6 +398,7 @@ export function RenderStudio({
   const isProcessing =
     loading || renderStatus === "queued" || renderStatus === "processing";
   const canRender = !!file && balance > 0 && !isProcessing;
+  const hasUploadedImage = Boolean(previewUrl);
   const shownImage = view === "hasil" && resultUrl ? resultUrl : previewUrl;
   const canCompare = Boolean(previewUrl && resultUrl);
   const styleLabel = mode === "interior" ? "Style Interior" : "Style Arsitektur";
@@ -400,6 +406,11 @@ export function RenderStudio({
     mode === "interior" ? SURROUNDINGS.interior : SURROUNDINGS.exterior;
   const surroundingLabel =
     mode === "interior" ? "View Jendela" : "Lingkungan Sekitar";
+  const viewerTabs: { value: StudioView; label: string; disabled: boolean }[] = [
+    { value: "asli", label: "Asli", disabled: !previewUrl },
+    { value: "komparasi", label: "Komparasi", disabled: !canCompare },
+    { value: "hasil", label: "Hasil", disabled: !resultUrl },
+  ];
 
   function zoomOut() {
     setZoom((value) => Math.max(0.5, Number((value - 0.25).toFixed(2))));
@@ -459,6 +470,7 @@ export function RenderStudio({
                   onClick={() => {
                     setMode(m.value);
                     setSurrounding("auto");
+                    if (m.value === "interior") setWeather("auto");
                   }}
                   className={cn(
                     "flex items-center gap-2 rounded-md border px-3 py-2.5 text-sm font-medium transition-colors",
@@ -536,9 +548,50 @@ export function RenderStudio({
             <ChipGroup options={TIMES} value={time} onChange={setTime} />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label>Cuaca</Label>
-            <ChipGroup options={WEATHERS} value={weather} onChange={setWeather} />
+          {mode !== "interior" && (
+            <div className="flex flex-col gap-2">
+              <Label>Cuaca</Label>
+              <ChipGroup
+                options={WEATHERS}
+                value={weather}
+                onChange={setWeather}
+              />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3 border-t border-border pt-4">
+            <Label className="text-base font-semibold text-foreground">
+              Objek & Asset
+            </Label>
+            <button
+              type="button"
+              aria-pressed={lightsOn}
+              onClick={() => setLightsOn((value) => !value)}
+              className={cn(
+                "flex h-12 items-center justify-between gap-3 rounded-lg border px-4 text-sm font-semibold transition-colors",
+                lightsOn
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-secondary/60 text-foreground hover:border-primary/40",
+              )}
+            >
+              <span className="flex items-center gap-2">
+                <Lightbulb className="size-4" />
+                Nyalain Lampu
+              </span>
+              <span
+                className={cn(
+                  "flex h-6 w-11 items-center rounded-full p-0.5 transition-colors",
+                  lightsOn ? "bg-primary" : "bg-muted-foreground/25",
+                )}
+              >
+                <span
+                  className={cn(
+                    "size-5 rounded-full bg-background shadow-sm transition-transform",
+                    lightsOn && "translate-x-5",
+                  )}
+                />
+              </span>
+            </button>
           </div>
         </CardContent>
       </Card>
@@ -549,17 +602,33 @@ export function RenderStudio({
           <CardContent className="flex flex-col gap-4 py-5">
             {/* tabs + zoom */}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              {resultUrl ? (
-                <Segmented
-                  options={[
-                    { value: "asli", label: "Mentahan" },
-                    { value: "komparasi", label: "Komparasi" },
-                    { value: "hasil", label: "Hasil" },
-                  ]}
-                  value={view}
-                  onChange={(next) => setView(canCompare ? next : "hasil")}
-                  size="sm"
-                />
+              {hasUploadedImage ? (
+                <div
+                  role="tablist"
+                  className="inline-flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1"
+                >
+                  {viewerTabs.map((tab) => {
+                    const active = tab.value === view;
+                    return (
+                      <button
+                        key={tab.value}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        disabled={tab.disabled}
+                        onClick={() => setView(tab.value)}
+                        className={cn(
+                          "rounded-md px-3 py-1 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-45",
+                          active
+                            ? "bg-card text-primary shadow-sm"
+                            : "text-muted-foreground hover:text-foreground",
+                        )}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  })}
+                </div>
               ) : (
                 <div />
               )}
@@ -618,7 +687,7 @@ export function RenderStudio({
                   >
                     <RenderImage
                       src={previewUrl ?? ""}
-                      alt="Gambar mentahan"
+                      alt="Gambar asli"
                       className="size-full"
                       style={{ transform: `scale(${zoom})` }}
                     />
@@ -642,7 +711,7 @@ export function RenderStudio({
                     className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
                     style={{ left: `${comparisonPosition}%` }}
                   >
-                    <span>Mentahan</span>
+                    <span>Asli</span>
                     <span className="text-muted-foreground">|</span>
                     <span>Hasil</span>
                   </div>
@@ -651,7 +720,7 @@ export function RenderStudio({
                 <div className="size-full overflow-hidden">
                   <RenderImage
                     src={shownImage}
-                    alt={view === "hasil" ? "Hasil render" : "Gambar mentahan"}
+                    alt={view === "hasil" ? "Hasil render" : "Gambar asli"}
                     className="size-full transition-transform"
                     style={{ transform: `scale(${zoom})` }}
                   />

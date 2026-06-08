@@ -5,6 +5,7 @@ export interface RenderOptions {
   style?: string;
   location?: string;
   surrounding?: string;
+  lightsOn?: boolean;
   time?: string;
   weather?: string;
   instruction?: string;
@@ -54,6 +55,13 @@ export function buildPrompt(o: RenderOptions): string {
   if (!isAuto(o.weather) && o.weather && WEATHER[o.weather])
     parts.push(WEATHER[o.weather]);
   if (o.surrounding && !isAuto(o.surrounding)) parts.push(o.surrounding);
+  if (o.lightsOn) {
+    parts.push(
+      o.mode === "interior"
+        ? "interior lights switched on, warm realistic lighting"
+        : "building lights switched on, warm architectural lighting visible",
+    );
+  }
   if (o.location) parts.push(`location context: ${o.location}`);
   if (o.instruction) parts.push(o.instruction);
 
