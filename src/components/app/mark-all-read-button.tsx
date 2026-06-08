@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { postJson } from "@/lib/client-api";
 
 export function MarkAllReadButton() {
   const router = useRouter();
@@ -12,13 +13,14 @@ export function MarkAllReadButton() {
 
   async function markAll() {
     setLoading(true);
-    await fetch("/api/notifications/read", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ all: true }),
-    });
-    router.refresh();
-    setLoading(false);
+    try {
+      await postJson("/api/notifications/read", { all: true });
+      router.refresh();
+    } catch {
+      // Keep the button quiet; the notifications page will refresh on navigation.
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

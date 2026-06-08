@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/ui/modal";
 import { Select } from "@/components/ui/select";
+import { apiErrorMessage, apiJson } from "@/lib/client-api";
 import type {
   StorageUsageCategory,
   UserStorageUsage,
@@ -45,6 +46,11 @@ type SettingsPreferences = {
 };
 
 type SettingsTab = "profile" | "preferences" | "storage" | "security";
+type ClearStorageResponse = {
+  deletedAssets: number;
+  deletedRenders: number;
+  usage: UserStorageUsage;
+};
 
 const TABS: Array<{
   value: SettingsTab;
@@ -109,12 +115,12 @@ export function SettingsModal({
     setRefreshingStorage(true);
     setStorageError("");
     try {
-      const res = await fetch("/api/account/storage", { cache: "no-store" });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Gagal memuat storage");
+      const json = await apiJson<UserStorageUsage>("/api/account/storage", {
+        cache: "no-store",
+      });
       setUsage(json);
     } catch (err) {
-      setStorageError(err instanceof Error ? err.message : "Gagal memuat storage");
+      setStorageError(apiErrorMessage(err, "Gagal memuat storage"));
     } finally {
       setRefreshingStorage(false);
     }
@@ -124,18 +130,16 @@ export function SettingsModal({
     setDeletingStorage(true);
     setStorageError("");
     try {
-      const res = await fetch("/api/account/storage", { method: "DELETE" });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Gagal menghapus storage");
+      const json = await apiJson<ClearStorageResponse>("/api/account/storage", {
+        method: "DELETE",
+      });
       setUsage(json.usage);
       setDeleteOpen(false);
       setDeleteText("");
       toast.success("Storage render dikosongkan");
       router.refresh();
     } catch (err) {
-      setStorageError(
-        err instanceof Error ? err.message : "Gagal menghapus storage",
-      );
+      setStorageError(apiErrorMessage(err, "Gagal menghapus storage"));
     } finally {
       setDeletingStorage(false);
     }

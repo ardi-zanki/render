@@ -15,6 +15,7 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover } from "@/components/ui/popover";
 import type { NotificationType } from "@/db/schema";
+import { postJson } from "@/lib/client-api";
 import { timeAgo, type NotificationItem } from "@/lib/notifications/ui";
 import { cn } from "@/lib/utils";
 
@@ -41,12 +42,12 @@ export function NotificationBell({
   const [unread, setUnread] = useState(initialUnread);
 
   async function post(body: { id: string } | { all: true }) {
-    await fetch("/api/notifications/read", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    router.refresh();
+    try {
+      await postJson("/api/notifications/read", body);
+      router.refresh();
+    } catch {
+      // Optimistic unread state is refreshed on the next server navigation.
+    }
   }
 
   function onItem(n: NotificationItem) {

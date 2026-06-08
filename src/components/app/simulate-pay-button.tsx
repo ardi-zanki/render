@@ -3,8 +3,10 @@
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { apiErrorMessage, postJson } from "@/lib/client-api";
 
 /** Dev-only: simulate a Midtrans notification by posting to our webhook. */
 export function SimulatePayButton({ orderId }: { orderId: string }) {
@@ -13,19 +15,20 @@ export function SimulatePayButton({ orderId }: { orderId: string }) {
 
   async function notify(transactionStatus: string, redirectStatus: string) {
     setLoading(transactionStatus === "settlement" ? "pay" : "fail");
-    await fetch("/api/payments/webhook", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      await postJson("/api/payments/webhook", {
         order_id: orderId,
         transaction_status: transactionStatus,
         status_code: "200",
         gross_amount: "0",
         transaction_id: `mock-${Date.now()}`,
-      }),
-    });
-    router.push(`/payments/finish?status=${redirectStatus}`);
-    router.refresh();
+      });
+      router.push(`/payments/finish?status=${redirectStatus}`);
+      router.refresh();
+    } catch (err) {
+      toast.error(apiErrorMessage(err, "Gagal menjalankan simulasi pembayaran"));
+      setLoading(null);
+    }
   }
 
   return (

@@ -6,61 +6,19 @@ import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
-import type { RenderMode } from "@/db/schema";
+import { useRenderQueue } from "@/hooks/use-render-queue";
 import { MODE_LABEL, STATUS_LABEL } from "@/lib/renders/labels";
 import { cn } from "@/lib/utils";
-
-type QueueItem = {
-  id: string;
-  renderId: string;
-  status: "queued" | "processing";
-  attempts: number;
-  mode: RenderMode;
-  prompt: string | null;
-  projectName: string;
-  createdAt: string;
-  startedAt: string | null;
-};
-
-type QueueResponse = {
-  count: number;
-  items: QueueItem[];
-};
 
 export function RenderQueueButton() {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
-  const [count, setCount] = useState(0);
-  const [items, setItems] = useState<QueueItem[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  async function loadQueue() {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/renders/queue", { cache: "no-store" });
-      if (!res.ok) return;
-      const json = (await res.json()) as QueueResponse;
-      setCount(json.count);
-      setItems(json.items);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => void loadQueue(), 0);
-    const interval = window.setInterval(loadQueue, 10_000);
-    return () => {
-      window.clearTimeout(timeout);
-      window.clearInterval(interval);
-    };
-  }, []);
+  const { count, items, loading, error, refresh } = useRenderQueue();
 
   useEffect(() => {
     if (!open) return;
-    const timeout = window.setTimeout(() => void loadQueue(), 0);
-    return () => window.clearTimeout(timeout);
-  }, [open]);
+    void refresh();
+  }, [open, refresh]);
 
   return (
     <>
@@ -101,7 +59,11 @@ export function RenderQueueButton() {
         </div>
 
         <div className="mt-3">
-          {loading && items.length === 0 ? (
+          {error ? (
+            <div className="rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {error}
+            </div>
+          ) : loading && items.length === 0 ? (
             <div className="flex items-center justify-center gap-2 rounded-md border border-dashed border-border py-8 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
               Memuat antrian

@@ -17,8 +17,10 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Textarea } from "@/components/ui/textarea";
+import { apiErrorMessage, apiJson, jsonInit } from "@/lib/client-api";
 
 type ConfirmKind = "archive" | "restore" | "delete" | null;
+type DownloadTokenResponse = { url: string };
 
 export function RenderDetailActions({
   renderId,
@@ -44,18 +46,13 @@ export function RenderDetailActions({
       kind === "delete"
         ? `/api/renders/${renderId}`
         : `/api/renders/${renderId}/${kind}`;
-    const res = await fetch(endpoint, {
-      method: kind === "delete" ? "DELETE" : "POST",
-      ...(kind === "delete"
-        ? {
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ note }),
-          }
-        : {}),
-    });
-    if (!res.ok) {
-      const json = await res.json().catch(() => ({}));
-      toast.error(json.error ?? "Aksi gagal");
+    try {
+      await apiJson(endpoint, {
+        method: kind === "delete" ? "DELETE" : "POST",
+        ...(kind === "delete" ? jsonInit({ note }) : {}),
+      });
+    } catch (err) {
+      toast.error(apiErrorMessage(err, "Aksi gagal"));
       return;
     }
     toast.success(
@@ -83,16 +80,17 @@ export function RenderDetailActions({
 
   async function download() {
     setDownloading(true);
-    const res = await fetch(`/api/renders/${renderId}/download-token`, {
-      method: "POST",
-    });
-    const json = await res.json().catch(() => ({}));
-    setDownloading(false);
-    if (!res.ok || !json.url) {
-      toast.error(json.error ?? "Download belum tersedia");
-      return;
+    try {
+      const json = await apiJson<DownloadTokenResponse>(
+        `/api/renders/${renderId}/download-token`,
+        { method: "POST" },
+      );
+      window.location.href = json.url;
+    } catch (err) {
+      toast.error(apiErrorMessage(err, "Download belum tersedia"));
+    } finally {
+      setDownloading(false);
     }
-    window.location.href = json.url;
   }
 
   const reuseHref = `/renders/new?project=${projectId}${

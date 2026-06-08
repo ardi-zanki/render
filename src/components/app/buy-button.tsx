@@ -5,12 +5,19 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { apiErrorMessage, postJson } from "@/lib/client-api";
 
 type SnapCallbacks = {
   onSuccess?: () => void;
   onPending?: () => void;
   onError?: () => void;
   onClose?: () => void;
+};
+
+type CheckoutResponse = {
+  provider: string;
+  token?: string;
+  redirectUrl?: string;
 };
 
 declare global {
@@ -34,17 +41,9 @@ export function BuyButton({
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/payments/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageSlug: slug }),
+      const json = await postJson<CheckoutResponse>("/api/payments/checkout", {
+        packageSlug: slug,
       });
-      const json = await res.json();
-      if (!res.ok) {
-        setError(json.error ?? "Gagal membuat pembayaran");
-        setLoading(false);
-        return;
-      }
 
       if (json.provider === "midtrans" && json.token && window.snap) {
         window.snap.pay(json.token, {
@@ -59,8 +58,8 @@ export function BuyButton({
         setError("Pembayaran tidak tersedia.");
         setLoading(false);
       }
-    } catch {
-      setError("Tidak bisa terhubung ke server.");
+    } catch (err) {
+      setError(apiErrorMessage(err, "Tidak bisa terhubung ke server."));
       setLoading(false);
     }
   }

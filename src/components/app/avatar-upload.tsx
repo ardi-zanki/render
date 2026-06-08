@@ -6,6 +6,11 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Avatar } from "@/components/ui/avatar";
+import { apiErrorMessage, apiJson } from "@/lib/client-api";
+
+type ProfileUploadResponse = {
+  image: string | null;
+};
 
 /**
  * Interactive profile avatar with click-to-upload. Posts the new image (plus
@@ -31,21 +36,21 @@ export function AvatarUpload({
     const fd = new FormData();
     fd.append("name", name);
     fd.append("avatar", file);
-    const res = await fetch("/api/account/profile", {
-      method: "POST",
-      body: fd,
-    });
-    const json = await res.json().catch(() => ({}));
-    setUploading(false);
-    URL.revokeObjectURL(localPreview);
-    if (!res.ok) {
+    try {
+      const json = await apiJson<ProfileUploadResponse>("/api/account/profile", {
+        method: "POST",
+        body: fd,
+      });
+      setPreview(json.image ?? null);
+      toast.success("Foto profil diperbarui");
+      router.refresh();
+    } catch (err) {
       setPreview(image ?? null);
-      toast.error(json.error ?? "Gagal memperbarui foto profil");
-      return;
+      toast.error(apiErrorMessage(err, "Gagal memperbarui foto profil"));
+    } finally {
+      setUploading(false);
+      URL.revokeObjectURL(localPreview);
     }
-    setPreview(json.image ?? null);
-    toast.success("Foto profil diperbarui");
-    router.refresh();
   }
 
   return (

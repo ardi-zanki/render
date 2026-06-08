@@ -33,6 +33,13 @@ import { Modal } from "@/components/ui/modal";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { RenderMode, RenderOutputFormat } from "@/db/schema";
+import { useRenderStatusPolling } from "@/hooks/use-render-status-polling";
+import {
+  apiErrorMessage,
+  apiFieldErrors,
+  apiJson,
+  postJson,
+} from "@/lib/client-api";
 import type { RenderListItem } from "@/lib/renders/service";
 import { cn } from "@/lib/utils";
 
@@ -105,6 +112,14 @@ const cap = (s: string) => (s === "auto" ? "Otomatis" : s[0].toUpperCase() + s.s
 
 type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;
 type StudioView = "asli" | "komparasi" | "hasil";
+type CreateProjectResponse = { id: string; name: string };
+type CreateRenderResponse = {
+  renderId: string;
+  status?: string;
+  balance?: number;
+};
+type ShareResponse = { url: string };
+type DownloadTokenResponse = { url: string };
 
 function ChipGroup({
   options,
@@ -158,6 +173,7 @@ export function RenderStudio({
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const referenceRef = useRef<HTMLInputElement>(null);
+  const { startPolling } = useRenderStatusPolling();
 
   function switchProject(id: string) {
     if (id !== projectId) router.push(`/renders/new?project=${id}`);
@@ -172,22 +188,18 @@ export function RenderStudio({
     setCreatingProject(true);
     setNewProjectErrors({});
     try {
-      const res = await fetch("/api/projects", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+      const json = await postJson<CreateProjectResponse>("/api/projects", {
+        name,
       });
-      const json = await res.json();
-      if (res.ok && json.id) {
-        toast.success("Project dibuat");
-        setCreateOpen(false);
-        setNewProjectName("");
-        setNewProjectErrors({});
-        router.push(`/renders/new?project=${json.id}`);
-      } else {
-        if (json.fieldErrors) setNewProjectErrors(json.fieldErrors);
-        toast.error(json.error ?? "Gagal membuat project");
-      }
+      toast.success("Project dibuat");
+      setCreateOpen(false);
+      setNewProjectName("");
+      setNewProjectErrors({});
+      router.push(`/renders/new?project=${json.id}`);
+    } catch (err) {
+      const fieldErrors = apiFieldErrors(err);
+      if (fieldErrors) setNewProjectErrors(fieldErrors);
+      toast.error(apiErrorMessage(err, "Gagal membuat project"));
     } finally {
       setCreatingProject(false);
     }
@@ -264,39 +276,6 @@ export function RenderStudio({
     }
   }
 
-  async function pollRender(id: string) {
-    for (let attempt = 0; attempt < 90; attempt++) {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      const res = await fetch(`/api/renders/${id}`, { cache: "no-store" });
-      if (!res.ok) continue;
-      const json = await res.json();
-      setRenderStatus(json.status);
-      setScenes((items) =>
-        items.map((item) =>
-          item.id === id
-            ? { ...item, status: json.status, resultUrl: json.resultUrl }
-            : item,
-        ),
-      );
-
-      if (json.status === "success") {
-        setResultUrl(json.resultUrl);
-        setView("hasil");
-        toast.success("Render selesai!");
-        router.refresh();
-        return;
-      }
-
-      if (json.status === "failed") {
-        setError(json.errorMessage ?? "Render gagal. Kredit sudah dikembalikan.");
-        router.refresh();
-        return;
-      }
-    }
-
-    setError("Render masih diproses. Cek Riwayat Render beberapa saat lagi.");
-  }
-
   async function onRender() {
     if (!file) {
       setError("Upload gambar desain dulu ya.");
@@ -329,12 +308,10 @@ export function RenderStudio({
         }
       }
 
-      const res = await fetch("/api/renders", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok) {
-        setError(json.error ?? "Render gagal. Coba lagi.");
-        return;
-      }
+      const json = await apiJson<CreateRenderResponse>("/api/renders", {
+        method: "POST",
+        body: fd,
+      });
       setResultUrl(null);
       setResultRenderId(json.renderId);
       setShareUrl(null);
@@ -345,10 +322,40 @@ export function RenderStudio({
         ...s,
       ]);
       toast.success("Render masuk antrean");
-      void pollRender(json.renderId);
+      startPolling(json.renderId, {
+        onUpdate: (render) => {
+          setRenderStatus(render.status);
+          setScenes((items) =>
+            items.map((item) =>
+              item.id === json.renderId
+                ? {
+                    ...item,
+                    status: render.status,
+                    resultUrl: render.resultUrl,
+                  }
+                : item,
+            ),
+          );
+        },
+        onSuccess: (render) => {
+          setResultUrl(render.resultUrl);
+          setView("hasil");
+          toast.success("Render selesai!");
+          router.refresh();
+        },
+        onFailure: (render) => {
+          setError(
+            render.errorMessage ?? "Render gagal. Kredit sudah dikembalikan.",
+          );
+          router.refresh();
+        },
+        onTimeout: () => {
+          setError("Render masih diproses. Cek Riwayat Render beberapa saat lagi.");
+        },
+      });
       router.refresh();
-    } catch {
-      setError("Tidak bisa terhubung ke server. Coba lagi.");
+    } catch (err) {
+      setError(apiErrorMessage(err, "Tidak bisa terhubung ke server. Coba lagi."));
     } finally {
       setLoading(false);
     }
@@ -358,20 +365,17 @@ export function RenderStudio({
     if (!resultRenderId) return;
     setSharing(true);
     try {
-      const res = await fetch("/api/renders/share", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ renderId: resultRenderId }),
+      const json = await postJson<ShareResponse>("/api/renders/share", {
+        renderId: resultRenderId,
       });
-      const json = await res.json();
-      if (res.ok && json.url) {
-        setShareUrl(json.url);
-        try {
-          await navigator.clipboard.writeText(json.url);
-        } catch {
-          // clipboard may be unavailable; the link is shown below regardless.
-        }
+      setShareUrl(json.url);
+      try {
+        await navigator.clipboard.writeText(json.url);
+      } catch {
+        // clipboard may be unavailable; the link is shown below regardless.
       }
+    } catch (err) {
+      toast.error(apiErrorMessage(err, "Gagal membuat link share"));
     } finally {
       setSharing(false);
     }
@@ -381,15 +385,13 @@ export function RenderStudio({
     if (!resultRenderId) return;
     setDownloading(true);
     try {
-      const res = await fetch(`/api/renders/${resultRenderId}/download-token`, {
-        method: "POST",
-      });
-      const json = await res.json();
-      if (res.ok && json.url) {
-        window.location.href = json.url;
-      } else {
-        toast.error(json.error ?? "Download belum tersedia");
-      }
+      const json = await apiJson<DownloadTokenResponse>(
+        `/api/renders/${resultRenderId}/download-token`,
+        { method: "POST" },
+      );
+      window.location.href = json.url;
+    } catch (err) {
+      toast.error(apiErrorMessage(err, "Download belum tersedia"));
     } finally {
       setDownloading(false);
     }
