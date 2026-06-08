@@ -29,7 +29,7 @@ export function PublicHeader({ nav }: { nav?: NavItem[] }) {
           aria-label="RenderAI beranda"
           className="shrink-0 justify-self-start"
         >
-          <Logo size={28} byline="by Ruma Interior" />
+          <Logo size={28} />
         </Link>
         {hasNav && (
           <nav className="hidden items-center justify-center gap-7 text-sm font-medium text-muted-foreground md:flex">
