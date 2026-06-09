@@ -251,7 +251,7 @@ export default function DesignSystemPage() {
                   penjelasan singkat pada card.
                 </p>
                 <p className="font-mono text-sm text-foreground">
-                  Rp249.000 - 100 kredit - VRENDR-1780227739602
+                  Rp280.000 - 100 kredit - VRENDR-1780227739602
                 </p>
               </div>
               <div className="rounded-lg border border-border bg-muted/40">
@@ -469,7 +469,7 @@ export default function DesignSystemPage() {
                   </thead>
                   <tbody className="divide-y divide-border">
                     {[
-                      ["Creator Pack", "Lunas", "Rp249.000"],
+                      ["Creator Pack", "Lunas", "Rp280.000"],
                       ["Render interior", "Selesai", "1 kredit"],
                     ].map(([item, status, value]) => (
                       <tr key={item} className="hover:bg-muted/30">

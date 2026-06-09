@@ -4,7 +4,7 @@ import { formatCredits, formatPrice, packageCopy } from "./pricing";
 
 describe("pricing helpers", () => {
   it("formats Indonesian Rupiah and credit totals", () => {
-    expect(formatPrice(249000)).toBe("Rp249.000");
+    expect(formatPrice(280000)).toBe("Rp280.000");
     expect(formatCredits(100, 10)).toBe("110 kredit");
   });
 

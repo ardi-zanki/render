@@ -3,19 +3,19 @@ import { paymentPackages } from "@/db/schema";
 
 /** Credit packages seed (PRD §23.2). Packages are managed via seed, not admin. */
 const packages = [
-  { name: "Starter", slug: "starter", price: 79_000, credits: 30, sortOrder: 1 },
+  { name: "Starter", slug: "starter", price: 90_000, credits: 30, sortOrder: 1 },
   {
     name: "Creator",
     slug: "creator",
-    price: 249_000,
+    price: 280_000,
     credits: 100,
     sortOrder: 2,
   },
-  { name: "Studio", slug: "studio", price: 735_000, credits: 300, sortOrder: 3 },
+  { name: "Studio", slug: "studio", price: 780_000, credits: 300, sortOrder: 3 },
   {
     name: "Agency",
     slug: "agency",
-    price: 2_300_000,
+    price: 2_500_000,
     credits: 1_000,
     sortOrder: 4,
   },

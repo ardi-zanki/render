@@ -51,7 +51,7 @@ export const PACKAGE_COPY: Record<string, PackageCopy> = {
 
 const idr = new Intl.NumberFormat("id-ID");
 
-/** Format a Rupiah price, e.g. 249000 -> "Rp249.000". */
+/** Format a Rupiah price, e.g. 280000 -> "Rp280.000". */
 export function formatPrice(price: number) {
   return `Rp${idr.format(price)}`;
 }
