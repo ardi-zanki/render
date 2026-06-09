@@ -44,7 +44,7 @@ export default async function PublicRenderPage({ params }: Params) {
           <div className="flex items-center gap-2">
             <ModeToggle />
             <Button asChild>
-              <Link href="/register">Coba gratis</Link>
+              <Link href="/register">Buat akun</Link>
             </Button>
           </div>
         </div>
@@ -76,15 +76,15 @@ export default async function PublicRenderPage({ params }: Params) {
           {dateFmt.format(render.createdAt)}
         </p>
 
-        <div className="mt-9 flex flex-col items-center gap-3 rounded-lg border border-border bg-muted/40 px-5 py-8 text-center">
-          <p className="text-lg font-semibold text-foreground">
+        <div className="mt-8 flex flex-col items-center gap-3 border-y border-border px-5 py-7 text-center">
+          <p className="text-base font-semibold text-foreground">
             Buat render arsitektur Anda sendiri
           </p>
           <p className="max-w-md text-sm leading-6 text-muted-foreground">
             Upload desain, pilih mode, dan dapatkan visual yang siap dibahas.
             Akun baru mendapatkan kredit awal.
           </p>
-          <Button asChild size="lg">
+          <Button asChild>
             <Link href="/register">
               Mulai eksplorasi <ArrowRight />
             </Link>

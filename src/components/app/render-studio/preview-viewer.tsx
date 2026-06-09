@@ -81,12 +81,12 @@ export function RenderPreviewViewer({
 }) {
   return (
     <Card className="overflow-hidden">
-      <CardContent className="flex flex-col gap-4 py-5">
+      <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {hasUploadedImage ? (
             <div
               role="tablist"
-              className="inline-flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1"
+              className="inline-flex flex-wrap items-center gap-1 rounded-md bg-muted/80 p-1"
             >
               {viewerTabs.map((tab) => {
                 const active = tab.value === view;
@@ -101,7 +101,7 @@ export function RenderPreviewViewer({
                     className={cn(
                       "rounded-md px-3 py-1 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-45",
                       active
-                        ? "bg-card text-primary shadow-sm"
+                        ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.045)]"
                         : "text-muted-foreground hover:text-foreground",
                     )}
                   >
@@ -115,7 +115,7 @@ export function RenderPreviewViewer({
           )}
 
           {shownImage && (
-            <div className="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-lg bg-muted p-1">
+            <div className="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1">
               <Button
                 type="button"
                 variant="ghost"
@@ -152,7 +152,7 @@ export function RenderPreviewViewer({
           )}
         </div>
 
-        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/40">
+        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/35">
           {canCompare && view === "komparasi" ? (
             <div className="relative size-full overflow-hidden bg-background">
               <RenderImage
@@ -190,7 +190,7 @@ export function RenderPreviewViewer({
                 aria-label="Geser komparasi"
               />
               <div
-                className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
+                className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-md border border-border bg-background/90 px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
                 style={{ left: `${comparisonPosition}%` }}
               >
                 <span>Asli</span>
@@ -213,7 +213,7 @@ export function RenderPreviewViewer({
               onClick={() => fileRef.current?.click()}
               className="flex flex-col items-center gap-2 text-muted-foreground"
             >
-              <div className="flex size-11 items-center justify-center rounded-md bg-secondary">
+              <div className="flex size-10 items-center justify-center rounded-md bg-secondary">
                 <ImagePlus className="size-5" />
               </div>
               <span className="text-sm font-medium">
@@ -255,7 +255,7 @@ export function RenderPreviewViewer({
         />
 
         {mode === "style_transfer" && (
-          <div className="rounded-lg border border-border bg-muted/35 p-3">
+          <div className="rounded-lg border border-border/80 bg-muted/35 p-3">
             <div className="mb-2 flex items-center justify-between gap-3">
               <div>
                 <Label>Reference Image</Label>

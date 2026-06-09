@@ -20,11 +20,11 @@ export function RenderSceneList({
         <Badge variant="secondary">{scenes.length}</Badge>
       </div>
       {scenes.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-lg border border-dashed border-border px-4 py-5 text-center text-sm text-muted-foreground">
           Belum ada render di project ini.
         </p>
       ) : (
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6">
           {scenes.map((s) => (
             <div
               key={s.id}

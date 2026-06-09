@@ -7,7 +7,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const base =
-  "inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-3 text-sm font-medium transition-colors";
+  "inline-flex h-8 min-w-8 items-center justify-center rounded-md border px-2.5 text-sm font-medium transition-colors";
 
 /** Page navigation that preserves existing query params (filters, tabs). */
 export function Pagination({

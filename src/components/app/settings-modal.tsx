@@ -150,7 +150,7 @@ export function SettingsModal({
       onClose={onClose}
       labelledBy="settings-title"
       containerClassName="p-3 sm:p-6"
-      panelClassName="flex h-[min(700px,calc(100vh-1.5rem))] w-full max-w-4xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-dialog md:grid md:grid-cols-[210px_1fr]"
+      panelClassName="flex h-[min(680px,calc(100vh-1.5rem))] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-dialog md:grid md:grid-cols-[196px_1fr]"
     >
       <button
         type="button"
@@ -161,7 +161,7 @@ export function SettingsModal({
         <X className="size-5" />
       </button>
 
-      <aside className="border-b border-border bg-muted/35 p-3 pr-12 md:border-b-0 md:border-r">
+      <aside className="border-b border-border bg-muted/35 p-3 pr-12 md:border-b-0 md:border-r md:pr-3">
         <div className="px-2 py-1 md:mb-4">
           <h2 id="settings-title" className="text-base font-semibold text-foreground">
             Pengaturan
@@ -180,7 +180,7 @@ export function SettingsModal({
                 className={cn(
                   "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   selected
-                    ? "bg-card text-primary shadow-sm"
+                    ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.045)]"
                     : "text-muted-foreground hover:bg-card/70 hover:text-foreground",
                 )}
               >
@@ -192,17 +192,17 @@ export function SettingsModal({
         </nav>
       </aside>
 
-      <div className="min-h-0 overflow-y-auto p-5 sm:p-7">
+      <div className="min-h-0 overflow-y-auto p-5">
         {activeTab === "profile" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Profil</h3>
+              <h3 className="text-base font-semibold text-foreground">Profil</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Kelola informasi akun dan identitas yang tampil di aplikasi.
               </p>
             </div>
 
-            <div className="rounded-lg border border-border bg-background/60 p-4">
+            <div className="rounded-lg border border-border/80 bg-background/60 p-4">
               <AvatarUpload name={user.name} image={user.image} />
             </div>
 
@@ -217,7 +217,7 @@ export function SettingsModal({
         {activeTab === "preferences" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Preferensi</h3>
+              <h3 className="text-base font-semibold text-foreground">Preferensi</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Atur tampilan, tema, notifikasi, dan default render.
               </p>
@@ -247,7 +247,7 @@ export function SettingsModal({
         {activeTab === "security" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Keamanan</h3>
+              <h3 className="text-base font-semibold text-foreground">Keamanan</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Ubah password dan tinjau sesi login aktif.
               </p>
@@ -255,9 +255,9 @@ export function SettingsModal({
 
             <PasswordForm />
 
-            <div className="rounded-lg border border-border bg-background/60 p-4">
+            <div className="rounded-lg border border-border/80 bg-background/60 p-4">
               <div className="flex items-start gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-foreground">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-foreground">
                   <Monitor className="size-4" />
                 </span>
                 <div className="min-w-0 flex-1">
@@ -272,9 +272,9 @@ export function SettingsModal({
               </div>
             </div>
 
-            <div className="rounded-lg border border-border bg-background/60 p-4">
+            <div className="rounded-lg border border-border/80 bg-background/60 p-4">
               <div className="flex items-start gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold text-foreground">
                   G
                 </span>
                 <div className="min-w-0 flex-1">
@@ -296,7 +296,7 @@ export function SettingsModal({
         {activeTab === "storage" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Storage</h3>
+              <h3 className="text-base font-semibold text-foreground">Storage</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Pantau kapasitas file mentahan, referensi, hasil render, dan hasil edit.
               </p>
@@ -309,10 +309,10 @@ export function SettingsModal({
               </Alert>
             )}
 
-            <div className="rounded-lg border border-border bg-background/60 p-4">
+            <div className="rounded-lg border border-border/80 bg-background/60 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xl font-semibold text-foreground">
+                  <p className="text-lg font-semibold text-foreground">
                     {formatBytes(usage.usedBytes)} dari{" "}
                     {formatBytes(usage.limitBytes)} terpakai
                   </p>
@@ -349,13 +349,13 @@ export function SettingsModal({
               </p>
             </div>
 
-            <div className="rounded-lg border border-border bg-background/60">
+            <div className="rounded-lg border border-border/80 bg-background/60">
               {usage.categories.map((category, index) => (
                 <div
                   key={category.type}
                   className={cn(
                     "flex items-center justify-between gap-4 px-4 py-3",
-                    index > 0 && "border-t border-border",
+                    index > 0 && "border-t border-border/80",
                   )}
                 >
                   <div>
@@ -377,7 +377,7 @@ export function SettingsModal({
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="font-semibold text-destructive">
-                    Remove all storage
+                    Hapus semua storage
                   </p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Menghapus semua file mentahan, referensi, hasil render, dan
@@ -393,7 +393,7 @@ export function SettingsModal({
                   }}
                   disabled={usage.assetCount === 0}
                 >
-                  <Trash2 /> Remove all
+                  <Trash2 /> Hapus semua
                 </Button>
               </div>
             </div>

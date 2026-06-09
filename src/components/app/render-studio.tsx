@@ -223,7 +223,7 @@ export function RenderStudio({
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[300px_1fr]">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[288px_1fr]">
       <RenderStudioControls
         projectId={projectId}
         projects={projects}

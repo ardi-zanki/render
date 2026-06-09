@@ -15,34 +15,34 @@ export type PackageCopy = {
 
 export const PACKAGE_COPY: Record<string, PackageCopy> = {
   starter: {
-    note: "Untuk validasi workflow awal",
+    note: "Untuk mencoba alur render pada project pertama",
     features: [
-      "Eksplorasi ringan",
-      "Project dan riwayat render",
+      "Eksplorasi konsep ringan",
+      "Project dan riwayat tersimpan",
       "Mode interior dan eksterior",
     ],
   },
   creator: {
-    note: "Untuk presentasi dan revisi rutin",
+    note: "Untuk presentasi, opsi mood, dan revisi rutin",
     highlighted: true,
     features: [
-      "Lebih leluasa membuat opsi",
-      "Riwayat render tertata",
+      "Lebih leluasa membuat variasi",
+      "Hasil tertata per project",
       "Bagikan dan unduh hasil",
     ],
   },
   studio: {
-    note: "Untuk beberapa project berjalan",
+    note: "Untuk beberapa project berjalan dalam satu studio",
     features: [
       "Cocok untuk tim desain",
-      "Manajemen project",
+      "Manajemen project aktif",
       "Bagikan dan unduh hasil",
     ],
   },
   agency: {
-    note: "Untuk kebutuhan visual volume tinggi",
+    note: "Untuk eksplorasi visual volume tinggi",
     features: [
-      "Kapasitas render tinggi",
+      "Kapasitas render lebih besar",
       "Workflow multi-project",
       "Bagikan dan unduh hasil",
     ],

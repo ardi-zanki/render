@@ -78,11 +78,11 @@ export default async function NotificationsPage({
                   key={n.id}
                   href={n.actionUrl ?? "#"}
                   className={cn(
-                    "flex gap-3 px-4 py-3 transition-colors hover:bg-muted",
+                    "flex gap-3 px-4 py-3 transition-colors hover:bg-muted/80",
                     !n.isRead && "bg-primary/5",
                   )}
                 >
-                  <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-secondary text-foreground">
                     <Icon className="size-4" />
                   </span>
                   <div className="flex min-w-0 flex-1 flex-col">

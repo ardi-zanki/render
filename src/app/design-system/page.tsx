@@ -40,8 +40,8 @@ const colorGroups = [
   {
     title: "Brand",
     swatches: [
-      { label: "Navy Blue", token: "--primary", note: "CTA, navigasi aktif, focus" },
-      { label: "Soft Blue", token: "--accent", note: "Highlight AI dan konteks" },
+      { label: "Render Navy", token: "--primary", note: "CTA, navigasi aktif, focus" },
+      { label: "Teal Mist", token: "--accent", note: "Highlight AI dan konteks" },
       { label: "Ink", token: "--foreground", note: "Teks utama" },
     ],
   },
@@ -66,9 +66,9 @@ const colorGroups = [
 ];
 
 const typeScale = [
-  ["Display", "42/48", "Headline landing"],
+  ["Display", "40/48", "Headline landing"],
   ["H1", "24/32", "Judul halaman app"],
-  ["H2", "20/28", "Judul section"],
+  ["H2", "18/26", "Judul section"],
   ["Body", "14/24", "Form, card, tabel"],
   ["Caption", "12/18", "Meta dan helper text"],
 ];
@@ -85,6 +85,16 @@ const foundations = [
     ],
   },
   {
+    title: "Layout",
+    icon: PanelTop,
+    items: [
+      "Container publik 1120px",
+      "App container 1120px",
+      "Grid kartu 12px gap",
+      "Sidebar 240px / collapsed 72px",
+    ],
+  },
+  {
     title: "Radius",
     icon: Layers3,
     items: [
@@ -96,14 +106,14 @@ const foundations = [
   },
   {
     title: "Elevation",
-    icon: PanelTop,
+    icon: Sparkles,
     items: ["Card memakai shadow-soft yang sangat halus", "Menu memakai shadow-elevated", "Modal memakai overlay blur ringan dan shadow-dialog"],
   },
 ];
 
 const visualAssetRules = [
   "Visual utama harus menunjukkan ruang, project, atau UI produk yang relevan, bukan ilustrasi generik.",
-  "Mockup produk memakai komponen terbaru: radius konsisten, Navy Blue sebagai aksen, dan layout yang lapang.",
+  "Mockup produk memakai komponen terbaru: radius konsisten, Render Navy sebagai aksen, dan layout yang lapang.",
   "Gambar showcase menggunakan rasio stabil, crop bersih, kontras cukup, dan caption singkat.",
   "Preview fitur harus membantu pengguna memahami manfaat workflow, bukan hanya menjadi dekorasi.",
 ];
@@ -206,7 +216,8 @@ export default function DesignSystemPage() {
                   items={[
                     "Konten lebih penting dari dekorasi.",
                     "Komponen padat, tetapi tetap mudah disentuh.",
-                    "Navy Blue menjadi identitas utama dan aksi utama.",
+                    "Render Navy menjadi identitas utama dan aksi utama.",
+                    "Lucide menjadi icon set untuk navigasi, aksi, dan feedback.",
                     "Shadow hanya muncul saat ada layer atau menu.",
                   ]}
                 />
@@ -219,7 +230,7 @@ export default function DesignSystemPage() {
 
         <Section
           title="Palet Warna"
-          description="Primary Navy Blue dipakai untuk aksi utama, link penting, focus ring, dan status aktif. Neutral surface menjaga app tetap ringan, premium, dan profesional."
+          description="Render Navy dipakai untuk aksi utama, link penting, focus ring, dan status aktif. Neutral surface menjaga app tetap ringan, premium, dan profesional."
         >
           <div className="grid gap-6">
             {colorGroups.map((group) => (
@@ -246,10 +257,10 @@ export default function DesignSystemPage() {
           <Card>
             <CardContent className="grid gap-5 py-5 lg:grid-cols-[1fr_320px]">
               <div className="space-y-4">
-                <p className="text-3xl font-semibold leading-tight text-foreground">
+                <p className="text-2xl font-semibold leading-tight text-foreground">
                   Visual arsitektur siap dibahas
                 </p>
-                <p className="text-2xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground">
                   Dashboard project
                 </p>
                 <p className="text-base leading-7 text-foreground">
@@ -285,14 +296,14 @@ export default function DesignSystemPage() {
         <Separator />
 
         <Section
-          title="Spacing, Radius, Shadow"
+          title="Spacing, Layout, Radius, Shadow"
           description="Sistem ini menjaga UI tetap rapi dan tidak terasa penuh, terutama pada dashboard dan form yang berulang."
         >
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
             {foundations.map((item) => (
               <Card key={item.title}>
                 <CardContent className="flex flex-col gap-4 py-5">
-                  <div className="flex size-10 items-center justify-center rounded-md bg-secondary text-primary">
+                  <div className="flex size-9 items-center justify-center rounded-md bg-accent text-primary">
                     <item.icon className="size-4" />
                   </div>
                   <div>

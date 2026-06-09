@@ -26,7 +26,7 @@ export function Segmented<T extends string>({
     <div
       role="tablist"
       className={cn(
-        "inline-flex flex-wrap items-center gap-1 rounded-md bg-muted p-1",
+        "inline-flex flex-wrap items-center gap-1 rounded-md bg-muted/80 p-1",
         className,
       )}
     >
@@ -43,7 +43,7 @@ export function Segmented<T extends string>({
               "cursor-pointer rounded-sm font-medium transition-colors",
               size === "sm" ? "px-3 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
               active
-                ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.06)]"
+                ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.045)]"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

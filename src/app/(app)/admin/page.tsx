@@ -64,12 +64,12 @@ export default async function AdminOverviewPage() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {cards.map((c) => (
           <Card key={c.label}>
-            <CardContent className="flex flex-col gap-3 py-5">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <CardContent className="flex flex-col gap-3 py-4">
+              <div className="flex size-8 items-center justify-center rounded-md bg-accent text-primary">
                 <c.icon className="size-4" />
               </div>
               <div>
-                <p className="text-xl font-semibold text-foreground">
+                <p className="text-lg font-semibold text-foreground">
                   {c.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{c.label}</p>
@@ -82,12 +82,12 @@ export default async function AdminOverviewPage() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Card>
-          <CardContent className="flex items-center justify-between gap-3 py-5">
+          <CardContent className="flex items-center justify-between gap-3 py-4">
             <div>
               <p className="text-sm text-muted-foreground">
                 AI provider error rate
               </p>
-              <p className="mt-1 text-xl font-semibold text-foreground">
+              <p className="mt-1 text-lg font-semibold text-foreground">
                 {stats.aiProviderErrorRate}%
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -114,10 +114,10 @@ export default async function AdminOverviewPage() {
         </Card>
 
         <Card>
-          <CardContent className="flex items-center justify-between gap-3 py-5">
+          <CardContent className="flex items-center justify-between gap-3 py-4">
             <div>
               <p className="text-sm text-muted-foreground">Payment webhook</p>
-              <p className="mt-1 text-xl font-semibold text-foreground">
+              <p className="mt-1 text-lg font-semibold text-foreground">
                 {idr.format(stats.webhookReceived)}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">

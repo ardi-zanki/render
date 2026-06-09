@@ -53,11 +53,11 @@ function Logo({
       <LogoMark size={size} />
       {withWordmark && (
         <span className="flex flex-col leading-none">
-          <span className="text-xl font-extrabold tracking-normal text-foreground">
+          <span className="text-lg font-extrabold tracking-normal text-foreground">
             RenderAI<span className="text-primary">.</span>
           </span>
           {byline && (
-            <span className="mt-0.5 text-[11px] font-medium text-muted-foreground">
+            <span className="mt-0.5 text-[10px] font-medium text-muted-foreground">
               {byline}
             </span>
           )}

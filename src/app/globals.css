@@ -6,105 +6,106 @@
 
 /*
   RenderAI Design Tokens
-  A premium navy-led palette, compact radius scale, and subtle surfaces for one
-  consistent product language across landing, auth, email, and app screens.
+  RenderAI's product language: calm architectural neutrals, disciplined navy,
+  restrained accent colors, compact radii, and soft elevation across landing,
+  auth, email, app, and dashboard screens.
 */
 :root {
   --radius: 0.5rem;
 
   /* Surfaces */
-  --background: #f7f9fc;
-  --foreground: #111827;
+  --background: #f8fafc;
+  --foreground: #172033;
   --card: #ffffff;
-  --card-foreground: #111827;
+  --card-foreground: #172033;
   --popover: #ffffff;
-  --popover-foreground: #121826;
+  --popover-foreground: #172033;
 
-  /* Brand primary - navy blue */
-  --primary: #102a56;
+  /* Brand primary */
+  --primary: #173b67;
   --primary-foreground: #ffffff;
 
   /* Secondary neutral surface */
-  --secondary: #eef3f8;
-  --secondary-foreground: #172033;
+  --secondary: #eef3f7;
+  --secondary-foreground: #223044;
 
-  --muted: #f0f4f8;
-  --muted-foreground: #667085;
+  --muted: #f1f5f9;
+  --muted-foreground: #66758a;
 
   /* Accent */
-  --accent: #eaf1ff;
-  --accent-foreground: #183d75;
+  --accent: #eaf6f7;
+  --accent-foreground: #155d63;
 
   /* Semantic */
-  --destructive: #c94343;
+  --destructive: #bf3f45;
   --destructive-foreground: #ffffff;
-  --success: #2f855a;
+  --success: #2f7d63;
   --success-foreground: #ffffff;
-  --warning: #b7791f;
+  --warning: #a56a20;
   --warning-foreground: #ffffff;
-  --info: #2563eb;
+  --info: #2563d8;
   --info-foreground: #ffffff;
 
   /* Lines & focus */
-  --border: #dbe3ea;
-  --input: #cfd8e3;
-  --ring: #102a56;
+  --border: #d9e2ec;
+  --input: #cbd6e2;
+  --ring: #1f5b91;
 
   /* Brand accent */
-  --brand-violet: #5d6fd7;
-  --brand-navy: #102a56;
-  --brand-sky: #eef5ff;
+  --brand-violet: #6674d8;
+  --brand-navy: #173b67;
+  --brand-sky: #eef6fb;
 
   /* Charts */
-  --chart-1: #102a56;
-  --chart-2: #5d6fd7;
-  --chart-3: #2563eb;
-  --chart-4: #b7791f;
-  --chart-5: #2f855a;
+  --chart-1: #173b67;
+  --chart-2: #2f7d63;
+  --chart-3: #6674d8;
+  --chart-4: #a56a20;
+  --chart-5: #2563d8;
 }
 
 .dark {
-  --background: #080f1f;
-  --foreground: #f3f7fb;
-  --card: #0f1829;
-  --card-foreground: #f3f7fb;
-  --popover: #0f1829;
-  --popover-foreground: #f3f7fb;
+  --background: #08111f;
+  --foreground: #f2f6fb;
+  --card: #0f1a2a;
+  --card-foreground: #f2f6fb;
+  --popover: #0f1a2a;
+  --popover-foreground: #f2f6fb;
 
-  --primary: #8fb4ff;
-  --primary-foreground: #061225;
+  --primary: #91b8f2;
+  --primary-foreground: #071425;
 
-  --secondary: #172235;
-  --secondary-foreground: #f3f7fb;
+  --secondary: #182538;
+  --secondary-foreground: #f2f6fb;
 
-  --muted: #131d30;
-  --muted-foreground: #a7b2c4;
+  --muted: #132033;
+  --muted-foreground: #a6b4c6;
 
-  --accent: #1a2747;
-  --accent-foreground: #c8d5ff;
+  --accent: #102f38;
+  --accent-foreground: #bcebf0;
 
-  --destructive: #ff6b6b;
-  --destructive-foreground: #240909;
-  --success: #65d394;
-  --success-foreground: #071a10;
-  --warning: #e7b867;
-  --warning-foreground: #201506;
-  --info: #78a8ff;
-  --info-foreground: #071222;
+  --destructive: #ff7b80;
+  --destructive-foreground: #22090b;
+  --success: #73d2a5;
+  --success-foreground: #07180f;
+  --warning: #e3b46f;
+  --warning-foreground: #201406;
+  --info: #82adff;
+  --info-foreground: #071322;
 
-  --border: #263247;
-  --input: #334159;
-  --ring: #9badff;
+  --border: #263448;
+  --input: #34445b;
+  --ring: #9fc2f8;
 
-  --brand-violet: #8b7dff;
-  --brand-navy: #8fb4ff;
-  --brand-sky: #13223d;
+  --brand-violet: #9a9cff;
+  --brand-navy: #91b8f2;
+  --brand-sky: #102438;
 
-  --chart-1: #9badff;
-  --chart-2: #8b7dff;
-  --chart-3: #78a8ff;
-  --chart-4: #e7b867;
-  --chart-5: #65d394;
+  --chart-1: #91b8f2;
+  --chart-2: #73d2a5;
+  --chart-3: #9a9cff;
+  --chart-4: #e3b46f;
+  --chart-5: #82adff;
 }
 
 @theme inline {
@@ -151,9 +152,9 @@
   --radius-xl: var(--radius);
   --radius-2xl: calc(var(--radius) + 6px);
 
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.035), 0 8px 20px rgb(15 23 42 / 0.035);
-  --shadow-elevated: 0 14px 36px rgb(15 23 42 / 0.12);
-  --shadow-dialog: 0 22px 64px rgb(15 23 42 / 0.18);
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.035);
+  --shadow-elevated: 0 12px 32px rgb(15 23 42 / 0.12);
+  --shadow-dialog: 0 22px 56px rgb(15 23 42 / 0.18);
 }
 
 @layer base {
@@ -169,10 +170,20 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     font-size: 14px;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4 {
     letter-spacing: 0;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary {
+    -webkit-tap-highlight-color: transparent;
   }
 
   ::selection {
@@ -202,5 +213,10 @@
   .container-app {
     width: min(100% - 2rem, 72rem);
     margin-inline: auto;
+  }
+
+  .surface-subtle {
+    background-color: color-mix(in oklch, var(--card) 86%, var(--muted));
+    border-color: color-mix(in oklch, var(--border) 82%, transparent);
   }
 }

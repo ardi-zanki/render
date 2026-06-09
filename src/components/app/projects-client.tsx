@@ -182,7 +182,7 @@ function ProjectFormModal({
 }
 
 const menuItem =
-  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
+  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground transition-colors hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
 const CONFIRM_COPY = {
   archive: {
@@ -307,7 +307,7 @@ export function ProjectsClient({
                       <FolderOpen className="size-7 text-muted-foreground" />
                     )}
                   </div>
-                  <CardContent className="py-4">
+                  <CardContent className="py-3.5">
                     <p className="flex items-center gap-2 truncate font-semibold text-foreground">
                       {p.name}
                       {p.isDefault && <Badge variant="secondary">Default</Badge>}
@@ -344,7 +344,7 @@ export function ProjectsClient({
           open
           onClose={() => setMenuId(null)}
           width={176}
-          className="rounded-lg border border-border bg-popover p-1 shadow-[0_12px_32px_rgb(15_23_42/0.12)]"
+          className="rounded-lg border border-border/80 bg-popover p-1 shadow-elevated"
         >
           <button
             className={menuItem}

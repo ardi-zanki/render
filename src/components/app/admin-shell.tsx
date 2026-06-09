@@ -14,11 +14,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <div>
       <div className="mb-5 flex items-center gap-3">
-        <span className="flex size-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <span className="flex size-9 items-center justify-center rounded-md bg-accent text-primary">
           <Icon className="size-4" />
         </span>
         <div className="flex flex-col">
-          <h1 className="text-xl font-semibold leading-tight text-foreground sm:text-2xl">
+          <h1 className="text-xl font-semibold leading-tight text-foreground">
             {isAudit ? "Log Audit" : "Admin"}
           </h1>
           <p className="text-sm leading-6 text-muted-foreground">

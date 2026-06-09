@@ -99,7 +99,7 @@ export default function TermsPage() {
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
         <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
+          <p className="text-xs font-semibold uppercase text-primary">
             Legal RenderAI
           </p>
           <h1 className="mt-3 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
@@ -110,7 +110,7 @@ export default function TermsPage() {
             kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan
             layanan.
           </p>
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-3 text-xs font-medium text-muted-foreground">
             Terakhir diperbarui: 1 Juni 2026
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function TermsPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-7 flex flex-col gap-3 rounded-lg border border-border/80 bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-7 flex flex-col gap-3 border-y border-border/80 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-semibold text-foreground">
               Siap mulai menggunakan RenderAI?
@@ -148,7 +148,7 @@ export default function TermsPage() {
             </p>
           </div>
           <Button asChild className="shrink-0">
-            <Link href="/register">Kembali ke daftar</Link>
+            <Link href="/register">Buat akun</Link>
           </Button>
         </div>
       </main>

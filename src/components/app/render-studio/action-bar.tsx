@@ -97,7 +97,7 @@ export function RenderActionBar({
       </div>
 
       {shareUrl && (
-        <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs">
+        <div className="flex items-center gap-2 rounded-md bg-muted/60 px-3 py-2 text-xs">
           <Share2 className="size-3.5 shrink-0 text-primary" />
           <span className="truncate font-mono text-muted-foreground">
             {shareUrl}

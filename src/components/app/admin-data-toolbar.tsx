@@ -26,7 +26,7 @@ export function AdminDataToolbar({
   return (
     <form
       method="get"
-      className="flex flex-col gap-2 rounded-lg border border-border/80 bg-card p-3 shadow-soft lg:flex-row lg:items-end"
+      className="flex flex-col gap-2 rounded-lg border border-border/75 bg-card p-3 shadow-soft lg:flex-row lg:items-end"
     >
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <label

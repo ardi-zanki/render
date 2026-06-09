@@ -1,4 +1,5 @@
 import { asc, eq } from "drizzle-orm";
+import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -13,7 +14,8 @@ import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Harga RenderAI",
-  description: "Paket kredit RenderAI untuk membuat render arsitektur AI.",
+  description:
+    "Paket kredit RenderAI untuk eksplorasi visual arsitektur dan interior berbasis AI.",
 };
 
 export const revalidate = 3600;
@@ -29,15 +31,15 @@ export default async function HargaPage() {
       <PublicHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
+          <p className="text-xs font-semibold uppercase text-primary">
             Paket Kredit
           </p>
           <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
-            Harga yang mengikuti ritme project desain
+            Kredit fleksibel untuk setiap ritme project desain
           </h1>
           <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
-            RenderAI memakai sistem kredit. Mulai kecil untuk validasi workflow,
-            lalu tambah kapasitas saat kebutuhan visual meningkat.
+            Mulai dari kebutuhan eksplorasi kecil, lalu tambah kapasitas saat
+            presentasi, revisi, dan jumlah project meningkat.
           </p>
         </div>
 
@@ -71,6 +73,14 @@ export default async function HargaPage() {
                       {copy.note}
                     </p>
                   </div>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    {copy.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2">
+                        <Check className="mt-0.5 size-4 shrink-0 text-success" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                   <Button asChild className="mt-auto">
                     <Link href="/register">Mulai render</Link>
                   </Button>

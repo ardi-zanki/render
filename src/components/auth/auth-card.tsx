@@ -13,7 +13,7 @@ type AuthCardProps = {
 
 function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
-    <div className="flex w-full max-w-[390px] flex-col gap-4">
+    <div className="flex w-full max-w-[380px] flex-col gap-4">
       <div className="flex flex-col items-center gap-2.5">
         <Link href="/" aria-label="RenderAI beranda">
           <Logo size={28} />
@@ -30,8 +30,8 @@ function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
         </div>
       </div>
 
-      <Card className="border-border/80 bg-card/95 shadow-[0_1px_2px_rgb(15_23_42/0.04)]">
-        <CardContent className="flex flex-col gap-4 py-4">
+      <Card className="border-border/75 bg-card/95 shadow-soft">
+        <CardContent className="flex flex-col gap-4 px-5 py-5">
           {children}
         </CardContent>
       </Card>

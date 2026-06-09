@@ -22,12 +22,12 @@ function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border/85 bg-card/70 px-5 py-7 text-center",
+        "flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border/85 bg-card/70 px-5 py-6 text-center",
         className,
       )}
     >
-      <div className="flex size-10 items-center justify-center rounded-md bg-accent text-primary">
-        <Icon className="size-5" />
+      <div className="flex size-9 items-center justify-center rounded-md bg-accent text-primary">
+        <Icon className="size-4" />
       </div>
       <div className="flex flex-col gap-1">
         <p className="text-sm font-semibold text-foreground">{title}</p>

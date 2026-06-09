@@ -20,7 +20,7 @@ const TABS: [string, string][] = [
 export function AdminNav() {
   const pathname = usePathname();
   return (
-    <div className="mb-5 flex gap-1 overflow-x-auto border-b border-border">
+    <div className="mb-5 flex gap-1 overflow-x-auto border-b border-border/75">
       {TABS.map(([href, label]) => {
         const active = pathname === href;
         return (
@@ -28,7 +28,7 @@ export function AdminNav() {
             key={href}
             href={href}
             className={cn(
-              "whitespace-nowrap border-b-2 px-3.5 py-2 text-sm font-medium transition-colors",
+              "whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors",
               active
                 ? "border-primary text-foreground"
                 : "border-transparent text-muted-foreground hover:text-foreground",

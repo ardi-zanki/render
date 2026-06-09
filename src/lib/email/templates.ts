@@ -3,11 +3,11 @@
  * All copy in Bahasa Indonesia (PRD §25).
  */
 
-const BRAND_NAVY = "#102a56";
-const INK = "#121826";
-const MUTED = "#68758a";
-const BORDER = "#dbe3ef";
-const SURFACE = "#f7f9fc";
+const BRAND_NAVY = "#173b67";
+const INK = "#172033";
+const MUTED = "#66758a";
+const BORDER = "#d9e2ec";
+const SURFACE = "#f8fafc";
 
 function layout(opts: {
   heading: string;
@@ -21,14 +21,14 @@ function layout(opts: {
   <body style="margin:0;background:${SURFACE};font-family:'Plus Jakarta Sans',Arial,sans-serif;color:${INK};">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:28px 12px;">
       <tr><td align="center">
-        <table role="presentation" width="500" cellpadding="0" cellspacing="0" style="width:100%;max-width:500px;background:#ffffff;border:1px solid ${BORDER};border-radius:10px;overflow:hidden;box-shadow:0 10px 28px rgba(15,23,42,0.06);">
+        <table role="presentation" width="500" cellpadding="0" cellspacing="0" style="width:100%;max-width:500px;background:#ffffff;border:1px solid ${BORDER};border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,0.04);">
           <tr><td style="height:4px;background:${BRAND_NAVY};font-size:0;line-height:0;">&nbsp;</td></tr>
           <tr><td style="padding:24px 28px 6px;">
             <span style="display:inline-block;width:28px;height:28px;background:${BRAND_NAVY};border-radius:8px;vertical-align:middle;text-align:center;line-height:28px;color:#ffffff;font-size:17px;font-weight:800;font-style:italic;letter-spacing:-3px;">//</span>
-            <span style="font-size:18px;font-weight:800;letter-spacing:0;vertical-align:middle;margin-left:9px;">RenderAI<span style="color:${BRAND_NAVY}">.</span></span>
+            <span style="font-size:17px;font-weight:800;letter-spacing:0;vertical-align:middle;margin-left:9px;">RenderAI<span style="color:${BRAND_NAVY}">.</span></span>
           </td></tr>
           <tr><td style="padding:8px 28px 0;">
-            <h1 style="font-size:20px;line-height:1.35;font-weight:800;letter-spacing:0;margin:10px 0;color:${INK};">${heading}</h1>
+            <h1 style="font-size:20px;line-height:1.35;font-weight:700;letter-spacing:0;margin:10px 0;color:${INK};">${heading}</h1>
             <div style="font-size:14px;line-height:1.7;color:#3f4a5d;">${body}</div>
           </td></tr>
           ${

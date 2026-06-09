@@ -130,14 +130,14 @@ export function AppShell({
       <aside
         onClick={(e) => openCollapsedSidebarFromEmptyArea(e, expanded)}
         className={cn(
-          "flex h-full flex-col overflow-visible border-r border-border/80 bg-card transition-[width] duration-200",
+          "flex h-full flex-col overflow-visible border-r border-border/75 bg-card transition-[width] duration-200",
           expanded ? "w-60" : "w-[72px]",
         )}
         suppressHydrationWarning
       >
         <div
           className={cn(
-            "flex h-14 items-center border-b border-border/70 px-4",
+            "flex h-14 items-center border-b border-border/75 px-4",
             expanded ? "justify-between" : "justify-center",
           )}
         >
@@ -158,7 +158,7 @@ export function AppShell({
           <button
             type="button"
             className={cn(
-              "hidden rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-primary lg:flex",
+              "hidden rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted/80 hover:text-primary lg:flex",
               !expanded && "flex",
             )}
             onClick={() => updateSidebarExpanded(!sidebarExpanded)}
@@ -175,11 +175,11 @@ export function AppShell({
             variant="ghost"
             size={expanded ? "default" : "icon"}
             className={cn(
-              "group relative w-full justify-start rounded-md px-3 font-medium hover:bg-muted",
+              "group relative w-full justify-start rounded-md px-3 font-medium hover:bg-muted/80",
               !expanded && "justify-center px-0",
               renderNewActive
                 ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                : "text-primary hover:bg-accent",
+                : "text-primary hover:bg-accent/80",
             )}
           >
             <Link
@@ -207,7 +207,7 @@ export function AppShell({
                   !expanded && "justify-center px-0",
                   active
                     ? "bg-accent text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
                 )}
               >
                 <item.icon className="size-4 shrink-0" />
@@ -227,7 +227,7 @@ export function AppShell({
                   !expanded && "justify-center px-0",
                   isActive("/admin") && !isActive("/admin/audit")
                     ? "bg-accent text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
                 )}
               >
                 <Shield className="size-4 shrink-0" />
@@ -242,7 +242,7 @@ export function AppShell({
                   !expanded && "justify-center px-0",
                   isActive("/admin/audit")
                     ? "bg-accent text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
                 )}
               >
                 <ClipboardList className="size-4 shrink-0" />
@@ -254,7 +254,7 @@ export function AppShell({
 
         <div
           className={cn(
-            "border-t border-border/80 p-3",
+            "border-t border-border/75 p-3",
             !expanded && "pb-16",
           )}
         >
@@ -304,7 +304,7 @@ export function AppShell({
         )}
         suppressHydrationWarning
       >
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/80 bg-background/90 px-4 backdrop-blur-xl sm:px-5">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/75 bg-background/90 px-4 backdrop-blur-xl sm:px-5">
           <button
             className="text-foreground lg:hidden"
             onClick={() => setOpen(true)}
@@ -323,7 +323,7 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-4 py-4 sm:px-5 sm:py-5">
+        <main className="mx-auto max-w-6xl px-4 py-5 sm:px-5 sm:py-6">
           {children}
         </main>
       </div>

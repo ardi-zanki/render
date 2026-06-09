@@ -14,9 +14,9 @@ export function AdminTable({
   isEmpty?: boolean;
 }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-border/85 bg-card shadow-soft">
+    <div className="overflow-x-auto rounded-lg border border-border/75 bg-card shadow-soft">
       <table className="w-full min-w-[640px] text-sm">
-        <thead className="bg-muted/65 text-left text-xs font-semibold uppercase tracking-[0.04em] text-muted-foreground">
+        <thead className="bg-muted/55 text-left text-xs font-semibold text-muted-foreground">
           <tr>
             {headers.map((h, i) => (
               <th
@@ -28,7 +28,7 @@ export function AdminTable({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-border/80">
+        <tbody className="divide-y divide-border/75">
           {isEmpty ? (
             <tr>
               <td

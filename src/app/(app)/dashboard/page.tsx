@@ -141,9 +141,9 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.label} className="transition-colors hover:border-primary/25">
-            <CardContent className="flex flex-col gap-3 py-5">
+            <CardContent className="flex flex-col gap-3 py-4">
               <div className="flex items-center justify-between">
-                <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <div className="flex size-8 items-center justify-center rounded-md bg-accent text-primary">
                   <s.icon className="size-4" />
                 </div>
                 {s.href && (
@@ -156,7 +156,7 @@ export default async function DashboardPage() {
                 )}
               </div>
               <div>
-                <p className="text-xl font-semibold tracking-normal text-foreground">
+                <p className="text-lg font-semibold tracking-normal text-foreground">
                   {s.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{s.label}</p>
@@ -170,8 +170,8 @@ export default async function DashboardPage() {
       <Card className="mt-5 overflow-hidden border-0 bg-primary text-primary-foreground shadow-soft">
         <CardContent className="flex flex-col items-start gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
-            <p className="flex items-center gap-2 text-base font-semibold sm:text-lg">
-              <Sparkles className="size-5" /> Buat opsi visual berikutnya
+            <p className="flex items-center gap-2 text-base font-semibold">
+              <Sparkles className="size-4" /> Buat opsi visual berikutnya
             </p>
             <p className="text-sm leading-6 text-primary-foreground/80">
               Upload desain, tentukan konteks, lalu simpan hasilnya langsung ke
@@ -191,7 +191,7 @@ export default async function DashboardPage() {
         <Card>
           <CardContent className="flex items-center justify-between gap-3 py-4">
             <div className="flex min-w-0 items-center gap-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-accent text-primary">
                 <CreditCard className="size-4" />
               </span>
               <div className="min-w-0">
@@ -232,7 +232,7 @@ export default async function DashboardPage() {
           <Card className="transition-colors hover:border-primary/25">
             <CardContent className="flex items-center justify-between gap-3 py-4">
               <div className="flex items-center gap-3">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-accent text-primary">
                   <Bell className="size-4" />
                 </span>
                 <div>
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
       {/* Recent renders */}
       <section className="mt-7">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Render Terbaru</h2>
+          <h2 className="text-base font-semibold text-foreground">Render Terbaru</h2>
           <Link
             href="/renders"
             className="text-sm font-medium text-primary hover:underline"
@@ -306,7 +306,7 @@ export default async function DashboardPage() {
       {/* Projects */}
       <section className="mt-7">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Project</h2>
+          <h2 className="text-base font-semibold text-foreground">Project</h2>
           <Link
             href="/projects"
             className="text-sm font-medium text-primary hover:underline"
@@ -318,7 +318,7 @@ export default async function DashboardPage() {
           {recentProjects.map((p) => (
             <Link key={p.id} href={`/projects/${p.id}`}>
               <Card className="transition-colors hover:border-primary/35">
-                <CardContent className="flex flex-col gap-3 py-5">
+                <CardContent className="flex flex-col gap-3 py-4">
                   <div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-muted text-muted-foreground">
                     {p.coverImageUrl ? (
                       <RenderImage

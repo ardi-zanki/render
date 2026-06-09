@@ -28,7 +28,7 @@ type MenuPreferences = {
 };
 
 const itemClass =
-  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
+  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
 export function UserMenu({
   user,
@@ -76,7 +76,7 @@ export function UserMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
-          "group relative flex w-full cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted",
+          "group relative flex w-full cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted/80",
           compact && "justify-center px-0",
         )}
       >
@@ -88,7 +88,7 @@ export function UserMenu({
           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </div>
         {compact && (
-          <span className="pointer-events-none absolute left-full ml-3 hidden whitespace-nowrap rounded-lg bg-foreground px-3 py-1.5 text-xs font-semibold text-background shadow-lg group-hover:block">
+          <span className="pointer-events-none absolute left-full ml-3 hidden whitespace-nowrap rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background shadow-elevated group-hover:block">
             Akun
           </span>
         )}
@@ -102,7 +102,7 @@ export function UserMenu({
         placement="top"
         align="start"
         alignOffset={compact ? 8 : 0}
-        className="max-h-[min(520px,calc(100vh-2rem))] overflow-y-auto rounded-lg border border-border bg-popover p-1.5 shadow-[0_16px_48px_rgb(15_23_42/0.14)]"
+        className="max-h-[min(520px,calc(100vh-2rem))] overflow-y-auto rounded-lg border border-border/80 bg-popover p-1.5 shadow-elevated"
       >
         <div className="flex items-center gap-2.5 px-2.5 py-2">
           <Avatar name={user.name} src={user.image} size={32} />

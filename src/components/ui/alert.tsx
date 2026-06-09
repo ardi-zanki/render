@@ -4,11 +4,11 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 const alertVariants = cva(
-  "relative flex gap-3 rounded-md border px-3.5 py-3 text-sm leading-6 shadow-[0_1px_1px_rgb(15_23_42/0.02)] [&_svg]:mt-1 [&_svg]:size-4 [&_svg]:shrink-0",
+  "relative flex gap-3 rounded-md border px-3.5 py-3 text-sm leading-6 shadow-[0_1px_1px_rgb(15_23_42/0.018)] [&_svg]:mt-1 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "border-border bg-card text-card-foreground",
+        default: "border-border/80 bg-card text-card-foreground",
         destructive:
           "border-destructive/30 bg-destructive/10 text-destructive [&_svg]:text-destructive",
         success:

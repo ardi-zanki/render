@@ -88,7 +88,7 @@ export function NotificationBell({
         open={open}
         onClose={() => setOpen(false)}
         width={320}
-        className="overflow-hidden rounded-lg border border-border bg-popover shadow-[0_16px_48px_rgb(15_23_42/0.14)]"
+        className="overflow-hidden rounded-lg border border-border/80 bg-popover shadow-elevated"
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
           <span className="font-semibold text-foreground">Notifikasi</span>
@@ -115,11 +115,11 @@ export function NotificationBell({
                   key={n.id}
                   onClick={() => onItem(n)}
                   className={cn(
-                    "flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-muted",
+                    "flex w-full gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/80",
                     !n.isRead && "bg-primary/5",
                   )}
                 >
-                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
+                  <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-secondary text-foreground">
                     <Icon className="size-4" />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col">

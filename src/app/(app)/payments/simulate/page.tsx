@@ -24,8 +24,8 @@ export default async function SimulatePaymentPage({
         description="Halaman dev untuk menguji alur top-up tanpa Midtrans asli."
       />
       <Card>
-        <CardContent className="flex flex-col gap-5 py-6">
-          <div className="flex items-center gap-3 rounded-xl bg-muted/60 px-4 py-3">
+        <CardContent className="flex flex-col gap-5 py-5">
+          <div className="flex items-center gap-3 rounded-lg bg-muted/60 px-4 py-3">
             <FlaskConical className="size-5 text-primary" />
             <div className="flex flex-col">
               <span className="text-sm font-semibold text-foreground">
