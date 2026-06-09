@@ -207,10 +207,6 @@ export function AdminUserActions({ user }: { user: UserSummary }) {
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm">
-                <span className="text-muted-foreground">Nama pengguna: </span>
-                <span className="font-semibold text-foreground">{label}</span>
-              </div>
               <Label htmlFor={`credit-confirmation-${user.id}`}>
                 Ketik nama pengguna
               </Label>

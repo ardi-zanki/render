@@ -229,10 +229,6 @@ export function RenderDetailActions({
             tidak bisa dikembalikan. Ketik nama render secara manual sebelum
             menghapus.
           </p>
-          <div className="mt-4 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm">
-            <span className="text-muted-foreground">Nama render: </span>
-            <span className="font-semibold text-foreground">{renderName}</span>
-          </div>
           <div className="mt-4 flex flex-col gap-1.5">
             <label
               htmlFor="delete-render-confirmation"
