@@ -1,10 +1,33 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import { creditBalances, session, user } from "@/db/schema";
 import { writeAuditLog } from "./audit";
 
-export async function listUsers(limit = 100, offset = 0) {
+export type AdminUserFilters = {
+  q?: string;
+  role?: "admin" | "user";
+  status?: "active" | "disabled" | "unverified";
+};
+
+function userWhere(filters: AdminUserFilters = {}) {
+  const search = filters.q?.trim();
+  return and(
+    search
+      ? or(ilike(user.name, `%${search}%`), ilike(user.email, `%${search}%`))
+      : undefined,
+    filters.role ? eq(user.role, filters.role) : undefined,
+    filters.status === "disabled" ? eq(user.isDisabled, true) : undefined,
+    filters.status === "active" ? eq(user.isDisabled, false) : undefined,
+    filters.status === "unverified" ? eq(user.emailVerified, false) : undefined,
+  );
+}
+
+export async function listUsers(
+  limit = 100,
+  offset = 0,
+  filters: AdminUserFilters = {},
+) {
   return db
     .select({
       id: user.id,
@@ -18,13 +41,17 @@ export async function listUsers(limit = 100, offset = 0) {
     })
     .from(user)
     .leftJoin(creditBalances, eq(creditBalances.userId, user.id))
+    .where(userWhere(filters))
     .orderBy(desc(user.createdAt))
     .limit(limit)
     .offset(offset);
 }
 
-export async function countUsers(): Promise<number> {
-  const [row] = await db.select({ value: count() }).from(user);
+export async function countUsers(filters: AdminUserFilters = {}): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(user)
+    .where(userWhere(filters));
   return row.value;
 }
 

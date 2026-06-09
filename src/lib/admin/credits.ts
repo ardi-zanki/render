@@ -1,11 +1,34 @@
-import { count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
 import { db } from "@/db";
-import { creditTransactions, user } from "@/db/schema";
+import { creditTransactions, user, type CreditTxType } from "@/db/schema";
 import { applyCreditChange } from "@/lib/credits";
 import { writeAuditLog } from "./audit";
 
-export async function listCreditTransactions(limit = 100, offset = 0) {
+export type AdminCreditFilters = {
+  q?: string;
+  type?: CreditTxType;
+};
+
+function creditWhere(filters: AdminCreditFilters = {}) {
+  const search = filters.q?.trim();
+  return and(
+    filters.type ? eq(creditTransactions.type, filters.type) : undefined,
+    search
+      ? or(
+          ilike(user.name, `%${search}%`),
+          ilike(user.email, `%${search}%`),
+          ilike(creditTransactions.description, `%${search}%`),
+        )
+      : undefined,
+  );
+}
+
+export async function listCreditTransactions(
+  limit = 100,
+  offset = 0,
+  filters: AdminCreditFilters = {},
+) {
   return db
     .select({
       id: creditTransactions.id,
@@ -19,13 +42,20 @@ export async function listCreditTransactions(limit = 100, offset = 0) {
     })
     .from(creditTransactions)
     .innerJoin(user, eq(user.id, creditTransactions.userId))
+    .where(creditWhere(filters))
     .orderBy(desc(creditTransactions.createdAt))
     .limit(limit)
     .offset(offset);
 }
 
-export async function countCreditTransactions(): Promise<number> {
-  const [row] = await db.select({ value: count() }).from(creditTransactions);
+export async function countCreditTransactions(
+  filters: AdminCreditFilters = {},
+): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(creditTransactions)
+    .innerJoin(user, eq(user.id, creditTransactions.userId))
+    .where(creditWhere(filters));
   return row.value;
 }
 

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, isNull } from "drizzle-orm";
+import { and, count, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -21,9 +21,34 @@ export interface AdminRenderRow {
   createdAt: Date;
 }
 
+export type AdminRenderFilters = {
+  q?: string;
+  status?: RenderStatus;
+  mode?: RenderMode;
+};
+
+function renderWhere(filters: AdminRenderFilters = {}) {
+  const search = filters.q?.trim();
+  return and(
+    isNull(renders.deletedAt),
+    filters.status ? eq(renders.status, filters.status) : undefined,
+    filters.mode ? eq(renders.mode, filters.mode) : undefined,
+    search
+      ? or(
+          ilike(user.name, `%${search}%`),
+          ilike(user.email, `%${search}%`),
+          ilike(renders.aiProvider, `%${search}%`),
+          ilike(renders.errorMessage, `%${search}%`),
+          ilike(renders.providerRequestId, `%${search}%`),
+          sql`${renders.id}::text ilike ${`%${search}%`}`,
+        )
+      : undefined,
+  );
+}
+
 export async function listAllRenders(
   limit = 100,
-  filters: { status?: RenderStatus; mode?: RenderMode } = {},
+  filters: AdminRenderFilters = {},
   offset = 0,
 ): Promise<AdminRenderRow[]> {
   return db
@@ -39,31 +64,20 @@ export async function listAllRenders(
     })
     .from(renders)
     .innerJoin(user, eq(user.id, renders.userId))
-    .where(
-      and(
-        isNull(renders.deletedAt),
-        filters.status ? eq(renders.status, filters.status) : undefined,
-        filters.mode ? eq(renders.mode, filters.mode) : undefined,
-      ),
-    )
+    .where(renderWhere(filters))
     .orderBy(desc(renders.createdAt))
     .limit(limit)
     .offset(offset);
 }
 
 export async function countAllRenders(
-  filters: { status?: RenderStatus; mode?: RenderMode } = {},
+  filters: AdminRenderFilters = {},
 ): Promise<number> {
   const [row] = await db
     .select({ value: count() })
     .from(renders)
-    .where(
-      and(
-        isNull(renders.deletedAt),
-        filters.status ? eq(renders.status, filters.status) : undefined,
-        filters.mode ? eq(renders.mode, filters.mode) : undefined,
-      ),
-    );
+    .innerJoin(user, eq(user.id, renders.userId))
+    .where(renderWhere(filters));
   return row.value;
 }
 

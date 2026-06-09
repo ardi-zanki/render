@@ -1,7 +1,7 @@
 import { RotateCcw } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { AdminDataToolbar } from "@/components/app/admin-data-toolbar";
 import { AdminTable } from "@/components/app/admin-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,11 +48,20 @@ function parseStatus(value?: string): RenderStatus | undefined {
 export default async function AdminRendersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; mode?: string; page?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    q?: string;
+    status?: string;
+    mode?: string;
+  }>;
 }) {
   await requireAdmin();
-  const { status, mode, page: pageParam } = await searchParams;
-  const filters = { status: parseStatus(status), mode: parseMode(mode) };
+  const { page: pageParam, q, status, mode } = await searchParams;
+  const filters = {
+    q: q?.trim() || undefined,
+    status: parseStatus(status),
+    mode: parseMode(mode),
+  };
   const pageSize = 20;
   const page = Math.max(1, Number(pageParam) || 1);
   const [rows, total] = await Promise.all([
@@ -63,18 +72,39 @@ export default async function AdminRendersPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap gap-2">
-        {["failed", "processing", "success"].map((s) => (
-          <Button key={s} asChild size="sm" variant={status === s ? "default" : "outline"}>
-            <Link href={`/admin/renders?status=${s}`}>
-              {STATUS_LABEL[s] ?? s}
-            </Link>
-          </Button>
-        ))}
-        <Button asChild size="sm" variant={!status && !mode ? "default" : "outline"}>
-          <Link href="/admin/renders">Semua</Link>
-        </Button>
-      </div>
+      <AdminDataToolbar
+        search={filters.q}
+        searchPlaceholder="Cari user, provider, request id, atau error"
+        resetHref="/admin/renders"
+        filters={[
+          {
+            name: "status",
+            label: "Status",
+            value: filters.status,
+            options: [
+              { label: "Semua status", value: "" },
+              { label: STATUS_LABEL.queued ?? "Queued", value: "queued" },
+              { label: STATUS_LABEL.processing ?? "Processing", value: "processing" },
+              { label: STATUS_LABEL.success ?? "Success", value: "success" },
+              { label: STATUS_LABEL.failed ?? "Failed", value: "failed" },
+              { label: STATUS_LABEL.cancelled ?? "Cancelled", value: "cancelled" },
+              { label: STATUS_LABEL.refunded ?? "Refunded", value: "refunded" },
+            ],
+          },
+          {
+            name: "mode",
+            label: "Mode",
+            value: filters.mode,
+            options: [
+              { label: "Semua mode", value: "" },
+              { label: MODE_LABEL.interior, value: "interior" },
+              { label: MODE_LABEL.exterior, value: "exterior" },
+              { label: MODE_LABEL.style_transfer, value: "style_transfer" },
+              { label: MODE_LABEL.upscale, value: "upscale" },
+            ],
+          },
+        ]}
+      />
 
       <AdminTable
         headers={[
@@ -87,7 +117,7 @@ export default async function AdminRendersPage({
           { label: "Aksi", align: "right" },
         ]}
         isEmpty={rows.length === 0}
-        empty="Belum ada render."
+        empty="Tidak ada render yang cocok."
       >
         {rows.map((r) => (
           <tr key={r.id} className="hover:bg-muted/30">

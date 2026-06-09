@@ -1,4 +1,4 @@
-import { count, desc, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { adminAuditLogs, user } from "@/db/schema";
@@ -26,8 +26,39 @@ export async function writeAuditLog(p: AuditParams) {
   });
 }
 
-export async function listAuditLogs(limit = 100, offset = 0) {
+export type AdminAuditFilters = {
+  q?: string;
+  action?: string;
+};
+
+function auditWhere(filters: AdminAuditFilters = {}) {
+  const search = filters.q?.trim();
+  const like = search ? `%${search}%` : "";
+  return and(
+    filters.action ? eq(adminAuditLogs.action, filters.action) : undefined,
+    search
+      ? sql`(
+          ${adminAuditLogs.action} ilike ${like}
+          or coalesce(${adminAuditLogs.entityType}, '') ilike ${like}
+          or coalesce(${adminAuditLogs.metadata}::text, '') ilike ${like}
+          or exists (
+            select 1
+            from "user" audit_user
+            where audit_user.id in (${adminAuditLogs.adminUserId}, ${adminAuditLogs.targetUserId})
+              and (audit_user.name ilike ${like} or audit_user.email ilike ${like})
+          )
+        )`
+      : undefined,
+  );
+}
+
+export async function listAuditLogs(
+  limit = 100,
+  offset = 0,
+  filters: AdminAuditFilters = {},
+) {
   const logs = await db.query.adminAuditLogs.findMany({
+    where: auditWhere(filters),
     orderBy: desc(adminAuditLogs.createdAt),
     limit,
     offset,
@@ -57,7 +88,12 @@ export async function listAuditLogs(limit = 100, offset = 0) {
   }));
 }
 
-export async function countAuditLogs(): Promise<number> {
-  const [row] = await db.select({ value: count() }).from(adminAuditLogs);
+export async function countAuditLogs(
+  filters: AdminAuditFilters = {},
+): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(adminAuditLogs)
+    .where(auditWhere(filters));
   return row.value;
 }
