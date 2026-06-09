@@ -11,16 +11,18 @@ PRD lengkap di `../RenderAI_PRD_Final/`.
 
 | Layer        | Teknologi                                          |
 | ------------ | -------------------------------------------------- |
-| Package mgr  | pnpm 11.5                                           |
-| Framework    | Next.js 16.2.6 (App Router, Turbopack)             |
+| Package mgr  | pnpm 11.5.2                                         |
+| Runtime      | Node.js 22 (Docker/CI)                              |
+| Framework    | Next.js 16.2.7 (App Router, Turbopack)             |
 | UI runtime   | React 19.2                                          |
-| Language     | TypeScript 5.9                                      |
+| Language     | TypeScript 6.0                                      |
 | CSS          | Tailwind CSS v4                                     |
 | UI primitive | `@base-ui/react` 1.5                               |
 | Komponen     | Pola Shadcn (custom, di `components/ui`)            |
 | Ikon         | `lucide-react` 1.17                                |
 | Tema         | `next-themes` (light/dark, class-based)            |
 | Font         | Plus Jakarta Sans (teks) · Geist Mono (angka/kode) |
+| Testing      | Vitest 4.1 + Playwright 1.60                        |
 
 Stack lengkap (auth, DB, storage, payment, AI provider) ada di PRD §5.
 
@@ -28,17 +30,20 @@ Stack lengkap (auth, DB, storage, payment, AI provider) ada di PRD §5.
 
 ```bash
 pnpm install   # sekali; build script sharp diizinkan via pnpm-workspace.yaml
-pnpm dev       # http://localhost:3000
+pnpm dev       # http://localhost:3210
 pnpm build     # build produksi
 pnpm lint      # eslint
+pnpm test      # unit test (Vitest)
+pnpm test:integration # integration test DB (credits + payments)
+pnpm test:e2e  # Playwright smoke + render mock flow
 ```
 
 Dari folder induk (`RumAI/`): `pnpm --dir renderai dev`.
 
 ## Design system
 
-Halaman beranda (`src/app/page.tsx`) saat ini adalah **showcase brand kit** —
-warna, tipografi, tombol, badge, form, kartu mode render, dan kartu harga.
+Halaman `/design-system` adalah **showcase brand kit** — warna, tipografi,
+tombol, badge, form, kartu mode render, dan kartu harga.
 
 ### Token warna (`src/app/globals.css`)
 
@@ -88,7 +93,8 @@ src/
     rate-limit.ts        # DB-backed limiter, all PRD §12 rules
     email/               # provider layer + Resend + templates + email_logs
     storage/             # provider layer + R2 (S3) + render asset key builder
-    providers/{ai,payment}/  # adapter interfaces + stubs (wired Phase 2/4)
+    providers/{ai,payment}/  # adapter interfaces + mock/real providers
+    renders/             # create, jobs, assets, queries, archive-delete, processor
     validations/auth.ts  # Zod schemas (Bahasa Indonesia errors)
   proxy.ts               # edge auth guard for protected routes (Next 16 convention)
   app/api/auth/[...all]/ # Better Auth route handler
@@ -102,6 +108,9 @@ pnpm db:migrate    # apply migrations
 pnpm db:seed       # seed credit packages
 pnpm db:studio     # Drizzle Studio
 pnpm smoke:auth    # runtime test: signup → provisioning → credits → rate limit
+pnpm test          # unit test cepat (co-located di src)
+pnpm test:integration # test DB untuk credits + payments
+pnpm test:e2e      # Playwright; login + render memakai mock provider
 ```
 
 Auth wiring: a new user gets a profile, a 0 credit balance, and a default
@@ -130,10 +139,12 @@ credits + "Project Saya". Forms use the `authClient` (`signUp`, `signIn`,
 
 ## Render core & Render Studio (Phase 2)
 
-The render pipeline (`src/lib/renders/service.ts`) is: check balance → create
-render row → deduct credit (idempotent) → store original → call AI provider →
-persist result asset → mark success. On failure the render is marked failed and
-the credit is refunded. Entry point: `POST /api/renders` (multipart upload).
+The render pipeline (`src/lib/renders/`) is split by concern: `create`, `jobs`,
+`assets`, `queries`, `archive-delete`, and `processor`. Flow: check balance →
+create render row → deduct credit (idempotent) → store original → enqueue job →
+worker/process job → call AI provider → persist result asset → mark success. On
+final failure the render is marked failed and the credit is refunded. Entry
+point: `POST /api/renders` (multipart upload).
 
 - **Render Studio** (`/renders/new`) — the workspace: mode (Interior/Exterior/
   Style Transfer/Upscale), style, location, time & weather, image upload,
@@ -191,6 +202,38 @@ For production set `PAYMENT_PROVIDER=midtrans` + `MIDTRANS_SERVER_KEY` /
 ```bash
 pnpm smoke:payment   # checkout → webhook → idempotent top-up
 ```
+
+## Testing & GitHub CI/CD
+
+Testing strategy is intentionally MVP-sized:
+
+- **Unit tests (Vitest, co-located):** validations, prompt builder, API helpers,
+  pricing, status mapping, rate-limit helper, and small UI utilities.
+- **Integration tests (Vitest):** `credits` and `payments` against PostgreSQL
+  with test-only users/packages and cleanup.
+- **E2E tests (Playwright):** public auth pages plus login → Render Studio →
+  upload image → create render using `AI_PROVIDER=mock`.
+
+Local commands:
+
+```bash
+pnpm test
+pnpm test:integration
+pnpm test:e2e
+```
+
+GitHub Actions lives in `.github/workflows/ci.yml`. It starts a temporary
+PostgreSQL service, runs migrations, then runs lint, unit tests, integration
+tests, Playwright E2E, and production build. CI uses safe test env values:
+`AI_PROVIDER=mock`, `PAYMENT_PROVIDER=mock`, `STORAGE_PROVIDER=local`, and
+`RATE_LIMIT_ENABLED=false`; production secrets are not needed for CI.
+
+For deployment, prefer Render.com Blueprint `autoDeploy` from the protected
+`main` branch. If you disable Render auto-deploy, the workflow can optionally
+trigger deploy hooks after CI passes by setting GitHub secrets:
+
+- `RENDER_WEB_DEPLOY_HOOK_URL`
+- `RENDER_WORKER_DEPLOY_HOOK_URL`
 
 ## Notifications & account settings (Phase 4)
 

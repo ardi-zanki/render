@@ -1,0 +1,124 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: renderai-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/renderai_test
+  APP_URL: http://localhost:3210
+  BETTER_AUTH_URL: http://localhost:3210
+  BETTER_AUTH_SECRET: ci-better-auth-secret-please-keep-long
+  JWT_SECRET: ci-jwt-secret-please-keep-long
+  JWT_ISSUER: renderai
+  JWT_AUDIENCE: renderai-app
+  RATE_LIMIT_DRIVER: database
+  RATE_LIMIT_ENABLED: "false"
+  STORAGE_PROVIDER: local
+  EMAIL_PROVIDER: resend
+  PAYMENT_PROVIDER: mock
+  AI_PROVIDER: mock
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: renderai_test
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d renderai_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.5.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Migrate database
+        run: pnpm db:migrate
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Integration tests
+        run: pnpm test:integration
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: pnpm test:e2e
+
+      - name: Build
+        run: pnpm build
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+  deploy-render:
+    name: Deploy Render
+    runs-on: ubuntu-latest
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 5
+    env:
+      RENDER_WEB_DEPLOY_HOOK_URL: ${{ secrets.RENDER_WEB_DEPLOY_HOOK_URL }}
+      RENDER_WORKER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_WORKER_DEPLOY_HOOK_URL }}
+
+    steps:
+      - name: Trigger Render web deploy hook
+        if: env.RENDER_WEB_DEPLOY_HOOK_URL != ''
+        run: curl -fsS -X POST "$RENDER_WEB_DEPLOY_HOOK_URL"
+
+      - name: Trigger Render worker deploy hook
+        if: env.RENDER_WORKER_DEPLOY_HOOK_URL != ''
+        run: curl -fsS -X POST "$RENDER_WORKER_DEPLOY_HOOK_URL"
+
+      - name: Skip optional deploy hooks
+        if: env.RENDER_WEB_DEPLOY_HOOK_URL == '' && env.RENDER_WORKER_DEPLOY_HOOK_URL == ''
+        run: echo "No Render deploy hook secrets configured. Use Render Blueprint autoDeploy or add deploy hook secrets."

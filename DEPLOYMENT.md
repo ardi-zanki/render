@@ -50,7 +50,48 @@ Full variable list: `.env.example`.
 
 ---
 
-## 2. Option A — VPS (Docker Compose + Caddy)
+## 2. GitHub CI/CD
+
+The repository includes `.github/workflows/ci.yml`.
+
+On pull requests and pushes it runs:
+
+1. PostgreSQL 17 service container.
+2. `pnpm install --frozen-lockfile`.
+3. `pnpm db:migrate`.
+4. `pnpm lint`.
+5. `pnpm test`.
+6. `pnpm test:integration` for credits + payments.
+7. `pnpm test:e2e` with Playwright and mock providers.
+8. `pnpm build`.
+
+CI intentionally does **not** require production secrets. It uses safe test
+values:
+
+- `AI_PROVIDER=mock`
+- `PAYMENT_PROVIDER=mock`
+- `STORAGE_PROVIDER=local`
+- `RATE_LIMIT_ENABLED=false`
+- dummy `BETTER_AUTH_SECRET` / `JWT_SECRET`
+- temporary PostgreSQL database from the GitHub Actions service container
+
+Recommended branch protection:
+
+- Require the `Verify` job before merging to `main`.
+- Deploy only from `main`.
+- Keep staging and production as separate Render env groups/services.
+
+For CD, choose one path:
+
+- **Recommended:** Render Blueprint with `autoDeploy: true` in `render.yaml`.
+  Push/merge to `main` after CI passes; Render builds web + worker.
+- **Optional deploy hooks:** disable Render auto-deploy and set GitHub secrets
+  `RENDER_WEB_DEPLOY_HOOK_URL` and `RENDER_WORKER_DEPLOY_HOOK_URL`. The workflow
+  triggers them after the `Verify` job passes on `main`.
+
+---
+
+## 3. Option A — VPS (Docker Compose + Caddy)
 
 Use a **Singapore/Jakarta** VPS for low Indonesia latency (Vultr Jakarta, OVH
 Singapore, DigitalOcean Singapore). 2 vCPU / 4 GB is enough for MVP — the box
@@ -75,9 +116,10 @@ firewall: 80/443/22, auto-updates) per deployment PRD §25.
 
 ---
 
-## 3. Option B — Render.com (Docker)
+## 4. Option B — Render.com (Docker)
 
-1. Push to GitHub → create a **Blueprint** from `render.yaml`. It creates
+1. Push to GitHub → wait for the GitHub Actions `Verify` job to pass → create a
+   **Blueprint** from `render.yaml`. It creates
    `renderai-web` (web) and `renderai-worker` (background worker), both built
    from the same `Dockerfile`.
 2. Fill every `sync:false` secret in the **renderai-shared** env group —
@@ -95,7 +137,7 @@ Approx cost: web (starter ~$7) + worker (starter ~$7) + Neon (free/launch) ≈
 
 ---
 
-## 4. Option C — Cloudflare Containers
+## 5. Option C — Cloudflare Containers
 
 If/when you want it: deploy the **same image** as a Cloudflare Container (run a
 web container and a worker container). Verify region latency to Indonesia and
@@ -103,7 +145,7 @@ pricing first — it's a newer product. DNS + R2 stay on Cloudflare either way.
 
 ---
 
-## 5. Migrations, staging, scaling
+## 6. Migrations, staging, scaling
 
 - **Migrations** run via `pnpm db:migrate` (drizzle-kit) with `DATABASE_URL` in
   the environment. Always migrate **staging** before **production**; snapshot
@@ -118,7 +160,7 @@ pricing first — it's a newer product. DNS + R2 stay on Cloudflare either way.
 
 ---
 
-## 6. Post-deploy smoke checklist (deployment PRD §30)
+## 7. Post-deploy smoke checklist (deployment PRD §30)
 
 - [ ] HTTPS live; `/api/health` returns `ok: true`; landing/login reachable.
 - [ ] Register → verify email (Resend) → 3 free credits granted.
