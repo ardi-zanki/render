@@ -1,4 +1,3 @@
-import { asc, eq } from "drizzle-orm";
 import { Check, Gem } from "lucide-react";
 import type { Metadata } from "next";
 import Script from "next/script";
@@ -14,11 +13,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
-import { db } from "@/db";
-import { paymentPackages } from "@/db/schema";
 import { env } from "@/env";
 import { getBalance } from "@/lib/credits";
-import { countPayments, listPayments } from "@/lib/payments/service";
+import {
+  countPayments,
+  listActivePaymentPackages,
+  listPayments,
+} from "@/lib/payments/service";
 import type { BadgeVariant } from "@/lib/renders/labels";
 import { requireVerifiedUser } from "@/lib/session";
 
@@ -49,10 +50,7 @@ export default async function PaymentsPage({
   const pageSize = 10;
   const page = Math.max(1, Number(pageParam) || 1);
   const [packages, balance, history, historyTotal] = await Promise.all([
-    db.query.paymentPackages.findMany({
-      where: eq(paymentPackages.isActive, true),
-      orderBy: asc(paymentPackages.sortOrder),
-    }),
+    listActivePaymentPackages(),
     getBalance(user.id),
     listPayments(user.id, { limit: pageSize, offset: (page - 1) * pageSize }),
     countPayments(user.id),

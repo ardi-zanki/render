@@ -1,4 +1,3 @@
-import { asc, eq } from "drizzle-orm";
 import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -8,8 +7,7 @@ import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { db } from "@/db";
-import { paymentPackages } from "@/db/schema";
+import { listActivePaymentPackages } from "@/lib/payments/service";
 import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
 
 export const metadata: Metadata = {
@@ -21,10 +19,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function HargaPage() {
-  const packages = await db.query.paymentPackages.findMany({
-    where: eq(paymentPackages.isActive, true),
-    orderBy: asc(paymentPackages.sortOrder),
-  });
+  const packages = await listActivePaymentPackages();
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">

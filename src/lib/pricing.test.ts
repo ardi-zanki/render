@@ -11,7 +11,7 @@ describe("pricing helpers", () => {
   it("returns known marketing copy and a safe fallback", () => {
     expect(packageCopy("creator")).toMatchObject({
       highlighted: true,
-      note: "Untuk presentasi dan revisi rutin",
+      note: "Untuk presentasi, opsi mood, dan revisi rutin",
     });
     expect(packageCopy("unknown")).toEqual({ note: "", features: [] });
   });

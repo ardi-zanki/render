@@ -20,16 +20,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { asc, eq } from "drizzle-orm";
-
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { db } from "@/db";
-import { paymentPackages } from "@/db/schema";
-import { PACKAGE_COPY, formatCredits, formatPrice } from "@/lib/pricing";
+import { listActivePaymentPackages } from "@/lib/payments/service";
+import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "RenderAI - Workspace Render AI untuk Arsitektur & Interior",
@@ -125,12 +122,9 @@ const faqs = [
 ];
 
 export default async function LandingPage() {
-  const dbPackages = await db.query.paymentPackages.findMany({
-    where: eq(paymentPackages.isActive, true),
-    orderBy: asc(paymentPackages.sortOrder),
-  });
+  const dbPackages = await listActivePaymentPackages();
   const pricing = dbPackages.map((pkg) => {
-    const copy = PACKAGE_COPY[pkg.slug] ?? { note: "", features: [] };
+    const copy = packageCopy(pkg.slug);
     return {
       name: pkg.name,
       credits: formatCredits(pkg.credits, pkg.bonusCredits),

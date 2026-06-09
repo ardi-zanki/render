@@ -397,6 +397,69 @@ describe("payments integration", () => {
     expect(failed?.status).toBe("failed");
     expect(failed?.failedAt).toBeInstanceOf(Date);
   });
+
+  it("recovers credits when a paid webhook retry finds missing credit transaction", async () => {
+    const {
+      createCheckout,
+      creditTransactions,
+      db,
+      getBalance,
+      handlePaymentNotification,
+      notifications,
+      paymentProvider,
+      payments,
+    } = await modules();
+    const testUser = await createTestUser();
+
+    const checkout = await createCheckout(testUser.id, TEST_PACKAGE_SLUG, {
+      name: testUser.name,
+      email: testUser.email,
+    });
+
+    const payment = await db.query.payments.findFirst({
+      where: eq(payments.providerOrderId, checkout.orderId),
+    });
+    expect(payment).toBeTruthy();
+
+    await db
+      .update(payments)
+      .set({ status: "paid", paidAt: new Date() })
+      .where(eq(payments.id, payment!.id));
+
+    const webhook = await paymentProvider().verifyAndParseWebhook({
+      headers: {},
+      body: {
+        order_id: checkout.orderId,
+        status_code: "200",
+        gross_amount: "10000",
+        transaction_id: `vitest-${randomUUID()}`,
+        transaction_status: "settlement",
+      },
+    });
+
+    await expect(handlePaymentNotification(webhook)).resolves.toEqual({
+      handled: true,
+      reason: "credited_after_paid",
+    });
+    await expect(getBalance(testUser.id)).resolves.toBe(12);
+
+    await expect(handlePaymentNotification(webhook)).resolves.toEqual({
+      handled: true,
+      reason: "already_paid",
+    });
+    await expect(getBalance(testUser.id)).resolves.toBe(12);
+
+    const transactions = await db.query.creditTransactions.findMany({
+      where: eq(creditTransactions.paymentId, payment!.id),
+    });
+    expect(transactions).toHaveLength(1);
+
+    const paymentNotifications = await db.query.notifications.findMany({
+      where: eq(notifications.userId, testUser.id),
+    });
+    expect(paymentNotifications).toHaveLength(1);
+    expect(paymentNotifications[0]?.type).toBe("payment_success");
+  });
 });
 
 describe("render project integration", () => {

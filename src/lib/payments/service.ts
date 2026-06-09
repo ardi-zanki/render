@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { and, count, desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { paymentPackages, payments } from "@/db/schema";
+import { creditTransactions, paymentPackages, payments } from "@/db/schema";
 import { env } from "@/env";
 import { applyCreditChange } from "@/lib/credits";
 import { paymentSuccessEmail } from "@/lib/email";
@@ -33,18 +33,68 @@ export interface CheckoutResult {
   redirectUrl?: string;
 }
 
+type PaymentRow = typeof payments.$inferSelect;
+
+function paymentCreditKey(paymentId: string) {
+  return `payment:${paymentId}`;
+}
+
+async function ensurePaymentCreditsApplied(payment: PaymentRow) {
+  const idempotencyKey = paymentCreditKey(payment.id);
+  const existing = await db.query.creditTransactions.findFirst({
+    where: eq(creditTransactions.idempotencyKey, idempotencyKey),
+  });
+  if (existing) {
+    return { applied: false, balance: existing.balanceAfter };
+  }
+
+  return applyCreditChange({
+    userId: payment.userId,
+    type: "purchase",
+    amount: payment.creditsAdded,
+    description: `Pembelian ${payment.creditsAdded} kredit`,
+    paymentId: payment.id,
+    idempotencyKey,
+  });
+}
+
+async function notifyPaymentSuccess(payment: PaymentRow) {
+  await notifyUser({
+    userId: payment.userId,
+    type: "payment_success",
+    title: "Pembayaran berhasil 🎉",
+    message: `${payment.creditsAdded} kredit sudah ditambahkan ke akunmu.`,
+    actionUrl: "/payments",
+    email: paymentSuccessEmail({
+      credits: payment.creditsAdded,
+      url: `${env.APP_URL.replace(/\/$/, "")}/renders/new`,
+    }),
+  });
+}
+
+export async function getActivePaymentPackage(slug: string) {
+  return db.query.paymentPackages.findFirst({
+    where: and(
+      eq(paymentPackages.slug, slug),
+      eq(paymentPackages.isActive, true),
+    ),
+  });
+}
+
+export async function listActivePaymentPackages() {
+  return db.query.paymentPackages.findMany({
+    where: eq(paymentPackages.isActive, true),
+    orderBy: (pkg, { asc }) => asc(pkg.sortOrder),
+  });
+}
+
 /** Create a payment for a credit package and a provider checkout (PRD §23.3). */
 export async function createCheckout(
   userId: string,
   packageSlug: string,
   customer: { name: string; email: string },
 ): Promise<CheckoutResult> {
-  const pkg = await db.query.paymentPackages.findFirst({
-    where: and(
-      eq(paymentPackages.slug, packageSlug),
-      eq(paymentPackages.isActive, true),
-    ),
-  });
+  const pkg = await getActivePaymentPackage(packageSlug);
   if (!pkg) throw new PackageNotFoundError();
 
   const orderId = generateOrderId();
@@ -92,8 +142,10 @@ export async function createCheckout(
 
 /**
  * Apply a normalized provider notification (PRD §23.4). Idempotent: a payment
- * already marked paid is a no-op, and the credit top-up uses a fixed
- * idempotency key so duplicate webhooks never double-credit.
+ * already marked paid is usually a no-op, but the credit top-up is verified
+ * first so a retry can recover if the previous request saved `paid` before
+ * credits were applied. The credit mutation uses a fixed idempotency key so
+ * duplicate webhooks never double-credit.
  */
 export async function handlePaymentNotification(webhook: NormalizedWebhook) {
   const payment = await db.query.payments.findFirst({
@@ -102,6 +154,11 @@ export async function handlePaymentNotification(webhook: NormalizedWebhook) {
   if (!payment) return { handled: false, reason: "payment_not_found" as const };
 
   if (payment.status === "paid") {
+    const credit = await ensurePaymentCreditsApplied(payment);
+    if (credit.applied) {
+      await notifyPaymentSuccess(payment);
+      return { handled: true, reason: "credited_after_paid" as const };
+    }
     return { handled: true, reason: "already_paid" as const };
   }
   if (payment.status === webhook.status) {
@@ -122,26 +179,8 @@ export async function handlePaymentNotification(webhook: NormalizedWebhook) {
       })
       .where(eq(payments.id, payment.id));
 
-    await applyCreditChange({
-      userId: payment.userId,
-      type: "purchase",
-      amount: payment.creditsAdded,
-      description: `Pembelian ${payment.creditsAdded} kredit`,
-      paymentId: payment.id,
-      idempotencyKey: `payment:${payment.id}`,
-    });
-
-    await notifyUser({
-      userId: payment.userId,
-      type: "payment_success",
-      title: "Pembayaran berhasil 🎉",
-      message: `${payment.creditsAdded} kredit sudah ditambahkan ke akunmu.`,
-      actionUrl: "/payments",
-      email: paymentSuccessEmail({
-        credits: payment.creditsAdded,
-        url: `${env.APP_URL.replace(/\/$/, "")}/renders/new`,
-      }),
-    });
+    const credit = await ensurePaymentCreditsApplied(payment);
+    if (credit.applied) await notifyPaymentSuccess(payment);
 
     return { handled: true, reason: "paid" as const };
   }
