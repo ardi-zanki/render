@@ -16,7 +16,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const getMetadataBase = () => {
+  const url =
+    process.env.APP_URL ?? process.env.BETTER_AUTH_URL ?? "http://localhost:3210";
+
+  try {
+    return new URL(url);
+  } catch {
+    return new URL("http://localhost:3210");
+  }
+};
+
 export const metadata: Metadata = {
+  metadataBase: getMetadataBase(),
   title: {
     default: "RenderAI - Render Arsitektur Berbasis AI",
     template: "%s · RenderAI",

@@ -19,14 +19,14 @@ const optional = z
   .transform((v) => (v && v.length > 0 ? v : undefined));
 
 const schema = z.object({
-  APP_URL: z.string().url().default("http://localhost:3000"),
+  APP_URL: z.string().url().default("http://localhost:3210"),
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
   DATABASE_URL: z.string().url(),
 
   BETTER_AUTH_SECRET: z.string().min(16, "BETTER_AUTH_SECRET wajib diisi"),
-  BETTER_AUTH_URL: z.string().url().default("http://localhost:3000"),
+  BETTER_AUTH_URL: z.string().url().default("http://localhost:3210"),
 
   GOOGLE_CLIENT_ID: optional,
   GOOGLE_CLIENT_SECRET: optional,

@@ -89,6 +89,10 @@ For CD, choose one path:
   `RENDER_WEB_DEPLOY_HOOK_URL` and `RENDER_WORKER_DEPLOY_HOOK_URL`. The workflow
   triggers them after the `Verify` job passes on `main`.
 
+Keep only one CD path active. If `autoDeploy: true` stays enabled in
+`render.yaml`, do not also configure deploy-hook secrets, otherwise one merge
+can trigger duplicate web/worker deploys.
+
 ---
 
 ## 3. Option A — VPS (Docker Compose + Caddy)

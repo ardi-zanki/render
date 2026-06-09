@@ -17,10 +17,9 @@ PRD lengkap di `../RenderAI_PRD_Final/`.
 | UI runtime   | React 19.2                                          |
 | Language     | TypeScript 6.0                                      |
 | CSS          | Tailwind CSS v4                                     |
-| UI primitive | `@base-ui/react` 1.5                               |
-| Komponen     | Pola Shadcn (custom, di `components/ui`)            |
+| Komponen     | Custom UI primitives di `src/components/ui`         |
 | Ikon         | `lucide-react` 1.17                                |
-| Tema         | `next-themes` (light/dark, class-based)            |
+| Tema         | Local `ThemeProvider` (light/dark/system, class-based) |
 | Font         | Plus Jakarta Sans (teks) · Geist Mono (angka/kode) |
 | Testing      | Vitest 4.1 + Playwright 1.60                        |
 
@@ -55,15 +54,17 @@ lalu dipetakan ke utility Tailwind via `@theme inline`. Token utama:
 - **Semantik:** `--success`, `--warning`, `--destructive`, `--info`
 
 Gunakan via kelas: `bg-primary`, `text-foreground`, `border-border`, dll.
-Mode gelap mengikuti kelas `.dark` (di-set `next-themes`) — tidak perlu
-menulis ulang warna, cukup pakai token.
+Mode gelap mengikuti kelas `.dark` yang diatur oleh local
+`src/components/theme-provider.tsx`; tidak perlu menulis ulang warna, cukup
+pakai token.
 
 ### Komponen
 
 ```
 src/components/
   ui/        button · card · input · textarea · label · badge ·
-             separator · slot · mode-toggle
+             separator · slot · mode-toggle · modal · popover ·
+             select · confirm-dialog
   brand/     logo (mark + wordmark) · credit-pill
   theme-provider.tsx
 src/lib/utils.ts   # cn() — clsx + tailwind-merge
@@ -125,17 +126,19 @@ Working pages on top of the Phase 1b backend:
 
 - **Public:** `/` (landing), `/design-system` (brand kit), `/login`,
   `/register`, `/forgot-password`, `/reset-password`, `/verify-email`.
-- **Protected** (app shell w/ sidebar + topbar): `/dashboard` (real data —
-  credit balance, counts, default project), `/payments` (live credit packages
-  from DB), and stubs for `/projects`, `/renders`, `/renders/new`,
-  `/notifications`, `/settings`.
+- **Protected** (app shell w/ sidebar + topbar): `/dashboard`, `/projects`,
+  `/projects/[id]`, `/renders`, `/renders/new`, `/renders/[id]`, `/payments`,
+  `/notifications`, and `/settings`.
+- **Admin:** `/admin`, `/admin/users`, `/admin/projects`, `/admin/renders`,
+  `/admin/payments`, `/admin/credits`, `/admin/packages`,
+  `/admin/notifications`, `/admin/settings`, and `/admin/audit`.
 
 Full flow works in the browser: register → (dev: verification link printed to
 the server console) → click link → auto sign-in → dashboard shows the 3 free
 credits + "Project Saya". Forms use the `authClient` (`signUp`, `signIn`,
 `requestPasswordReset`, `resetPassword`, `sendVerificationEmail`, `signOut`).
-
-> Dev demo account (already verified): **demo@renderai.test** / `rahasia123`.
+Smoke scripts or E2E flows that use `demo@renderai.test` require that user to
+exist in the local/test database first.
 
 ## Render core & Render Studio (Phase 2)
 
@@ -166,10 +169,11 @@ The `selfhost-stablediffusion` provider posts multipart form data to
 `SELFHOST_SD_API_URL` for a ComfyUI/FastAPI wrapper and accepts raw image, URL,
 data URL, or base64 outputs. A `mock` provider (sharp-based) and a `local`
 storage provider make the full flow testable locally without any cloud
-credentials. Dev defaults: `AI_PROVIDER=mock`, `STORAGE_PROVIDER=local`. For
-production set one of `AI_PROVIDER=myarchitectai` + `MYARCHITECTAI_API_KEY`,
-`AI_PROVIDER=fal` + `FAL_KEY`, or `AI_PROVIDER=selfhost-stablediffusion` +
-`SELFHOST_SD_API_URL`, plus `STORAGE_PROVIDER=r2` + R2 creds.
+credentials. For local smoke tests and CI, use `AI_PROVIDER=mock` and
+`STORAGE_PROVIDER=local`. For production set one of `AI_PROVIDER=fal` +
+`FAL_KEY`, `AI_PROVIDER=myarchitectai` + `MYARCHITECTAI_API_KEY`, or
+`AI_PROVIDER=selfhost-stablediffusion` + `SELFHOST_SD_API_URL`, plus
+`STORAGE_PROVIDER=r2` + R2 creds.
 
 ```bash
 pnpm smoke:render   # render pipeline test (credit, storage, provider, assets)
@@ -194,7 +198,8 @@ a no-op, so duplicate webhooks never double-credit).
 (`POST {app[.sandbox].midtrans.com}/snap/v1/transactions`, Basic auth) and
 webhook verification (`sha512(order_id + status_code + gross_amount + serverKey)`).
 A `mock` provider routes checkout to the in-app simulate page so the full
-checkout → webhook → credit flow runs locally. Dev default: `PAYMENT_PROVIDER=mock`.
+checkout → webhook → credit flow runs locally. For local development use
+`PAYMENT_PROVIDER=mock`.
 For production set `PAYMENT_PROVIDER=midtrans` + `MIDTRANS_SERVER_KEY` /
 `MIDTRANS_CLIENT_KEY` and point the Midtrans notification URL at
 `/api/payments/webhook`.
@@ -283,15 +288,16 @@ pnpm make:admin [email] [password]   # promote/create an admin (default admin@re
 - [x] **Phase 1a** — Scaffold + design system + dark mode
 - [x] **Phase 1b** — Better Auth, PostgreSQL/Drizzle, R2, Resend, rate limiter, JWT
 - [x] **Auth UI + dashboard** — login/register/verify/reset, app shell, dashboard
-- [x] **Phase 2** — Project & Render core, Render Studio, MyArchitectAI provider
+- [x] **Phase 2** — Project & Render core, Render Studio, AI provider layer
 - [x] **Phase 3** — Credit purchase + Midtrans payment (Snap + webhook)
 - [x] **Phase 4** — Notifications (in-app + email) + account settings
 - [x] **Phase 5** — Admin (users, renders, payments, audit log)
 
 The MVP feature set is complete. Before production, supply real credentials and
 flip providers: Google OAuth (`GOOGLE_CLIENT_*`), email (`RESEND_API_KEY`),
-`STORAGE_PROVIDER=r2` (+ R2 creds), `AI_PROVIDER=myarchitectai`
-(+ `MYARCHITECTAI_API_KEY`), `AI_PROVIDER=fal` (+ `FAL_KEY`), or
+`STORAGE_PROVIDER=r2` (+ R2 creds), `AI_PROVIDER=fal` (+ `FAL_KEY`),
+`AI_PROVIDER=myarchitectai` (+ `MYARCHITECTAI_API_KEY`), or
 `AI_PROVIDER=selfhost-stablediffusion` (+ `SELFHOST_SD_API_URL`),
 `PAYMENT_PROVIDER=midtrans` (+ Midtrans keys and notification URL). Render
-execution uses the DB-backed `render_jobs` queue and `pnpm render:worker`.
+execution uses the DB-backed `render_jobs` queue and `pnpm worker` in
+production (`pnpm render:worker` is the local `.env.local` helper).
