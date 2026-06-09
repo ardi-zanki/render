@@ -24,12 +24,14 @@ async function modules() {
     credits,
     paymentsService,
     paymentProviderModule,
+    rendersService,
   ] = await Promise.all([
     import("@/db"),
     import("@/db/schema"),
     import("@/lib/credits"),
     import("@/lib/payments/service"),
     import("@/lib/providers/payment"),
+    import("@/lib/renders/service"),
   ]);
 
   return {
@@ -38,6 +40,7 @@ async function modules() {
     ...credits,
     ...paymentsService,
     ...paymentProviderModule,
+    ...rendersService,
   };
 }
 
@@ -60,6 +63,73 @@ async function createTestUser(email = `vitest-${randomUUID()}@renderai.test`) {
   });
 
   return { id, email, name: "Vitest User" };
+}
+
+async function createTestProject(
+  userId: string,
+  name = `Vitest Project ${randomUUID()}`,
+  opts: { archived?: boolean; isDefault?: boolean } = {},
+) {
+  const { db, projects } = await modules();
+  const [project] = await db
+    .insert(projects)
+    .values({
+      userId,
+      name,
+      isDefault: opts.isDefault ?? false,
+      archivedAt: opts.archived ? new Date() : null,
+    })
+    .returning();
+  return project;
+}
+
+async function createTestRenderWithAssets(params: {
+  userId: string;
+  projectId: string;
+}) {
+  const { db, renderAssets, renders } = await modules();
+  const [render] = await db
+    .insert(renders)
+    .values({
+      userId: params.userId,
+      projectId: params.projectId,
+      mode: "interior",
+      prompt: "Vitest render prompt",
+      outputFormat: "png",
+      status: "success",
+      creditsUsed: 1,
+      completedAt: new Date(),
+    })
+    .returning();
+
+  await db.insert(renderAssets).values([
+    {
+      renderId: render.id,
+      userId: params.userId,
+      projectId: params.projectId,
+      type: "original",
+      fileUrl: `http://localhost:3210/uploads/${render.id}/original.jpg`,
+      fileKey: `vitest/${render.id}/original.jpg`,
+      fileSize: 128,
+      mimeType: "image/jpeg",
+      width: 16,
+      height: 9,
+    },
+    {
+      renderId: render.id,
+      userId: params.userId,
+      projectId: params.projectId,
+      type: "result",
+      fileUrl: `http://localhost:3210/uploads/${render.id}/result.png`,
+      fileKey: `vitest/${render.id}/result.png`,
+      fileSize: 256,
+      mimeType: "image/png",
+      width: 16,
+      height: 9,
+    },
+  ]);
+
+  return render;
 }
 
 async function ensureTestPackage() {
@@ -286,5 +356,82 @@ describe("payments integration", () => {
     });
     expect(failed?.status).toBe("failed");
     expect(failed?.failedAt).toBeInstanceOf(Date);
+  });
+});
+
+describe("render project integration", () => {
+  it("moves a render and its assets to another project owned by the user", async () => {
+    const { db, moveRenderToProject, renderAssets, renders } = await modules();
+    const testUser = await createTestUser();
+    const sourceProject = await createTestProject(
+      testUser.id,
+      "Vitest Source Project",
+    );
+    const targetProject = await createTestProject(
+      testUser.id,
+      "Vitest Target Project",
+    );
+    const render = await createTestRenderWithAssets({
+      userId: testUser.id,
+      projectId: sourceProject.id,
+    });
+
+    await expect(
+      moveRenderToProject(testUser.id, render.id, targetProject.id),
+    ).resolves.toEqual({ ok: true, projectName: targetProject.name });
+
+    const movedRender = await db.query.renders.findFirst({
+      where: eq(renders.id, render.id),
+    });
+    expect(movedRender?.projectId).toBe(targetProject.id);
+
+    const movedAssets = await db.query.renderAssets.findMany({
+      where: eq(renderAssets.renderId, render.id),
+    });
+    expect(movedAssets).toHaveLength(2);
+    expect(movedAssets.every((asset) => asset.projectId === targetProject.id)).toBe(
+      true,
+    );
+  });
+
+  it("rejects moving a render to another user's project or an archived project", async () => {
+    const { db, moveRenderToProject, renderAssets, renders } = await modules();
+    const testUser = await createTestUser();
+    const otherUser = await createTestUser();
+    const sourceProject = await createTestProject(
+      testUser.id,
+      "Vitest Source Project",
+    );
+    const otherProject = await createTestProject(
+      otherUser.id,
+      "Vitest Other User Project",
+    );
+    const archivedProject = await createTestProject(
+      testUser.id,
+      "Vitest Archived Project",
+      { archived: true },
+    );
+    const render = await createTestRenderWithAssets({
+      userId: testUser.id,
+      projectId: sourceProject.id,
+    });
+
+    await expect(
+      moveRenderToProject(testUser.id, render.id, otherProject.id),
+    ).resolves.toEqual({ ok: false, reason: "project_not_found" });
+    await expect(
+      moveRenderToProject(testUser.id, render.id, archivedProject.id),
+    ).resolves.toEqual({ ok: false, reason: "project_not_found" });
+
+    const unchangedRender = await db.query.renders.findFirst({
+      where: eq(renders.id, render.id),
+    });
+    expect(unchangedRender?.projectId).toBe(sourceProject.id);
+
+    const unchangedAssets = await db.query.renderAssets.findMany({
+      where: eq(renderAssets.renderId, render.id),
+    });
+    expect(unchangedAssets.every((asset) => asset.projectId === sourceProject.id))
+      .toBe(true);
   });
 });
