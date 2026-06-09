@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { AuthCard } from "@/components/auth/auth-card";
 import { VerifyEmailActions } from "@/components/auth/verify-email-actions";
 
-export const metadata: Metadata = { title: "Verifikasi Email" };
+export const metadata: Metadata = { title: "Verifikasi email" };
 
 export default async function VerifyEmailPage({
   searchParams,
@@ -15,7 +15,7 @@ export default async function VerifyEmailPage({
 
   return (
     <AuthCard
-      title="Cek Email Anda"
+      title="Cek email Anda"
       subtitle={
         email
           ? `Kami mengirim tautan verifikasi ke ${email}.`

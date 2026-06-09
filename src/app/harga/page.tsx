@@ -27,12 +27,12 @@ export default async function HargaPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">
         <div className="max-w-2xl">
           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
             Paket Kredit
           </p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-normal sm:text-4xl">
+          <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
             Harga yang mengikuti ritme project desain
           </h1>
           <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
@@ -41,7 +41,7 @@ export default async function HargaPage() {
           </p>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {packages.map((pkg) => {
             const copy = packageCopy(pkg.slug);
             return (
@@ -53,7 +53,7 @@ export default async function HargaPage() {
                     : ""
                 }
               >
-                <CardContent className="flex h-full flex-col gap-4 py-5">
+                <CardContent className="flex h-full flex-col gap-3.5 py-5">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h2 className="text-base font-semibold">{pkg.name}</h2>

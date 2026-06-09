@@ -69,7 +69,7 @@ export default async function AdminOverviewPage() {
                 <c.icon className="size-4" />
               </div>
               <div>
-                <p className="text-2xl font-semibold text-foreground">
+                <p className="text-xl font-semibold text-foreground">
                   {c.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{c.label}</p>
@@ -87,7 +87,7 @@ export default async function AdminOverviewPage() {
               <p className="text-sm text-muted-foreground">
                 AI provider error rate
               </p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">
+              <p className="mt-1 text-xl font-semibold text-foreground">
                 {stats.aiProviderErrorRate}%
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -117,7 +117,7 @@ export default async function AdminOverviewPage() {
           <CardContent className="flex items-center justify-between gap-3 py-5">
             <div>
               <p className="text-sm text-muted-foreground">Payment webhook</p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">
+              <p className="mt-1 text-xl font-semibold text-foreground">
                 {idr.format(stats.webhookReceived)}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">

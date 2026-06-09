@@ -66,7 +66,7 @@ const colorGroups = [
 ];
 
 const typeScale = [
-  ["Display", "46/52", "Headline landing"],
+  ["Display", "42/48", "Headline landing"],
   ["H1", "24/32", "Judul halaman app"],
   ["H2", "20/28", "Judul section"],
   ["Body", "14/24", "Form, card, tabel"],
@@ -77,12 +77,22 @@ const foundations = [
   {
     title: "Spacing",
     icon: Grid3X3,
-    items: ["Basis 4px", "Kontrol ringkas 12-16px", "Card padding 20px", "Section landing 48-56px"],
+    items: [
+      "Basis 4px",
+      "Kontrol ringkas 12-16px",
+      "Card padding 16px",
+      "Section landing 40-48px",
+    ],
   },
   {
     title: "Radius",
     icon: Layers3,
-    items: ["4px untuk tombol, input, dan badge", "6px untuk card, modal, dan popover", "10px untuk brand mark", "Lingkaran penuh untuk avatar"],
+    items: [
+      "4-6px untuk tombol, input, dan badge",
+      "8px untuk card, modal, dan popover",
+      "10px untuk brand mark",
+      "Lingkaran penuh untuk avatar",
+    ],
   },
   {
     title: "Elevation",
@@ -172,14 +182,14 @@ export default function DesignSystemPage() {
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-10 sm:px-5 sm:py-12">
+      <main className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 sm:px-5 sm:py-12">
         <section className="flex flex-col gap-5">
           <Badge variant="violet" className="w-fit">
             <Sparkles /> Bahasa Visual RenderAI
           </Badge>
           <div className="grid gap-6 lg:grid-cols-[1fr_360px] lg:items-start">
             <div>
-              <h1 className="max-w-3xl text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+              <h1 className="max-w-3xl text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
                 Fondasi UI yang clean, sederhana, profesional, dan konsisten
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
@@ -196,7 +206,7 @@ export default function DesignSystemPage() {
                   items={[
                     "Konten lebih penting dari dekorasi.",
                     "Komponen padat, tetapi tetap mudah disentuh.",
-                "Navy Blue menjadi identitas utama dan primary action.",
+                    "Navy Blue menjadi identitas utama dan aksi utama.",
                     "Shadow hanya muncul saat ada layer atau menu.",
                   ]}
                 />
@@ -236,7 +246,7 @@ export default function DesignSystemPage() {
           <Card>
             <CardContent className="grid gap-5 py-5 lg:grid-cols-[1fr_320px]">
               <div className="space-y-4">
-                <p className="text-4xl font-semibold leading-tight text-foreground">
+                <p className="text-3xl font-semibold leading-tight text-foreground">
                   Visual arsitektur siap dibahas
                 </p>
                 <p className="text-2xl font-semibold text-foreground">
@@ -403,7 +413,7 @@ export default function DesignSystemPage() {
                       Draft ke visual presentasi
                     </p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      Card menggunakan border halus, padding 20px, dan shadow
+                      Card menggunakan border halus, padding 16px, dan shadow
                       sangat tipis.
                     </p>
                   </div>
@@ -516,7 +526,7 @@ export default function DesignSystemPage() {
                 <div className="rounded-lg border border-border bg-card p-4 shadow-[0_20px_60px_rgb(15_23_42/0.08)]">
                   <p className="font-semibold text-foreground">Pola modal</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Dialog memakai radius 6px, padding 20px, overlay 45%, dan
+                    Dialog memakai radius 8px, padding 20px, overlay 45%, dan
                     shadow hanya untuk layer aktif.
                   </p>
                   <div className="mt-4 flex justify-end gap-2">

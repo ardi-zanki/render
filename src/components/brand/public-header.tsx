@@ -54,7 +54,7 @@ export function PublicHeader({ nav }: { nav?: NavItem[] }) {
           </Button>
           <Button asChild className="h-9 px-4 text-sm">
             <Link href="/register">
-              Mulai <ArrowRight />
+              Mulai render <ArrowRight />
             </Link>
           </Button>
           <ModeToggle />

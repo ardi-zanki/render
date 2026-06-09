@@ -156,7 +156,7 @@ export default async function DashboardPage() {
                 )}
               </div>
               <div>
-                <p className="text-2xl font-semibold tracking-normal text-foreground">
+                <p className="text-xl font-semibold tracking-normal text-foreground">
                   {s.value}
                 </p>
                 <p className="text-sm text-muted-foreground">{s.label}</p>

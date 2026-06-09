@@ -13,10 +13,10 @@
   --radius: 0.5rem;
 
   /* Surfaces */
-  --background: #f6f8fb;
-  --foreground: #121826;
+  --background: #f7f9fc;
+  --foreground: #111827;
   --card: #ffffff;
-  --card-foreground: #121826;
+  --card-foreground: #111827;
   --popover: #ffffff;
   --popover-foreground: #121826;
 
@@ -28,8 +28,8 @@
   --secondary: #eef3f8;
   --secondary-foreground: #172033;
 
-  --muted: #eef3f8;
-  --muted-foreground: #68758a;
+  --muted: #f0f4f8;
+  --muted-foreground: #667085;
 
   /* Accent */
   --accent: #eaf1ff;
@@ -46,8 +46,8 @@
   --info-foreground: #ffffff;
 
   /* Lines & focus */
-  --border: #dbe3ef;
-  --input: #cfd9e8;
+  --border: #dbe3ea;
+  --input: #cfd8e3;
   --ring: #102a56;
 
   /* Brand accent */
@@ -151,9 +151,9 @@
   --radius-xl: var(--radius);
   --radius-2xl: calc(var(--radius) + 6px);
 
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.05);
-  --shadow-elevated: 0 18px 48px rgb(15 23 42 / 0.14);
-  --shadow-dialog: 0 24px 80px rgb(15 23 42 / 0.18);
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.035), 0 8px 20px rgb(15 23 42 / 0.035);
+  --shadow-elevated: 0 14px 36px rgb(15 23 42 / 0.12);
+  --shadow-dialog: 0 22px 64px rgb(15 23 42 / 0.18);
 }
 
 @layer base {

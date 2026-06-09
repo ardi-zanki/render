@@ -193,16 +193,14 @@ export function RenderStudioControls({
           </div>
         )}
 
-        <div className="flex flex-col gap-3 border-t border-border pt-4">
-          <Label className="text-base font-semibold text-foreground">
-            Objek
-          </Label>
+        <div className="flex flex-col gap-2.5 border-t border-border pt-4">
+          <Label className="font-semibold text-foreground">Objek</Label>
           <button
             type="button"
             aria-pressed={lightsOn}
             onClick={() => setLightsOn((value) => !value)}
             className={cn(
-              "flex h-12 items-center justify-between gap-3 rounded-lg border px-4 text-sm font-semibold transition-colors",
+              "flex h-10 items-center justify-between gap-3 rounded-md border px-3 text-sm font-medium transition-colors",
               lightsOn
                 ? "border-primary bg-primary/10 text-primary"
                 : "border-border bg-secondary/60 text-foreground hover:border-primary/40",
@@ -214,14 +212,14 @@ export function RenderStudioControls({
             </span>
             <span
               className={cn(
-                "flex h-6 w-11 items-center rounded-full p-0.5 transition-colors",
+                "flex h-5 w-9 items-center rounded-full p-0.5 transition-colors",
                 lightsOn ? "bg-primary" : "bg-muted-foreground/25",
               )}
             >
               <span
                 className={cn(
-                  "size-5 rounded-full bg-background shadow-sm transition-transform",
-                  lightsOn && "translate-x-5",
+                  "size-4 rounded-full bg-background shadow-sm transition-transform",
+                  lightsOn && "translate-x-4",
                 )}
               />
             </span>

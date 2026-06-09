@@ -24,7 +24,7 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", {
 const FILTERS: { label: string; href: string }[] = [
   { label: "Aktif", href: "/renders" },
   { label: "Arsip", href: "/renders?archived=1" },
-  { label: "Processing", href: "/renders?status=processing" },
+  { label: "Diproses", href: "/renders?status=processing" },
   { label: "Gagal", href: "/renders?status=failed" },
 ];
 
@@ -67,7 +67,7 @@ export default async function RendersPage({
   return (
     <>
       <PageHeader
-        title="Riwayat Render"
+        title="Riwayat render"
         description="Semua render Anda, lengkap dengan status, mode, dan waktu pembuatan."
         action={
           <Button asChild>

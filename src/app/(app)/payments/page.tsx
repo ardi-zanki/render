@@ -108,7 +108,7 @@ export default async function PaymentsPage({
                   <span className="text-sm font-medium text-muted-foreground">
                     Rp
                   </span>
-                  <span className="text-2xl font-semibold tracking-normal text-foreground">
+                  <span className="text-xl font-semibold tracking-normal text-foreground">
                     {idr.format(pkg.price)}
                   </span>
                 </div>
@@ -125,7 +125,7 @@ export default async function PaymentsPage({
         })}
       </div>
 
-      <section className="mt-10">
+      <section className="mt-7">
         <h2 className="mb-3 text-lg font-semibold text-foreground">
           Riwayat Transaksi
         </h2>

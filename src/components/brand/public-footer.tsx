@@ -12,8 +12,8 @@ const LINKS = [
 /** Shared footer for public (logged-out) marketing pages. */
 export function PublicFooter() {
   return (
-    <footer className="border-t border-border">
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <footer className="border-t border-border/80">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-7 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="flex items-center gap-2.5">
           <Logo size={22} withWordmark={false} />
           <p>

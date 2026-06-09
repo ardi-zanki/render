@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Daftar" };
 export default function RegisterPage() {
   return (
     <AuthCard
-      title="Buat Akun RenderAI"
+      title="Buat akun RenderAI"
       subtitle="Mulai ruang kerja visual untuk project arsitektur dan interior Anda."
       footer={
         <>
