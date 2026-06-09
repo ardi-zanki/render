@@ -106,6 +106,16 @@ export async function countUsers(): Promise<number> {
   return row.value;
 }
 
+export async function getUserLabel(targetUserId: string) {
+  const [row] = await db
+    .select({ name: user.name, email: user.email })
+    .from(user)
+    .where(eq(user.id, targetUserId))
+    .limit(1);
+  if (!row) return null;
+  return row.name || row.email;
+}
+
 export interface AdminRenderRow {
   id: string;
   mode: RenderMode;

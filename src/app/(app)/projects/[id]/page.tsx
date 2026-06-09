@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { RenderImage } from "@/components/app/render-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { getProject } from "@/lib/projects/service";
@@ -86,13 +86,13 @@ export default async function ProjectDetailPage({
           }
         />
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {renders.map((r) => {
             const thumb = r.resultUrl ?? r.originalUrl;
             return (
-              <Link key={r.id} href={`/renders/${r.id}`} className="group">
-                <Card className="gap-0 overflow-hidden p-0 transition-colors group-hover:border-primary/35">
-                  <div className="relative flex aspect-square items-center justify-center bg-muted">
+              <Link key={r.id} href={`/renders/${r.id}`}>
+                <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
+                  <div className="relative flex aspect-video items-center justify-center bg-muted">
                     {thumb ? (
                       <RenderImage
                         src={thumb}
@@ -100,7 +100,7 @@ export default async function ProjectDetailPage({
                         className="size-full"
                       />
                     ) : (
-                      <ImageIcon className="size-6 text-muted-foreground" />
+                      <ImageIcon className="size-7 text-muted-foreground" />
                     )}
                     <Badge
                       variant={statusBadgeVariant(r.status)}
@@ -109,14 +109,14 @@ export default async function ProjectDetailPage({
                       {STATUS_LABEL[r.status] ?? r.status}
                     </Badge>
                   </div>
-                  <div className="flex flex-col gap-0.5 p-3">
-                    <p className="text-sm font-semibold text-foreground">
+                  <CardContent className="py-4">
+                    <p className="font-semibold text-foreground">
                       {MODE_LABEL[r.mode]}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {dateFmt.format(r.createdAt)}
                     </p>
-                  </div>
+                  </CardContent>
                 </Card>
               </Link>
             );

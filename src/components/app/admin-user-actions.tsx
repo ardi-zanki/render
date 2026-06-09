@@ -31,17 +31,18 @@ function userLabel(user: UserSummary) {
 export function AdminUserActions({ user }: { user: UserSummary }) {
   const [open, setOpen] = useState<AdminUserAction | null>(null);
   const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
+  const [confirmationName, setConfirmationName] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
 
+  const label = userLabel(user);
   const nextRole = user.role === "admin" ? "user" : "admin";
   const nextDisabled = !user.isDisabled;
 
   function close() {
     setOpen(null);
     setAmount("");
-    setDescription("");
+    setConfirmationName("");
     setErrors({});
   }
 
@@ -86,8 +87,8 @@ export function AdminUserActions({ user }: { user: UserSummary }) {
     else if (!Number.isInteger(value) || value === 0) {
       nextErrors.amount = "Jumlah harus bilangan bulat selain 0";
     }
-    if (!description.trim()) {
-      nextErrors.description = "Catatan admin wajib diisi";
+    if (confirmationName.trim() !== label) {
+      nextErrors.confirmationName = `Ketik "${label}" untuk menyesuaikan kredit`;
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -98,7 +99,7 @@ export function AdminUserActions({ user }: { user: UserSummary }) {
     const fd = new FormData();
     fd.set("userId", user.id);
     fd.set("amount", String(value));
-    fd.set("description", description.trim());
+    fd.set("confirmationName", confirmationName.trim());
     runAction(() => creditAdjustmentAction(fd), "Kredit berhasil disesuaikan");
   }
 
@@ -185,7 +186,7 @@ export function AdminUserActions({ user }: { user: UserSummary }) {
             Sesuaikan kredit
           </h2>
           <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
-            Masukkan nilai positif untuk menambah kredit atau negatif untuk mengurangi kredit {userLabel(user)}.
+            Masukkan nilai positif untuk menambah kredit atau negatif untuk mengurangi kredit {label}.
           </p>
           <div className="mt-4 grid gap-4">
             <div className="flex flex-col gap-1.5">
@@ -206,20 +207,28 @@ export function AdminUserActions({ user }: { user: UserSummary }) {
               )}
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor={`credit-description-${user.id}`}>Catatan admin</Label>
+              <div className="rounded-md border border-border bg-muted/50 px-3 py-2 text-sm">
+                <span className="text-muted-foreground">Nama pengguna: </span>
+                <span className="font-semibold text-foreground">{label}</span>
+              </div>
+              <Label htmlFor={`credit-confirmation-${user.id}`}>
+                Ketik nama pengguna
+              </Label>
               <Input
-                id={`credit-description-${user.id}`}
-                value={description}
+                id={`credit-confirmation-${user.id}`}
+                value={confirmationName}
                 onChange={(e) => {
-                  setDescription(e.target.value);
-                  setErrors((prev) => ({ ...prev, description: "" }));
+                  setConfirmationName(e.target.value);
+                  setErrors((prev) => ({ ...prev, confirmationName: "" }));
                 }}
-                placeholder="Contoh: kompensasi gagal render"
+                placeholder={label}
                 maxLength={160}
-                aria-invalid={!!errors.description}
+                aria-invalid={!!errors.confirmationName}
               />
-              {errors.description && (
-                <p className="text-xs text-destructive">{errors.description}</p>
+              {errors.confirmationName && (
+                <p className="text-xs text-destructive">
+                  {errors.confirmationName}
+                </p>
               )}
             </div>
           </div>

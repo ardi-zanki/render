@@ -5,6 +5,7 @@ import {
   adminToggleDisableSchema,
   notificationReadSchema,
   renderDeleteSchema,
+  renderMoveProjectSchema,
 } from "./api";
 
 describe("api validation", () => {
@@ -17,17 +18,25 @@ describe("api validation", () => {
     ).toBe(true);
   });
 
-  it("requires a deletion note and trims it", () => {
+  it("requires a render deletion confirmation name and trims it", () => {
     const result = renderDeleteSchema.safeParse({
-      note: "  duplikat render  ",
+      confirmationName: "  Render Interior  ",
     });
 
     expect(result.success).toBe(true);
     if (!result.success) return;
-    expect(result.data.note).toBe("duplikat render");
+    expect(result.data.confirmationName).toBe("Render Interior");
 
-    const blank = renderDeleteSchema.safeParse({ note: "   " });
+    const blank = renderDeleteSchema.safeParse({ confirmationName: "   " });
     expect(blank.success).toBe(false);
+  });
+
+  it("accepts a render move project payload", () => {
+    const result = renderMoveProjectSchema.safeParse({
+      targetProjectId: "f75bc311-6ca8-40b8-b5e6-0c57e168873d",
+    });
+
+    expect(result.success).toBe(true);
   });
 
   it("coerces admin toggle values from form payloads", () => {
@@ -45,7 +54,7 @@ describe("api validation", () => {
     const valid = adminCreditAdjustmentSchema.safeParse({
       userId: "user-1",
       amount: "3",
-      description: "Top up manual",
+      confirmationName: "Ardi Demo",
     });
 
     expect(valid.success).toBe(true);
@@ -55,7 +64,7 @@ describe("api validation", () => {
     const invalid = adminCreditAdjustmentSchema.safeParse({
       userId: "user-1",
       amount: "0",
-      description: "Noop",
+      confirmationName: "Ardi Demo",
     });
     expect(invalid.success).toBe(false);
   });

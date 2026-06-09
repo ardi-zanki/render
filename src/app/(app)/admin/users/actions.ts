@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import {
+  getUserLabel,
   manualCreditAdjustment,
   setUserDisabled,
   setUserRole,
@@ -51,16 +52,22 @@ export async function creditAdjustmentAction(formData: FormData) {
   const parsed = adminCreditAdjustmentSchema.safeParse({
     userId: formData.get("userId"),
     amount: formData.get("amount"),
-    description: formData.get("description"),
+    confirmationName: formData.get("confirmationName"),
   });
   if (!parsed.success) return;
-  const { userId: targetId, amount, description } = parsed.data;
+  const { userId: targetId, amount, confirmationName } = parsed.data;
+
+  const targetLabel = await getUserLabel(targetId);
+  if (!targetLabel) throw new Error("User tidak ditemukan.");
+  if (confirmationName !== targetLabel) {
+    throw new Error(`Ketik "${targetLabel}" untuk menyesuaikan kredit.`);
+  }
 
   await manualCreditAdjustment({
     adminUserId: session.user.id,
     targetUserId: targetId,
     amount,
-    description,
+    description: `Penyesuaian kredit admin untuk ${targetLabel}`,
   });
   revalidatePath("/admin/users");
   revalidatePath("/admin/credits");

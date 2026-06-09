@@ -4,9 +4,15 @@ import { auth } from "@/lib/auth";
 import {
   deleteRenderPermanently,
   getRenderDetail,
+  moveRenderToProject,
 } from "@/lib/renders/service";
+import { renderDisplayName } from "@/lib/renders/labels";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { renderDeleteSchema, renderIdSchema } from "@/lib/validations/api";
+import {
+  renderDeleteSchema,
+  renderIdSchema,
+  renderMoveProjectSchema,
+} from "@/lib/validations/api";
 
 export const runtime = "nodejs";
 
@@ -66,20 +72,33 @@ export async function DELETE(
     throw err;
   }
 
+  const { id } = await params;
+  const parsedId = renderIdSchema.safeParse(id);
+  if (!parsedId.success) {
+    return NextResponse.json({ error: "ID render tidak valid" }, { status: 400 });
+  }
+
   const parsed = renderDeleteSchema.safeParse(
     await req.json().catch(() => ({})),
   );
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Catatan wajib diisi sebelum menghapus render" },
+      { error: "Nama render wajib diisi sebelum menghapus render" },
       { status: 400 },
     );
   }
 
-  const { id } = await params;
-  const parsedId = renderIdSchema.safeParse(id);
-  if (!parsedId.success) {
-    return NextResponse.json({ error: "ID render tidak valid" }, { status: 400 });
+  const render = await getRenderDetail(session.user.id, parsedId.data);
+  if (!render) {
+    return NextResponse.json({ error: "Render tidak ditemukan" }, { status: 404 });
+  }
+
+  const expectedName = renderDisplayName(render.mode);
+  if (parsed.data.confirmationName !== expectedName) {
+    return NextResponse.json(
+      { error: `Ketik "${expectedName}" untuk menghapus render` },
+      { status: 400 },
+    );
   }
 
   const ok = await deleteRenderPermanently(session.user.id, parsedId.data);
@@ -88,4 +107,67 @@ export async function DELETE(
   }
 
   return NextResponse.json({ ok: true });
+}
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const session = await auth.api.getSession({ headers: req.headers });
+  if (!session || !session.user.emailVerified) {
+    return NextResponse.json({ error: "Tidak terautentikasi" }, { status: 401 });
+  }
+
+  try {
+    await assertRateLimit("public_api", session.user.id);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      return NextResponse.json(
+        { error: err.message, code: err.code },
+        { status: 429 },
+      );
+    }
+    throw err;
+  }
+
+  const { id } = await params;
+  const parsedId = renderIdSchema.safeParse(id);
+  if (!parsedId.success) {
+    return NextResponse.json({ error: "ID render tidak valid" }, { status: 400 });
+  }
+
+  const parsed = renderMoveProjectSchema.safeParse(
+    await req.json().catch(() => ({})),
+  );
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Project tujuan tidak valid" },
+      { status: 400 },
+    );
+  }
+
+  const result = await moveRenderToProject(
+    session.user.id,
+    parsedId.data,
+    parsed.data.targetProjectId,
+  );
+
+  if (!result.ok) {
+    if (result.reason === "render_not_found") {
+      return NextResponse.json(
+        { error: "Render tidak ditemukan" },
+        { status: 404 },
+      );
+    }
+    return NextResponse.json(
+      { error: "Project tujuan tidak ditemukan atau sudah diarsipkan" },
+      { status: 404 },
+    );
+  }
+
+  return NextResponse.json({
+    ok: true,
+    projectId: parsed.data.targetProjectId,
+    projectName: result.projectName,
+  });
 }

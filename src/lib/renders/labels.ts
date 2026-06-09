@@ -7,6 +7,10 @@ export const MODE_LABEL: Record<RenderMode, string> = {
   upscale: "Upscale",
 };
 
+export function renderDisplayName(mode: RenderMode) {
+  return `Render ${MODE_LABEL[mode]}`;
+}
+
 export const STATUS_LABEL: Record<string, string> = {
   queued: "Antri",
   processing: "Proses",

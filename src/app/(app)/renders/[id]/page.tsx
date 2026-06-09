@@ -6,14 +6,17 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/app/page-header";
 import { RenderDetailActions } from "@/components/app/render-detail-actions";
 import { RenderImage } from "@/components/app/render-image";
+import { RenderProjectSelector } from "@/components/app/render-project-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   MODE_LABEL,
   STATUS_LABEL,
+  renderDisplayName,
   statusBadgeVariant,
 } from "@/lib/renders/labels";
+import { listProjects } from "@/lib/projects/service";
 import { getRenderDetail } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
@@ -31,13 +34,21 @@ export default async function RenderDetailPage({
 }) {
   const { user } = await requireVerifiedUser();
   const { id } = await params;
-  const render = await getRenderDetail(user.id, id);
+  const [render, projectRows] = await Promise.all([
+    getRenderDetail(user.id, id),
+    listProjects(user.id),
+  ]);
   if (!render) notFound();
+  const renderName = renderDisplayName(render.mode);
+  const projectOptions = projectRows.map((project) => ({
+    id: project.id,
+    name: project.name,
+  }));
 
   return (
     <>
       <PageHeader
-        title={`Render ${MODE_LABEL[render.mode]}`}
+        title={renderName}
         description={`${render.projectName} · ${dateFmt.format(render.createdAt)}`}
         action={
           <Button asChild variant="outline">
@@ -85,7 +96,15 @@ export default async function RenderDetailPage({
                 </Badge>
               </div>
               <Info label="Mode" value={MODE_LABEL[render.mode]} />
-              <Info label="Project" value={render.projectName} />
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <span className="text-muted-foreground">Project</span>
+                <RenderProjectSelector
+                  renderId={render.id}
+                  currentProjectId={render.projectId}
+                  currentProjectName={render.projectName}
+                  projects={projectOptions}
+                />
+              </div>
               <Info label="Format" value={render.outputFormat.toUpperCase()} />
               <Info label="Kredit" value={`${render.creditsUsed || 1} kredit`} />
               {render.errorMessage && (
@@ -96,6 +115,7 @@ export default async function RenderDetailPage({
               <RenderDetailActions
                 renderId={render.id}
                 projectId={render.projectId}
+                renderName={renderName}
                 prompt={render.prompt}
                 archived={!!render.archivedAt}
                 canDownload={render.status === "success" && !!render.resultUrl}

@@ -26,7 +26,11 @@ export const renderShareSchema = z.object({
 });
 
 export const renderDeleteSchema = z.object({
-  note: requiredText("Catatan"),
+  confirmationName: requiredText("Nama render", 120),
+});
+
+export const renderMoveProjectSchema = z.object({
+  targetProjectId: uuidSchema,
 });
 
 export const profileUploadSchema = z.object({
@@ -63,7 +67,7 @@ export const adminCreditAdjustmentSchema = z.object({
     .number()
     .int("Jumlah kredit harus bilangan bulat")
     .refine((value) => value !== 0, "Jumlah kredit tidak boleh 0"),
-  description: requiredText("Catatan admin"),
+  confirmationName: requiredText("Nama pengguna", 160),
 });
 
 export const retryRenderSchema = z.object({
@@ -76,4 +80,5 @@ export const projectIdSchema = uuidSchema;
 export type NotificationReadInput = z.infer<typeof notificationReadSchema>;
 export type RenderShareInput = z.infer<typeof renderShareSchema>;
 export type RenderDeleteInput = z.infer<typeof renderDeleteSchema>;
+export type RenderMoveProjectInput = z.infer<typeof renderMoveProjectSchema>;
 export type ProfileUploadInput = z.infer<typeof profileUploadSchema>;
