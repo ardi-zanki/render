@@ -1,4 +1,3 @@
-import { and, count, desc, eq, isNull } from "drizzle-orm";
 import {
   ArrowRight,
   Bell,
@@ -19,17 +18,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { db } from "@/db";
-import { projects, renders } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
+import { getUnreadCount } from "@/lib/notifications/service";
 import {
   STATUS_LABEL,
   statusBadgeVariant,
   type BadgeVariant,
 } from "@/lib/renders/labels";
-import { getUnreadCount } from "@/lib/notifications/service";
 import { listPayments } from "@/lib/payments/service";
-import { listRenders } from "@/lib/renders/service";
+import { countProjects, listRecentProjects } from "@/lib/projects/service";
+import { countUserRenders, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -60,38 +58,15 @@ export default async function DashboardPage() {
     unreadCount,
     latestPaymentRows,
   ] = await Promise.all([
-      getBalance(uid),
-      db
-        .select({ value: count() })
-        .from(renders)
-        .where(and(eq(renders.userId, uid), isNull(renders.deletedAt))),
-      db
-        .select({ value: count() })
-        .from(renders)
-        .where(
-          and(
-            eq(renders.userId, uid),
-            eq(renders.status, "success"),
-            isNull(renders.deletedAt),
-          ),
-        ),
-      db
-        .select({ value: count() })
-        .from(projects)
-        .where(and(eq(projects.userId, uid), isNull(projects.deletedAt))),
-      db.query.projects.findMany({
-        where: and(
-          eq(projects.userId, uid),
-          isNull(projects.deletedAt),
-          isNull(projects.archivedAt),
-        ),
-        orderBy: desc(projects.updatedAt),
-        limit: 4,
-      }),
-      listRenders(uid, { limit: 6 }),
-      getUnreadCount(uid),
-      listPayments(uid, { limit: 1 }),
-    ]);
+    getBalance(uid),
+    countUserRenders(uid),
+    countUserRenders(uid, { status: "success" }),
+    countProjects(uid),
+    listRecentProjects(uid, 4),
+    listRenders(uid, { limit: 6 }),
+    getUnreadCount(uid),
+    listPayments(uid, { limit: 1 }),
+  ]);
 
   const latestPayment = latestPaymentRows[0] ?? null;
   const firstName = session.user.name.split(" ")[0];
@@ -106,17 +81,17 @@ export default async function DashboardPage() {
     },
     {
       label: "Total Render",
-      value: renderCount[0].value.toLocaleString("id-ID"),
+      value: renderCount.toLocaleString("id-ID"),
       icon: ImageIcon,
     },
     {
       label: "Render Selesai",
-      value: successCount[0].value.toLocaleString("id-ID"),
+      value: successCount.toLocaleString("id-ID"),
       icon: CheckCircle2,
     },
     {
       label: "Project",
-      value: projectCount[0].value.toLocaleString("id-ID"),
+      value: projectCount.toLocaleString("id-ID"),
       icon: FolderOpen,
       href: "/projects",
       hint: "Kelola",

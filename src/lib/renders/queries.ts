@@ -162,6 +162,24 @@ export async function countRenders(
   return row.value;
 }
 
+/** Total non-deleted renders for a user's dashboard-level statistics. */
+export async function countUserRenders(
+  userId: string,
+  opts: { status?: RenderStatus } = {},
+): Promise<number> {
+  const [row] = await db
+    .select({ value: count() })
+    .from(renders)
+    .where(
+      and(
+        eq(renders.userId, userId),
+        isNull(renders.deletedAt),
+        opts.status ? eq(renders.status, opts.status) : undefined,
+      ),
+    );
+  return row.value;
+}
+
 export async function getResultAssetForDownload(userId: string, renderId: string) {
   const render = await db.query.renders.findFirst({
     where: and(

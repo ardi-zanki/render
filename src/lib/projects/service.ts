@@ -36,6 +36,18 @@ export async function listProjects(
   });
 }
 
+export async function listRecentProjects(userId: string, limit = 4) {
+  return db.query.projects.findMany({
+    where: and(
+      eq(projects.userId, userId),
+      isNull(projects.deletedAt),
+      isNull(projects.archivedAt),
+    ),
+    orderBy: desc(projects.updatedAt),
+    limit,
+  });
+}
+
 export const MAX_PROJECTS = 10;
 
 /** Count a user's non-deleted projects (active + archived). */

@@ -15,6 +15,7 @@ export { createRender } from "./create";
 export { processNextRenderJob, processRenderJob } from "./processor";
 export {
   countRenders,
+  countUserRenders,
   getRenderDetail,
   getResultAssetForDownload,
   listRenders,

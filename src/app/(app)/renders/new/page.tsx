@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { eq } from "drizzle-orm";
 
 import { PageHeader } from "@/components/app/page-header";
 import { RenderStudio } from "@/components/app/render-studio";
-import { db } from "@/db";
-import { userProfiles, type RenderOutputFormat } from "@/db/schema";
+import type { RenderOutputFormat } from "@/db/schema";
+import { getUserProfile } from "@/lib/account/service";
 import { getBalance } from "@/lib/credits";
 import {
   getDefaultProject,
@@ -46,9 +45,7 @@ export default async function CreateRenderPage({
     getBalance(user.id),
     listRenders(user.id, { projectId: project.id, limit: 12 }),
     listProjects(user.id),
-    db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, user.id),
-    }),
+    getUserProfile(user.id),
   ]);
 
   return (
