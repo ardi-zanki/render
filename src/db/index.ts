@@ -21,5 +21,6 @@ if (env.NODE_ENV !== "production") {
 }
 
 export const db = drizzle(client, { schema });
+export const dbClient = client;
 export { schema };
 export type Database = typeof db;
