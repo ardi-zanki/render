@@ -11,6 +11,7 @@ export default async function AdminSettingsPage() {
 
   const rows = [
     ["AI Provider", env.AI_PROVIDER],
+    ["Render Processing", env.RENDER_PROCESSING_MODE],
     ["Storage Provider", env.STORAGE_PROVIDER],
     ["Payment Provider", env.PAYMENT_PROVIDER],
     ["Email Provider", env.EMAIL_PROVIDER],

@@ -66,6 +66,7 @@ const schema = z.object({
   AI_PROVIDER: z
     .enum(["myarchitectai", "openai", "mock", "selfhost-stablediffusion", "fal"])
     .default("myarchitectai"),
+  RENDER_PROCESSING_MODE: z.enum(["inline", "worker"]).optional(),
   MYARCHITECTAI_API_KEY: optional,
   SELFHOST_SD_API_URL: optional,
   SELFHOST_SD_API_KEY: optional,
@@ -93,5 +94,21 @@ if (!parsed.success) {
   );
 }
 
-export const env = parsed.data;
+const renderProcessingMode =
+  parsed.data.RENDER_PROCESSING_MODE ??
+  (parsed.data.NODE_ENV === "production" ? "worker" : "inline");
+
+if (
+  parsed.data.NODE_ENV === "production" &&
+  parsed.data.RENDER_PROCESSING_MODE === "inline"
+) {
+  throw new Error(
+    "Environment variable tidak valid. Production wajib menggunakan RENDER_PROCESSING_MODE=worker.",
+  );
+}
+
+export const env = {
+  ...parsed.data,
+  RENDER_PROCESSING_MODE: renderProcessingMode,
+};
 export type Env = typeof env;

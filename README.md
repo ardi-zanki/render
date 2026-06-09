@@ -147,7 +147,10 @@ The render pipeline (`src/lib/renders/`) is split by concern: `create`, `jobs`,
 create render row → deduct credit (idempotent) → store original → enqueue job →
 worker/process job → call AI provider → persist result asset → mark success. On
 final failure the render is marked failed and the credit is refunded. Entry
-point: `POST /api/renders` (multipart upload).
+point: `POST /api/renders` (multipart upload). In local development,
+`RENDER_PROCESSING_MODE=inline` can process the queued job from the web request
+for convenience. In production, use `RENDER_PROCESSING_MODE=worker` so the web
+service only enqueues jobs and `pnpm worker` processes the queue.
 
 - **Render Studio** (`/renders/new`) — the workspace: mode (Interior/Exterior/
   Style Transfer/Upscale), style, location, time & weather, image upload,
@@ -300,4 +303,5 @@ flip providers: Google OAuth (`GOOGLE_CLIENT_*`), email (`RESEND_API_KEY`),
 `AI_PROVIDER=selfhost-stablediffusion` (+ `SELFHOST_SD_API_URL`),
 `PAYMENT_PROVIDER=midtrans` (+ Midtrans keys and notification URL). Render
 execution uses the DB-backed `render_jobs` queue and `pnpm worker` in
-production (`pnpm render:worker` is the local `.env.local` helper).
+production with `RENDER_PROCESSING_MODE=worker` (`pnpm render:worker` is the
+local `.env.local` helper).

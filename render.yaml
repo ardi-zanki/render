@@ -22,6 +22,8 @@ envVarGroups:
         value: midtrans
       - key: AI_PROVIDER
         value: fal
+      - key: RENDER_PROCESSING_MODE
+        value: worker
       - key: FAL_RENDER_MODEL
         value: fal-ai/flux-kontext/dev
       - key: FAL_STYLE_TRANSFER_MODEL

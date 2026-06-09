@@ -13,7 +13,9 @@ Dockerfile ─┤
 
 The worker is **required**. Without a running worker, render jobs stay `queued`
 forever (deployment PRD §13). The queue is **PostgreSQL-backed**, so **no Redis
-is needed** for the current scale.
+is needed** for the current scale. Production web services must set
+`RENDER_PROCESSING_MODE=worker`; `inline` is reserved for local/dev convenience
+and is rejected when `NODE_ENV=production`.
 
 | Target | How | Config |
 |---|---|---|
@@ -128,7 +130,8 @@ firewall: 80/443/22, auto-updates) per deployment PRD §25.
    from the same `Dockerfile`.
 2. Fill every `sync:false` secret in the **renderai-shared** env group —
    including `DATABASE_URL` (Neon pooled URL), `APP_URL`, `BETTER_AUTH_URL`,
-   `FAL_KEY`, and all storage/payment/email secrets.
+   `FAL_KEY`, `RENDER_PROCESSING_MODE=worker`, and all storage/payment/email
+   secrets.
 3. First deploy — run once in a Render Shell (or locally against the Neon URL):
    ```bash
    pnpm db:migrate
@@ -159,6 +162,10 @@ pricing first — it's a newer product. DNS + R2 stay on Cloudflare either way.
   a VPS use a second compose project + `.env.staging` + subdomain.
 - **Workers:** scale by adding worker containers/replicas. Jobs are pulled with
   `SELECT … FOR UPDATE SKIP LOCKED`, so multiple workers won't collide.
+- **Web render mode:** production web services should return
+  `renderProcessingMode: "worker"` from `/api/health`. If it returns `inline`,
+  the environment is configured like local development and should not be used
+  for production traffic.
 - **Redis:** not required now. If you later move to BullMQ, uncomment the `redis`
   service in `docker-compose.yml`.
 
@@ -166,7 +173,8 @@ pricing first — it's a newer product. DNS + R2 stay on Cloudflare either way.
 
 ## 7. Post-deploy smoke checklist (deployment PRD §30)
 
-- [ ] HTTPS live; `/api/health` returns `ok: true`; landing/login reachable.
+- [ ] HTTPS live; `/api/health` returns `ok: true` and
+  `renderProcessingMode: "worker"`; landing/login reachable.
 - [ ] Register → verify email (Resend) → 3 free credits granted.
 - [ ] Render each mode → worker processes → output stored in R2 → download works.
 - [ ] Force a provider error → credit auto-refunded after 3 attempts.

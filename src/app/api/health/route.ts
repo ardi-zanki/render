@@ -14,6 +14,7 @@ export async function GET() {
       ok: true,
       service: "renderai",
       aiProvider: env.AI_PROVIDER,
+      renderProcessingMode: env.RENDER_PROCESSING_MODE,
       storageProvider: env.STORAGE_PROVIDER,
     });
   } catch {

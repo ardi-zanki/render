@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 
+import { env } from "@/env";
 import { InsufficientCreditsError } from "@/lib/credits";
 import { auth } from "@/lib/auth";
 import { getDefaultProject, getProject } from "@/lib/projects/service";
 import { AiProviderError } from "@/lib/providers/ai";
 import { buildPrompt } from "@/lib/renders/prompt";
-import { createRender, processRenderJob } from "@/lib/renders/service";
+import { createRender } from "@/lib/renders/service";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { StorageQuotaExceededError } from "@/lib/storage/usage";
 import { ImageUploadError, validateImageFile } from "@/lib/uploads/images";
@@ -13,6 +14,18 @@ import { createRenderSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
+
+function startInlineRenderProcessing(renderId: string, userId: string) {
+  if (env.RENDER_PROCESSING_MODE !== "inline") return;
+
+  setTimeout(() => {
+    void import("@/lib/renders/processor")
+      .then(({ processRenderJob }) => processRenderJob(renderId, `api-${userId}`))
+      .catch((err) => {
+        console.error("Background render job gagal:", err);
+      });
+  }, 0);
+}
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });
@@ -157,11 +170,7 @@ export async function POST(req: Request) {
       original,
       reference,
     });
-    setTimeout(() => {
-      void processRenderJob(result.renderId, `api-${userId}`).catch((err) => {
-        console.error("Background render job gagal:", err);
-      });
-    }, 0);
+    startInlineRenderProcessing(result.renderId, userId);
     return NextResponse.json(result);
   } catch (err) {
     if (err instanceof InsufficientCreditsError) {
