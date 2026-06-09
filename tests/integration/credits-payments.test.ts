@@ -7,11 +7,13 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 loadEnv({ path: ".env.local", override: false });
 
 process.env.APP_URL ??= "http://localhost:3210";
+process.env.AI_PROVIDER = "mock";
 process.env.BETTER_AUTH_SECRET ??= "test-secret-for-vitest";
 process.env.BETTER_AUTH_URL ??= "http://localhost:3210";
 process.env.JWT_SECRET ??= "test-jwt-secret-for-vitest";
 process.env.PAYMENT_PROVIDER = "mock";
 process.env.RATE_LIMIT_ENABLED = "false";
+process.env.RENDER_PROCESSING_MODE = "worker";
 process.env.STORAGE_PROVIDER = "local";
 
 const TEST_PACKAGE_SLUG = "vitest-creator";
@@ -25,6 +27,7 @@ async function modules() {
     paymentsService,
     paymentProviderModule,
     rendersService,
+    storageModule,
   ] = await Promise.all([
     import("@/db"),
     import("@/db/schema"),
@@ -32,6 +35,7 @@ async function modules() {
     import("@/lib/payments/service"),
     import("@/lib/providers/payment"),
     import("@/lib/renders/service"),
+    import("@/lib/storage"),
   ]);
 
   return {
@@ -41,6 +45,7 @@ async function modules() {
     ...paymentsService,
     ...paymentProviderModule,
     ...rendersService,
+    ...storageModule,
   };
 }
 
@@ -161,11 +166,46 @@ async function ensureTestPackage() {
 }
 
 async function cleanupCreatedUsers() {
-  const { db, user } = await modules();
+  const { db, renderAssets, storage, user } = await modules();
   for (const email of createdEmails) {
+    const existing = await db.query.user.findFirst({
+      where: eq(user.email, email),
+    });
+    if (existing) {
+      const assets = await db.query.renderAssets.findMany({
+        where: eq(renderAssets.userId, existing.id),
+      });
+      for (const asset of assets) {
+        await storage().deleteObject(asset.fileKey);
+      }
+    }
     await db.delete(user).where(eq(user.email, email));
   }
   createdEmails.clear();
+}
+
+async function createUploadedImage(fileName = "vitest-original.png") {
+  const sharp = (await import("sharp")).default;
+  const data = await sharp({
+    create: {
+      width: 8,
+      height: 8,
+      channels: 3,
+      background: { r: 180, g: 190, b: 200 },
+    },
+  })
+    .png()
+    .toBuffer();
+
+  return {
+    data,
+    contentType: "image/png",
+    ext: "png",
+    fileName,
+    size: data.length,
+    width: 8,
+    height: 8,
+  };
 }
 
 beforeAll(async () => {
@@ -433,5 +473,91 @@ describe("render project integration", () => {
     });
     expect(unchangedAssets.every((asset) => asset.projectId === sourceProject.id))
       .toBe(true);
+  });
+});
+
+describe("render workflow integration", () => {
+  it("enqueues a render, reserves credit, and completes it through the worker", async () => {
+    const {
+      applyCreditChange,
+      createRender,
+      db,
+      getBalance,
+      notifications,
+      processRenderJob,
+      projects,
+      renderAssets,
+      renderJobs,
+      renders,
+    } = await modules();
+    const testUser = await createTestUser();
+    const project = await createTestProject(
+      testUser.id,
+      "Vitest Render Workflow Project",
+    );
+    await applyCreditChange({
+      userId: testUser.id,
+      type: "bonus",
+      amount: 5,
+      description: "Render workflow test credit",
+      idempotencyKey: `workflow-credit:${testUser.id}`,
+    });
+
+    const created = await createRender({
+      userId: testUser.id,
+      projectId: project.id,
+      mode: "interior",
+      prompt: "Vitest render workflow prompt",
+      outputFormat: "png",
+      original: await createUploadedImage(),
+    });
+
+    expect(created.status).toBe("queued");
+    expect(created.balance).toBe(4);
+    await expect(getBalance(testUser.id)).resolves.toBe(4);
+
+    const queuedJob = await db.query.renderJobs.findFirst({
+      where: eq(renderJobs.renderId, created.renderId),
+    });
+    expect(queuedJob?.status).toBe("queued");
+
+    await expect(
+      processRenderJob(created.renderId, "vitest-worker"),
+    ).resolves.toEqual({
+      processed: true,
+      renderId: created.renderId,
+      status: "success",
+    });
+
+    const completedRender = await db.query.renders.findFirst({
+      where: eq(renders.id, created.renderId),
+    });
+    expect(completedRender?.status).toBe("success");
+    expect(completedRender?.creditsUsed).toBe(1);
+    expect(completedRender?.completedAt).toBeInstanceOf(Date);
+
+    const completedJob = await db.query.renderJobs.findFirst({
+      where: eq(renderJobs.renderId, created.renderId),
+    });
+    expect(completedJob?.status).toBe("success");
+
+    const assets = await db.query.renderAssets.findMany({
+      where: eq(renderAssets.renderId, created.renderId),
+    });
+    expect(assets.some((asset) => asset.type === "original")).toBe(true);
+    expect(assets.some((asset) => asset.type === "result")).toBe(true);
+
+    const updatedProject = await db.query.projects.findFirst({
+      where: eq(projects.id, project.id),
+    });
+    expect(updatedProject?.coverImageUrl).toBeTruthy();
+
+    const renderNotifications = await db.query.notifications.findMany({
+      where: eq(notifications.userId, testUser.id),
+    });
+    expect(renderNotifications.some((note) => note.type === "render_success")).toBe(
+      true,
+    );
+    await expect(getBalance(testUser.id)).resolves.toBe(4);
   });
 });
