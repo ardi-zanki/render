@@ -9,6 +9,7 @@ import {
   Grid3X3,
   ImageIcon,
   Layers3,
+  Lightbulb,
   Loader2,
   PanelTop,
   Sparkles,
@@ -28,6 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ChoiceCard } from "@/components/ui/choice-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,6 +37,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Select } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { ToggleRow } from "@/components/ui/toggle-row";
 
 const colorGroups = [
   {
@@ -116,6 +119,14 @@ const visualAssetRules = [
   "Mockup produk memakai komponen terbaru: radius konsisten, Render Navy sebagai aksen, dan layout yang lapang.",
   "Gambar showcase menggunakan rasio stabil, crop bersih, kontras cukup, dan caption singkat.",
   "Preview fitur harus membantu pengguna memahami manfaat workflow, bukan hanya menjadi dekorasi.",
+];
+
+const implementationContract = [
+  "Gunakan token Tailwind dari globals.css: bg-card, text-foreground, border-border, text-primary, dan semantic variants.",
+  "Pakai Button, Input, Select, Textarea, Card, Badge, Alert, Modal, Popover, EmptyState, Segmented, ChoiceCard, dan ToggleRow sebelum membuat styling lokal.",
+  "Hard-coded warna hanya untuk logo SVG, brand pihak ketiga, OpenGraph, atau overlay gambar melalui token overlay.",
+  "Card dipakai untuk item/alat yang benar-benar berbingkai; layout halaman tetap berupa section atau grid, bukan card di dalam card.",
+  "Radius default 4-8px; rounded-full hanya untuk avatar, badge counter, dan kontrol berbentuk switch.",
 ];
 
 function Swatch({
@@ -315,6 +326,43 @@ export default function DesignSystemPage() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </Section>
+
+        <Separator />
+
+        <Section
+          title="Kontrak Implementasi"
+          description="Aturan ini menjadi batas pemakaian komponen supaya halaman baru tidak keluar dari bahasa visual RenderAI."
+        >
+          <div className="grid gap-4 lg:grid-cols-[1fr_340px]">
+            <Card>
+              <CardContent className="flex flex-col gap-4 py-5">
+                <p className="font-semibold text-foreground">
+                  Checklist sebelum membuat UI baru
+                </p>
+                <SpecList items={implementationContract} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="flex flex-col gap-4 py-5">
+                <div>
+                  <p className="font-semibold text-foreground">
+                    Pola pilihan dan toggle
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    Gunakan pola ini untuk mode render, opsi visual, dan
+                    pengaturan biner di dalam panel.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <ChoiceCard active icon={ImageIcon} label="Interior" />
+                  <ChoiceCard icon={Layers3} label="Exterior" />
+                </div>
+                <ToggleRow checked icon={Lightbulb} label="Nyalain Lampu" />
+              </CardContent>
+            </Card>
           </div>
         </Section>
 

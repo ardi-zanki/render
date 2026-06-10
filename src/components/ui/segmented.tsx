@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-type Option<T extends string> = { value: T; label: string };
+type Option<T extends string> = { value: T; label: string; disabled?: boolean };
 
 /**
  * Segmented control for switching between a small set of mutually-exclusive
@@ -38,9 +38,10 @@ export function Segmented<T extends string>({
             type="button"
             role="tab"
             aria-selected={active}
+            disabled={option.disabled}
             onClick={() => onChange(option.value)}
             className={cn(
-              "cursor-pointer rounded-sm font-medium transition-colors",
+              "cursor-pointer rounded-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-45",
               size === "sm" ? "px-3 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
               active
                 ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.045)]"

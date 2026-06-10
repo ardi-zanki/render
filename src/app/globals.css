@@ -50,6 +50,8 @@
   --border: #d9e2ec;
   --input: #cbd6e2;
   --ring: #1f5b91;
+  --overlay: #020617;
+  --overlay-foreground: #ffffff;
 
   /* Brand accent */
   --brand-violet: #6674d8;
@@ -96,6 +98,8 @@
   --border: #263448;
   --input: #34445b;
   --ring: #9fc2f8;
+  --overlay: #020617;
+  --overlay-foreground: #ffffff;
 
   --brand-violet: #9a9cff;
   --brand-navy: #91b8f2;
@@ -134,6 +138,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+  --color-overlay-foreground: var(--overlay-foreground);
   --color-brand-violet: var(--brand-violet);
   --color-brand-navy: var(--brand-navy);
   --color-brand-sky: var(--brand-sky);

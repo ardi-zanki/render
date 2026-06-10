@@ -224,7 +224,7 @@ export default async function LandingPage() {
                   sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
                   className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-left text-sm font-semibold text-white">
+                <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-overlay/70 to-transparent p-4 text-left text-sm font-semibold text-overlay-foreground">
                   {item.title}
                 </figcaption>
               </figure>
@@ -452,7 +452,7 @@ function ProductPreview() {
               className="size-full object-cover"
             />
             <div className="absolute inset-y-0 left-1/2 w-px bg-white/90" />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-full border border-white/80 bg-black/55 px-3 py-1 text-xs font-semibold text-white shadow">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-full border border-overlay-foreground/80 bg-overlay/55 px-3 py-1 text-xs font-semibold text-overlay-foreground shadow">
               Draft / Opsi visual
             </div>
           </div>

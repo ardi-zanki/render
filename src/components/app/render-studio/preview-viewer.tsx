@@ -15,9 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Segmented } from "@/components/ui/segmented";
 import { Textarea } from "@/components/ui/textarea";
 import type { RenderMode } from "@/db/schema";
-import { cn } from "@/lib/utils";
 import type { StudioView, ViewerTab } from "./types";
 
 export function RenderPreviewViewer({
@@ -84,32 +84,12 @@ export function RenderPreviewViewer({
       <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {hasUploadedImage ? (
-            <div
-              role="tablist"
-              className="inline-flex flex-wrap items-center gap-1 rounded-md bg-muted/80 p-1"
-            >
-              {viewerTabs.map((tab) => {
-                const active = tab.value === view;
-                return (
-                  <button
-                    key={tab.value}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    disabled={tab.disabled}
-                    onClick={() => setView(tab.value)}
-                    className={cn(
-                      "rounded-md px-3 py-1 text-xs font-medium transition-colors disabled:pointer-events-none disabled:opacity-45",
-                      active
-                        ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.045)]"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
+            <Segmented
+              options={viewerTabs}
+              value={view}
+              onChange={setView}
+              size="sm"
+            />
           ) : (
             <div />
           )}

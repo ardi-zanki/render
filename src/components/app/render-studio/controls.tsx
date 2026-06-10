@@ -4,11 +4,12 @@ import { Lightbulb, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ChoiceCard } from "@/components/ui/choice-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { ToggleRow } from "@/components/ui/toggle-row";
 import type { RenderMode, RenderOutputFormat } from "@/db/schema";
-import { cn } from "@/lib/utils";
 import {
   MODES,
   OUTPUT_FORMATS,
@@ -104,24 +105,17 @@ export function RenderStudioControls({
           <Label>Mode Render</Label>
           <div className="grid grid-cols-2 gap-2">
             {MODES.map((m) => (
-              <button
+              <ChoiceCard
                 key={m.value}
-                type="button"
+                active={mode === m.value}
+                icon={m.icon}
+                label={m.label}
                 onClick={() => {
                   setMode(m.value);
                   setSurrounding("auto");
                   if (m.value === "interior") setWeather("auto");
                 }}
-                className={cn(
-                  "flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
-                  mode === m.value
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:bg-muted",
-                )}
-              >
-                <m.icon className="size-4" />
-                {m.label}
-              </button>
+              />
             ))}
           </div>
         </div>
@@ -195,35 +189,12 @@ export function RenderStudioControls({
 
         <div className="flex flex-col gap-2.5 border-t border-border/80 pt-4">
           <Label className="font-semibold text-foreground">Objek</Label>
-          <button
-            type="button"
-            aria-pressed={lightsOn}
-            onClick={() => setLightsOn((value) => !value)}
-            className={cn(
-              "flex h-10 items-center justify-between gap-3 rounded-md border px-3 text-sm font-medium transition-colors",
-              lightsOn
-                ? "border-primary bg-accent text-primary"
-                : "border-border bg-secondary/60 text-foreground hover:border-primary/40",
-            )}
-          >
-            <span className="flex items-center gap-2">
-              <Lightbulb className="size-4" />
-              Nyalain Lampu
-            </span>
-            <span
-              className={cn(
-                "flex h-5 w-9 items-center rounded-full p-0.5 transition-colors",
-                lightsOn ? "bg-primary" : "bg-muted-foreground/25",
-              )}
-            >
-              <span
-                className={cn(
-                  "size-4 rounded-full bg-background shadow-sm transition-transform",
-                  lightsOn && "translate-x-4",
-                )}
-              />
-            </span>
-          </button>
+          <ToggleRow
+            checked={lightsOn}
+            onCheckedChange={(next) => setLightsOn(() => next)}
+            icon={Lightbulb}
+            label="Nyalain Lampu"
+          />
         </div>
       </CardContent>
     </Card>

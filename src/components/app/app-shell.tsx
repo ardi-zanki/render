@@ -288,7 +288,7 @@ export function AppShell({
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-slate-950/45 backdrop-blur-[2px]"
+            className="absolute inset-0 bg-overlay/45 backdrop-blur-[2px]"
             onClick={() => setOpen(false)}
           />
           <div className="absolute inset-y-0 left-0 w-64">
