@@ -1,4 +1,14 @@
-import { and, asc, count, desc, eq, inArray, isNull, lte } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  lt,
+  lte,
+} from "drizzle-orm";
 
 import { db } from "@/db";
 import { projects, renderJobs, renders } from "@/db/schema";
@@ -76,8 +86,55 @@ export async function lockJobByRenderId(renderId: string, lockedBy: string) {
   });
 }
 
+export async function recoverStaleRenderJobs(now = new Date()) {
+  const staleBefore = new Date(
+    now.getTime() - env.JOB_LOCK_TIMEOUT_SECONDS * 1000,
+  );
+
+  const recovered = await db
+    .update(renderJobs)
+    .set({
+      status: "queued",
+      lockedAt: null,
+      lockedBy: null,
+      availableAt: now,
+      errorMessage: "Job dipulihkan setelah worker tidak merespons",
+      updatedAt: now,
+    })
+    .where(
+      and(
+        eq(renderJobs.status, "processing"),
+        lt(renderJobs.lockedAt, staleBefore),
+      ),
+    )
+    .returning({ renderId: renderJobs.renderId });
+
+  if (recovered.length === 0) return 0;
+
+  await db
+    .update(renders)
+    .set({
+      status: "queued",
+      errorCode: "STALE_JOB_RECOVERED",
+      errorMessage: "Job dipulihkan setelah worker tidak merespons",
+    })
+    .where(
+      and(
+        inArray(
+          renders.id,
+          recovered.map((job) => job.renderId),
+        ),
+        eq(renders.status, "processing"),
+      ),
+    );
+
+  return recovered.length;
+}
+
 export async function lockNextJob(lockedBy: string) {
   const now = new Date();
+  await recoverStaleRenderJobs(now);
+
   return db.transaction(async (tx) => {
     const [job] = await tx
       .select()

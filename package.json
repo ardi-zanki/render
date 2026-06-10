@@ -5,7 +5,7 @@
   "packageManager": "pnpm@11.5.2",
   "scripts": {
     "dev": "next dev --port 3210",
-    "build": "next build",
+    "build": "env RENDER_PROCESSING_MODE=worker next build",
     "start": "next start --port 3210",
     "lint": "eslint",
     "test": "vitest run",

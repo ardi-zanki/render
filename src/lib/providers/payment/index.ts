@@ -15,8 +15,6 @@ export function paymentProvider(): PaymentProvider {
     case "mock":
       cached = createMockPaymentProvider();
       break;
-    case "doku":
-      throw new Error("DOKU provider belum diimplementasi (Phase 7).");
     default:
       throw new Error(`Payment provider tidak didukung: ${env.PAYMENT_PROVIDER}`);
   }

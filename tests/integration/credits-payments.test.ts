@@ -11,6 +11,7 @@ process.env.AI_PROVIDER = "mock";
 process.env.BETTER_AUTH_SECRET ??= "test-secret-for-vitest";
 process.env.BETTER_AUTH_URL ??= "http://localhost:3210";
 process.env.JWT_SECRET ??= "test-jwt-secret-for-vitest";
+process.env.JOB_LOCK_TIMEOUT_SECONDS = "300";
 process.env.PAYMENT_PROVIDER = "mock";
 process.env.RATE_LIMIT_ENABLED = "false";
 process.env.RENDER_PROCESSING_MODE = "worker";
@@ -622,5 +623,70 @@ describe("render workflow integration", () => {
       true,
     );
     await expect(getBalance(testUser.id)).resolves.toBe(4);
+  });
+
+  it("recovers stale processing jobs before a worker claims the next job", async () => {
+    const {
+      applyCreditChange,
+      createRender,
+      db,
+      processNextRenderJob,
+      renderJobs,
+      renders,
+    } = await modules();
+    const testUser = await createTestUser();
+    const project = await createTestProject(
+      testUser.id,
+      "Vitest Stale Worker Project",
+    );
+    await applyCreditChange({
+      userId: testUser.id,
+      type: "bonus",
+      amount: 2,
+      description: "Stale worker test credit",
+      idempotencyKey: `stale-worker-credit:${testUser.id}`,
+    });
+
+    const created = await createRender({
+      userId: testUser.id,
+      projectId: project.id,
+      mode: "interior",
+      prompt: "Vitest stale worker prompt",
+      outputFormat: "png",
+      original: await createUploadedImage("vitest-stale-original.png"),
+    });
+
+    const lockedAt = new Date(Date.now() - 301_000);
+    await db
+      .update(renderJobs)
+      .set({
+        status: "processing",
+        attempts: 1,
+        lockedAt,
+        lockedBy: "dead-vitest-worker",
+      })
+      .where(eq(renderJobs.renderId, created.renderId));
+    await db
+      .update(renders)
+      .set({ status: "processing", startedAt: lockedAt })
+      .where(eq(renders.id, created.renderId));
+
+    await expect(processNextRenderJob("vitest-worker")).resolves.toEqual({
+      processed: true,
+      renderId: created.renderId,
+      status: "success",
+    });
+
+    const completedJob = await db.query.renderJobs.findFirst({
+      where: eq(renderJobs.renderId, created.renderId),
+    });
+    expect(completedJob?.status).toBe("success");
+    expect(completedJob?.lockedBy).toBeNull();
+
+    const completedRender = await db.query.renders.findFirst({
+      where: eq(renders.id, created.renderId),
+    });
+    expect(completedRender?.status).toBe("success");
+    expect(completedRender?.errorCode).toBeNull();
   });
 });

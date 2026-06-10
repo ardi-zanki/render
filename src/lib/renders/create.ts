@@ -67,6 +67,7 @@ export async function createRender(
     .returning();
 
   let balanceAfterDeduction = 0;
+  let creditDeducted = false;
   try {
     const deduction = await applyCreditChange({
       userId,
@@ -77,6 +78,7 @@ export async function createRender(
       idempotencyKey: `render-usage:${render.id}`,
     });
     balanceAfterDeduction = deduction.balance;
+    creditDeducted = deduction.applied;
 
     const original = await storeAsset({
       renderId: render.id,
@@ -122,14 +124,16 @@ export async function createRender(
         errorMessage: message,
       })
       .where(eq(renders.id, render.id));
-    await applyCreditChange({
-      userId,
-      type: "refund",
-      amount: RENDER_COST,
-      description: "Refund render gagal dibuat",
-      renderId: render.id,
-      idempotencyKey: `render-refund:${render.id}`,
-    });
+    if (creditDeducted) {
+      await applyCreditChange({
+        userId,
+        type: "refund",
+        amount: RENDER_COST,
+        description: "Refund render gagal dibuat",
+        renderId: render.id,
+        idempotencyKey: `render-refund:${render.id}`,
+      });
+    }
     throw err;
   }
 }

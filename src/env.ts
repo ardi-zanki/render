@@ -35,7 +35,7 @@ const schema = z.object({
   JWT_ISSUER: z.string().default("renderai"),
   JWT_AUDIENCE: z.string().default("renderai-app"),
 
-  RATE_LIMIT_DRIVER: z.enum(["database", "memory"]).default("database"),
+  RATE_LIMIT_DRIVER: z.literal("database").default("database"),
   RATE_LIMIT_ENABLED: boolish(true),
 
   SESSION_DEFAULT_MAX_AGE: z.coerce.number().int().default(604800),
@@ -54,19 +54,16 @@ const schema = z.object({
   RESEND_API_KEY: optional,
   EMAIL_FROM: z.string().default("RenderAI <onboarding@resend.dev>"),
 
-  PAYMENT_PROVIDER: z.enum(["midtrans", "doku", "mock"]).default("midtrans"),
+  PAYMENT_PROVIDER: z.enum(["midtrans", "mock"]).default("midtrans"),
   MIDTRANS_SERVER_KEY: optional,
   MIDTRANS_CLIENT_KEY: optional,
   MIDTRANS_IS_PRODUCTION: boolish(false),
-  DOKU_CLIENT_ID: optional,
-  DOKU_SECRET_KEY: optional,
-  DOKU_MERCHANT_ID: optional,
-  DOKU_ENV: z.enum(["sandbox", "production"]).default("sandbox"),
 
   AI_PROVIDER: z
     .enum(["myarchitectai", "mock", "selfhost-stablediffusion", "fal"])
     .default("myarchitectai"),
   RENDER_PROCESSING_MODE: z.enum(["inline", "worker"]).optional(),
+  JOB_LOCK_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
   MYARCHITECTAI_API_KEY: optional,
   SELFHOST_SD_API_URL: optional,
   SELFHOST_SD_API_KEY: optional,
