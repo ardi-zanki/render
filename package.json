@@ -26,10 +26,10 @@
     "make:admin": "tsx --env-file=.env.local scripts/make-admin.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1063.0",
-    "@aws-sdk/s3-request-presigner": "^3.1063.0",
+    "@aws-sdk/client-s3": "^3.1065.0",
+    "@aws-sdk/s3-request-presigner": "^3.1065.0",
     "@fal-ai/client": "^1.10.1",
-    "better-auth": "^1.6.14",
+    "better-auth": "^1.6.16",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
