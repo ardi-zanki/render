@@ -57,6 +57,7 @@ export async function createRender(
       projectId,
       mode,
       prompt: params.prompt,
+      config: params.config ?? null,
       outputFormat,
       status: "queued",
       aiProvider: env.AI_PROVIDER,

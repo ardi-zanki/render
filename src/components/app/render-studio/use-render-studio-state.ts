@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import type { RenderMode, RenderOutputFormat } from "@/db/schema";
+import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
 import type { Scene, StudioView } from "./types";
 
 export function useRenderStudioState({
@@ -11,20 +11,26 @@ export function useRenderStudioState({
   initialInstruction,
   initialBalance,
   initialScenes,
+  initialConfig,
+  initialImageUrl,
 }: {
   defaultRenderMode: RenderMode;
   defaultOutputFormat: RenderOutputFormat;
   initialInstruction: string;
   initialBalance: number;
   initialScenes: Scene[];
+  initialConfig?: RenderConfig | null;
+  initialImageUrl?: string | null;
 }) {
   const [mode, setMode] = useState<RenderMode>(defaultRenderMode);
-  const [style, setStyle] = useState("auto");
-  const [location, setLocation] = useState("");
-  const [surrounding, setSurrounding] = useState("auto");
-  const [lightsOn, setLightsOn] = useState(false);
-  const [time, setTime] = useState("auto");
-  const [weather, setWeather] = useState("auto");
+  const [style, setStyle] = useState(initialConfig?.style ?? "auto");
+  const [location, setLocation] = useState(initialConfig?.location ?? "");
+  const [surrounding, setSurrounding] = useState(
+    initialConfig?.surrounding ?? "auto",
+  );
+  const [lightsOn, setLightsOn] = useState(initialConfig?.lightsOn ?? false);
+  const [time, setTime] = useState(initialConfig?.time ?? "auto");
+  const [weather, setWeather] = useState(initialConfig?.weather ?? "auto");
   const [instruction, setInstruction] = useState(initialInstruction);
   const [outputFormat, setOutputFormat] =
     useState<RenderOutputFormat>(defaultOutputFormat);
@@ -87,6 +93,37 @@ export function useRenderStudioState({
       setReferencePreviewUrl(null);
     }
   }
+
+  // "Open Studio": pull the source render's original image onto the canvas once,
+  // so the user can re-render without re-uploading. Failures (e.g. cross-origin
+  // storage) fall back silently to the empty uploader.
+  const loadedInitialImage = useRef(false);
+  useEffect(() => {
+    if (!initialImageUrl || loadedInitialImage.current) return;
+    loadedInitialImage.current = true;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(initialImageUrl);
+        if (!res.ok) return;
+        const blob = await res.blob();
+        if (cancelled) return;
+        const type = blob.type || "image/jpeg";
+        const ext = type.includes("png")
+          ? "png"
+          : type.includes("webp")
+            ? "webp"
+            : "jpg";
+        pickFile(new File([blob], `source.${ext}`, { type }));
+      } catch {
+        // Original not reachable — leave the uploader empty.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialImageUrl]);
 
   function zoomOut() {
     setZoom((value) => Math.max(0.5, Number((value - 0.25).toFixed(2))));

@@ -1,5 +1,6 @@
 import type {
   RenderAssetType,
+  RenderConfig,
   RenderMode,
   RenderOutputFormat,
   RenderStatus,
@@ -16,6 +17,7 @@ export interface CreateRenderParams {
   projectId: string;
   mode: RenderMode;
   prompt: string;
+  config?: RenderConfig;
   outputFormat?: RenderOutputFormat;
   negativePrompt?: string;
   styleTransferStrength?: number;
@@ -47,6 +49,7 @@ export interface RenderDetail {
   mode: RenderMode;
   status: RenderStatus;
   prompt: string | null;
+  config: RenderConfig | null;
   outputFormat: string;
   creditsUsed: number;
   projectId: string;

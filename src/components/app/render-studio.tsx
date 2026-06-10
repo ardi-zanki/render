@@ -35,6 +35,8 @@ export function RenderStudio({
   defaultRenderMode = "interior",
   defaultOutputFormat = "jpg",
   initialInstruction = "",
+  initialConfig = null,
+  initialImageUrl = null,
 }: RenderStudioProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -46,6 +48,8 @@ export function RenderStudio({
     initialInstruction,
     initialBalance,
     initialScenes,
+    initialConfig,
+    initialImageUrl,
   });
 
   function switchProject(id: string) {

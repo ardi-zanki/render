@@ -56,6 +56,7 @@ export async function getRenderDetail(
     mode: render.mode,
     status: render.status,
     prompt: render.prompt,
+    config: render.config ?? null,
     outputFormat: render.outputFormat,
     creditsUsed: render.creditsUsed,
     projectId: render.projectId,

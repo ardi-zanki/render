@@ -16,6 +16,21 @@ import { user } from "./auth";
 export type RenderMode = "interior" | "exterior" | "style_transfer" | "upscale";
 // "original" keeps the provider's native output as-is (no app-side re-encode).
 export type RenderOutputFormat = "jpg" | "png" | "webp" | "avif" | "original";
+
+/**
+ * Raw Render Studio selections, persisted so a render can be reopened in the
+ * studio with every control pre-filled (the composed `prompt` is not reversible
+ * and is treated as a secret, so we store the inputs instead).
+ */
+export type RenderConfig = {
+  style?: string;
+  time?: string;
+  weather?: string;
+  lightsOn?: boolean;
+  location?: string;
+  surrounding?: string;
+  instruction?: string;
+};
 export type RenderStatus =
   | "queued"
   | "processing"
@@ -117,6 +132,8 @@ export const renders = pgTable(
     mode: text("mode").$type<RenderMode>().notNull(),
     prompt: text("prompt"),
     enhancedPrompt: text("enhanced_prompt"),
+    // Raw studio selections used to build the prompt (for re-open / re-render).
+    config: jsonb("config").$type<RenderConfig>(),
     outputFormat: text("output_format").notNull().default("png"),
     status: text("status").$type<RenderStatus>().notNull().default("queued"),
     creditsUsed: integer("credits_used").notNull().default(0),

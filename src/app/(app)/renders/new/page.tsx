@@ -10,7 +10,7 @@ import {
   getProject,
   listProjects,
 } from "@/lib/projects/service";
-import { listRenders } from "@/lib/renders/service";
+import { getRenderDetail, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Render Studio" };
@@ -20,6 +20,7 @@ const OUTPUT_FORMATS = new Set<RenderOutputFormat>([
   "png",
   "webp",
   "avif",
+  "original",
 ]);
 
 function defaultOutputFormat(value: string | null | undefined): RenderOutputFormat {
@@ -31,14 +32,17 @@ function defaultOutputFormat(value: string | null | undefined): RenderOutputForm
 export default async function CreateRenderPage({
   searchParams,
 }: {
-  searchParams: Promise<{ project?: string; prompt?: string }>;
+  searchParams: Promise<{ project?: string; source?: string }>;
 }) {
   const { user } = await requireVerifiedUser();
-  const { project: projectParam, prompt } = await searchParams;
+  const { project: projectParam, source } = await searchParams;
 
-  const selected = projectParam
-    ? await getProject(user.id, projectParam)
-    : null;
+  // "Open Studio": reopen an existing render with its controls pre-filled and
+  // its original image on the canvas. The composed prompt is never surfaced.
+  const sourceRender = source ? await getRenderDetail(user.id, source) : null;
+
+  const projectId = sourceRender?.projectId ?? projectParam;
+  const selected = projectId ? await getProject(user.id, projectId) : null;
   const project = selected ?? (await getDefaultProject(user.id));
 
   const [balance, scenes, projects, profile] = await Promise.all([
@@ -55,7 +59,7 @@ export default async function CreateRenderPage({
         description="Upload desain, atur konteks visual, lalu buat hasil render yang tersimpan ke project."
       />
       <RenderStudio
-        key={project.id}
+        key={`${project.id}:${sourceRender?.id ?? "new"}`}
         projectId={project.id}
         projectName={project.name}
         projects={projects.map((p) => ({ id: p.id, name: p.name }))}
@@ -66,9 +70,15 @@ export default async function CreateRenderPage({
           status: s.status,
           resultUrl: s.resultUrl,
         }))}
-        defaultRenderMode={profile?.defaultRenderMode ?? "interior"}
-        defaultOutputFormat={defaultOutputFormat(profile?.defaultOutputFormat)}
-        initialInstruction={prompt ?? ""}
+        defaultRenderMode={
+          sourceRender?.mode ?? profile?.defaultRenderMode ?? "interior"
+        }
+        defaultOutputFormat={defaultOutputFormat(
+          sourceRender?.outputFormat ?? profile?.defaultOutputFormat,
+        )}
+        initialInstruction=""
+        initialConfig={sourceRender?.config ?? null}
+        initialImageUrl={sourceRender?.originalUrl ?? null}
       />
     </>
   );

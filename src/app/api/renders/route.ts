@@ -153,6 +153,16 @@ export async function POST(req: Request) {
   }
 
   const prompt = buildPrompt(input);
+  // Persist the raw studio selections so the render can be reopened pre-filled.
+  const config = {
+    style: input.style,
+    time: input.time,
+    weather: input.weather,
+    lightsOn: input.lightsOn,
+    location: input.location,
+    surrounding: input.surrounding,
+    instruction: input.instruction,
+  };
 
   try {
     const result = await createRender({
@@ -160,6 +170,7 @@ export async function POST(req: Request) {
       projectId: project.id,
       mode: input.mode,
       prompt,
+      config,
       outputFormat: input.outputFormat,
       negativePrompt:
         input.mode === "style_transfer" ? input.negativePrompt : undefined,

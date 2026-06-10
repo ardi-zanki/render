@@ -36,6 +36,13 @@
       "when": 1781107043034,
       "tag": "0004_yummy_venus",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781110362174,
+      "tag": "0005_skinny_black_bolt",
+      "breakpoints": true
     }
   ]
 }

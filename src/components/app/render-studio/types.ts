@@ -1,4 +1,4 @@
-import type { RenderMode, RenderOutputFormat } from "@/db/schema";
+import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
 import type { RenderListItem } from "@/lib/renders/service";
 
 export type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;
@@ -20,6 +20,10 @@ export type RenderStudioProps = {
   defaultRenderMode?: RenderMode;
   defaultOutputFormat?: RenderOutputFormat;
   initialInstruction?: string;
+  /** Pre-fill the studio controls when reopening a render ("Open Studio"). */
+  initialConfig?: RenderConfig | null;
+  /** Original image URL to load onto the canvas for re-render (no re-upload). */
+  initialImageUrl?: string | null;
 };
 
 export type CreateProjectResponse = { id: string; name: string };

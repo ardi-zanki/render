@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/app/page-header";
 import { RenderDetailActions } from "@/components/app/render-detail-actions";
 import { RenderImage } from "@/components/app/render-image";
+import { RenderImagePreview } from "@/components/app/render-image-preview";
 import { RenderProjectSelector } from "@/components/app/render-project-selector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -114,23 +115,10 @@ export default async function RenderDetailPage({
               )}
               <RenderDetailActions
                 renderId={render.id}
-                projectId={render.projectId}
                 renderName={renderName}
-                prompt={render.prompt}
                 archived={!!render.archivedAt}
                 canDownload={render.status === "success" && !!render.resultUrl}
               />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Prompt</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
-                {render.prompt || "Tidak ada prompt."}
-              </p>
             </CardContent>
           </Card>
         </aside>
@@ -147,7 +135,7 @@ function ImagePanel({ title, src }: { title: string; src: string | null }) {
       </figcaption>
       <div className="flex aspect-square items-center justify-center">
         {src ? (
-          <RenderImage src={src} alt={title} className="size-full" />
+          <RenderImagePreview src={src} alt={title} className="size-full" />
         ) : (
           <div className="flex flex-col items-center gap-2 text-muted-foreground">
             <ImageIcon className="size-8" />

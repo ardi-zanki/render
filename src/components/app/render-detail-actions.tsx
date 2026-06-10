@@ -7,8 +7,8 @@ import {
   Loader2,
   RotateCcw,
   Share2,
-  Sparkles,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,16 +27,12 @@ type ShareResponse = { url: string };
 
 export function RenderDetailActions({
   renderId,
-  projectId,
   renderName,
-  prompt,
   archived,
   canDownload,
 }: {
   renderId: string;
-  projectId: string;
   renderName: string;
-  prompt?: string | null;
   archived: boolean;
   canDownload: boolean;
 }) {
@@ -123,9 +119,9 @@ export function RenderDetailActions({
     }
   }
 
-  const reuseHref = `/renders/new?project=${projectId}${
-    prompt ? `&prompt=${encodeURIComponent(prompt)}` : ""
-  }`;
+  // Reopen this render in the studio with its config + original image
+  // pre-filled (the composed prompt is never passed through the URL).
+  const openStudioHref = `/renders/new?source=${renderId}`;
 
   const actionClass = "w-full justify-start";
 
@@ -133,8 +129,8 @@ export function RenderDetailActions({
     <>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <Button asChild variant="outline" className={actionClass}>
-          <Link href={reuseHref}>
-            <Sparkles /> Reuse prompt
+          <Link href={openStudioHref}>
+            <Wand2 /> Open Studio
           </Link>
         </Button>
         <Button
