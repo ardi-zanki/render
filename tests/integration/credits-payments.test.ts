@@ -65,7 +65,6 @@ async function createTestUser(email = `vitest-${randomUUID()}@renderai.test`) {
   });
   await db.insert(userProfiles).values({
     userId: id,
-    emailNotificationsEnabled: false,
   });
 
   return { id, email, name: "Vitest User" };

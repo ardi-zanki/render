@@ -38,7 +38,6 @@ export default async function AppLayout({
       }}
       preferences={{
         displayName: profile?.displayName ?? "",
-        emailNotificationsEnabled: profile?.emailNotificationsEnabled ?? true,
         defaultRenderMode: profile?.defaultRenderMode ?? "interior",
         defaultOutputFormat: profile?.defaultOutputFormat ?? "png",
       }}

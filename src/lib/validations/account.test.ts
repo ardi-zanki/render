@@ -32,7 +32,6 @@ describe("account validation", () => {
 
   it("validates preference enums", () => {
     const result = preferencesSchema.safeParse({
-      emailNotificationsEnabled: true,
       defaultRenderMode: "interior",
       defaultOutputFormat: "png",
     });

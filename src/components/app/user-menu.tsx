@@ -27,7 +27,6 @@ type MenuUser = {
 };
 type MenuPreferences = {
   displayName: string;
-  emailNotificationsEnabled: boolean;
   defaultRenderMode: string;
   defaultOutputFormat: string;
 };

@@ -9,7 +9,6 @@ import {
 } from "@/db/schema";
 
 export type UserPreferencesUpdate = {
-  emailNotificationsEnabled: boolean;
   defaultRenderMode: RenderMode;
   defaultOutputFormat: RenderOutputFormat;
 };

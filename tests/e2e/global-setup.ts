@@ -2,7 +2,7 @@ import { config as loadEnv } from "dotenv";
 import { eq } from "drizzle-orm";
 
 import { db, dbClient } from "../../src/db";
-import { user, userProfiles } from "../../src/db/schema";
+import { user } from "../../src/db/schema";
 import { auth } from "../../src/lib/auth";
 import { grantSignupBonus } from "../../src/lib/provisioning";
 import { E2E_USER_EMAIL, E2E_USER_PASSWORD } from "./test-user";
@@ -36,10 +36,6 @@ export default async function globalSetup() {
     .update(user)
     .set({ emailVerified: true, updatedAt: new Date() })
     .where(eq(user.id, created.id));
-  await db
-    .update(userProfiles)
-    .set({ emailNotificationsEnabled: false, updatedAt: new Date() })
-    .where(eq(userProfiles.userId, created.id));
   await grantSignupBonus(created.id);
 
   await dbClient.end({ timeout: 5 });

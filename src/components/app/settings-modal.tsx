@@ -45,7 +45,6 @@ type SettingsUser = {
 };
 type SettingsPreferences = {
   displayName: string;
-  emailNotificationsEnabled: boolean;
   defaultRenderMode: string;
   defaultOutputFormat: string;
 };
@@ -243,7 +242,6 @@ export function SettingsModal({
             </div>
 
             <PreferencesForm
-              emailNotificationsEnabled={preferences.emailNotificationsEnabled}
               defaultRenderMode={preferences.defaultRenderMode}
               defaultOutputFormat={preferences.defaultOutputFormat}
             />

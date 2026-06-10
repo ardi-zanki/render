@@ -6,7 +6,6 @@ export const profileSchema = z.object({
 });
 
 export const preferencesSchema = z.object({
-  emailNotificationsEnabled: z.boolean(),
   defaultRenderMode: z.enum([
     "interior",
     "exterior",

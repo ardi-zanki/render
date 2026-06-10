@@ -53,7 +53,6 @@ export async function updatePreferencesAction(
   const { user } = await requireVerifiedUser();
   await assertRateLimit("public_api", user.id);
   const parsed = preferencesSchema.safeParse({
-    emailNotificationsEnabled: formData.get("emailNotificationsEnabled") === "on",
     defaultRenderMode: formData.get("defaultRenderMode"),
     defaultOutputFormat: formData.get("defaultOutputFormat"),
   });

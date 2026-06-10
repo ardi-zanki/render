@@ -70,9 +70,6 @@ export const userProfiles = pgTable("user_profiles", {
     .$type<RenderMode>()
     .default("interior"),
   defaultOutputFormat: text("default_output_format").default("png"),
-  emailNotificationsEnabled: boolean("email_notifications_enabled")
-    .notNull()
-    .default(true),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

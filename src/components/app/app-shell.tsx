@@ -44,7 +44,6 @@ type AppUser = {
 
 type AppUserPreferences = {
   displayName: string;
-  emailNotificationsEnabled: boolean;
   defaultRenderMode: string;
   defaultOutputFormat: string;
 };

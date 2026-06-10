@@ -8,7 +8,6 @@ import { PasswordInput } from "@/components/auth/password-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -132,11 +131,9 @@ export function ProfileForm({
 }
 
 export function PreferencesForm({
-  emailNotificationsEnabled,
   defaultRenderMode,
   defaultOutputFormat,
 }: {
-  emailNotificationsEnabled: boolean;
   defaultRenderMode: string;
   defaultOutputFormat: string;
 }) {
@@ -154,13 +151,6 @@ export function PreferencesForm({
           <AlertDescription>{state.error}</AlertDescription>
         </Alert>
       )}
-      <label className="flex items-center gap-2 text-sm text-foreground">
-        <Checkbox
-          name="emailNotificationsEnabled"
-          defaultChecked={emailNotificationsEnabled}
-        />
-        Kirim notifikasi lewat email
-      </label>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="defaultRenderMode">Mode render default</Label>
         <Select
