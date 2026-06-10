@@ -23,8 +23,6 @@ export function aiProvider(): AiProvider {
     case "fal":
       cached = createFalAiProvider();
       break;
-    case "openai":
-      throw new Error("OpenAI image provider belum diimplementasi (Phase 7).");
     default:
       throw new Error(`AI provider tidak didukung: ${env.AI_PROVIDER}`);
   }

@@ -64,7 +64,7 @@ const schema = z.object({
   DOKU_ENV: z.enum(["sandbox", "production"]).default("sandbox"),
 
   AI_PROVIDER: z
-    .enum(["myarchitectai", "openai", "mock", "selfhost-stablediffusion", "fal"])
+    .enum(["myarchitectai", "mock", "selfhost-stablediffusion", "fal"])
     .default("myarchitectai"),
   RENDER_PROCESSING_MODE: z.enum(["inline", "worker"]).optional(),
   MYARCHITECTAI_API_KEY: optional,
@@ -78,9 +78,6 @@ const schema = z.object({
   FAL_STYLE_TRANSFER_MODEL: z.string().default("fal-ai/uso"),
   FAL_UPSCALE_MODEL: z.string().default("fal-ai/aura-sr"),
   FAL_START_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
-  OPENAI_API_KEY: optional,
-  OPENAI_IMAGE_MODEL: optional,
-  OPENAI_TEXT_MODEL: optional,
 });
 
 const parsed = schema.safeParse(process.env);
