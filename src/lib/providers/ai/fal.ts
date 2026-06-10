@@ -155,6 +155,28 @@ function baseEditPrompt(prompt: string | undefined, mode: string) {
   return "Create a polished architectural exterior render while preserving the building structure.";
 }
 
+/**
+ * FLUX.2 [pro] edit honors an explicit `image_size`. We keep the output ~2K on
+ * its longest edge while matching the input aspect ratio, rounding each side to
+ * a multiple of 32 (model requirement). Falls back to "auto" when the input
+ * dimensions are unknown.
+ */
+async function editImageSize(
+  data: Buffer | undefined,
+  maxEdge: number,
+): Promise<{ width: number; height: number } | "auto"> {
+  if (!data) return "auto";
+  try {
+    const { width, height } = await sharp(data).metadata();
+    if (!width || !height) return "auto";
+    const scale = maxEdge / Math.max(width, height);
+    const round32 = (n: number) => Math.max(512, Math.round((n * scale) / 32) * 32);
+    return { width: round32(width), height: round32(height) };
+  } catch {
+    return "auto";
+  }
+}
+
 function apiErrorDetail(body: unknown) {
   if (!body || typeof body !== "object") return null;
   const obj = body as Record<string, unknown>;
@@ -257,14 +279,21 @@ export function createFalAiProvider(): AiProvider {
             requestInput.guidance_scale = 2 + input.styleTransferStrength * 4;
           }
         } else {
+          // fal-ai/flux-2-pro/edit — instruction-style image editor.
+          // No negative prompt (FLUX.2 ignores negation); describe the desired
+          // result positively. Inputs go in `image_urls`, and we pin an explicit
+          // `image_size` so the photo keeps the input's framing at ~2K.
           requestInput = {
             prompt: baseEditPrompt(input.prompt, input.mode),
-            image_url: imageUrl,
-            num_images: 1,
-            enable_safety_checker: true,
+            image_urls: [imageUrl],
+            image_size: await editImageSize(input.imageBuffer, env.FAL_RENDER_MAX_EDGE),
             output_format: modelOutputFormat,
-            resolution_mode: "match_input",
+            safety_tolerance: env.FAL_RENDER_SAFETY_TOLERANCE,
+            enable_safety_checker: true,
           };
+          if (typeof env.FAL_RENDER_SEED === "number") {
+            requestInput.seed = env.FAL_RENDER_SEED;
+          }
         }
 
         const result = await client.subscribe(endpointId, {

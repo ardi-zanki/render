@@ -71,10 +71,18 @@ const schema = z.object({
   FAL_KEY: optional,
   FAL_KEY_ID: optional,
   FAL_KEY_SECRET: optional,
-  FAL_RENDER_MODEL: z.string().default("fal-ai/flux-kontext/dev"),
+  FAL_RENDER_MODEL: z.string().default("fal-ai/flux-2-pro/edit"),
   FAL_STYLE_TRANSFER_MODEL: z.string().default("fal-ai/uso"),
   FAL_UPSCALE_MODEL: z.string().default("fal-ai/aura-sr"),
   FAL_START_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
+  // FLUX.2 [pro] edit knobs. Target long edge keeps output ~2K matching the
+  // input aspect ratio; safety_tolerance 1 (strict) – 5 (permissive); seed is
+  // optional (set it for reproducible renders, leave empty for variety).
+  FAL_RENDER_MAX_EDGE: z.coerce.number().int().positive().default(2048),
+  FAL_RENDER_SAFETY_TOLERANCE: z
+    .enum(["1", "2", "3", "4", "5"])
+    .default("2"),
+  FAL_RENDER_SEED: z.coerce.number().int().optional(),
 });
 
 const parsed = schema.safeParse(process.env);

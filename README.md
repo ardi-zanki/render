@@ -165,9 +165,13 @@ outputs are fetched immediately since the CDN expires them in ~5 min). `fal`
 uses the official `@fal-ai/client`: it uploads local/R2 image bytes to fal
 storage, calls queue-based model inference, fetches result URLs immediately, and
 normalizes the result to the requested output format. Defaults are
-`fal-ai/flux-kontext/dev` for interior/exterior edits, `fal-ai/uso` for style
+`fal-ai/flux-2-pro/edit` for interior/exterior edits, `fal-ai/uso` for style
 transfer with a reference image, and `fal-ai/aura-sr` for upscale; override them
 with `FAL_RENDER_MODEL`, `FAL_STYLE_TRANSFER_MODEL`, and `FAL_UPSCALE_MODEL`.
+The FLUX.2 edit path sends positive, instruction-style prompts (no negative
+prompt), passes inputs via `image_urls`, and pins an explicit `image_size`
+(~2K longest edge, controlled by `FAL_RENDER_MAX_EDGE`); `FAL_RENDER_SAFETY_TOLERANCE`
+(1 strict – 5 permissive) and an optional `FAL_RENDER_SEED` tune it further.
 The `selfhost-stablediffusion` provider posts multipart form data to
 `SELFHOST_SD_API_URL` for a ComfyUI/FastAPI wrapper and accepts raw image, URL,
 data URL, or base64 outputs. A `mock` provider (sharp-based) and a `local`

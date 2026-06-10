@@ -27,7 +27,7 @@ envVarGroups:
       - key: JOB_LOCK_TIMEOUT_SECONDS
         value: "300"
       - key: FAL_RENDER_MODEL
-        value: fal-ai/flux-kontext/dev
+        value: fal-ai/flux-2-pro/edit
       - key: FAL_STYLE_TRANSFER_MODEL
         value: fal-ai/uso
       - key: FAL_UPSCALE_MODEL
