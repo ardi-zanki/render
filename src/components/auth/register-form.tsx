@@ -44,10 +44,13 @@ export function RegisterForm() {
     }
     setErrors({});
     setLoading(true);
+    // Use the parsed values so the trimmed name and trimmed/lowercased email are
+    // what actually gets registered.
+    const { name, email, password } = parsed.data;
     const { error } = await signUp.email({
-      name: values.name,
-      email: values.email,
-      password: values.password,
+      name,
+      email,
+      password,
       callbackURL: "/dashboard",
     });
     if (error) {
@@ -55,7 +58,7 @@ export function RegisterForm() {
       setLoading(false);
       return;
     }
-    router.push(`/verify-email?email=${encodeURIComponent(values.email)}`);
+    router.push(`/verify-email?email=${encodeURIComponent(email)}`);
   }
 
   return (

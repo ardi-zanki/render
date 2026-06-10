@@ -7,6 +7,7 @@ import {
   type RateLimitAction,
   RateLimitError,
 } from "@/lib/rate-limit";
+import { isDisposableEmail } from "@/lib/validations/disposable-email";
 
 const handlers = toNextJsHandler(auth);
 
@@ -33,6 +34,27 @@ export const GET = handlers.GET;
 
 export async function POST(req: Request) {
   const action = authAction(new URL(req.url).pathname);
+
+  // Reject sign-ups from disposable/temporary email providers (server-side
+  // guard mirroring registerSchema, so the API is protected directly too).
+  if (action === "register") {
+    try {
+      const body = (await req.clone().json()) as { email?: unknown };
+      const email = typeof body.email === "string" ? body.email : "";
+      if (email && isDisposableEmail(email)) {
+        return NextResponse.json(
+          {
+            code: "DISPOSABLE_EMAIL",
+            message: "Gunakan email permanen, bukan email sementara.",
+          },
+          { status: 422 },
+        );
+      }
+    } catch {
+      // Body not JSON / unreadable — let Better Auth handle validation.
+    }
+  }
+
   if (action) {
     let identifier = clientIp(req);
     // Login, forgot-password, and resend are scoped to IP + email (PRD §12.1).

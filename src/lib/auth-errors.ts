@@ -3,6 +3,7 @@ type AuthErrorLike = { code?: string; message?: string } | null | undefined;
 /** Map common Better Auth error codes to Bahasa Indonesia (PRD §13.2). */
 const MESSAGES: Record<string, string> = {
   USER_ALREADY_EXISTS: "Email ini sudah terdaftar. Silakan masuk.",
+  DISPOSABLE_EMAIL: "Gunakan email permanen, bukan email sementara untuk mendaftar.",
   INVALID_EMAIL_OR_PASSWORD: "Email atau password salah.",
   EMAIL_NOT_VERIFIED: "Email Anda belum diverifikasi.",
   INVALID_TOKEN: "Tautan tidak valid atau sudah kedaluwarsa.",

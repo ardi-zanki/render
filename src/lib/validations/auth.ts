@@ -1,8 +1,18 @@
 import { z } from "zod";
 
+import { isDisposableEmail } from "./disposable-email";
+
 export const registerSchema = z.object({
-  name: z.string().min(1, "Nama wajib diisi").max(120),
-  email: z.email("Format email tidak valid"),
+  name: z.string().trim().min(2, "Nama minimal 2 karakter").max(120),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .pipe(z.email("Format email tidak valid"))
+    .refine((email) => !isDisposableEmail(email), {
+      error: "Gunakan email permanen, bukan email sementara.",
+    }),
+  // Length only — no character/complexity rules (modern guidance favors length).
   password: z.string().min(8, "Password minimal 8 karakter").max(128),
   agreeTerms: z.literal(true, {
     error: "Anda harus menyetujui syarat & ketentuan",
