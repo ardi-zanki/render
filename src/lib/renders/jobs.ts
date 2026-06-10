@@ -14,7 +14,6 @@ import { db } from "@/db";
 import { projects, renderJobs, renders } from "@/db/schema";
 import { env } from "@/env";
 import { applyCreditChange } from "@/lib/credits";
-import { renderResultEmail } from "@/lib/email";
 import { notifyUser } from "@/lib/notifications/service";
 import { RENDER_COST } from "./types";
 
@@ -202,16 +201,13 @@ export async function finalizeFailedRender(params: {
     idempotencyKey: `render-refund:${params.renderId}`,
   });
 
+  // In-app only (PRD email scope: render events do not email).
   await notifyUser({
     userId: params.userId,
     type: "render_failed",
     title: "Render gagal diproses",
     message: "Kredit kamu sudah dikembalikan. Silakan coba lagi.",
     actionUrl: "/renders/new",
-    email: renderResultEmail({
-      success: false,
-      url: `${env.APP_URL.replace(/\/$/, "")}/renders/new`,
-    }),
   });
 }
 

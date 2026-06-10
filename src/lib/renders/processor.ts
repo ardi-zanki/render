@@ -2,9 +2,7 @@ import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { projects, renderAssets, renderJobs, renders } from "@/db/schema";
-import { env } from "@/env";
 import { getBalance } from "@/lib/credits";
-import { lowCreditEmail, renderResultEmail } from "@/lib/email";
 import { notifyUser } from "@/lib/notifications/service";
 import { aiProvider } from "@/lib/providers/ai";
 import {
@@ -163,16 +161,13 @@ async function processLockedJob(jobId: string) {
       .set({ coverImageUrl: firstResultUrl, updatedAt: now })
       .where(and(eq(projects.id, render.projectId), isNull(projects.coverImageUrl)));
 
+    // In-app only (PRD email scope: render events do not email).
     await notifyUser({
       userId: render.userId,
       type: "render_success",
       title: "Render kamu sudah jadi",
       message: `Render ${render.mode} berhasil diproses.`,
       actionUrl: `/renders/${render.id}`,
-      email: renderResultEmail({
-        success: true,
-        url: `${env.APP_URL.replace(/\/$/, "")}/renders/${render.id}`,
-      }),
     });
 
     const balance = await getBalance(render.userId);
@@ -180,19 +175,13 @@ async function processLockedJob(jobId: string) {
       // Email only when the balance first crosses into the low zone (PRD §25.3:
       // no repeated email for the same event). The in-app notification still
       // fires on every render while credits are low.
-      const justCrossed = balance + RENDER_COST > LOW_CREDIT_THRESHOLD;
+      // In-app only (PRD email scope: low-credit alerts do not email).
       await notifyUser({
         userId: render.userId,
         type: "low_credit",
         title: "Kredit kamu menipis",
         message: `Sisa kredit kamu tinggal ${balance}. Yuk top up.`,
         actionUrl: "/payments",
-        email: justCrossed
-          ? lowCreditEmail({
-              balance,
-              url: `${env.APP_URL.replace(/\/$/, "")}/payments`,
-            })
-          : undefined,
       });
     }
 

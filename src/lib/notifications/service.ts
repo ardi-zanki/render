@@ -1,12 +1,7 @@
 import { and, count, desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  notifications,
-  user,
-  userProfiles,
-  type NotificationType,
-} from "@/db/schema";
+import { notifications, user, type NotificationType } from "@/db/schema";
 import { sendTransactionalEmail } from "@/lib/email";
 
 export interface CreateNotificationParams {
@@ -32,26 +27,21 @@ export async function createNotification(p: CreateNotificationParams) {
 }
 
 export interface NotifyParams extends CreateNotificationParams {
-  /** When set, also send an email (gated by the user's preference). */
+  /**
+   * When set, also send an email. Reserved for transactional events that must
+   * always reach the user (e.g. payment). Day-to-day events (render done,
+   * low credit) are in-app only and omit this. Never throws on email failure
+   * (notifications must not break the originating flow).
+   */
   email?: { subject: string; html: string };
 }
 
-/**
- * Create an in-app notification and, when an email payload is provided, send it
- * too — respecting `user_profiles.emailNotificationsEnabled`. Never throws on
- * email failure (notifications must not break the originating flow).
- */
 export async function notifyUser(p: NotifyParams) {
   await createNotification(p);
 
   if (!p.email) return;
 
   try {
-    const profile = await db.query.userProfiles.findFirst({
-      where: eq(userProfiles.userId, p.userId),
-    });
-    if (profile && profile.emailNotificationsEnabled === false) return;
-
     const u = await db.query.user.findFirst({
       where: eq(user.id, p.userId),
     });
