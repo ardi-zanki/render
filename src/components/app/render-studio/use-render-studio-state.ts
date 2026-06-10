@@ -108,14 +108,15 @@ export function useRenderStudioState({
   const loadedInitialImage = useRef(false);
   useEffect(() => {
     if (!initialImageUrl || loadedInitialImage.current) return;
+    // Guard against StrictMode double-invoke; no per-run cancel flag so the
+    // single fetch always applies (cancelling it would leave the canvas empty
+    // when the cleanup runs before the fetch resolves).
     loadedInitialImage.current = true;
-    let cancelled = false;
     void (async () => {
       try {
         const res = await fetch(initialImageUrl);
         if (!res.ok) return;
         const blob = await res.blob();
-        if (cancelled) return;
         const type = blob.type || "image/jpeg";
         const ext = type.includes("png")
           ? "png"
@@ -133,9 +134,6 @@ export function useRenderStudioState({
         // Original not reachable — leave the uploader empty.
       }
     })();
-    return () => {
-      cancelled = true;
-    };
   }, [initialImageUrl]);
 
   function zoomOut() {

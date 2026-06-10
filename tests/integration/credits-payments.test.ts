@@ -689,3 +689,116 @@ describe("render workflow integration", () => {
     expect(completedRender?.errorCode).toBeNull();
   });
 });
+
+describe("notifications email routing", () => {
+  it("emails transactional events (payment) but keeps render/credit in-app only", async () => {
+    const { db, emailLogs, notifications } = await modules();
+    const { notifyUser } = await import("@/lib/notifications/service");
+    const testUser = await createTestUser();
+
+    // Payment: carries an email payload -> must always send (email_logs row).
+    await notifyUser({
+      userId: testUser.id,
+      type: "payment_success",
+      title: "Pembayaran berhasil",
+      email: { subject: "Pembayaran berhasil", html: "<p>ok</p>" },
+    });
+
+    // Render / low-credit: no email payload -> in-app notification only.
+    await notifyUser({
+      userId: testUser.id,
+      type: "render_success",
+      title: "Render selesai",
+    });
+    await notifyUser({
+      userId: testUser.id,
+      type: "low_credit",
+      title: "Kredit menipis",
+    });
+
+    const notes = await db.query.notifications.findMany({
+      where: eq(notifications.userId, testUser.id),
+    });
+    expect(notes).toHaveLength(3);
+
+    const emails = await db.query.emailLogs.findMany({
+      where: eq(emailLogs.userId, testUser.id),
+    });
+    expect(emails).toHaveLength(1);
+    expect(emails[0]?.type).toBe("payment_success");
+  });
+});
+
+describe("render failure refund", () => {
+  it("refunds the reserved credit and notifies in-app (no email) on final failure", async () => {
+    const {
+      applyCreditChange,
+      createRender,
+      db,
+      emailLogs,
+      getBalance,
+      notifications,
+      renderJobs,
+      renders,
+    } = await modules();
+    const { finalizeFailedRender } = await import("@/lib/renders/jobs");
+    const testUser = await createTestUser();
+    const project = await createTestProject(testUser.id, "Vitest Failure Project");
+    await applyCreditChange({
+      userId: testUser.id,
+      type: "bonus",
+      amount: 3,
+      description: "Failure test credit",
+      idempotencyKey: `fail-credit:${testUser.id}`,
+    });
+
+    const created = await createRender({
+      userId: testUser.id,
+      projectId: project.id,
+      mode: "interior",
+      prompt: "Vitest failure prompt",
+      outputFormat: "png",
+      original: await createUploadedImage("vitest-fail-original.png"),
+    });
+    // 1 credit reserved at enqueue.
+    expect(created.balance).toBe(2);
+    await expect(getBalance(testUser.id)).resolves.toBe(2);
+
+    const job = await db.query.renderJobs.findFirst({
+      where: eq(renderJobs.renderId, created.renderId),
+    });
+
+    await finalizeFailedRender({
+      renderId: created.renderId,
+      userId: testUser.id,
+      jobId: job!.id,
+      message: "boom",
+      code: "TEST_FAIL",
+    });
+
+    // Reserved credit is returned.
+    await expect(getBalance(testUser.id)).resolves.toBe(3);
+
+    const failedRender = await db.query.renders.findFirst({
+      where: eq(renders.id, created.renderId),
+    });
+    expect(failedRender?.status).toBe("failed");
+    expect(failedRender?.errorCode).toBe("TEST_FAIL");
+
+    const failedJob = await db.query.renderJobs.findFirst({
+      where: eq(renderJobs.renderId, created.renderId),
+    });
+    expect(failedJob?.status).toBe("failed");
+
+    const notes = await db.query.notifications.findMany({
+      where: eq(notifications.userId, testUser.id),
+    });
+    expect(notes.some((note) => note.type === "render_failed")).toBe(true);
+
+    // Render failures are in-app only.
+    const emails = await db.query.emailLogs.findMany({
+      where: eq(emailLogs.userId, testUser.id),
+    });
+    expect(emails).toHaveLength(0);
+  });
+});

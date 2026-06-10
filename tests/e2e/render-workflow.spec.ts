@@ -38,6 +38,10 @@ test("user can login and create a mock render", async ({ page }) => {
     buffer: await makeRenderImage(),
   });
 
+  // Pick a couple of controls so the persisted config can be asserted later.
+  await page.locator("#style").selectOption("modern");
+  await page.locator("#location").fill("Bandung E2E");
+
   await expect(page.getByRole("tab", { name: "Asli" })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Render", exact: true }),
@@ -79,4 +83,26 @@ test("user can login and create a mock render", async ({ page }) => {
     page.getByRole("link", { name: "Open Studio" }),
   ).toBeVisible();
   await expect(page.getByText("Prompt", { exact: true })).toHaveCount(0);
+
+  // Clicking the original image opens a zoomable lightbox.
+  await page.getByRole("button", { name: /Perbesar Gambar asli/ }).click();
+  await expect(
+    page.getByRole("button", { name: "Perbesar", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Tutup" }).click();
+
+  // Open Studio: reopens with config pre-filled and the original + previous
+  // result loaded, so all three viewer tabs are available.
+  await page.getByRole("link", { name: "Open Studio" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Render Studio" }),
+  ).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Komparasi" })).toBeVisible();
+  await expect(page.locator("#style")).toHaveValue("modern");
+  await expect(page.locator("#location")).toHaveValue("Bandung E2E");
+  for (const name of ["Asli", "Komparasi", "Hasil"]) {
+    await expect(
+      page.getByRole("tab", { name, exact: true }),
+    ).not.toHaveAttribute("aria-disabled", "true");
+  }
 });
