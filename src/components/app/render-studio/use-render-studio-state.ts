@@ -13,6 +13,8 @@ export function useRenderStudioState({
   initialScenes,
   initialConfig,
   initialImageUrl,
+  initialResultUrl,
+  initialResultRenderId,
 }: {
   defaultRenderMode: RenderMode;
   defaultOutputFormat: RenderOutputFormat;
@@ -21,6 +23,8 @@ export function useRenderStudioState({
   initialScenes: Scene[];
   initialConfig?: RenderConfig | null;
   initialImageUrl?: string | null;
+  initialResultUrl?: string | null;
+  initialResultRenderId?: string | null;
 }) {
   const [mode, setMode] = useState<RenderMode>(defaultRenderMode);
   const [style, setStyle] = useState(initialConfig?.style ?? "auto");
@@ -43,8 +47,12 @@ export function useRenderStudioState({
   const [referencePreviewUrl, setReferencePreviewUrl] = useState<string | null>(
     null,
   );
-  const [resultUrl, setResultUrl] = useState<string | null>(null);
-  const [resultRenderId, setResultRenderId] = useState<string | null>(null);
+  const [resultUrl, setResultUrl] = useState<string | null>(
+    initialResultUrl ?? null,
+  );
+  const [resultRenderId, setResultRenderId] = useState<string | null>(
+    initialResultRenderId ?? null,
+  );
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -114,7 +122,13 @@ export function useRenderStudioState({
           : type.includes("webp")
             ? "webp"
             : "jpg";
-        pickFile(new File([blob], `source.${ext}`, { type }));
+        // Set the original directly (not via pickFile) so the pre-filled
+        // previous result is kept — enabling the Komparasi/Hasil tabs.
+        setFile(new File([blob], `source.${ext}`, { type }));
+        setPreviewUrl((current) => {
+          if (current) URL.revokeObjectURL(current);
+          return URL.createObjectURL(blob);
+        });
       } catch {
         // Original not reachable — leave the uploader empty.
       }
@@ -122,7 +136,6 @@ export function useRenderStudioState({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialImageUrl]);
 
   function zoomOut() {

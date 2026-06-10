@@ -24,6 +24,9 @@ export type RenderStudioProps = {
   initialConfig?: RenderConfig | null;
   /** Original image URL to load onto the canvas for re-render (no re-upload). */
   initialImageUrl?: string | null;
+  /** Previous render result, so the Komparasi/Hasil tabs work on reopen. */
+  initialResultUrl?: string | null;
+  initialResultRenderId?: string | null;
 };
 
 export type CreateProjectResponse = { id: string; name: string };

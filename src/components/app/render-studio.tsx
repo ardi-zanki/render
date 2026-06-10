@@ -37,6 +37,8 @@ export function RenderStudio({
   initialInstruction = "",
   initialConfig = null,
   initialImageUrl = null,
+  initialResultUrl = null,
+  initialResultRenderId = null,
 }: RenderStudioProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -50,6 +52,8 @@ export function RenderStudio({
     initialScenes,
     initialConfig,
     initialImageUrl,
+    initialResultUrl,
+    initialResultRenderId,
   });
 
   function switchProject(id: string) {
