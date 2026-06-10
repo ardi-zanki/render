@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -12,6 +12,14 @@ export async function getBalance(userId: string): Promise<number> {
     where: eq(creditBalances.userId, userId),
   });
   return row?.balance ?? 0;
+}
+
+export async function listCreditTransactions(userId: string, limit = 100) {
+  return db.query.creditTransactions.findMany({
+    where: eq(creditTransactions.userId, userId),
+    orderBy: desc(creditTransactions.createdAt),
+    limit,
+  });
 }
 
 export interface ApplyCreditParams {

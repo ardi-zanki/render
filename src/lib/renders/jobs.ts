@@ -1,12 +1,51 @@
-import { and, asc, eq, lte } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, lte } from "drizzle-orm";
 
 import { db } from "@/db";
-import { renderJobs, renders } from "@/db/schema";
+import { projects, renderJobs, renders } from "@/db/schema";
 import { env } from "@/env";
 import { applyCreditChange } from "@/lib/credits";
 import { renderResultEmail } from "@/lib/email";
 import { notifyUser } from "@/lib/notifications/service";
 import { RENDER_COST } from "./types";
+
+export async function listActiveRenderQueue(userId: string, limit = 20) {
+  const activeQueueWhere = and(
+    eq(renderJobs.userId, userId),
+    inArray(renderJobs.status, ["queued", "processing"]),
+    isNull(renders.deletedAt),
+  );
+
+  const [totalRow, rows] = await Promise.all([
+    db
+      .select({ value: count() })
+      .from(renderJobs)
+      .innerJoin(renders, eq(renderJobs.renderId, renders.id))
+      .where(activeQueueWhere),
+    db
+      .select({
+        id: renderJobs.id,
+        renderId: renderJobs.renderId,
+        status: renderJobs.status,
+        attempts: renderJobs.attempts,
+        mode: renders.mode,
+        prompt: renders.prompt,
+        projectName: projects.name,
+        createdAt: renderJobs.createdAt,
+        startedAt: renderJobs.startedAt,
+      })
+      .from(renderJobs)
+      .innerJoin(renders, eq(renderJobs.renderId, renders.id))
+      .innerJoin(projects, eq(renders.projectId, projects.id))
+      .where(activeQueueWhere)
+      .orderBy(desc(renderJobs.createdAt))
+      .limit(limit),
+  ]);
+
+  return {
+    count: totalRow[0]?.value ?? rows.length,
+    items: rows,
+  };
+}
 
 export async function lockJobByRenderId(renderId: string, lockedBy: string) {
   return db.transaction(async (tx) => {

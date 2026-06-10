@@ -1,7 +1,18 @@
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { account, userProfiles } from "@/db/schema";
+import {
+  account,
+  userProfiles,
+  type RenderMode,
+  type RenderOutputFormat,
+} from "@/db/schema";
+
+export type UserPreferencesUpdate = {
+  emailNotificationsEnabled: boolean;
+  defaultRenderMode: RenderMode;
+  defaultOutputFormat: RenderOutputFormat;
+};
 
 export async function getUserProfile(userId: string) {
   return db.query.userProfiles.findFirst({
@@ -21,4 +32,24 @@ export async function hasLinkedAccount(userId: string, providerId: string) {
 
 export async function hasGoogleAccount(userId: string) {
   return hasLinkedAccount(userId, "google");
+}
+
+export async function updateUserProfileDisplayName(
+  userId: string,
+  displayName?: string,
+) {
+  await db
+    .update(userProfiles)
+    .set({ displayName: displayName ?? null, updatedAt: new Date() })
+    .where(eq(userProfiles.userId, userId));
+}
+
+export async function updateUserPreferences(
+  userId: string,
+  preferences: UserPreferencesUpdate,
+) {
+  await db
+    .update(userProfiles)
+    .set({ ...preferences, updatedAt: new Date() })
+    .where(eq(userProfiles.userId, userId));
 }

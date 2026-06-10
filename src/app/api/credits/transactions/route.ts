@@ -1,9 +1,7 @@
-import { desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-import { db } from "@/db";
-import { creditTransactions } from "@/db/schema";
 import { auth } from "@/lib/auth";
+import { listCreditTransactions } from "@/lib/credits";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
@@ -26,11 +24,7 @@ export async function GET(req: Request) {
     throw err;
   }
 
-  const rows = await db.query.creditTransactions.findMany({
-    where: eq(creditTransactions.userId, session.user.id),
-    orderBy: desc(creditTransactions.createdAt),
-    limit: 100,
-  });
+  const rows = await listCreditTransactions(session.user.id, 100);
 
   return NextResponse.json({ transactions: rows });
 }

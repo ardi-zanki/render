@@ -2,10 +2,11 @@
 
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
 
-import { db } from "@/db";
-import { userProfiles } from "@/db/schema";
+import {
+  updateUserPreferences,
+  updateUserProfileDisplayName,
+} from "@/lib/account/service";
 import { auth } from "@/lib/auth";
 import { zodFieldErrors } from "@/lib/form";
 import { assertRateLimit } from "@/lib/rate-limit";
@@ -38,10 +39,7 @@ export async function updateProfileAction(
     headers: await headers(),
   });
 
-  await db
-    .update(userProfiles)
-    .set({ displayName: parsed.data.displayName ?? null, updatedAt: new Date() })
-    .where(eq(userProfiles.userId, user.id));
+  await updateUserProfileDisplayName(user.id, parsed.data.displayName);
 
   revalidatePath("/settings");
   revalidatePath("/", "layout");
@@ -63,10 +61,7 @@ export async function updatePreferencesAction(
     return { error: "Input tidak valid" };
   }
 
-  await db
-    .update(userProfiles)
-    .set({ ...parsed.data, updatedAt: new Date() })
-    .where(eq(userProfiles.userId, user.id));
+  await updateUserPreferences(user.id, parsed.data);
 
   revalidatePath("/settings");
   return { ok: true };

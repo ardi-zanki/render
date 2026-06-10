@@ -12,6 +12,7 @@ export {
 } from "./types";
 
 export { createRender } from "./create";
+export { listActiveRenderQueue } from "./jobs";
 export { processNextRenderJob, processRenderJob } from "./processor";
 export {
   countRenders,

@@ -1,10 +1,8 @@
-import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-import { db } from "@/db";
-import { projects, renderJobs, renders } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
+import { listActiveRenderQueue } from "@/lib/renders/service";
 
 export const runtime = "nodejs";
 
@@ -27,40 +25,11 @@ export async function GET(req: Request) {
     throw err;
   }
 
-  const activeQueueWhere = and(
-    eq(renderJobs.userId, userId),
-    inArray(renderJobs.status, ["queued", "processing"]),
-    isNull(renders.deletedAt),
-  );
-  const [totalRow, rows] = await Promise.all([
-    db
-      .select({ value: count() })
-      .from(renderJobs)
-      .innerJoin(renders, eq(renderJobs.renderId, renders.id))
-      .where(activeQueueWhere),
-    db
-      .select({
-        id: renderJobs.id,
-        renderId: renderJobs.renderId,
-        status: renderJobs.status,
-        attempts: renderJobs.attempts,
-        mode: renders.mode,
-        prompt: renders.prompt,
-        projectName: projects.name,
-        createdAt: renderJobs.createdAt,
-        startedAt: renderJobs.startedAt,
-      })
-      .from(renderJobs)
-      .innerJoin(renders, eq(renderJobs.renderId, renders.id))
-      .innerJoin(projects, eq(renders.projectId, projects.id))
-      .where(activeQueueWhere)
-      .orderBy(desc(renderJobs.createdAt))
-      .limit(20),
-  ]);
+  const queue = await listActiveRenderQueue(userId, 20);
 
   return NextResponse.json({
-    count: totalRow[0]?.value ?? rows.length,
-    items: rows.map((row) => ({
+    count: queue.count,
+    items: queue.items.map((row) => ({
       ...row,
       createdAt: row.createdAt.toISOString(),
       startedAt: row.startedAt?.toISOString() ?? null,
