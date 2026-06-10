@@ -1,7 +1,10 @@
 import sharp from "sharp";
 
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
-export const MIN_IMAGE_DIMENSION = 512;
+// Low floor: the render provider reinterprets the input and pins the output to
+// ~2K (see editImageSize in providers/ai/fal.ts), so small design exports and
+// photos (e.g. 640x480) are fine. We only reject genuinely tiny thumbnails.
+export const MIN_IMAGE_DIMENSION = 256;
 export const MAX_IMAGE_DIMENSION = 6000;
 
 const ALLOWED: Record<string, string> = {
@@ -57,11 +60,15 @@ export async function validateImageFile(
   }
 
   if (width < MIN_IMAGE_DIMENSION || height < MIN_IMAGE_DIMENSION) {
-    throw new ImageUploadError("Resolusi gambar minimal 512 x 512 px");
+    throw new ImageUploadError(
+      `Resolusi gambar minimal ${MIN_IMAGE_DIMENSION} x ${MIN_IMAGE_DIMENSION} px`,
+    );
   }
 
   if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
-    throw new ImageUploadError("Resolusi gambar maksimal 6000 x 6000 px");
+    throw new ImageUploadError(
+      `Resolusi gambar maksimal ${MAX_IMAGE_DIMENSION} x ${MAX_IMAGE_DIMENSION} px`,
+    );
   }
 
   return {
