@@ -13,7 +13,7 @@ async function jpegFile(width: number, height: number, name = "x.jpg") {
   })
     .jpeg()
     .toBuffer();
-  return new File([data], name, { type: "image/jpeg" });
+  return new File([new Uint8Array(data)], name, { type: "image/jpeg" });
 }
 
 describe("validateImageFile", () => {
@@ -42,7 +42,9 @@ describe("validateImageFile", () => {
   });
 
   it("rejects an unsupported file type", async () => {
-    const file = new File([Buffer.from("x")], "x.gif", { type: "image/gif" });
+    const file = new File([new Uint8Array([1, 2, 3])], "x.gif", {
+      type: "image/gif",
+    });
     await expect(validateImageFile(file)).rejects.toThrow(
       "Format gambar harus JPG, PNG, atau WebP",
     );

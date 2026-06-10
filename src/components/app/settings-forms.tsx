@@ -1,11 +1,12 @@
 "use client";
 
-import { Check, Loader2 } from "lucide-react";
+import { BadgeCheck, Check, Loader2, ShieldAlert } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PasswordInput } from "@/components/auth/password-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -35,10 +36,12 @@ export function ProfileForm({
   name,
   displayName,
   email,
+  emailVerified,
 }: {
   name: string;
   displayName: string;
   email: string;
+  emailVerified: boolean;
 }) {
   const [state, action, pending] = useActionState(
     updateProfileAction,
@@ -98,7 +101,25 @@ export function ProfileForm({
       </div>
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="email">Email</Label>
-        <Input id="email" defaultValue={email} disabled />
+        <div className="relative">
+          <Input
+            id="email"
+            defaultValue={email}
+            disabled
+            className={emailVerified ? "pr-32" : "pr-40"}
+          />
+          <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2">
+            {emailVerified ? (
+              <Badge variant="success" className="h-6 px-1.5 text-[11px]">
+                <BadgeCheck /> Terverifikasi
+              </Badge>
+            ) : (
+              <Badge variant="warning" className="h-6 px-1.5 text-[11px]">
+                <ShieldAlert /> Belum terverifikasi
+              </Badge>
+            )}
+          </span>
+        </div>
       </div>
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>

@@ -33,6 +33,7 @@ export default async function AppLayout({
       user={{
         name: session.user.name,
         email: session.user.email,
+        emailVerified: session.user.emailVerified,
         image: session.user.image ?? null,
       }}
       preferences={{

@@ -19,7 +19,12 @@ import { cn } from "@/lib/utils";
 
 const WA_SUPPORT = "https://wa.me/6200012340001";
 
-type MenuUser = { name: string; email: string; image?: string | null };
+type MenuUser = {
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string | null;
+};
 type MenuPreferences = {
   displayName: string;
   emailNotificationsEnabled: boolean;

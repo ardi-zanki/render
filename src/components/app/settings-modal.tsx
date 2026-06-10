@@ -37,7 +37,12 @@ import type {
 } from "@/lib/storage/usage";
 import { cn } from "@/lib/utils";
 
-type SettingsUser = { name: string; email: string; image?: string | null };
+type SettingsUser = {
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string | null;
+};
 type SettingsPreferences = {
   displayName: string;
   emailNotificationsEnabled: boolean;
@@ -210,6 +215,7 @@ export function SettingsModal({
               name={user.name}
               displayName={preferences.displayName}
               email={user.email}
+              emailVerified={user.emailVerified}
             />
           </div>
         )}

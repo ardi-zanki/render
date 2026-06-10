@@ -38,6 +38,7 @@ const NAV = [
 type AppUser = {
   name: string;
   email: string;
+  emailVerified: boolean;
   image?: string | null;
 };
 
