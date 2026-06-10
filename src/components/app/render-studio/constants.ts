@@ -71,6 +71,7 @@ export const SURROUNDINGS = {
 };
 
 export const OUTPUT_FORMATS: { value: RenderOutputFormat; label: string }[] = [
+  { value: "original", label: "Original" },
   { value: "jpg", label: "JPG" },
   { value: "png", label: "PNG" },
   { value: "webp", label: "WebP" },

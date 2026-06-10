@@ -18,6 +18,17 @@ describe("createRenderSchema", () => {
     expect(result.data.styleTransferStrength).toBe(0.75);
   });
 
+  it('accepts the "original" output format', () => {
+    const result = createRenderSchema.safeParse({
+      mode: "interior",
+      outputFormat: "original",
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.outputFormat).toBe("original");
+  });
+
   it("rejects invalid render options", () => {
     const result = createRenderSchema.safeParse({
       mode: "landscape",

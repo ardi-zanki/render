@@ -151,7 +151,10 @@ export function createSelfHostedStableDiffusionProvider(): AiProvider {
         );
       }
 
-      const outputFormat = input.outputFormat ?? "jpg";
+      // No "original" passthrough for this backend; fall back to lossless png.
+      const requestedFormat = input.outputFormat ?? "jpg";
+      const outputFormat =
+        requestedFormat === "original" ? "png" : requestedFormat;
       const fallbackContentType = CONTENT_TYPE_BY_FORMAT[outputFormat];
       const form = new FormData();
 

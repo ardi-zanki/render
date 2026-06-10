@@ -14,7 +14,8 @@ import { user } from "./auth";
 
 // ── Shared string unions (stored as text, typed in TS) ──────────────
 export type RenderMode = "interior" | "exterior" | "style_transfer" | "upscale";
-export type RenderOutputFormat = "jpg" | "png" | "webp" | "avif";
+// "original" keeps the provider's native output as-is (no app-side re-encode).
+export type RenderOutputFormat = "jpg" | "png" | "webp" | "avif" | "original";
 export type RenderStatus =
   | "queued"
   | "processing"

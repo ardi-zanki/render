@@ -53,7 +53,10 @@ export function createMyArchitectAiProvider(): AiProvider {
         );
       }
 
-      const outputFormat = input.outputFormat ?? "jpg";
+      // This API has no "original" passthrough; fall back to lossless png.
+      const requestedFormat = input.outputFormat ?? "jpg";
+      const outputFormat =
+        requestedFormat === "original" ? "png" : requestedFormat;
       // MyArchitectAI uses snake_case request fields (see API reference).
       const body: Record<string, unknown> = {
         image: input.imageUrl,

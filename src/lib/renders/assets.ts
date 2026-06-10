@@ -14,6 +14,7 @@ const OUTPUT_FORMATS = new Set<RenderOutputFormat>([
   "png",
   "webp",
   "avif",
+  "original",
 ]);
 
 export function normalizeOutputFormat(

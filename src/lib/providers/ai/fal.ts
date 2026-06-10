@@ -223,7 +223,11 @@ export function createFalAiProvider(): AiProvider {
         throw new AiProviderError("FAL_KEY belum dikonfigurasi", "NO_API_KEY");
       }
 
-      const outputFormat = input.outputFormat ?? "jpg";
+      const requested = input.outputFormat ?? "jpg";
+      // "original" → keep fal's native output untouched: ask fal for lossless PNG
+      // and skip the sharp re-encode below (no generational quality loss).
+      const keepOriginal = requested === "original";
+      const outputFormat: OutputFormat = keepOriginal ? "png" : requested;
       const fallbackContentType = CONTENT_TYPE_BY_FORMAT[outputFormat];
       const modelOutputFormat = falOutputFormat(outputFormat);
       const client = createFalClient({ credentials });
@@ -320,9 +324,11 @@ export function createFalAiProvider(): AiProvider {
 
         return {
           providerRequestId: result.requestId,
-          outputs: await Promise.all(
-            outputs.map((output) => normalizeOutput(output, outputFormat)),
-          ),
+          outputs: keepOriginal
+            ? outputs
+            : await Promise.all(
+                outputs.map((output) => normalizeOutput(output, outputFormat)),
+              ),
           raw: {
             endpointId,
             response: result.data,

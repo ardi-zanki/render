@@ -171,6 +171,7 @@ export function PreferencesForm({
           name="defaultOutputFormat"
           defaultValue={defaultOutputFormat}
         >
+          <option value="original">Original</option>
           <option value="jpg">JPG</option>
           <option value="png">PNG</option>
           <option value="webp">WebP</option>

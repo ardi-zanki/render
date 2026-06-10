@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export const outputFormatEnum = z.enum(["jpg", "png", "webp", "avif"]);
+export const outputFormatEnum = z.enum([
+  "jpg",
+  "png",
+  "webp",
+  "avif",
+  "original",
+]);
 
 export const renderModeEnum = z.enum([
   "interior",

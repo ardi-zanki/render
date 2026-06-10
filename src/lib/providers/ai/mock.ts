@@ -34,7 +34,9 @@ export function createMockAiProvider(): AiProvider {
       }
 
       const isUpscale = input.mode === "upscale";
-      const format = input.outputFormat ?? "jpg";
+      // Mock has no native format, so "original" maps to lossless png.
+      const requested = input.outputFormat ?? "jpg";
+      const format = requested === "original" ? "png" : requested;
       const image = sharp(inputBuf)
         .resize(isUpscale ? 2048 : 1024, isUpscale ? 2048 : 1024, {
           fit: "inside",
