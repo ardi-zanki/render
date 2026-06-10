@@ -69,7 +69,10 @@ describe("postJson", () => {
       }),
     );
 
-    const [, init] = fetchMock.mock.calls[0];
+    const [, init] = fetchMock.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
     expect((init?.headers as Headers).get("Content-Type")).toBe(
       "application/json",
     );

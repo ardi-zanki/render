@@ -38,7 +38,7 @@ test.describe("auth pages", () => {
 
     await page.getByRole("button", { name: "Daftar", exact: true }).click();
 
-    await expect(page.getByText("Nama wajib diisi")).toBeVisible();
+    await expect(page.getByText("Nama minimal 2 karakter")).toBeVisible();
     await expect(page.getByText("Format email tidak valid")).toBeVisible();
     await expect(page.getByText("Password minimal 8 karakter")).toBeVisible();
     await expect(

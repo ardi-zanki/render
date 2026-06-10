@@ -29,6 +29,8 @@ test("user can login and create a mock render", async ({ page }) => {
     page.getByRole("heading", { name: "Render Studio" }),
   ).toBeVisible();
   await expect(page.getByText(/sisa\s+3/i)).toBeVisible();
+  // Output format now offers an "Original" (no re-encode) choice.
+  await expect(page.locator("#outputFormat")).toContainText("Original");
 
   await page.locator('input[type="file"]').first().setInputFiles({
     name: "e2e-room.png",
@@ -71,4 +73,10 @@ test("user can login and create a mock render", async ({ page }) => {
   await page.goto(`/renders/${renderId}`);
   await expect(page.getByRole("heading", { name: "Interior" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Download" })).toBeVisible();
+  // Detail page reopens in the studio (renamed from "Reuse prompt") and no
+  // longer surfaces the prompt (treated as a company secret).
+  await expect(
+    page.getByRole("link", { name: "Open Studio" }),
+  ).toBeVisible();
+  await expect(page.getByText("Prompt", { exact: true })).toHaveCount(0);
 });
