@@ -712,6 +712,55 @@ describe("render workflow integration", () => {
     expect(editJob?.baseAssetId).toBe(resultAsset?.id);
   });
 
+  it("stores a default render name and renames it (own renders only)", async () => {
+    const {
+      applyCreditChange,
+      createRender,
+      db,
+      renameRender,
+      renders,
+    } = await modules();
+    const testUser = await createTestUser();
+    const otherUser = await createTestUser();
+    const project = await createTestProject(testUser.id, "Vitest Name Project");
+    await applyCreditChange({
+      userId: testUser.id,
+      type: "bonus",
+      amount: 2,
+      description: "Name test credit",
+      idempotencyKey: `name-credit:${testUser.id}`,
+    });
+
+    const created = await createRender({
+      userId: testUser.id,
+      projectId: project.id,
+      mode: "interior",
+      prompt: "Vitest name prompt",
+      outputFormat: "png",
+      original: await createUploadedImage("vitest-name.png"),
+    });
+
+    // Default name = the mode label when none is provided.
+    const initial = await db.query.renders.findFirst({
+      where: eq(renders.id, created.renderId),
+    });
+    expect(initial?.name).toBe("Render Interior");
+
+    // Rename succeeds for the owner.
+    await expect(
+      renameRender(testUser.id, created.renderId, "Ruang Tamu"),
+    ).resolves.toBe(true);
+    const renamed = await db.query.renders.findFirst({
+      where: eq(renders.id, created.renderId),
+    });
+    expect(renamed?.name).toBe("Ruang Tamu");
+
+    // Another user cannot rename it.
+    await expect(
+      renameRender(otherUser.id, created.renderId, "Hacked"),
+    ).resolves.toBe(false);
+  });
+
   it("recovers stale processing jobs before a worker claims the next job", async () => {
     const {
       applyCreditChange,
