@@ -1,19 +1,20 @@
 "use client";
 
-import { Minus, Plus, RotateCcw, X, ZoomIn } from "lucide-react";
+import { Minus, Plus, RotateCw, X, ZoomIn } from "lucide-react";
 import { useState } from "react";
 
 import { RenderImage } from "@/components/app/render-image";
 import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
 
-const MIN_ZOOM = 1;
+const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
 const STEP = 0.25;
 
 /**
- * Clickable image thumbnail that opens a zoomable lightbox. Zoom grows the
- * image width inside a scrollable area so the user can pan a zoomed image.
+ * Clickable image thumbnail that opens a zoomable lightbox. Zoom grows/shrinks
+ * the image width inside a scrollable area (so a zoomed-in image can be panned),
+ * and the image can be rotated in 90° steps.
  */
 export function RenderImagePreview({
   src,
@@ -26,16 +27,23 @@ export function RenderImagePreview({
 }) {
   const [open, setOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
 
   const round = (value: number) => Number(value.toFixed(2));
   const zoomIn = () => setZoom((z) => round(Math.min(MAX_ZOOM, z + STEP)));
   const zoomOut = () => setZoom((z) => round(Math.max(MIN_ZOOM, z - STEP)));
-  const reset = () => setZoom(1);
+  const rotate = () => setRotation((r) => (r + 90) % 360);
+  const reset = () => {
+    setZoom(1);
+    setRotation(0);
+  };
 
   function openLightbox() {
-    setZoom(1);
+    reset();
     setOpen(true);
   }
+
+  const isDefault = zoom === 1 && rotation === 0;
 
   return (
     <>
@@ -74,9 +82,16 @@ export function RenderImagePreview({
               >
                 <Minus className="size-4" />
               </button>
-              <span className="w-12 text-center text-xs font-medium tabular-nums text-muted-foreground">
+              <button
+                type="button"
+                onClick={reset}
+                disabled={isDefault}
+                aria-label="Reset tampilan"
+                title="Reset"
+                className="w-12 rounded-md py-1 text-center text-xs font-medium tabular-nums text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-default disabled:hover:bg-transparent disabled:hover:text-muted-foreground"
+              >
                 {Math.round(zoom * 100)}%
-              </span>
+              </button>
               <button
                 type="button"
                 onClick={zoomIn}
@@ -88,12 +103,12 @@ export function RenderImagePreview({
               </button>
               <button
                 type="button"
-                onClick={reset}
-                disabled={zoom === 1}
-                aria-label="Reset zoom"
-                className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={rotate}
+                aria-label="Putar 90°"
+                title="Putar 90°"
+                className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
-                <RotateCcw className="size-4" />
+                <RotateCw className="size-4" />
               </button>
               <button
                 type="button"
@@ -106,12 +121,13 @@ export function RenderImagePreview({
             </div>
           </div>
 
-          <div className="flex-1 overflow-auto bg-muted/40 p-4">
-            <div className="mx-auto" style={{ width: `${zoom * 100}%` }}>
+          <div className="flex flex-1 items-center justify-center overflow-auto bg-muted/40 p-4">
+            <div className="m-auto shrink-0" style={{ width: `${zoom * 100}%` }}>
               <RenderImage
                 src={src}
                 alt={alt}
-                className="block h-auto w-full object-contain"
+                className="block h-auto w-full object-contain transition-transform"
+                style={{ transform: `rotate(${rotation}deg)` }}
               />
             </div>
           </div>
