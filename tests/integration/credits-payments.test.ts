@@ -624,6 +624,83 @@ describe("render workflow integration", () => {
     await expect(getBalance(testUser.id)).resolves.toBe(4);
   });
 
+  it("edits a render in place: appends a version, charges 1 credit, no new render", async () => {
+    const {
+      applyCreditChange,
+      createRender,
+      createRenderEdit,
+      db,
+      getBalance,
+      processRenderJob,
+      renderAssets,
+      renders,
+    } = await modules();
+    const testUser = await createTestUser();
+    const project = await createTestProject(testUser.id, "Vitest Edit Project");
+    await applyCreditChange({
+      userId: testUser.id,
+      type: "bonus",
+      amount: 5,
+      description: "Edit test credit",
+      idempotencyKey: `edit-credit:${testUser.id}`,
+    });
+
+    // Initial render -> version 1 (result).
+    const created = await createRender({
+      userId: testUser.id,
+      projectId: project.id,
+      mode: "interior",
+      prompt: "Vitest initial prompt",
+      config: { style: "modern" },
+      outputFormat: "png",
+      original: await createUploadedImage("vitest-edit-original.png"),
+    });
+    await processRenderJob(created.renderId, "vitest-worker");
+    await expect(getBalance(testUser.id)).resolves.toBe(4); // 5 - 1
+
+    // Edit in place -> version 2 (edit), same render row, another credit.
+    const edit = await createRenderEdit({
+      userId: testUser.id,
+      renderId: created.renderId,
+      config: { style: "industrial", time: "malam" },
+      prompt: "Vitest edited prompt",
+    });
+    expect(edit.renderId).toBe(created.renderId);
+    expect(edit.status).toBe("queued");
+    await expect(getBalance(testUser.id)).resolves.toBe(3); // reserved
+
+    await expect(
+      processRenderJob(created.renderId, "vitest-worker"),
+    ).resolves.toEqual({
+      processed: true,
+      renderId: created.renderId,
+      status: "success",
+    });
+    await expect(getBalance(testUser.id)).resolves.toBe(3); // 2 versions = 2 credits
+
+    // Exactly one render row for the user (no new record).
+    const userRenders = await db.query.renders.findMany({
+      where: eq(renders.userId, testUser.id),
+    });
+    expect(userRenders).toHaveLength(1);
+    expect(userRenders[0]?.status).toBe("success");
+    expect(userRenders[0]?.creditsUsed).toBe(2);
+
+    // Versions accumulate: 1 result + 1 edit (+ the original).
+    const assets = await db.query.renderAssets.findMany({
+      where: eq(renderAssets.renderId, created.renderId),
+    });
+    const versions = assets.filter(
+      (a) => a.type === "result" || a.type === "edit",
+    );
+    expect(versions).toHaveLength(2);
+    const editVersion = assets.find((a) => a.type === "edit");
+    expect(editVersion?.prompt).toBe("Vitest edited prompt");
+    expect((editVersion?.config as { style?: string } | null)?.style).toBe(
+      "industrial",
+    );
+  });
+
   it("recovers stale processing jobs before a worker claims the next job", async () => {
     const {
       applyCreditChange,

@@ -27,6 +27,8 @@ export type RenderStudioProps = {
   /** Previous render result, so the Komparasi/Hasil tabs work on reopen. */
   initialResultUrl?: string | null;
   initialResultRenderId?: string | null;
+  /** When set, the studio edits this render in place (new version, 1 credit). */
+  sourceRenderId?: string | null;
 };
 
 export type CreateProjectResponse = { id: string; name: string };

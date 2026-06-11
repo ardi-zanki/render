@@ -167,10 +167,14 @@ export async function finalizeFailedRender(params: {
   renderId: string;
   userId: string;
   jobId: string;
+  /** Set for a failed edit/re-render — keys the refund and keeps prior version. */
+  editId?: string | null;
   message: string;
   code: string;
 }) {
   const now = new Date();
+  const isEdit = Boolean(params.editId);
+
   await db
     .update(renderJobs)
     .set({
@@ -182,32 +186,40 @@ export async function finalizeFailedRender(params: {
     })
     .where(eq(renderJobs.id, params.jobId));
 
+  // A failed edit leaves the prior successful version intact, so the render
+  // reverts to "success". Only an initial render becomes "failed".
   await db
     .update(renders)
-    .set({
-      status: "failed",
-      failedAt: now,
-      errorMessage: params.message,
-      errorCode: params.code,
-    })
+    .set(
+      isEdit
+        ? { status: "success", failedAt: null, errorCode: null, errorMessage: null }
+        : {
+            status: "failed",
+            failedAt: now,
+            errorMessage: params.message,
+            errorCode: params.code,
+          },
+    )
     .where(eq(renders.id, params.renderId));
 
   await applyCreditChange({
     userId: params.userId,
     type: "refund",
     amount: RENDER_COST,
-    description: "Refund render gagal",
+    description: isEdit ? "Refund edit gagal" : "Refund render gagal",
     renderId: params.renderId,
-    idempotencyKey: `render-refund:${params.renderId}`,
+    idempotencyKey: params.editId
+      ? `render-refund:${params.editId}`
+      : `render-refund:${params.renderId}`,
   });
 
   // In-app only (PRD email scope: render events do not email).
   await notifyUser({
     userId: params.userId,
     type: "render_failed",
-    title: "Render gagal diproses",
+    title: isEdit ? "Edit gagal diproses" : "Render gagal diproses",
     message: "Kredit kamu sudah dikembalikan. Silakan coba lagi.",
-    actionUrl: "/renders/new",
+    actionUrl: isEdit ? `/renders/${params.renderId}` : "/renders/new",
   });
 }
 

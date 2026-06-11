@@ -4,6 +4,7 @@ import { db } from "@/db";
 import {
   renderAssets,
   type RenderAssetType,
+  type RenderConfig,
   type RenderOutputFormat,
 } from "@/db/schema";
 import { renderAssetKey, storage } from "@/lib/storage";
@@ -80,7 +81,13 @@ export async function storeResultAsset(params: {
   data: Buffer;
   contentType: string;
   index: number;
+  /** "result" for the first version, "edit" for subsequent re-renders. */
+  assetType?: Extract<RenderAssetType, "result" | "edit">;
+  /** Studio selections + composed prompt that produced this version. */
+  config?: RenderConfig | null;
+  prompt?: string | null;
 }) {
+  const assetType = params.assetType ?? "result";
   const ext = params.contentType.includes("png")
     ? "png"
     : params.contentType.includes("webp")
@@ -92,7 +99,7 @@ export async function storeResultAsset(params: {
     userId: params.userId,
     projectId: params.projectId,
     renderId: params.renderId,
-    type: "result",
+    type: assetType,
     ext,
     index: params.index,
   });
@@ -108,13 +115,15 @@ export async function storeResultAsset(params: {
       renderId: params.renderId,
       userId: params.userId,
       projectId: params.projectId,
-      type: "result",
+      type: assetType,
       fileUrl: stored.url,
       fileKey: key,
       fileSize: params.data.length,
       mimeType: params.contentType,
       width: meta.width,
       height: meta.height,
+      config: params.config ?? null,
+      prompt: params.prompt ?? null,
     })
     .returning();
   return asset;

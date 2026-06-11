@@ -1,7 +1,9 @@
-import { eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
+
+import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { renderJobs, renders } from "@/db/schema";
+import { renderAssets, renderJobs, renders, type RenderConfig } from "@/db/schema";
 import { env } from "@/env";
 import {
   applyCreditChange,
@@ -133,6 +135,108 @@ export async function createRender(
         description: "Refund render gagal dibuat",
         renderId: render.id,
         idempotencyKey: `render-refund:${render.id}`,
+      });
+    }
+    throw err;
+  }
+}
+
+export interface CreateRenderEditParams {
+  userId: string;
+  renderId: string;
+  config?: RenderConfig;
+  prompt: string;
+}
+
+/**
+ * Re-render ("edit") an existing render in place: produce a NEW version on the
+ * SAME render row (no new record), reserving 1 credit. The original image and
+ * prior versions are kept; the processor appends an `edit` asset. Refunds the
+ * reserved credit if enqueue or processing ultimately fails.
+ */
+export async function createRenderEdit(
+  params: CreateRenderEditParams,
+): Promise<CreateRenderResult> {
+  const { userId, renderId } = params;
+
+  const render = await db.query.renders.findFirst({
+    where: and(
+      eq(renders.id, renderId),
+      eq(renders.userId, userId),
+      isNull(renders.deletedAt),
+    ),
+  });
+  if (!render) throw new Error("Render tidak ditemukan");
+  if (render.status !== "success") {
+    throw new Error("Render harus selesai sebelum bisa diedit ulang");
+  }
+
+  const original = await db.query.renderAssets.findFirst({
+    where: and(
+      eq(renderAssets.renderId, renderId),
+      eq(renderAssets.type, "original"),
+      isNull(renderAssets.deletedAt),
+    ),
+  });
+  if (!original) throw new Error("Gambar asli tidak ditemukan");
+
+  if ((await getBalance(userId)) < RENDER_COST) {
+    throw new InsufficientCreditsError();
+  }
+
+  // Per-generation key so each edit charges/refunds independently.
+  const editId = randomUUID();
+  const deduction = await applyCreditChange({
+    userId,
+    type: "usage",
+    amount: -RENDER_COST,
+    description: `Edit render ${render.mode}`,
+    renderId,
+    idempotencyKey: `render-usage:${editId}`,
+  });
+
+  try {
+    await db
+      .update(renders)
+      .set({
+        config: params.config ?? null,
+        prompt: params.prompt,
+        status: "queued",
+        errorCode: null,
+        errorMessage: null,
+      })
+      .where(eq(renders.id, renderId));
+
+    await db.insert(renderJobs).values({
+      renderId,
+      userId,
+      editId,
+      status: "queued",
+      attempts: 0,
+      maxAttempts: 3,
+      availableAt: new Date(),
+    });
+
+    return {
+      renderId,
+      status: "queued",
+      originalUrl: original.fileUrl,
+      balance: deduction.balance,
+    };
+  } catch (err) {
+    // Roll back: keep the prior successful version and refund the reservation.
+    await db
+      .update(renders)
+      .set({ status: "success" })
+      .where(eq(renders.id, renderId));
+    if (deduction.applied) {
+      await applyCreditChange({
+        userId,
+        type: "refund",
+        amount: RENDER_COST,
+        description: "Refund edit gagal dibuat",
+        renderId,
+        idempotencyKey: `render-refund:${editId}`,
       });
     }
     throw err;

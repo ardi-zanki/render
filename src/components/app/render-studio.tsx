@@ -39,6 +39,7 @@ export function RenderStudio({
   initialImageUrl = null,
   initialResultUrl = null,
   initialResultRenderId = null,
+  sourceRenderId = null,
 }: RenderStudioProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -86,7 +87,58 @@ export function RenderStudio({
     }
   }
 
+  async function onEdit() {
+    if (!sourceRenderId) return;
+    state.setLoading(true);
+    state.setError("");
+    try {
+      const json = await postJson<CreateRenderResponse>(
+        `/api/renders/${sourceRenderId}/edit`,
+        {
+          style: state.style,
+          time: state.time,
+          weather: state.weather,
+          location: state.location || undefined,
+          surrounding: state.surrounding,
+          lightsOn: state.lightsOn,
+          instruction: state.instruction || undefined,
+          outputFormat: state.outputFormat,
+        },
+      );
+      state.setRenderStatus(json.status ?? "queued");
+      state.setResultRenderId(json.renderId);
+      state.setBalance((balance) => json.balance ?? balance - 1);
+      toast.success("Edit masuk antrean");
+      startPolling(json.renderId, {
+        onUpdate: (render) => state.setRenderStatus(render.status),
+        onSuccess: (render) => {
+          state.setResultUrl(render.resultUrl);
+          state.setView("hasil");
+          toast.success("Edit selesai!");
+          router.refresh();
+        },
+        onFailure: (render) => {
+          state.setError(
+            render.errorMessage ?? "Edit gagal. Kredit sudah dikembalikan.",
+          );
+          router.refresh();
+        },
+        onTimeout: () => {
+          state.setError("Edit masih diproses. Cek beberapa saat lagi.");
+        },
+      });
+      router.refresh();
+    } catch (err) {
+      state.setError(
+        apiErrorMessage(err, "Tidak bisa terhubung ke server. Coba lagi."),
+      );
+    } finally {
+      state.setLoading(false);
+    }
+  }
+
   async function onRender() {
+    if (sourceRenderId) return onEdit();
     if (!state.file) {
       state.setError("Upload gambar desain dulu ya.");
       return;
@@ -217,7 +269,10 @@ export function RenderStudio({
     state.loading ||
     state.renderStatus === "queued" ||
     state.renderStatus === "processing";
-  const canRender = !!state.file && state.balance > 0 && !isProcessing;
+  const canRender =
+    (Boolean(sourceRenderId) || !!state.file) &&
+    state.balance > 0 &&
+    !isProcessing;
   const hasUploadedImage = Boolean(state.previewUrl);
   const shownImage =
     state.view === "hasil" && state.resultUrl

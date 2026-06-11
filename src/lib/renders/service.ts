@@ -11,7 +11,7 @@ export {
   type UploadedFile,
 } from "./types";
 
-export { createRender } from "./create";
+export { createRender, createRenderEdit } from "./create";
 export { listActiveRenderQueue } from "./jobs";
 export { processNextRenderJob, processRenderJob } from "./processor";
 export {

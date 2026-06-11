@@ -185,6 +185,10 @@ export const renderAssets = pgTable(
     mimeType: text("mime_type"),
     width: integer("width"),
     height: integer("height"),
+    // For result/edit assets: the studio selections + composed prompt that
+    // produced this version, so each version can be reopened/continued.
+    config: jsonb("config").$type<RenderConfig>(),
+    prompt: text("prompt"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -205,6 +209,9 @@ export const renderJobs = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     status: text("status").$type<JobStatus>().notNull().default("queued"),
+    // Set for edit/re-render jobs (a new version on the same render). Used as
+    // the per-generation key for credit charge/refund. Null = initial render.
+    editId: text("edit_id"),
     attempts: integer("attempts").notNull().default(0),
     maxAttempts: integer("max_attempts").notNull().default(3),
     lockedAt: timestamp("locked_at", { withTimezone: true }),

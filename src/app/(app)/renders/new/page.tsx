@@ -81,6 +81,7 @@ export default async function CreateRenderPage({
         initialImageUrl={sourceRender?.originalUrl ?? null}
         initialResultUrl={sourceRender?.resultUrl ?? null}
         initialResultRenderId={sourceRender?.id ?? null}
+        sourceRenderId={sourceRender?.id ?? null}
       />
     </>
   );

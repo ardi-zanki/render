@@ -101,16 +101,24 @@ async function processLockedJob(jobId: string) {
       throw new Error("Provider tidak mengembalikan hasil render");
     }
 
-    await db
-      .update(renderAssets)
-      .set({ deletedAt: new Date() })
-      .where(
-        and(
-          eq(renderAssets.renderId, render.id),
-          eq(renderAssets.type, "result"),
-          isNull(renderAssets.deletedAt),
-        ),
-      );
+    // An edit (job.editId set) appends a new version; the initial render
+    // replaces any partial result from a prior failed attempt.
+    const isEdit = Boolean(job.editId);
+    const priorVersions = isEdit
+      ? assets.filter((a) => a.type === "result" || a.type === "edit").length
+      : 0;
+    if (!isEdit) {
+      await db
+        .update(renderAssets)
+        .set({ deletedAt: new Date() })
+        .where(
+          and(
+            eq(renderAssets.renderId, render.id),
+            eq(renderAssets.type, "result"),
+            isNull(renderAssets.deletedAt),
+          ),
+        );
+    }
 
     let firstResultUrl = "";
     for (let i = 0; i < result.outputs.length; i++) {
@@ -121,10 +129,14 @@ async function processLockedJob(jobId: string) {
         projectId: render.projectId,
         data: out.data,
         contentType: out.contentType,
-        index: i + 1,
+        index: priorVersions + i + 1,
+        assetType: isEdit ? "edit" : "result",
+        config: render.config,
+        prompt: render.prompt,
       });
       if (i === 0) firstResultUrl = asset.fileUrl;
     }
+    const versionCount = priorVersions + result.outputs.length;
 
     const now = new Date();
     await db
@@ -133,7 +145,7 @@ async function processLockedJob(jobId: string) {
         status: "success",
         completedAt: now,
         failedAt: null,
-        creditsUsed: RENDER_COST,
+        creditsUsed: versionCount * RENDER_COST,
         providerRequestId: result.providerRequestId,
         providerResponse: {
           requestOptions,
@@ -156,33 +168,39 @@ async function processLockedJob(jobId: string) {
       })
       .where(eq(renderJobs.id, job.id));
 
-    await db
-      .update(projects)
-      .set({ coverImageUrl: firstResultUrl, updatedAt: now })
-      .where(and(eq(projects.id, render.projectId), isNull(projects.coverImageUrl)));
+    // Post-success side effects are non-critical: never let them throw back
+    // into the catch below (which would reschedule an already-succeeded job and
+    // duplicate the stored version).
+    try {
+      await db
+        .update(projects)
+        .set({ coverImageUrl: firstResultUrl, updatedAt: now })
+        .where(
+          and(eq(projects.id, render.projectId), isNull(projects.coverImageUrl)),
+        );
 
-    // In-app only (PRD email scope: render events do not email).
-    await notifyUser({
-      userId: render.userId,
-      type: "render_success",
-      title: "Render kamu sudah jadi",
-      message: `Render ${render.mode} berhasil diproses.`,
-      actionUrl: `/renders/${render.id}`,
-    });
-
-    const balance = await getBalance(render.userId);
-    if (balance <= LOW_CREDIT_THRESHOLD) {
-      // Email only when the balance first crosses into the low zone (PRD §25.3:
-      // no repeated email for the same event). The in-app notification still
-      // fires on every render while credits are low.
-      // In-app only (PRD email scope: low-credit alerts do not email).
+      // In-app only (PRD email scope: render events do not email).
       await notifyUser({
         userId: render.userId,
-        type: "low_credit",
-        title: "Kredit kamu menipis",
-        message: `Sisa kredit kamu tinggal ${balance}. Yuk top up.`,
-        actionUrl: "/payments",
+        type: "render_success",
+        title: "Render kamu sudah jadi",
+        message: `Render ${render.mode} berhasil diproses.`,
+        actionUrl: `/renders/${render.id}`,
       });
+
+      const balance = await getBalance(render.userId);
+      if (balance <= LOW_CREDIT_THRESHOLD) {
+        // In-app only (PRD email scope: low-credit alerts do not email).
+        await notifyUser({
+          userId: render.userId,
+          type: "low_credit",
+          title: "Kredit kamu menipis",
+          message: `Sisa kredit kamu tinggal ${balance}. Yuk top up.`,
+          actionUrl: "/payments",
+        });
+      }
+    } catch (sideEffectErr) {
+      console.warn("processRenderJob: post-success side effect failed", sideEffectErr);
     }
 
     return { processed: true, renderId: render.id, status: "success" as const };
@@ -199,6 +217,7 @@ async function processLockedJob(jobId: string) {
         renderId: render.id,
         userId: render.userId,
         jobId: job.id,
+        editId: job.editId,
         message,
         code,
       });

@@ -109,4 +109,24 @@ test("user can login and create a mock render", async ({ page }) => {
       page.getByRole("tab", { name, exact: true }),
     ).not.toHaveAttribute("aria-disabled", "true");
   }
+
+  // Edit-in-place: changing config and rendering adds a NEW version to the SAME
+  // render (no new record) and charges a credit.
+  await page.locator("#style").selectOption("industrial");
+  await page.getByRole("button", { name: "Render", exact: true }).click();
+  await expect(
+    page.getByText("Edit masuk antrean", { exact: true }),
+  ).toBeVisible();
+  await expect
+    .poll(
+      async () => {
+        const response = await page.request.get(`/api/renders/${renderId}`);
+        const detail = (await response.json()) as {
+          assets?: { type: string }[];
+        };
+        return (detail.assets ?? []).filter((a) => a.type === "edit").length;
+      },
+      { timeout: 30_000, intervals: [1_000, 2_000] },
+    )
+    .toBeGreaterThan(0);
 });
