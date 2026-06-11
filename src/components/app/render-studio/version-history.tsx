@@ -12,11 +12,11 @@ import type { StudioVersion } from "./types";
  */
 export function StudioVersionHistory({
   versions,
-  activeFileUrl,
+  activeId,
   onSelect,
 }: {
   versions: StudioVersion[];
-  activeFileUrl: string | null;
+  activeId: string | null;
   onSelect: (version: StudioVersion) => void;
 }) {
   return (
@@ -31,11 +31,11 @@ export function StudioVersionHistory({
             key={version.id}
             type="button"
             onClick={() => onSelect(version)}
-            aria-pressed={activeFileUrl === version.fileUrl}
+            aria-pressed={activeId === version.id}
             title={version.label}
             className={cn(
               "flex flex-col gap-1 rounded-lg border bg-card p-1 text-left transition-colors",
-              activeFileUrl === version.fileUrl
+              activeId === version.id
                 ? "border-primary ring-1 ring-primary/30"
                 : "border-border hover:border-primary/40",
             )}

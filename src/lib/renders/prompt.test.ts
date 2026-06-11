@@ -64,6 +64,16 @@ describe("buildPrompt", () => {
     expect(prompt).not.toContain("Through the windows there is");
   });
 
+  it("frames the prompt as a photo edit when the base is a rendered photo", () => {
+    const sketch = buildPrompt({ mode: "interior" });
+    const photo = buildPrompt({ mode: "interior" }, "photo");
+    expect(sketch).toContain(
+      "Convert this architectural interior screenshot into a realistic photograph",
+    );
+    expect(photo).toContain("Edit this realistic interior photograph");
+    expect(photo).not.toContain("screenshot");
+  });
+
   it("keeps a concise keyword prompt for style transfer", () => {
     const prompt = buildPrompt({ mode: "style_transfer", style: "industrial" });
     expect(prompt).toContain("applying the reference image style");

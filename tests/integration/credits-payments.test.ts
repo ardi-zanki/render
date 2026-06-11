@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { config as loadEnv } from "dotenv";
-import { eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 
 loadEnv({ path: ".env.local", override: false });
@@ -633,6 +633,7 @@ describe("render workflow integration", () => {
       getBalance,
       processRenderJob,
       renderAssets,
+      renderJobs,
       renders,
     } = await modules();
     const testUser = await createTestUser();
@@ -699,6 +700,16 @@ describe("render workflow integration", () => {
     expect((editVersion?.config as { style?: string } | null)?.style).toBe(
       "industrial",
     );
+
+    // Iterative base: the edit defaulted to the latest version (the result).
+    const editJob = await db.query.renderJobs.findFirst({
+      where: and(
+        eq(renderJobs.renderId, created.renderId),
+        isNotNull(renderJobs.editId),
+      ),
+    });
+    const resultAsset = assets.find((a) => a.type === "result");
+    expect(editJob?.baseAssetId).toBe(resultAsset?.id);
   });
 
   it("recovers stale processing jobs before a worker claims the next job", async () => {

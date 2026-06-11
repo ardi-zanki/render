@@ -40,14 +40,27 @@ export default async function CreateRenderPage({
   // "Open Studio": reopen an existing render with its controls pre-filled and
   // its original image on the canvas. The composed prompt is never surfaced.
   const sourceRender = source ? await getRenderDetail(user.id, source) : null;
-  const sourceVersions = (sourceRender?.assets ?? [])
-    .filter((a) => a.type === "result" || a.type === "edit")
-    .map((a, i) => ({
-      id: a.id,
-      label: i === 0 ? "Hasil render" : `Edit ${i}`,
-      fileUrl: a.fileUrl,
-      config: a.config,
-    }));
+  const originalAsset = sourceRender?.assets.find((a) => a.type === "original");
+  const sourceVersions = [
+    ...(originalAsset
+      ? [
+          {
+            id: originalAsset.id,
+            label: "Original",
+            fileUrl: originalAsset.fileUrl,
+            config: null,
+          },
+        ]
+      : []),
+    ...(sourceRender?.assets ?? [])
+      .filter((a) => a.type === "result" || a.type === "edit")
+      .map((a, i) => ({
+        id: a.id,
+        label: i === 0 ? "Hasil render" : `Edit ${i}`,
+        fileUrl: a.fileUrl,
+        config: a.config,
+      })),
+  ];
 
   const projectId = sourceRender?.projectId ?? projectParam;
   const selected = projectId ? await getProject(user.id, projectId) : null;

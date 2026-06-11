@@ -72,7 +72,11 @@ async function processLockedJob(jobId: string) {
     const reference = assets.find((a) => a.type === "reference");
     if (!original) throw new Error("Asset original tidak ditemukan");
 
-    const originalBytes = await fetchAssetBytes(original.fileUrl, original.fileKey);
+    // Iterative edits build on a chosen prior version; otherwise use the original.
+    const baseAsset =
+      (job.baseAssetId && assets.find((a) => a.id === job.baseAssetId)) ||
+      original;
+    const baseBytes = await fetchAssetBytes(baseAsset.fileUrl, baseAsset.fileKey);
     const referenceBytes = reference
       ? await fetchAssetBytes(reference.fileUrl, reference.fileKey)
       : undefined;
@@ -85,9 +89,9 @@ async function processLockedJob(jobId: string) {
         : {};
     const result = await aiProvider().createRender({
       mode: render.mode,
-      imageUrl: original.fileUrl,
-      imageContentType: original.mimeType ?? undefined,
-      imageBuffer: originalBytes,
+      imageUrl: baseAsset.fileUrl,
+      imageContentType: baseAsset.mimeType ?? undefined,
+      imageBuffer: baseBytes,
       referenceUrl: reference?.fileUrl,
       referenceContentType: reference?.mimeType ?? undefined,
       referenceBuffer: referenceBytes,

@@ -212,6 +212,9 @@ export const renderJobs = pgTable(
     // Set for edit/re-render jobs (a new version on the same render). Used as
     // the per-generation key for credit charge/refund. Null = initial render.
     editId: text("edit_id"),
+    // The render_assets.id used as the base image for an iterative edit. Null
+    // falls back to the original. Lets edits build on a selected prior version.
+    baseAssetId: uuid("base_asset_id"),
     attempts: integer("attempts").notNull().default(0),
     maxAttempts: integer("max_attempts").notNull().default(3),
     lockedAt: timestamp("locked_at", { withTimezone: true }),

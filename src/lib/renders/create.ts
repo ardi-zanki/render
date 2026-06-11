@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { renderAssets, renderJobs, renders, type RenderConfig } from "@/db/schema";
@@ -146,6 +146,8 @@ export interface CreateRenderEditParams {
   renderId: string;
   config?: RenderConfig;
   prompt: string;
+  /** Version (render_assets.id) to edit from. Defaults to the latest version. */
+  baseAssetId?: string;
 }
 
 /**
@@ -180,6 +182,29 @@ export async function createRenderEdit(
   });
   if (!original) throw new Error("Gambar asli tidak ditemukan");
 
+  // Iterative base: edit from the chosen version, or the latest one by default.
+  let baseAssetId = params.baseAssetId;
+  if (baseAssetId) {
+    const baseAsset = await db.query.renderAssets.findFirst({
+      where: and(
+        eq(renderAssets.id, baseAssetId),
+        eq(renderAssets.renderId, renderId),
+        isNull(renderAssets.deletedAt),
+      ),
+    });
+    if (!baseAsset) throw new Error("Versi dasar tidak ditemukan");
+  } else {
+    const latest = await db.query.renderAssets.findFirst({
+      where: and(
+        eq(renderAssets.renderId, renderId),
+        inArray(renderAssets.type, ["result", "edit"]),
+        isNull(renderAssets.deletedAt),
+      ),
+      orderBy: desc(renderAssets.createdAt),
+    });
+    baseAssetId = latest?.id ?? original.id;
+  }
+
   if ((await getBalance(userId)) < RENDER_COST) {
     throw new InsufficientCreditsError();
   }
@@ -211,6 +236,7 @@ export async function createRenderEdit(
       renderId,
       userId,
       editId,
+      baseAssetId,
       status: "queued",
       attempts: 0,
       maxAttempts: 3,

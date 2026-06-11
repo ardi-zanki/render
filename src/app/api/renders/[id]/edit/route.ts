@@ -71,7 +71,18 @@ export async function POST(
   }
   const input = parsed.data;
 
-  const prompt = buildPrompt(input);
+  // Iterative base: the chosen version, or the latest one by default. Editing a
+  // rendered photo uses a "photo" prompt; the original sketch uses "sketch".
+  const baseAssetId =
+    typeof body.baseAssetId === "string" ? body.baseAssetId : undefined;
+  const baseAsset = baseAssetId
+    ? render.assets.find((a) => a.id === baseAssetId)
+    : [...render.assets]
+        .reverse()
+        .find((a) => a.type === "result" || a.type === "edit");
+  const promptBase = baseAsset?.type === "original" ? "sketch" : "photo";
+
+  const prompt = buildPrompt(input, promptBase);
   const config = {
     style: input.style,
     time: input.time,
@@ -88,6 +99,7 @@ export async function POST(
       renderId: parsedId.data,
       config,
       prompt,
+      baseAssetId,
     });
     startInlineRenderProcessing(result.renderId, userId);
     return NextResponse.json(result);

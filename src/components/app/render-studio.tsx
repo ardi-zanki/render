@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -47,6 +47,10 @@ export function RenderStudio({
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const referenceRef = useRef<HTMLInputElement>(null);
+  // Iterative editing base: defaults to the latest version.
+  const [selectedBaseAssetId, setSelectedBaseAssetId] = useState<string | null>(
+    initialVersions[initialVersions.length - 1]?.id ?? null,
+  );
   const { startPolling } = useRenderStatusPolling();
   const state = useRenderStudioState({
     defaultRenderMode,
@@ -106,6 +110,7 @@ export function RenderStudio({
           lightsOn: state.lightsOn,
           instruction: state.instruction || undefined,
           outputFormat: state.outputFormat,
+          baseAssetId: selectedBaseAssetId ?? undefined,
         },
       );
       state.setRenderStatus(json.status ?? "queued");
@@ -271,6 +276,7 @@ export function RenderStudio({
   // Scene History: load a version's config onto the controls + its image onto
   // the canvas, so the user can continue editing from that version.
   function loadVersion(version: StudioVersion) {
+    setSelectedBaseAssetId(version.id);
     const cfg = version.config;
     state.setStyle(cfg?.style ?? "auto");
     state.setTime(cfg?.time ?? "auto");
@@ -389,7 +395,7 @@ export function RenderStudio({
         {initialVersions.length > 0 ? (
           <StudioVersionHistory
             versions={initialVersions}
-            activeFileUrl={shownImage}
+            activeId={selectedBaseAssetId}
             onSelect={loadVersion}
           />
         ) : (

@@ -109,10 +109,12 @@ function exteriorLighting(o: RenderOptions): string | undefined {
   return sentences.length ? sentences.join(" ") : undefined;
 }
 
-function buildInterior(o: RenderOptions): string {
+function buildInterior(o: RenderOptions, base: PromptBase): string {
   const style = styleWord(o);
   const parts: (string | undefined)[] = [
-    "Convert this architectural interior screenshot into a realistic photograph, keeping everything exactly as it already appears in the image.",
+    base === "photo"
+      ? "Edit this realistic interior photograph to match the requested settings, keeping everything else exactly as it appears — the same layout, furniture, materials, colors, framing and camera angle."
+      : "Convert this architectural interior screenshot into a realistic photograph, keeping everything exactly as it already appears in the image.",
     "Reproduce every surface faithfully — each material, color, tone and texture stays exactly as shown: each wood keeps its own real tone, grey stays grey, white stays white, marble stays marble, concrete stays concrete, fabric stays fabric and metal stays metal, every surface keeping its own original color and finish straight from the image.",
     "Keep the exact same layout, camera angle, framing and every object and piece of furniture in the same position and quantity as the image; surfaces that are empty stay empty.",
     "Any glass-door wardrobe, cabinet or display unit keeps its own interior contents — the shelves, hanging clothes and items inside — clearly visible behind its glass doors.",
@@ -126,10 +128,12 @@ function buildInterior(o: RenderOptions): string {
   return parts.filter(Boolean).join(" ");
 }
 
-function buildExterior(o: RenderOptions): string {
+function buildExterior(o: RenderOptions, base: PromptBase): string {
   const style = styleWord(o);
   const parts: (string | undefined)[] = [
-    "Convert this architectural exterior screenshot into a realistic photograph, keeping the building's exact form, proportions, materials, openings and layout as in the image.",
+    base === "photo"
+      ? "Edit this realistic exterior photograph to match the requested settings, keeping the building's exact form, proportions, materials, openings, framing and camera as they appear."
+      : "Convert this architectural exterior screenshot into a realistic photograph, keeping the building's exact form, proportions, materials, openings and layout as in the image.",
     "Reproduce every surface faithfully — each material, color, tone and texture stays exactly as shown, every facade element keeping its own original color and finish straight from the image.",
     "Keep the exact same camera angle, framing and composition as the image.",
     style ? `The architecture keeps its ${style} character.` : undefined,
@@ -158,9 +162,15 @@ function buildStyleOrUpscale(o: RenderOptions): string {
   return parts.join(", ");
 }
 
+/**
+ * Whether the prompt edits an existing rendered photo ("photo") or converts the
+ * uploaded sketch/screenshot into a photo ("sketch", the default).
+ */
+export type PromptBase = "sketch" | "photo";
+
 /** Compose render controls (Bahasa Indonesia values) into an English prompt. */
-export function buildPrompt(o: RenderOptions): string {
-  if (o.mode === "interior") return buildInterior(o);
-  if (o.mode === "exterior") return buildExterior(o);
+export function buildPrompt(o: RenderOptions, base: PromptBase = "sketch"): string {
+  if (o.mode === "interior") return buildInterior(o, base);
+  if (o.mode === "exterior") return buildExterior(o, base);
   return buildStyleOrUpscale(o);
 }
