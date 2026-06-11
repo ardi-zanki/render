@@ -125,7 +125,7 @@ export default async function RendersPage({
                       <RenderImage
                         src={thumb}
                         alt={r.mode}
-                        className="size-full"
+                        className="absolute inset-0 size-full"
                       />
                     ) : (
                       <ImageIcon className="size-7 text-muted-foreground" />
@@ -137,8 +137,8 @@ export default async function RendersPage({
                       {STATUS_LABEL[r.status] ?? r.status}
                     </Badge>
                   </div>
-                  <CardContent className="py-4">
-                    <p className="font-semibold text-foreground">
+                  <CardContent className="py-3.5">
+                    <p className="truncate font-semibold text-foreground">
                       {MODE_LABEL[r.mode]}
                     </p>
                     <p className="text-xs text-muted-foreground">

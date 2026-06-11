@@ -296,15 +296,17 @@ export function ProjectsClient({
             <div key={p.id} className="relative">
               <Link href={`/projects/${p.id}`}>
                 <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
-                  <div className="flex aspect-video items-center justify-center bg-muted">
+                  <div className="relative aspect-video bg-muted">
                     {p.coverImageUrl ? (
                       <RenderImage
                         src={p.coverImageUrl}
                         alt={p.name}
-                        className="size-full"
+                        className="absolute inset-0 size-full"
                       />
                     ) : (
-                      <FolderOpen className="size-7 text-muted-foreground" />
+                      <div className="flex size-full items-center justify-center">
+                        <FolderOpen className="size-7 text-muted-foreground" />
+                      </div>
                     )}
                   </div>
                   <CardContent className="py-3.5">

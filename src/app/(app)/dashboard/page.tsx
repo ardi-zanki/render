@@ -294,12 +294,12 @@ export default async function DashboardPage() {
             <Link key={p.id} href={`/projects/${p.id}`}>
               <Card className="transition-colors hover:border-primary/35">
                 <CardContent className="flex flex-col gap-3 py-4">
-                  <div className="flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-muted text-muted-foreground">
+                  <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-muted text-muted-foreground">
                     {p.coverImageUrl ? (
                       <RenderImage
                         src={p.coverImageUrl}
                         alt={p.name}
-                        className="size-full"
+                        className="absolute inset-0 size-full"
                       />
                     ) : (
                       <FolderOpen className="size-6" />
