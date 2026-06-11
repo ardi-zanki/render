@@ -56,6 +56,7 @@ export async function getRenderDetail(
   return {
     id: render.id,
     mode: render.mode,
+    name: render.name ?? null,
     status: render.status,
     prompt: render.prompt,
     config: render.config ?? null,

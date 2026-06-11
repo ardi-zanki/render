@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { PageHeader } from "@/components/app/page-header";
 import { RenderStudio } from "@/components/app/render-studio";
 import type { RenderOutputFormat } from "@/db/schema";
 import { getUserProfile } from "@/lib/account/service";
@@ -10,6 +9,7 @@ import {
   getProject,
   listProjects,
 } from "@/lib/projects/service";
+import { renderDisplayName } from "@/lib/renders/labels";
 import { getRenderDetail, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
@@ -73,14 +73,14 @@ export default async function CreateRenderPage({
     getUserProfile(user.id),
   ]);
 
+  const studioMode =
+    sourceRender?.mode ?? profile?.defaultRenderMode ?? "interior";
+  const renderName =
+    sourceRender?.name ?? renderDisplayName(sourceRender?.mode ?? studioMode);
+
   return (
-    <>
-      <PageHeader
-        title="Render Studio"
-        description="Upload desain, atur konteks visual, lalu buat hasil render yang tersimpan ke project."
-      />
-      <RenderStudio
-        key={`${project.id}:${sourceRender?.id ?? "new"}`}
+    <RenderStudio
+      key={`${project.id}:${sourceRender?.id ?? "new"}`}
         projectId={project.id}
         projectName={project.name}
         projects={projects.map((p) => ({ id: p.id, name: p.name }))}
@@ -91,9 +91,7 @@ export default async function CreateRenderPage({
           status: s.status,
           resultUrl: s.resultUrl,
         }))}
-        defaultRenderMode={
-          sourceRender?.mode ?? profile?.defaultRenderMode ?? "interior"
-        }
+        defaultRenderMode={studioMode}
         defaultOutputFormat={defaultOutputFormat(
           sourceRender?.outputFormat ?? profile?.defaultOutputFormat,
         )}
@@ -104,6 +102,7 @@ export default async function CreateRenderPage({
         initialResultRenderId={sourceRender?.id ?? null}
         sourceRenderId={sourceRender?.id ?? null}
         initialVersions={sourceVersions}
+        initialRenderName={renderName}
         renderInfo={
           sourceRender
             ? {
@@ -115,6 +114,5 @@ export default async function CreateRenderPage({
             : null
         }
       />
-    </>
   );
 }

@@ -84,6 +84,7 @@ export async function POST(req: Request) {
   const rawFields = Object.fromEntries(
     [
       "mode",
+      "name",
       "style",
       "location",
       "surrounding",
@@ -169,6 +170,7 @@ export async function POST(req: Request) {
       userId,
       projectId: project.id,
       mode: input.mode,
+      name: input.name,
       prompt,
       config,
       outputFormat: input.outputFormat,

@@ -68,3 +68,23 @@ export async function moveRenderToProject(
 
   return { ok: true, projectName: targetProject.name };
 }
+
+/** Rename a render. Returns false if it does not belong to the user. */
+export async function renameRender(
+  userId: string,
+  renderId: string,
+  name: string,
+): Promise<boolean> {
+  const result = await db
+    .update(renders)
+    .set({ name })
+    .where(
+      and(
+        eq(renders.id, renderId),
+        eq(renders.userId, userId),
+        isNull(renders.deletedAt),
+      ),
+    )
+    .returning({ id: renders.id });
+  return result.length > 0;
+}

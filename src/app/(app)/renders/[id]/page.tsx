@@ -40,7 +40,7 @@ export default async function RenderDetailPage({
     listProjects(user.id),
   ]);
   if (!render) notFound();
-  const renderName = renderDisplayName(render.mode);
+  const renderName = render.name ?? renderDisplayName(render.mode);
   const projectOptions = projectRows.map((project) => ({
     id: project.id,
     name: project.name,

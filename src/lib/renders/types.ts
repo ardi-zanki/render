@@ -16,6 +16,7 @@ export interface CreateRenderParams {
   userId: string;
   projectId: string;
   mode: RenderMode;
+  name?: string;
   prompt: string;
   config?: RenderConfig;
   outputFormat?: RenderOutputFormat;
@@ -50,6 +51,7 @@ export interface RenderAssetView {
 export interface RenderDetail {
   id: string;
   mode: RenderMode;
+  name: string | null;
   status: RenderStatus;
   prompt: string | null;
   config: RenderConfig | null;

@@ -12,6 +12,7 @@ import {
 } from "@/lib/credits";
 import { assertUserStorageCapacity } from "@/lib/storage/usage";
 import { storeAsset } from "./assets";
+import { renderDisplayName } from "./labels";
 import {
   RENDER_COST,
   type CreateRenderParams,
@@ -58,6 +59,7 @@ export async function createRender(
       userId,
       projectId,
       mode,
+      name: params.name?.trim() || renderDisplayName(mode),
       prompt: params.prompt,
       config: params.config ?? null,
       outputFormat,

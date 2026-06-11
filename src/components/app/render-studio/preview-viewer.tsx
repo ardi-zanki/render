@@ -172,20 +172,26 @@ export function RenderPreviewViewer({
                 className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
                 aria-label="Geser komparasi"
               />
-              <div
-                className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2"
+              {/* Handle — centered exactly on the divider line. */}
+              <span
+                className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md"
                 style={{ left: `${comparisonPosition}%` }}
               >
-                <span className="rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
-                  Hasil
-                </span>
-                <span className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md">
-                  <ArrowLeftRight className="size-4" />
-                </span>
-                <span className="rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
-                  Asli
-                </span>
-              </div>
+                <ArrowLeftRight className="size-4" />
+              </span>
+              {/* Labels — symmetric on each side of the handle. */}
+              <span
+                className="pointer-events-none absolute top-1/2 -translate-x-full -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm"
+                style={{ left: `calc(${comparisonPosition}% - 1.5rem)` }}
+              >
+                Hasil
+              </span>
+              <span
+                className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm"
+                style={{ left: `calc(${comparisonPosition}% + 1.5rem)` }}
+              >
+                Asli
+              </span>
             </div>
           ) : shownImage ? (
             <div className="size-full overflow-hidden">

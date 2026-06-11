@@ -37,6 +37,8 @@ export type RenderStudioProps = {
   initialResultRenderId?: string | null;
   /** When set, the studio edits this render in place (new version, 1 credit). */
   sourceRenderId?: string | null;
+  /** Editable render name shown in the studio header. */
+  initialRenderName?: string;
   /** Version history of the render being edited (Scene History). */
   initialVersions?: StudioVersion[];
   /** Metadata of the render being edited, shown above the Scene panel. */

@@ -14,6 +14,7 @@ import {
 import { RenderActionBar } from "./render-studio/action-bar";
 import { CreateProjectModal } from "./render-studio/create-project-modal";
 import { RenderStudioControls } from "./render-studio/controls";
+import { StudioTitleBar } from "./render-studio/title-bar";
 import { RenderPreviewViewer } from "./render-studio/preview-viewer";
 import { StudioRenderInfo } from "./render-studio/render-info";
 import { RenderSceneList } from "./render-studio/scene-list";
@@ -45,10 +46,12 @@ export function RenderStudio({
   sourceRenderId = null,
   initialVersions = [],
   renderInfo = null,
+  initialRenderName = "Tanpa Judul",
 }: RenderStudioProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const referenceRef = useRef<HTMLInputElement>(null);
+  const [renderName, setRenderName] = useState(initialRenderName);
   // Iterative editing base: defaults to the latest version.
   const [selectedBaseAssetId, setSelectedBaseAssetId] = useState<string | null>(
     initialVersions[initialVersions.length - 1]?.id ?? null,
@@ -93,6 +96,18 @@ export function RenderStudio({
       toast.error(apiErrorMessage(err, "Gagal membuat project"));
     } finally {
       state.setCreatingProject(false);
+    }
+  }
+
+  async function saveRenderName(next: string) {
+    setRenderName(next);
+    if (!sourceRenderId) return; // new render: applied on creation
+    try {
+      await postJson(`/api/renders/${sourceRenderId}/rename`, { name: next });
+      toast.success("Nama render diperbarui");
+      router.refresh();
+    } catch (err) {
+      toast.error(apiErrorMessage(err, "Gagal mengganti nama"));
     }
   }
 
@@ -163,6 +178,7 @@ export function RenderStudio({
       const fd = new FormData();
       fd.append("image", state.file);
       fd.append("mode", state.mode);
+      fd.append("name", renderName);
       fd.append("projectId", projectId);
       fd.append("outputFormat", state.outputFormat);
       if (state.style !== "auto") fd.append("style", state.style);
@@ -313,7 +329,10 @@ export function RenderStudio({
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_300px]">
+    <div className="flex flex-col gap-4">
+      <StudioTitleBar name={renderName} onSave={saveRenderName} />
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_300px]">
       <RenderStudioControls
         projectId={projectId}
         projects={projects}
@@ -405,6 +424,7 @@ export function RenderStudio({
           <RenderSceneList scenes={state.scenes} projectName={projectName} />
         )}
       </aside>
+      </div>
 
       {state.createOpen && (
         <CreateProjectModal

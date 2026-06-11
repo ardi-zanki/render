@@ -26,4 +26,8 @@ export {
   deleteRenderPermanently,
   restoreRender,
 } from "./archive-delete";
-export { moveRenderToProject, type MoveRenderProjectResult } from "./update";
+export {
+  moveRenderToProject,
+  renameRender,
+  type MoveRenderProjectResult,
+} from "./update";

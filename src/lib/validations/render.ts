@@ -18,6 +18,7 @@ export const renderModeEnum = z.enum([
 export const createRenderSchema = z.object({
   projectId: z.uuid().optional(),
   mode: renderModeEnum,
+  name: z.string().trim().max(80).optional(),
   style: z.string().max(40).optional(),
   location: z.string().max(120).optional(),
   surrounding: z.string().max(120).optional(),
@@ -38,6 +39,10 @@ export const createRenderSchema = z.object({
 });
 
 export type CreateRenderInput = z.infer<typeof createRenderSchema>;
+
+export const renderNameSchema = z.object({
+  name: z.string().trim().min(1, "Nama wajib diisi").max(80),
+});
 
 export const createProjectSchema = z.object({
   name: z.string().min(1, "Nama project wajib diisi").max(80),

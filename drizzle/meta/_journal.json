@@ -64,6 +64,13 @@
       "when": 1781175903349,
       "tag": "0008_moaning_punisher",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1781181499960,
+      "tag": "0009_old_wolfsbane",
+      "breakpoints": true
     }
   ]
 }

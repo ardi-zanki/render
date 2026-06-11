@@ -130,6 +130,8 @@ export const renders = pgTable(
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
     mode: text("mode").$type<RenderMode>().notNull(),
+    // User-facing name/identity for the render (defaults to the mode label).
+    name: text("name"),
     prompt: text("prompt"),
     enhancedPrompt: text("enhanced_prompt"),
     // Raw studio selections used to build the prompt (for re-open / re-render).
