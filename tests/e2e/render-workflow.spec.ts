@@ -76,7 +76,11 @@ test("user can login and create a mock render", async ({ page }) => {
 
   await page.goto(`/renders/${renderId}`);
   await expect(page.getByRole("heading", { name: "Interior" })).toBeVisible();
+  // Secondary actions are grouped under the ⋮ menu; Open Studio is the primary.
+  await page.getByRole("button", { name: "Aksi lainnya" }).click();
   await expect(page.getByRole("button", { name: "Download" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Bagikan" })).toBeVisible();
+  await page.keyboard.press("Escape");
   // Detail page reopens in the studio (renamed from "Reuse prompt") and no
   // longer surfaces the prompt (treated as a company secret).
   await expect(

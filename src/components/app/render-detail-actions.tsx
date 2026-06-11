@@ -2,30 +2,38 @@
 
 import {
   Archive,
-  Check,
   Download,
   Loader2,
+  MoreVertical,
   RotateCcw,
   Share2,
   Trash2,
-  Wand2,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
-import { Modal } from "@/components/ui/modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
+import { Modal } from "@/components/ui/modal";
+import { Popover } from "@/components/ui/popover";
 import { apiErrorMessage, apiJson, jsonInit, postJson } from "@/lib/client-api";
+import { cn } from "@/lib/utils";
 
 type ConfirmKind = "archive" | "restore" | "delete" | null;
 type DownloadTokenResponse = { url: string };
 type ShareResponse = { url: string };
 
-export function RenderDetailActions({
+const itemClass =
+  "flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
+
+/**
+ * Overflow (⋮) menu for a render's secondary actions — share, download,
+ * archive/restore, delete. The primary "Open Studio" action lives outside this
+ * menu so the detail page stays focused on the result.
+ */
+export function RenderActionsMenu({
   renderId,
   renderName,
   archived,
@@ -37,10 +45,11 @@ export function RenderDetailActions({
   canDownload: boolean;
 }) {
   const router = useRouter();
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmKind>(null);
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
@@ -105,12 +114,11 @@ export function RenderDetailActions({
       const json = await postJson<ShareResponse>("/api/renders/share", {
         renderId,
       });
-      setShareUrl(json.url);
       try {
         await navigator.clipboard.writeText(json.url);
         toast.success("Link share disalin");
       } catch {
-        toast.success("Link share dibuat");
+        toast.success(`Link share: ${json.url}`);
       }
     } catch (err) {
       toast.error(apiErrorMessage(err, "Gagal membuat link share"));
@@ -119,86 +127,92 @@ export function RenderDetailActions({
     }
   }
 
-  // Reopen this render in the studio with its config + original image
-  // pre-filled (the composed prompt is never passed through the URL).
-  const openStudioHref = `/renders/new?source=${renderId}`;
-
-  const actionClass = "w-full justify-start";
+  function runFromMenu(action: () => void) {
+    setMenuOpen(false);
+    action();
+  }
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <Button asChild variant="outline" className={actionClass}>
-          <Link href={openStudioHref}>
-            <Wand2 /> Open Studio
-          </Link>
-        </Button>
-        <Button
-          variant="inverse"
-          onClick={download}
-          disabled={!canDownload || downloading}
-          className={actionClass}
-        >
-          {downloading ? <Loader2 className="animate-spin" /> : <Download />}
-          Download
-        </Button>
-        <Button
-          variant="outline"
-          onClick={share}
+      <Button
+        ref={menuRef}
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => setMenuOpen((open) => !open)}
+        aria-label="Aksi lainnya"
+        aria-haspopup="menu"
+        aria-expanded={menuOpen}
+      >
+        <MoreVertical />
+      </Button>
+
+      <Popover
+        anchorRef={menuRef}
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        width={200}
+        align="end"
+        className="rounded-lg border border-border/80 bg-popover p-1.5 shadow-elevated"
+      >
+        <button
+          type="button"
+          className={itemClass}
           disabled={!canDownload || sharing}
-          className={actionClass}
+          onClick={() => runFromMenu(share)}
         >
-          {sharing ? (
-            <Loader2 className="animate-spin" />
-          ) : shareUrl ? (
-            <Check />
-          ) : (
-            <Share2 />
-          )}
-          {shareUrl ? "Tersalin" : "Bagikan"}
-        </Button>
+          {sharing ? <Loader2 className="animate-spin" /> : <Share2 />} Bagikan
+        </button>
+        <button
+          type="button"
+          className={itemClass}
+          disabled={!canDownload || downloading}
+          onClick={() => runFromMenu(download)}
+        >
+          {downloading ? <Loader2 className="animate-spin" /> : <Download />}{" "}
+          Download
+        </button>
         {archived ? (
-          <Button
-            variant="outline"
-            onClick={() => setConfirm("restore")}
-            className={actionClass}
+          <button
+            type="button"
+            className={itemClass}
+            onClick={() => runFromMenu(() => setConfirm("restore"))}
           >
             <RotateCcw /> Pulihkan
-          </Button>
+          </button>
         ) : (
-          <Button
-            variant="outline"
-            onClick={() => setConfirm("archive")}
-            className={actionClass}
+          <button
+            type="button"
+            className={itemClass}
+            onClick={() => runFromMenu(() => setConfirm("archive"))}
           >
             <Archive /> Arsipkan
-          </Button>
+          </button>
         )}
-        <Button
-          variant="destructive"
-          onClick={() => {
-            setDeleteConfirmation("");
-            setConfirm("delete");
-          }}
-          className={actionClass}
+        <div className="my-1 h-px bg-border" />
+        <button
+          type="button"
+          className={cn(itemClass, "text-destructive [&_svg]:text-destructive")}
+          onClick={() =>
+            runFromMenu(() => {
+              setDeleteConfirmation("");
+              setConfirm("delete");
+            })
+          }
         >
           <Trash2 /> Hapus
-        </Button>
-      </div>
+        </button>
+      </Popover>
 
       {confirm && confirm !== "delete" && (
         <ConfirmDialog
-          title={
-            confirm === "archive" ? "Arsipkan render?" : "Pulihkan render?"
-          }
+          title={confirm === "archive" ? "Arsipkan render?" : "Pulihkan render?"}
           description={
             confirm === "archive"
               ? "Render akan disembunyikan dari daftar utama. File tetap tersimpan."
               : "Render akan dikembalikan ke daftar utama."
           }
-          confirmLabel={
-            confirm === "archive" ? "Arsipkan" : "Pulihkan"
-          }
+          confirmLabel={confirm === "archive" ? "Arsipkan" : "Pulihkan"}
           destructive={false}
           onConfirm={() => mutate(confirm)}
           onClose={() => setConfirm(null)}
@@ -259,23 +273,6 @@ export function RenderDetailActions({
             </Button>
           </div>
         </Modal>
-      )}
-
-      {shareUrl && (
-        <div className="mt-3 flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-2 text-xs">
-          <Share2 className="size-3.5 shrink-0 text-primary" />
-          <span className="truncate font-mono text-muted-foreground">
-            {shareUrl}
-          </span>
-          <a
-            href={shareUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="ml-auto shrink-0 font-medium text-primary hover:underline"
-          >
-            Buka
-          </a>
-        </div>
       )}
     </>
   );

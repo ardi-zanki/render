@@ -1,10 +1,10 @@
-import { ArrowLeft, ImageIcon } from "lucide-react";
+import { ArrowLeft, ImageIcon, Wand2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageHeader } from "@/components/app/page-header";
-import { RenderDetailActions } from "@/components/app/render-detail-actions";
+import { RenderActionsMenu } from "@/components/app/render-detail-actions";
 import { RenderImage } from "@/components/app/render-image";
 import { RenderImagePreview } from "@/components/app/render-image-preview";
 import { RenderProjectSelector } from "@/components/app/render-project-selector";
@@ -50,7 +50,6 @@ export default async function RenderDetailPage({
     <>
       <PageHeader
         title={renderName}
-        description={`${render.projectName} · ${dateFmt.format(render.createdAt)}`}
         action={
           <Button asChild variant="outline">
             <Link href="/renders">
@@ -90,12 +89,22 @@ export default async function RenderDetailPage({
         <aside className="flex flex-col gap-4">
           <Card>
             <CardContent className="flex flex-col gap-4 py-5">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold text-foreground">Detail</h2>
+                <RenderActionsMenu
+                  renderId={render.id}
+                  renderName={renderName}
+                  archived={!!render.archivedAt}
+                  canDownload={render.status === "success" && !!render.resultUrl}
+                />
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Status</span>
                 <Badge variant={statusBadgeVariant(render.status)}>
                   {STATUS_LABEL[render.status] ?? render.status}
                 </Badge>
               </div>
+              <Info label="Dibuat" value={dateFmt.format(render.createdAt)} />
               <Info label="Mode" value={MODE_LABEL[render.mode]} />
               <div className="flex items-center justify-between gap-4 text-sm">
                 <span className="text-muted-foreground">Project</span>
@@ -113,12 +122,11 @@ export default async function RenderDetailPage({
                   {render.errorMessage}
                 </div>
               )}
-              <RenderDetailActions
-                renderId={render.id}
-                renderName={renderName}
-                archived={!!render.archivedAt}
-                canDownload={render.status === "success" && !!render.resultUrl}
-              />
+              <Button asChild className="w-full">
+                <Link href={`/renders/new?source=${render.id}`}>
+                  <Wand2 /> Open Studio
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </aside>
