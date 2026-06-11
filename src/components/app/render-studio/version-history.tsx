@@ -36,7 +36,7 @@ export function StudioVersionHistory({
             className={cn(
               "flex flex-col gap-1 rounded-lg border bg-card p-1 text-left transition-colors",
               activeId === version.id
-                ? "border-primary ring-1 ring-primary/30"
+                ? "border-primary/70 ring-1 ring-primary/15"
                 : "border-border hover:border-primary/40",
             )}
           >

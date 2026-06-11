@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeftRight,
   ImagePlus,
   Loader2,
   X,
@@ -135,12 +136,14 @@ export function RenderPreviewViewer({
         <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/35">
           {canCompare && view === "komparasi" ? (
             <div className="relative size-full overflow-hidden bg-background">
+              {/* Base = original, shown on the right. */}
               <RenderImage
-                src={resultUrl ?? ""}
-                alt="Hasil render"
+                src={previewUrl ?? ""}
+                alt="Gambar asli"
                 className="size-full"
                 style={{ transform: `scale(${zoom})` }}
               />
+              {/* Overlay = result, revealed on the left as the handle moves. */}
               <div
                 className="absolute inset-0 overflow-hidden"
                 style={{
@@ -148,14 +151,14 @@ export function RenderPreviewViewer({
                 }}
               >
                 <RenderImage
-                  src={previewUrl ?? ""}
-                  alt="Gambar asli"
+                  src={resultUrl ?? ""}
+                  alt="Hasil render"
                   className="size-full"
                   style={{ transform: `scale(${zoom})` }}
                 />
               </div>
               <div
-                className="absolute inset-y-0 w-px bg-background/90 shadow-[0_0_0_1px_rgb(15_23_42/0.12)]"
+                className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(15_23_42/0.12)]"
                 style={{ left: `${comparisonPosition}%` }}
               />
               <input
@@ -170,12 +173,18 @@ export function RenderPreviewViewer({
                 aria-label="Geser komparasi"
               />
               <div
-                className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-md border border-border bg-background/90 px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
+                className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2"
                 style={{ left: `${comparisonPosition}%` }}
               >
-                <span>Asli</span>
-                <span className="text-muted-foreground">|</span>
-                <span>Hasil</span>
+                <span className="rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
+                  Hasil
+                </span>
+                <span className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md">
+                  <ArrowLeftRight className="size-4" />
+                </span>
+                <span className="rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm">
+                  Asli
+                </span>
               </div>
             </div>
           ) : shownImage ? (
