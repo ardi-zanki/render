@@ -42,6 +42,57 @@ describe("auth validation", () => {
     ]);
   });
 
+  it("rejects passwords with spaces", () => {
+    const result = registerSchema.safeParse({
+      name: "Ardi Demo",
+      email: "ardi@example.com",
+      password: "pass word123",
+      agreeTerms: true,
+    });
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error.flatten().fieldErrors.password).toEqual([
+      "Password tidak boleh mengandung spasi",
+    ]);
+  });
+
+  it("rejects passwords longer than 30 characters", () => {
+    const result = registerSchema.safeParse({
+      name: "Ardi Demo",
+      email: "ardi@example.com",
+      password: "a".repeat(31),
+      agreeTerms: true,
+    });
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error.flatten().fieldErrors.password).toEqual([
+      "Password maksimal 30 karakter",
+    ]);
+  });
+
+  it("rejects a name longer than 60 characters", () => {
+    const result = registerSchema.safeParse({
+      name: "a".repeat(61),
+      email: "ardi@example.com",
+      password: "password123",
+      agreeTerms: true,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("applies the same password rules to reset password", () => {
+    const result = resetPasswordSchema.safeParse({
+      token: "token",
+      password: "pass word",
+      confirmPassword: "pass word",
+    });
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error.flatten().fieldErrors.password).toEqual([
+      "Password tidak boleh mengandung spasi",
+    ]);
+  });
+
   it("rejects disposable email providers", () => {
     const result = registerSchema.safeParse({
       name: "Ardi Demo",

@@ -2,8 +2,18 @@ import { z } from "zod";
 
 import { isDisposableEmail } from "./disposable-email";
 
+// Length-based, no complexity rules (modern guidance favors length); the only
+// character rule is disallowing spaces.
+const passwordSchema = z
+  .string()
+  .min(8, "Password minimal 8 karakter")
+  .max(30, "Password maksimal 30 karakter")
+  .refine((value) => !/\s/.test(value), {
+    error: "Password tidak boleh mengandung spasi",
+  });
+
 export const registerSchema = z.object({
-  name: z.string().trim().min(2, "Nama minimal 2 karakter").max(120),
+  name: z.string().trim().min(2, "Nama minimal 2 karakter").max(60),
   email: z
     .string()
     .trim()
@@ -12,8 +22,7 @@ export const registerSchema = z.object({
     .refine((email) => !isDisposableEmail(email), {
       error: "Gunakan email permanen, bukan email sementara.",
     }),
-  // Length only — no character/complexity rules (modern guidance favors length).
-  password: z.string().min(8, "Password minimal 8 karakter").max(128),
+  password: passwordSchema,
   agreeTerms: z.literal(true, {
     error: "Anda harus menyetujui syarat & ketentuan",
   }),
@@ -32,7 +41,7 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z
   .object({
     token: z.string().min(1, "Token tidak valid"),
-    password: z.string().min(8, "Password minimal 8 karakter").max(128),
+    password: passwordSchema,
     confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
   })
   .refine((d) => d.password === d.confirmPassword, {
