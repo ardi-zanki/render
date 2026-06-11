@@ -1,18 +1,15 @@
-import {
-  Building2,
-  Maximize2,
-  Palette,
-  Sofa,
-  type LucideIcon,
-} from "lucide-react";
+import { Building2, Sofa, type LucideIcon } from "lucide-react";
 
 import type { RenderMode, RenderOutputFormat } from "@/db/schema";
 
-export const MODES: { value: RenderMode; label: string; icon: LucideIcon }[] = [
+export const MODES: {
+  value: RenderMode;
+  label: string;
+  icon: LucideIcon;
+  comingSoon?: boolean;
+}[] = [
   { value: "interior", label: "Interior", icon: Sofa },
-  { value: "exterior", label: "Exterior", icon: Building2 },
-  { value: "style_transfer", label: "Style", icon: Palette },
-  { value: "upscale", label: "Upscale", icon: Maximize2 },
+  { value: "exterior", label: "Exterior", icon: Building2, comingSoon: true },
 ];
 
 export const STYLES = [

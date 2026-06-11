@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Check,
-  Download,
-  Loader2,
-  Share2,
-  Sparkles,
-} from "lucide-react";
+import { Check, Download, Loader2, Share2, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -42,27 +36,27 @@ export function RenderActionBar({
   onRender: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2.5">
       <Textarea
         value={instruction}
         onChange={(e) => setInstruction(e.target.value)}
-        placeholder="Instruksi tambahan (boleh kosong): material kayu hangat, banyak tanaman..."
-        className="min-h-20"
+        placeholder="Tambahkan instruksi (opsional)…"
+        className="min-h-14 resize-none border-border/70 text-sm"
       />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Sparkles className="size-4 text-primary" />
-          Biaya: <span className="font-semibold text-foreground">1 kredit</span>
-          <span className="text-muted-foreground">· sisa {balance}</span>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Sparkles className="size-3.5 text-primary" />
+          <span className="font-semibold text-foreground">1 kredit</span>
+          <span>· sisa {balance}</span>
         </div>
-        <div className="flex items-center gap-2">
-          {resultRenderId && (
-            <Button variant="outline" asChild>
-              <Link href={`/renders/${resultRenderId}`}>Detail</Link>
-            </Button>
-          )}
+        <div className="flex items-center gap-1.5">
           {resultUrl && resultRenderId && (
-            <Button variant="outline" onClick={onShare} disabled={sharing}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onShare}
+              disabled={sharing}
+            >
               {sharing ? (
                 <Loader2 className="animate-spin" />
               ) : shareUrl ? (
@@ -74,21 +68,22 @@ export function RenderActionBar({
             </Button>
           )}
           {resultUrl && (
-            <Button variant="inverse" onClick={onDownload} disabled={downloading}>
-              {downloading ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <Download />
-              )}
+            <Button
+              variant="inverse"
+              size="sm"
+              onClick={onDownload}
+              disabled={downloading}
+            >
+              {downloading ? <Loader2 className="animate-spin" /> : <Download />}
               Unduh
             </Button>
           )}
           {balance <= 0 ? (
-            <Button asChild>
+            <Button size="sm" asChild>
               <Link href="/payments">Top up kredit</Link>
             </Button>
           ) : (
-            <Button onClick={onRender} disabled={!canRender}>
+            <Button size="sm" onClick={onRender} disabled={!canRender}>
               {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
               Render
             </Button>
@@ -97,7 +92,7 @@ export function RenderActionBar({
       </div>
 
       {shareUrl && (
-        <div className="flex items-center gap-2 rounded-md bg-muted/60 px-3 py-2 text-xs">
+        <div className="flex items-center gap-2 rounded-md bg-muted/60 px-3 py-1.5 text-xs">
           <Share2 className="size-3.5 shrink-0 text-primary" />
           <span className="truncate font-mono text-muted-foreground">
             {shareUrl}

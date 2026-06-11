@@ -15,6 +15,7 @@ import { RenderActionBar } from "./render-studio/action-bar";
 import { CreateProjectModal } from "./render-studio/create-project-modal";
 import { RenderStudioControls } from "./render-studio/controls";
 import { RenderPreviewViewer } from "./render-studio/preview-viewer";
+import { StudioRenderInfo } from "./render-studio/render-info";
 import { RenderSceneList } from "./render-studio/scene-list";
 import { StudioVersionHistory } from "./render-studio/version-history";
 import {
@@ -43,6 +44,7 @@ export function RenderStudio({
   initialResultRenderId = null,
   sourceRenderId = null,
   initialVersions = [],
+  renderInfo = null,
 }: RenderStudioProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -390,8 +392,9 @@ export function RenderStudio({
         </div>
       </div>
 
-      {/* Info Render: version history (Scene History) or project scenes. */}
+      {/* Info Render + Scene History (or project scenes for a new render). */}
       <aside className="flex flex-col gap-4">
+        {renderInfo && <StudioRenderInfo info={renderInfo} />}
         {initialVersions.length > 0 ? (
           <StudioVersionHistory
             versions={initialVersions}

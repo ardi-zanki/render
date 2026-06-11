@@ -47,14 +47,14 @@ test("user can login and create a mock render", async ({ page }) => {
     page.getByRole("button", { name: "Render", exact: true }),
   ).toBeEnabled();
 
+  const createResp = page.waitForResponse(
+    (r) => r.url().endsWith("/api/renders") && r.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "Render", exact: true }).click();
   await expect(page.getByText("Render masuk antrean", { exact: true })).toBeVisible();
 
-  const detailLink = page.getByRole("link", { name: "Detail" });
-  await expect(detailLink).toBeVisible();
-
-  const href = await detailLink.getAttribute("href");
-  const renderId = href?.split("/").pop();
+  const renderId = ((await (await createResp).json()) as { renderId: string })
+    .renderId;
   expect(renderId).toBeTruthy();
 
   await expect

@@ -104,6 +104,16 @@ export default async function CreateRenderPage({
         initialResultRenderId={sourceRender?.id ?? null}
         sourceRenderId={sourceRender?.id ?? null}
         initialVersions={sourceVersions}
+        renderInfo={
+          sourceRender
+            ? {
+                createdAt: sourceRender.createdAt.toISOString(),
+                mode: sourceRender.mode,
+                outputFormat: sourceRender.outputFormat,
+                creditsUsed: sourceRender.creditsUsed,
+              }
+            : null
+        }
       />
     </>
   );

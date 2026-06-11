@@ -39,6 +39,13 @@ export type RenderStudioProps = {
   sourceRenderId?: string | null;
   /** Version history of the render being edited (Scene History). */
   initialVersions?: StudioVersion[];
+  /** Metadata of the render being edited, shown above the Scene panel. */
+  renderInfo?: {
+    createdAt: string;
+    mode: RenderMode;
+    outputFormat: string;
+    creditsUsed: number;
+  } | null;
 };
 
 export type CreateProjectResponse = { id: string; name: string };

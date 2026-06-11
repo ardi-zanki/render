@@ -2,6 +2,7 @@
 
 import { Lightbulb, Plus } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChoiceCard } from "@/components/ui/choice-card";
@@ -110,6 +111,17 @@ export function RenderStudioControls({
                 active={mode === m.value}
                 icon={m.icon}
                 label={m.label}
+                description={
+                  m.comingSoon ? (
+                    <Badge
+                      variant="secondary"
+                      className="mt-0.5 px-1.5 py-0 text-[10px]"
+                    >
+                      Coming Soon
+                    </Badge>
+                  ) : undefined
+                }
+                disabled={m.comingSoon}
                 onClick={() => {
                   setMode(m.value);
                   setSurrounding("auto");

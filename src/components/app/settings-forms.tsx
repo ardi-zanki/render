@@ -159,9 +159,9 @@ export function PreferencesForm({
           defaultValue={defaultRenderMode}
         >
           <option value="interior">Interior</option>
-          <option value="exterior">Exterior</option>
-          <option value="style_transfer">Style Transfer</option>
-          <option value="upscale">Upscale</option>
+          <option value="exterior" disabled>
+            Exterior (Coming Soon)
+          </option>
         </Select>
       </div>
       <div className="flex flex-col gap-1.5">
