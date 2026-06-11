@@ -49,6 +49,8 @@ export async function getRenderDetail(
     mimeType: a.mimeType,
     width: a.width,
     height: a.height,
+    config: a.config ?? null,
+    prompt: a.prompt ?? null,
   }));
 
   return {

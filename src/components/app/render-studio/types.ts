@@ -11,6 +11,14 @@ export type ViewerTab = {
 
 export type RenderStudioProject = { id: string; name: string };
 
+/** A version (result/edit) of the render being edited, for Scene History. */
+export type StudioVersion = {
+  id: string;
+  label: string;
+  fileUrl: string;
+  config: RenderConfig | null;
+};
+
 export type RenderStudioProps = {
   projectId: string;
   projectName: string;
@@ -29,6 +37,8 @@ export type RenderStudioProps = {
   initialResultRenderId?: string | null;
   /** When set, the studio edits this render in place (new version, 1 credit). */
   sourceRenderId?: string | null;
+  /** Version history of the render being edited (Scene History). */
+  initialVersions?: StudioVersion[];
 };
 
 export type CreateProjectResponse = { id: string; name: string };

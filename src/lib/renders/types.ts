@@ -42,6 +42,9 @@ export interface RenderAssetView {
   mimeType: string | null;
   width: number | null;
   height: number | null;
+  /** For result/edit assets: the settings + prompt that produced this version. */
+  config: RenderConfig | null;
+  prompt: string | null;
 }
 
 export interface RenderDetail {

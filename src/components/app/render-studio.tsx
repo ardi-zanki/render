@@ -16,12 +16,14 @@ import { CreateProjectModal } from "./render-studio/create-project-modal";
 import { RenderStudioControls } from "./render-studio/controls";
 import { RenderPreviewViewer } from "./render-studio/preview-viewer";
 import { RenderSceneList } from "./render-studio/scene-list";
+import { StudioVersionHistory } from "./render-studio/version-history";
 import {
   type CreateProjectResponse,
   type CreateRenderResponse,
   type DownloadTokenResponse,
   type RenderStudioProps,
   type ShareResponse,
+  type StudioVersion,
   type ViewerTab,
 } from "./render-studio/types";
 import { useRenderStudioState } from "./render-studio/use-render-studio-state";
@@ -40,6 +42,7 @@ export function RenderStudio({
   initialResultUrl = null,
   initialResultRenderId = null,
   sourceRenderId = null,
+  initialVersions = [],
 }: RenderStudioProps) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -265,6 +268,22 @@ export function RenderStudio({
     }
   }
 
+  // Scene History: load a version's config onto the controls + its image onto
+  // the canvas, so the user can continue editing from that version.
+  function loadVersion(version: StudioVersion) {
+    const cfg = version.config;
+    state.setStyle(cfg?.style ?? "auto");
+    state.setTime(cfg?.time ?? "auto");
+    state.setWeather(cfg?.weather ?? "auto");
+    state.setLightsOn(() => cfg?.lightsOn ?? false);
+    state.setLocation(cfg?.location ?? "");
+    state.setSurrounding(cfg?.surrounding ?? "auto");
+    state.setInstruction(cfg?.instruction ?? "");
+    state.setResultUrl(version.fileUrl);
+    state.setResultRenderId(sourceRenderId);
+    state.setView("hasil");
+  }
+
   const isProcessing =
     state.loading ||
     state.renderStatus === "queued" ||
@@ -361,7 +380,15 @@ export function RenderStudio({
           onRender={onRender}
         />
 
-        <RenderSceneList scenes={state.scenes} projectName={projectName} />
+        {initialVersions.length > 0 ? (
+          <StudioVersionHistory
+            versions={initialVersions}
+            activeFileUrl={shownImage}
+            onSelect={loadVersion}
+          />
+        ) : (
+          <RenderSceneList scenes={state.scenes} projectName={projectName} />
+        )}
       </div>
 
       {state.createOpen && (

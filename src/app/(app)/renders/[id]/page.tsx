@@ -1,4 +1,4 @@
-import { ArrowLeft, ImageIcon, Wand2 } from "lucide-react";
+import { ArrowLeft, Wand2 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,8 +6,8 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/app/page-header";
 import { RenderActionsMenu } from "@/components/app/render-detail-actions";
 import { RenderImage } from "@/components/app/render-image";
-import { RenderImagePreview } from "@/components/app/render-image-preview";
 import { RenderProjectSelector } from "@/components/app/render-project-selector";
+import { RenderVersions } from "@/components/app/render-versions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,6 +45,14 @@ export default async function RenderDetailPage({
     id: project.id,
     name: project.name,
   }));
+  // Versions in chronological order: first result, then each edit.
+  const versions = render.assets
+    .filter((a) => a.type === "result" || a.type === "edit")
+    .map((a, i) => ({
+      id: a.id,
+      fileUrl: a.fileUrl,
+      label: i === 0 ? "Hasil render" : `Edit ${i}`,
+    }));
 
   return (
     <>
@@ -61,12 +69,10 @@ export default async function RenderDetailPage({
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-4">
-          <Card className="overflow-hidden p-0">
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <ImagePanel title="Gambar asli" src={render.originalUrl} />
-              <ImagePanel title="Hasil render" src={render.resultUrl} />
-            </div>
-          </Card>
+          <RenderVersions
+            originalUrl={render.originalUrl}
+            versions={versions}
+          />
 
           {render.referenceUrl && (
             <Card>
@@ -132,26 +138,6 @@ export default async function RenderDetailPage({
         </aside>
       </div>
     </>
-  );
-}
-
-function ImagePanel({ title, src }: { title: string; src: string | null }) {
-  return (
-    <figure className="border-b border-border bg-muted md:border-b-0 md:border-r md:last:border-r-0">
-      <figcaption className="border-b border-border bg-card px-4 py-2 text-sm font-semibold">
-        {title}
-      </figcaption>
-      <div className="flex aspect-square items-center justify-center">
-        {src ? (
-          <RenderImagePreview src={src} alt={title} className="size-full" />
-        ) : (
-          <div className="flex flex-col items-center gap-2 text-muted-foreground">
-            <ImageIcon className="size-8" />
-            <span className="text-sm">Belum tersedia</span>
-          </div>
-        )}
-      </div>
-    </figure>
   );
 }
 
