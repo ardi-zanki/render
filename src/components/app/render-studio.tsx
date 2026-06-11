@@ -305,7 +305,7 @@ export function RenderStudio({
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[288px_1fr]">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_300px]">
       <RenderStudioControls
         projectId={projectId}
         projects={projects}
@@ -364,22 +364,28 @@ export function RenderStudio({
           error={state.error}
         />
 
-        <RenderActionBar
-          instruction={state.instruction}
-          setInstruction={state.setInstruction}
-          balance={state.balance}
-          resultRenderId={state.resultRenderId}
-          resultUrl={state.resultUrl}
-          sharing={state.sharing}
-          shareUrl={state.shareUrl}
-          onShare={onShare}
-          downloading={state.downloading}
-          onDownload={onDownload}
-          loading={state.loading}
-          canRender={canRender}
-          onRender={onRender}
-        />
+        {/* Manual prompt + actions, sticky at the bottom of the workspace. */}
+        <div className="sticky bottom-4 z-20 rounded-xl border border-border bg-card/95 p-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/80">
+          <RenderActionBar
+            instruction={state.instruction}
+            setInstruction={state.setInstruction}
+            balance={state.balance}
+            resultRenderId={state.resultRenderId}
+            resultUrl={state.resultUrl}
+            sharing={state.sharing}
+            shareUrl={state.shareUrl}
+            onShare={onShare}
+            downloading={state.downloading}
+            onDownload={onDownload}
+            loading={state.loading}
+            canRender={canRender}
+            onRender={onRender}
+          />
+        </div>
+      </div>
 
+      {/* Info Render: version history (Scene History) or project scenes. */}
+      <aside className="flex flex-col gap-4">
         {initialVersions.length > 0 ? (
           <StudioVersionHistory
             versions={initialVersions}
@@ -389,7 +395,7 @@ export function RenderStudio({
         ) : (
           <RenderSceneList scenes={state.scenes} projectName={projectName} />
         )}
-      </div>
+      </aside>
 
       {state.createOpen && (
         <CreateProjectModal

@@ -104,6 +104,9 @@ export function AppShell({
   }
 
   const renderNewActive = isActive("/renders/new");
+  // The Render Studio is a focused full-page workspace: collapse the sidebar
+  // and let the content span full width while it is open.
+  const effectiveExpanded = renderNewActive ? false : sidebarExpanded;
 
   function openCollapsedSidebarFromEmptyArea(
     e: MouseEvent<HTMLElement>,
@@ -124,7 +127,7 @@ export function AppShell({
   }
 
   function renderSidebar(forceExpanded = false) {
-    const expanded = forceExpanded || sidebarExpanded;
+    const expanded = forceExpanded || effectiveExpanded;
 
     return (
       <aside
@@ -277,7 +280,7 @@ export function AppShell({
         className={cn(
           "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:block",
           zLayer.sidebar,
-          sidebarExpanded ? "lg:w-60" : "lg:w-[72px]",
+          effectiveExpanded ? "lg:w-60" : "lg:w-[72px]",
         )}
         suppressHydrationWarning
       >
@@ -300,7 +303,7 @@ export function AppShell({
       <div
         className={cn(
           "transition-[padding] duration-200",
-          sidebarExpanded ? "lg:pl-60" : "lg:pl-[72px]",
+          effectiveExpanded ? "lg:pl-60" : "lg:pl-[72px]",
         )}
         suppressHydrationWarning
       >
@@ -323,7 +326,13 @@ export function AppShell({
           </div>
         </header>
 
-        <main className="mx-auto max-w-6xl px-4 py-5 sm:px-5 sm:py-6">
+        <main
+          className={cn(
+            renderNewActive
+              ? "w-full px-4 py-4 sm:px-5"
+              : "mx-auto max-w-6xl px-4 py-5 sm:px-5 sm:py-6",
+          )}
+        >
           {children}
         </main>
       </div>

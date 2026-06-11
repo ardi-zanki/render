@@ -25,7 +25,7 @@ export function StudioVersionHistory({
         <h2 className="text-sm font-semibold text-foreground">Riwayat versi</h2>
         <Badge variant="secondary">{versions.length}</Badge>
       </div>
-      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-6">
+      <div className="grid grid-cols-3 gap-2.5">
         {versions.map((version) => (
           <button
             key={version.id}
