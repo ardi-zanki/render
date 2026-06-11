@@ -59,15 +59,9 @@ const schema = z.object({
   MIDTRANS_CLIENT_KEY: optional,
   MIDTRANS_IS_PRODUCTION: boolish(false),
 
-  AI_PROVIDER: z
-    .enum(["myarchitectai", "mock", "selfhost-stablediffusion", "fal"])
-    .default("myarchitectai"),
+  AI_PROVIDER: z.enum(["fal", "mock"]).default("fal"),
   RENDER_PROCESSING_MODE: z.enum(["inline", "worker"]).optional(),
   JOB_LOCK_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
-  MYARCHITECTAI_API_KEY: optional,
-  SELFHOST_SD_API_URL: optional,
-  SELFHOST_SD_API_KEY: optional,
-  SELFHOST_SD_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
   FAL_KEY: optional,
   FAL_KEY_ID: optional,
   FAL_KEY_SECRET: optional,

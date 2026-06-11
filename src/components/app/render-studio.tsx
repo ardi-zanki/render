@@ -392,7 +392,7 @@ export function RenderStudio({
         />
 
         {/* Manual prompt + actions, sticky at the bottom of the workspace. */}
-        <div className="sticky bottom-4 z-20 rounded-xl border border-border bg-card/95 p-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/80">
+        <div className="sticky bottom-4 z-20 rounded-lg border border-border bg-card/95 p-3 shadow-soft backdrop-blur supports-[backdrop-filter]:bg-card/80">
           <RenderActionBar
             instruction={state.instruction}
             setInstruction={state.setInstruction}

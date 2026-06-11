@@ -39,7 +39,7 @@ export class AiProviderError extends Error {
   }
 }
 
-/** Pluggable AI render provider (PRD §6.1). MyArchitectAI is the MVP provider. */
+/** Pluggable AI render provider (PRD §6.1). fal is the MVP provider. */
 export interface AiProvider {
   readonly name: string;
   createRender(input: AiRenderInput): Promise<AiRenderResult>;

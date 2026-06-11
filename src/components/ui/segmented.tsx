@@ -44,7 +44,7 @@ export function Segmented<T extends string>({
               "cursor-pointer rounded-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-45",
               size === "sm" ? "px-3 py-1 text-xs" : "px-3.5 py-1.5 text-sm",
               active
-                ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.045)]"
+                ? "bg-card text-primary shadow-soft"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >

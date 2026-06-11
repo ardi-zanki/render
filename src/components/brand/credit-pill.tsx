@@ -23,7 +23,7 @@ function CreditPill({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-card py-1 pl-2.5 pr-1 shadow-[0_1px_1px_rgb(15_23_42/0.025)]",
+        "inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-card py-1 pl-2.5 pr-1 shadow-hairline",
         className,
       )}
     >

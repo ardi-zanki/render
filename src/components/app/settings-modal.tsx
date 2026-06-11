@@ -184,7 +184,7 @@ export function SettingsModal({
                 className={cn(
                   "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   selected
-                    ? "bg-card text-primary shadow-[0_1px_2px_rgb(15_23_42/0.045)]"
+                    ? "bg-card text-primary shadow-soft"
                     : "text-muted-foreground hover:bg-card/70 hover:text-foreground",
                 )}
               >

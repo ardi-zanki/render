@@ -101,8 +101,8 @@ const foundations = [
     title: "Radius",
     icon: Layers3,
     items: [
-      "4-6px untuk tombol, input, dan badge",
-      "8px untuk card, modal, dan popover",
+      "4px (rounded-md) untuk tombol, input, dan badge",
+      "6px (rounded-lg) untuk card, modal, dan popover",
       "10px untuk brand mark",
       "Lingkaran penuh untuk avatar",
     ],
@@ -110,7 +110,7 @@ const foundations = [
   {
     title: "Elevation",
     icon: Sparkles,
-    items: ["Card memakai shadow-soft yang sangat halus", "Menu memakai shadow-elevated", "Modal memakai overlay blur ringan dan shadow-dialog"],
+    items: ["Input dan kontrol memakai shadow-hairline", "Card memakai shadow-soft yang sangat halus", "Menu memakai shadow-elevated", "Modal memakai overlay blur ringan dan shadow-dialog"],
   },
 ];
 
@@ -126,7 +126,7 @@ const implementationContract = [
   "Pakai Button, Input, Select, Textarea, Card, Badge, Alert, Modal, Popover, EmptyState, Segmented, ChoiceCard, dan ToggleRow sebelum membuat styling lokal.",
   "Hard-coded warna hanya untuk logo SVG, brand pihak ketiga, OpenGraph, atau overlay gambar melalui token overlay.",
   "Card dipakai untuk item/alat yang benar-benar berbingkai; layout halaman tetap berupa section atau grid, bukan card di dalam card.",
-  "Radius default 4-8px; rounded-full hanya untuk avatar, badge counter, dan kontrol berbentuk switch.",
+  "Radius default 4-6px; rounded-full hanya untuk avatar, badge counter, dan kontrol berbentuk switch.",
 ];
 
 function Swatch({
@@ -582,7 +582,7 @@ export default function DesignSystemPage() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border border-border bg-card p-4 shadow-[0_20px_60px_rgb(15_23_42/0.08)]">
+                <div className="rounded-lg border border-border bg-card p-4 shadow-elevated">
                   <p className="font-semibold text-foreground">Pola modal</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Dialog memakai radius 8px, padding 20px, overlay 45%, dan

@@ -158,10 +158,7 @@ service only enqueues jobs and `pnpm worker` processes the queue.
 - **Riwayat Render** (`/renders`) and **Project** (`/projects`) show real data;
   the dashboard lists recent renders.
 
-**AI provider** (`src/lib/providers/ai/`): `myarchitectai` implements the real
-API (`POST https://api.myarchitectai.com/v1/render/{interior,exterior}` etc.,
-`x-api-key` header, `{ image: <public url>, prompt, outputFormat }` → `{ output }`;
-outputs are fetched immediately since the CDN expires them in ~5 min). `fal`
+**AI provider** (`src/lib/providers/ai/`): `fal` is the production provider. It
 uses the official `@fal-ai/client`: it uploads local/R2 image bytes to fal
 storage, calls queue-based model inference, fetches result URLs immediately, and
 normalizes the result to the requested output format. Defaults are
@@ -172,15 +169,10 @@ The FLUX.2 edit path sends positive, instruction-style prompts (no negative
 prompt), passes inputs via `image_urls`, and pins an explicit `image_size`
 (~2K longest edge, controlled by `FAL_RENDER_MAX_EDGE`); `FAL_RENDER_SAFETY_TOLERANCE`
 (1 strict – 5 permissive) and an optional `FAL_RENDER_SEED` tune it further.
-The `selfhost-stablediffusion` provider posts multipart form data to
-`SELFHOST_SD_API_URL` for a ComfyUI/FastAPI wrapper and accepts raw image, URL,
-data URL, or base64 outputs. A `mock` provider (sharp-based) and a `local`
-storage provider make the full flow testable locally without any cloud
-credentials. For local smoke tests and CI, use `AI_PROVIDER=mock` and
-`STORAGE_PROVIDER=local`. For production set one of `AI_PROVIDER=fal` +
-`FAL_KEY`, `AI_PROVIDER=myarchitectai` + `MYARCHITECTAI_API_KEY`, or
-`AI_PROVIDER=selfhost-stablediffusion` + `SELFHOST_SD_API_URL`, plus
-`STORAGE_PROVIDER=r2` + R2 creds.
+A `mock` provider (sharp-based) and a `local` storage provider make the full
+flow testable locally without any cloud credentials. For local smoke tests and
+CI, use `AI_PROVIDER=mock` and `STORAGE_PROVIDER=local`. For production set
+`AI_PROVIDER=fal` + `FAL_KEY`, plus `STORAGE_PROVIDER=r2` + R2 creds.
 
 ```bash
 pnpm smoke:render   # render pipeline test (credit, storage, provider, assets)
@@ -303,8 +295,6 @@ pnpm make:admin [email] [password]   # promote/create an admin (default admin@re
 The MVP feature set is complete. Before production, supply real credentials and
 flip providers: Google OAuth (`GOOGLE_CLIENT_*`), email (`RESEND_API_KEY`),
 `STORAGE_PROVIDER=r2` (+ R2 creds), `AI_PROVIDER=fal` (+ `FAL_KEY`),
-`AI_PROVIDER=myarchitectai` (+ `MYARCHITECTAI_API_KEY`), or
-`AI_PROVIDER=selfhost-stablediffusion` (+ `SELFHOST_SD_API_URL`),
 `PAYMENT_PROVIDER=midtrans` (+ Midtrans keys and notification URL). Render
 execution uses the DB-backed `render_jobs` queue and `pnpm worker` in
 production with `RENDER_PROCESSING_MODE=worker` (`pnpm render:worker` is the

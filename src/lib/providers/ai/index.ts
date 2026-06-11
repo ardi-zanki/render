@@ -1,8 +1,6 @@
 import { env } from "@/env";
 import { createFalAiProvider } from "./fal";
 import { createMockAiProvider } from "./mock";
-import { createMyArchitectAiProvider } from "./myarchitectai";
-import { createSelfHostedStableDiffusionProvider } from "./selfhost-stablediffusion";
 import type { AiProvider } from "./types";
 
 let cached: AiProvider | null = null;
@@ -11,14 +9,8 @@ let cached: AiProvider | null = null;
 export function aiProvider(): AiProvider {
   if (cached) return cached;
   switch (env.AI_PROVIDER) {
-    case "myarchitectai":
-      cached = createMyArchitectAiProvider();
-      break;
     case "mock":
       cached = createMockAiProvider();
-      break;
-    case "selfhost-stablediffusion":
-      cached = createSelfHostedStableDiffusionProvider();
       break;
     case "fal":
       cached = createFalAiProvider();
