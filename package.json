@@ -26,8 +26,8 @@
     "make:admin": "tsx --env-file=.env.local scripts/make-admin.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1065.0",
-    "@aws-sdk/s3-request-presigner": "^3.1065.0",
+    "@aws-sdk/client-s3": "^3.1066.0",
+    "@aws-sdk/s3-request-presigner": "^3.1066.0",
     "@fal-ai/client": "^1.10.1",
     "better-auth": "^1.6.16",
     "class-variance-authority": "^0.7.1",
@@ -40,7 +40,7 @@
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "resend": "^6.12.4",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "4.3.0",
-    "@types/node": "^25.9.2",
+    "@types/node": "^25.9.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "dotenv": "^17.4.2",
