@@ -44,7 +44,7 @@ export function StudioTitleBar({
 
   return (
     <div className="flex items-center gap-2">
-      <h1 className="text-lg font-semibold tracking-normal text-foreground">
+      <h1 className="shrink-0 text-sm font-semibold tracking-normal text-foreground">
         Render Studio
       </h1>
       <span className="text-border" aria-hidden="true">
@@ -64,11 +64,11 @@ export function StudioTitleBar({
               setEditing(false);
             }
           }}
-          className="min-w-32 rounded-md border border-primary/45 bg-card px-2 py-0.5 text-base font-semibold text-foreground outline-none ring-2 ring-ring/20"
+          className="min-w-32 rounded-md border border-primary/45 bg-card px-2 py-0.5 text-sm font-semibold text-foreground outline-none ring-2 ring-ring/20"
         />
       ) : (
         <>
-          <span className="truncate text-base font-semibold text-foreground">
+          <span className="truncate text-sm font-semibold text-foreground">
             {name}
           </span>
           <button

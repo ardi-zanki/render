@@ -1,24 +1,42 @@
 "use client";
 
-import { Box, Clock, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Box, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Popover } from "@/components/ui/popover";
-import { useRenderQueue } from "@/hooks/use-render-queue";
-import { MODE_LABEL, STATUS_LABEL } from "@/lib/renders/labels";
+import { useRenderQueue, type RenderQueueItem } from "@/hooks/use-render-queue";
+import { timeAgo } from "@/lib/notifications/ui";
+import {
+  MODE_LABEL,
+  STATUS_LABEL,
+  statusBadgeVariant,
+} from "@/lib/renders/labels";
 import { cn } from "@/lib/utils";
 
 export function RenderQueueButton() {
+  const router = useRouter();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
-  const { count, items, loading, error, refresh } = useRenderQueue();
+  const { count, items, loading, error, refresh, markSeen } = useRenderQueue();
 
   useEffect(() => {
     if (!open) return;
     void refresh();
   }, [open, refresh]);
+
+  function onItem(item: RenderQueueItem) {
+    setOpen(false);
+    if (item.status === "success") {
+      // Opening a finished render dismisses it from the queue, then lands in
+      // the studio to view the result.
+      markSeen(item.renderId);
+      router.push(`/renders/new?source=${item.renderId}`);
+    } else {
+      router.push(`/renders/${item.renderId}`);
+    }
+  }
 
   return (
     <>
@@ -46,9 +64,9 @@ export function RenderQueueButton() {
         open={open}
         onClose={() => setOpen(false)}
         width={340}
-        className="max-h-[min(520px,calc(100vh-2rem))] overflow-y-auto rounded-lg border border-border/80 bg-popover p-3 shadow-elevated"
+        className="overflow-hidden rounded-lg border border-border/80 bg-popover shadow-elevated"
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
           <div className="flex items-center gap-2">
             <Box className="size-4 text-muted-foreground" />
             <p className="font-semibold text-foreground">Antrian Render</p>
@@ -58,7 +76,7 @@ export function RenderQueueButton() {
           </Badge>
         </div>
 
-        <div className="mt-3">
+        <div className="max-h-96 overflow-y-auto p-3">
           {error ? (
             <div className="rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}
@@ -77,34 +95,45 @@ export function RenderQueueButton() {
             </div>
           ) : (
             <div className="space-y-2">
-              {items.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/renders/${item.renderId}`}
-                  onClick={() => setOpen(false)}
-                  className="block rounded-md border border-border bg-card p-3 transition-colors hover:bg-muted/60"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-foreground">
-                        {MODE_LABEL[item.mode]}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                        {item.projectName}
-                      </p>
+              {items.map((item) => {
+                const done = item.status === "success";
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onItem(item)}
+                    className="block w-full rounded-md border border-border bg-card p-3 text-left transition-colors hover:bg-muted/60"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {MODE_LABEL[item.mode]}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                          {item.projectName}
+                        </p>
+                      </div>
+                      <Badge variant={statusBadgeVariant(item.status)}>
+                        {STATUS_LABEL[item.status]}
+                      </Badge>
                     </div>
-                    <Badge
-                      variant={item.status === "processing" ? "warning" : "secondary"}
-                    >
-                      {STATUS_LABEL[item.status]}
-                    </Badge>
-                  </div>
-                  <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Clock className="size-3.5" />
-                    Percobaan {item.attempts}
-                  </div>
-                </Link>
-              ))}
+                    <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                      {done ? (
+                        <>
+                          <CheckCircle2 className="size-3.5" />
+                          Selesai
+                          {item.completedAt && ` · ${timeAgo(item.completedAt)}`}
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="size-3.5" />
+                          Percobaan {item.attempts}
+                        </>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>

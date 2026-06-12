@@ -1,7 +1,7 @@
-import { and, count, desc, eq, isNotNull, isNull } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { projects, renders } from "@/db/schema";
+import { projects, renderAssets, renders } from "@/db/schema";
 
 export async function getDefaultProject(userId: string) {
   const existing = await db.query.projects.findFirst({
@@ -135,6 +135,48 @@ export async function deleteProject(
     .set({ deletedAt: new Date(), updatedAt: new Date() })
     .where(and(eq(projects.id, projectId), eq(projects.userId, userId)));
   return { deleted: true };
+}
+
+/**
+ * Cover image per project: the result of each project's most recent render.
+ * Derived at read-time (not a stored field) so the cover always tracks the
+ * latest render — a project with no renders has no cover (falls back to the
+ * default placeholder), and moving every render out reverts it automatically.
+ */
+export async function coverImagesByProject(
+  userId: string,
+  projectIds: string[],
+) {
+  if (projectIds.length === 0) return new Map<string, string>();
+
+  const rows = await db
+    .select({
+      projectId: renders.projectId,
+      fileUrl: renderAssets.fileUrl,
+    })
+    .from(renders)
+    .innerJoin(
+      renderAssets,
+      and(
+        eq(renderAssets.renderId, renders.id),
+        eq(renderAssets.type, "result"),
+        isNull(renderAssets.deletedAt),
+      ),
+    )
+    .where(
+      and(
+        eq(renders.userId, userId),
+        inArray(renders.projectId, projectIds),
+        isNull(renders.deletedAt),
+      ),
+    )
+    .orderBy(desc(renders.createdAt));
+
+  const cover = new Map<string, string>();
+  for (const row of rows) {
+    if (!cover.has(row.projectId)) cover.set(row.projectId, row.fileUrl);
+  }
+  return cover;
 }
 
 /** Render counts per project for the given user (active renders). */

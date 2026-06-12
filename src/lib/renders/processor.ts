@@ -1,7 +1,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { projects, renderAssets, renderJobs, renders } from "@/db/schema";
+import { renderAssets, renderJobs, renders } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
 import { notifyUser } from "@/lib/notifications/service";
 import { aiProvider } from "@/lib/providers/ai";
@@ -124,10 +124,9 @@ async function processLockedJob(jobId: string) {
         );
     }
 
-    let firstResultUrl = "";
     for (let i = 0; i < result.outputs.length; i++) {
       const out = result.outputs[i];
-      const asset = await storeResultAsset({
+      await storeResultAsset({
         renderId: render.id,
         userId: render.userId,
         projectId: render.projectId,
@@ -138,7 +137,6 @@ async function processLockedJob(jobId: string) {
         config: render.config,
         prompt: render.prompt,
       });
-      if (i === 0) firstResultUrl = asset.fileUrl;
     }
     const versionCount = priorVersions + result.outputs.length;
 
@@ -176,13 +174,6 @@ async function processLockedJob(jobId: string) {
     // into the catch below (which would reschedule an already-succeeded job and
     // duplicate the stored version).
     try {
-      await db
-        .update(projects)
-        .set({ coverImageUrl: firstResultUrl, updatedAt: now })
-        .where(
-          and(eq(projects.id, render.projectId), isNull(projects.coverImageUrl)),
-        );
-
       // In-app only (PRD email scope: render events do not email).
       await notifyUser({
         userId: render.userId,

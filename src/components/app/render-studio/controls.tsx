@@ -72,7 +72,9 @@ export function RenderStudioControls({
     mode === "interior" ? "View Jendela" : "Lingkungan Sekitar";
 
   return (
-    <Card className="h-fit">
+    // In the fixed-height studio, fill the column so its bottom lines up with
+    // the prompt/info columns (grows taller and scrolls when content overflows).
+    <Card className="h-fit lg:min-h-full">
       <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="project">Project</Label>

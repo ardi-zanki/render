@@ -26,7 +26,11 @@ import {
   type BadgeVariant,
 } from "@/lib/renders/labels";
 import { listPayments } from "@/lib/payments/service";
-import { countProjects, listRecentProjects } from "@/lib/projects/service";
+import {
+  countProjects,
+  coverImagesByProject,
+  listRecentProjects,
+} from "@/lib/projects/service";
 import { countUserRenders, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
@@ -67,6 +71,12 @@ export default async function DashboardPage() {
     getUnreadCount(uid),
     listPayments(uid, { limit: 1 }),
   ]);
+
+  // Project covers track each project's latest render (derived, never stored).
+  const projectCovers = await coverImagesByProject(
+    uid,
+    recentProjects.map((p) => p.id),
+  );
 
   const latestPayment = latestPaymentRows[0] ?? null;
   const firstName = session.user.name.split(" ")[0];
@@ -290,14 +300,16 @@ export default async function DashboardPage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {recentProjects.map((p) => (
+          {recentProjects.map((p) => {
+            const coverImageUrl = projectCovers.get(p.id) ?? null;
+            return (
             <Link key={p.id} href={`/projects/${p.id}`}>
               <Card className="transition-colors hover:border-primary/35">
                 <CardContent className="flex flex-col gap-3 py-4">
                   <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-lg bg-muted text-muted-foreground">
-                    {p.coverImageUrl ? (
+                    {coverImageUrl ? (
                       <RenderImage
-                        src={p.coverImageUrl}
+                        src={coverImageUrl}
                         alt={p.name}
                         className="absolute inset-0 size-full"
                       />
@@ -316,7 +328,8 @@ export default async function DashboardPage() {
                 </CardContent>
               </Card>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
     </>

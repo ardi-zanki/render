@@ -43,52 +43,55 @@ export function RenderActionBar({
         placeholder="Tambahkan instruksi (opsional)…"
         className="min-h-14 resize-none border-border/70 text-sm"
       />
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Sparkles className="size-3.5 text-primary" />
-          <span className="font-semibold text-foreground">1 kredit</span>
-          <span>· sisa {balance}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          {resultUrl && resultRenderId && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onShare}
-              disabled={sharing}
-            >
-              {sharing ? (
-                <Loader2 className="animate-spin" />
-              ) : shareUrl ? (
-                <Check />
-              ) : (
-                <Share2 />
-              )}
-              {shareUrl ? "Tersalin" : "Bagikan"}
-            </Button>
-          )}
-          {resultUrl && (
-            <Button
-              variant="inverse"
-              size="sm"
-              onClick={onDownload}
-              disabled={downloading}
-            >
-              {downloading ? <Loader2 className="animate-spin" /> : <Download />}
-              Unduh
-            </Button>
-          )}
-          {balance <= 0 ? (
-            <Button size="sm" asChild>
-              <Link href="/payments">Top up kredit</Link>
-            </Button>
-          ) : (
-            <Button size="sm" onClick={onRender} disabled={!canRender}>
-              {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
-              Render
-            </Button>
-          )}
-        </div>
+      <div className="flex flex-wrap items-center justify-end gap-1.5">
+        {/* Secondary actions are icon-only to stay compact in the column. */}
+        {resultUrl && resultRenderId && (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            onClick={onShare}
+            disabled={sharing}
+            aria-label={shareUrl ? "Link tersalin" : "Bagikan"}
+            title={shareUrl ? "Link tersalin" : "Bagikan"}
+            className="size-7"
+          >
+            {sharing ? (
+              <Loader2 className="animate-spin" />
+            ) : shareUrl ? (
+              <Check />
+            ) : (
+              <Share2 />
+            )}
+          </Button>
+        )}
+        {resultUrl && (
+          <Button
+            variant="inverse"
+            size="icon-sm"
+            onClick={onDownload}
+            disabled={downloading}
+            aria-label="Unduh"
+            title="Unduh"
+            className="size-7"
+          >
+            {downloading ? <Loader2 className="animate-spin" /> : <Download />}
+          </Button>
+        )}
+        {balance <= 0 ? (
+          <Button size="sm" asChild className="h-7 px-2.5">
+            <Link href="/payments">Top up kredit</Link>
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            onClick={onRender}
+            disabled={!canRender}
+            className="h-7 px-2.5"
+          >
+            {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
+            Render
+          </Button>
+        )}
       </div>
 
       {shareUrl && (

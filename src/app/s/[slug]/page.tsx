@@ -66,13 +66,7 @@ export default async function PublicRenderPage({ params }: Params) {
           />
         </div>
 
-        {render.prompt && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">Prompt:</span>{" "}
-            {render.prompt}
-          </p>
-        )}
-        <p className="mt-1 text-xs text-muted-foreground">
+        <p className="mt-4 text-xs text-muted-foreground">
           {dateFmt.format(render.createdAt)}
         </p>
 

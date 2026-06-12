@@ -33,6 +33,7 @@ export async function GET(req: Request) {
       ...row,
       createdAt: row.createdAt.toISOString(),
       startedAt: row.startedAt?.toISOString() ?? null,
+      completedAt: row.completedAt?.toISOString() ?? null,
     })),
   });
 }

@@ -6,6 +6,7 @@ import {
   type ProjectRow,
 } from "@/components/app/projects-client";
 import {
+  coverImagesByProject,
   listProjects,
   renderCountsByProject,
 } from "@/lib/projects/service";
@@ -22,16 +23,20 @@ export default async function ProjectsPage({
   const { status } = await searchParams;
   const archived = status === "archived";
 
-  const [projects, counts] = await Promise.all([
-    listProjects(user.id, { archived }),
+  const projects = await listProjects(user.id, { archived });
+  const [counts, covers] = await Promise.all([
     renderCountsByProject(user.id),
+    coverImagesByProject(
+      user.id,
+      projects.map((p) => p.id),
+    ),
   ]);
 
   const rows: ProjectRow[] = projects.map((p) => ({
     id: p.id,
     name: p.name,
     description: p.description,
-    coverImageUrl: p.coverImageUrl,
+    coverImageUrl: covers.get(p.id) ?? null,
     isDefault: p.isDefault,
     updatedAt: p.updatedAt.toISOString(),
     renderCount: counts.get(p.id) ?? 0,

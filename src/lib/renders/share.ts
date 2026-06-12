@@ -39,7 +39,6 @@ export async function enableShare(
 
 export interface PublicRender {
   mode: RenderMode;
-  prompt: string | null;
   resultUrl: string;
   createdAt: Date;
 }
@@ -62,9 +61,10 @@ export async function getPublicRender(
   });
   if (!asset) return null;
 
+  // The composed prompt is internal/secret — never expose it to the public
+  // Share page (principle of least privilege: return only what the UI needs).
   return {
     mode: r.mode,
-    prompt: r.prompt,
     resultUrl: asset.fileUrl,
     createdAt: r.createdAt,
   };

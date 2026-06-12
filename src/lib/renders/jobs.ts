@@ -4,10 +4,12 @@ import {
   count,
   desc,
   eq,
+  gte,
   inArray,
   isNull,
   lt,
   lte,
+  or,
 } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -17,11 +19,30 @@ import { applyCreditChange } from "@/lib/credits";
 import { notifyUser } from "@/lib/notifications/service";
 import { RENDER_COST } from "./types";
 
+/** Window for keeping finished jobs in the queue panel (as "Selesai"). */
+const RECENT_COMPLETED_MS = 24 * 60 * 60 * 1000;
+
 export async function listActiveRenderQueue(userId: string, limit = 20) {
-  const activeQueueWhere = and(
+  const completedCutoff = new Date(Date.now() - RECENT_COMPLETED_MS);
+
+  const activeWhere = and(
     eq(renderJobs.userId, userId),
     inArray(renderJobs.status, ["queued", "processing"]),
     isNull(renders.deletedAt),
+  );
+
+  // Active jobs, plus recently-finished ones so they linger as "Selesai" in the
+  // panel until the user opens them (the client dismisses seen completions).
+  const queueWhere = and(
+    eq(renderJobs.userId, userId),
+    isNull(renders.deletedAt),
+    or(
+      inArray(renderJobs.status, ["queued", "processing"]),
+      and(
+        eq(renderJobs.status, "success"),
+        gte(renderJobs.completedAt, completedCutoff),
+      ),
+    ),
   );
 
   const [totalRow, rows] = await Promise.all([
@@ -29,7 +50,7 @@ export async function listActiveRenderQueue(userId: string, limit = 20) {
       .select({ value: count() })
       .from(renderJobs)
       .innerJoin(renders, eq(renderJobs.renderId, renders.id))
-      .where(activeQueueWhere),
+      .where(activeWhere),
     db
       .select({
         id: renderJobs.id,
@@ -41,17 +62,19 @@ export async function listActiveRenderQueue(userId: string, limit = 20) {
         projectName: projects.name,
         createdAt: renderJobs.createdAt,
         startedAt: renderJobs.startedAt,
+        completedAt: renderJobs.completedAt,
       })
       .from(renderJobs)
       .innerJoin(renders, eq(renderJobs.renderId, renders.id))
       .innerJoin(projects, eq(renders.projectId, projects.id))
-      .where(activeQueueWhere)
+      .where(queueWhere)
       .orderBy(desc(renderJobs.createdAt))
       .limit(limit),
   ]);
 
   return {
-    count: totalRow[0]?.value ?? rows.length,
+    // Count reflects in-progress work; the client adds unseen completions.
+    count: totalRow[0]?.value ?? 0,
     items: rows,
   };
 }

@@ -318,6 +318,9 @@ export function AppShell({
           <div className="lg:hidden">
             <Logo size={26} withWordmark={false} />
           </div>
+          {/* Page-level header slot: the Render Studio title is portaled here
+              so it sits top-left, aligned with the actions on the right. */}
+          <div id="app-header-slot" className="flex min-w-0 items-center" />
           <div className="ml-auto flex items-center gap-2">
             <CreditPill balance={balance} />
             <RenderQueueButton />

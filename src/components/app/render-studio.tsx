@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -30,6 +31,17 @@ import {
 } from "./render-studio/types";
 import { useRenderStudioState } from "./render-studio/use-render-studio-state";
 
+// True only after client hydration — lets us portal into a DOM node that the
+// server didn't render into, without a hydration mismatch.
+const subscribeNoop = () => () => {};
+function useHydrated() {
+  return useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
+}
+
 export function RenderStudio({
   projectId,
   projectName,
@@ -49,6 +61,7 @@ export function RenderStudio({
   initialRenderName = "Tanpa Judul",
 }: RenderStudioProps) {
   const router = useRouter();
+  const hydrated = useHydrated();
   const fileRef = useRef<HTMLInputElement>(null);
   const referenceRef = useRef<HTMLInputElement>(null);
   const [renderName, setRenderName] = useState(initialRenderName);
@@ -328,71 +341,103 @@ export function RenderStudio({
     { value: "hasil", label: "Hasil", disabled: !state.resultUrl },
   ];
 
+  // Portal the title into the global header slot (rendered by the app shell).
+  // Only after hydration, so the server/client trees match (the slot is empty
+  // on the server and filled on the client).
+  const headerSlot = hydrated
+    ? document.getElementById("app-header-slot")
+    : null;
+
   return (
-    <div className="flex flex-col gap-4">
-      <StudioTitleBar name={renderName} onSave={saveRenderName} />
+    // Fixed-height studio: the three columns stay put and each scrolls on its
+    // own (Config / Studio / Info) instead of the whole page scrolling.
+    <div className="lg:h-[calc(100vh-5.5rem)]">
+      {/* Title lives in the global header's top-left slot. */}
+      {headerSlot &&
+        createPortal(
+          <StudioTitleBar name={renderName} onSave={saveRenderName} />,
+          headerSlot,
+        )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_300px]">
-      <RenderStudioControls
-        projectId={projectId}
-        projects={projects}
-        mode={state.mode}
-        setMode={state.setMode}
-        style={state.style}
-        setStyle={state.setStyle}
-        outputFormat={state.outputFormat}
-        setOutputFormat={state.setOutputFormat}
-        location={state.location}
-        setLocation={state.setLocation}
-        surrounding={state.surrounding}
-        setSurrounding={state.setSurrounding}
-        lightsOn={state.lightsOn}
-        setLightsOn={state.setLightsOn}
-        time={state.time}
-        setTime={state.setTime}
-        weather={state.weather}
-        setWeather={state.setWeather}
-        onSwitchProject={switchProject}
-        onCreateProject={() => {
-          state.setCreateOpen(true);
-          state.setNewProjectErrors({});
-        }}
-      />
-
-      <div className="flex flex-col gap-4">
-        <RenderPreviewViewer
-          fileRef={fileRef}
-          referenceRef={referenceRef}
-          hasUploadedImage={hasUploadedImage}
-          viewerTabs={viewerTabs}
-          view={state.view}
-          setView={state.setView}
-          shownImage={shownImage}
-          previewUrl={state.previewUrl}
-          resultUrl={state.resultUrl}
-          canCompare={canCompare}
-          comparisonPosition={state.comparisonPosition}
-          setComparisonPosition={state.setComparisonPosition}
-          zoom={state.zoom}
-          zoomOut={state.zoomOut}
-          zoomIn={state.zoomIn}
-          resetZoom={state.resetZoom}
-          isProcessing={isProcessing}
-          renderStatus={state.renderStatus}
-          file={state.file}
-          pickFile={state.pickFile}
+      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_340px]">
+      {/* Column 1 — Configuration */}
+      <div className="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
+        <RenderStudioControls
+          projectId={projectId}
+          projects={projects}
           mode={state.mode}
-          referencePreviewUrl={state.referencePreviewUrl}
-          pickReference={state.pickReference}
-          styleTransferStrength={state.styleTransferStrength}
-          setStyleTransferStrength={state.setStyleTransferStrength}
-          negativePrompt={state.negativePrompt}
-          setNegativePrompt={state.setNegativePrompt}
-          error={state.error}
+          setMode={state.setMode}
+          style={state.style}
+          setStyle={state.setStyle}
+          outputFormat={state.outputFormat}
+          setOutputFormat={state.setOutputFormat}
+          location={state.location}
+          setLocation={state.setLocation}
+          surrounding={state.surrounding}
+          setSurrounding={state.setSurrounding}
+          lightsOn={state.lightsOn}
+          setLightsOn={state.setLightsOn}
+          time={state.time}
+          setTime={state.setTime}
+          weather={state.weather}
+          setWeather={state.setWeather}
+          onSwitchProject={switchProject}
+          onCreateProject={() => {
+            state.setCreateOpen(true);
+            state.setNewProjectErrors({});
+          }}
         />
+      </div>
 
-        {/* Manual prompt + actions, sticky at the bottom of the workspace. */}
-        <div className="sticky bottom-4 z-20 rounded-lg border border-border bg-card/95 p-3 shadow-soft backdrop-blur supports-[backdrop-filter]:bg-card/80">
+      {/* Column 2 — Studio canvas (title is in the header). */}
+      <div className="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
+          <RenderPreviewViewer
+            fileRef={fileRef}
+            referenceRef={referenceRef}
+            hasUploadedImage={hasUploadedImage}
+            viewerTabs={viewerTabs}
+            view={state.view}
+            setView={state.setView}
+            shownImage={shownImage}
+            previewUrl={state.previewUrl}
+            resultUrl={state.resultUrl}
+            canCompare={canCompare}
+            comparisonPosition={state.comparisonPosition}
+            setComparisonPosition={state.setComparisonPosition}
+            zoom={state.zoom}
+            zoomOut={state.zoomOut}
+            zoomIn={state.zoomIn}
+            resetZoom={state.resetZoom}
+            isProcessing={isProcessing}
+            renderStatus={state.renderStatus}
+            file={state.file}
+            pickFile={state.pickFile}
+            mode={state.mode}
+            referencePreviewUrl={state.referencePreviewUrl}
+            pickReference={state.pickReference}
+            styleTransferStrength={state.styleTransferStrength}
+            setStyleTransferStrength={state.setStyleTransferStrength}
+            negativePrompt={state.negativePrompt}
+            setNegativePrompt={state.setNegativePrompt}
+            error={state.error}
+          />
+      </div>
+
+      {/* Column 3 — Info, scrollable Scene History, then the manual prompt. */}
+      <aside className="flex flex-col gap-4 lg:min-h-0">
+        {renderInfo && <StudioRenderInfo info={renderInfo} />}
+        {initialVersions.length > 0 ? (
+          <StudioVersionHistory
+            versions={initialVersions}
+            activeId={selectedBaseAssetId}
+            onSelect={loadVersion}
+          />
+        ) : (
+          <RenderSceneList scenes={state.scenes} projectName={projectName} />
+        )}
+
+        {/* Manual prompt + actions, pinned below the Scene History. */}
+        <div className="shrink-0 rounded-lg border border-border bg-card p-3 shadow-soft">
           <RenderActionBar
             instruction={state.instruction}
             setInstruction={state.setInstruction}
@@ -409,20 +454,6 @@ export function RenderStudio({
             onRender={onRender}
           />
         </div>
-      </div>
-
-      {/* Info Render + Scene History (or project scenes for a new render). */}
-      <aside className="flex flex-col gap-4">
-        {renderInfo && <StudioRenderInfo info={renderInfo} />}
-        {initialVersions.length > 0 ? (
-          <StudioVersionHistory
-            versions={initialVersions}
-            activeId={selectedBaseAssetId}
-            onSelect={loadVersion}
-          />
-        ) : (
-          <RenderSceneList scenes={state.scenes} projectName={projectName} />
-        )}
       </aside>
       </div>
 

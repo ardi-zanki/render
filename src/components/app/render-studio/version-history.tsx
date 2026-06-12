@@ -20,12 +20,12 @@ export function StudioVersionHistory({
   onSelect: (version: StudioVersion) => void;
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-foreground">Riwayat versi</h2>
         <Badge variant="secondary">{versions.length}</Badge>
       </div>
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-3 gap-2.5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1 lg:content-start">
         {versions.map((version) => (
           <button
             key={version.id}

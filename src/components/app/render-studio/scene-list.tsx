@@ -12,7 +12,7 @@ export function RenderSceneList({
   projectName: string;
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1">
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold text-foreground">
           Scene · {projectName}
@@ -24,7 +24,7 @@ export function RenderSceneList({
           Belum ada render di project ini.
         </p>
       ) : (
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-3 gap-2.5 lg:min-h-0 lg:flex-1 lg:content-start lg:overflow-y-auto lg:pr-1">
           {scenes.map((s) => (
             <div
               key={s.id}
