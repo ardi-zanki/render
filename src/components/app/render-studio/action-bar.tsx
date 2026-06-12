@@ -4,6 +4,7 @@ import { Check, Download, Loader2, Share2, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export function RenderActionBar({
@@ -37,12 +38,19 @@ export function RenderActionBar({
 }) {
   return (
     <div className="flex flex-col gap-2.5">
-      <Textarea
-        value={instruction}
-        onChange={(e) => setInstruction(e.target.value)}
-        placeholder="Tambahkan instruksi (opsional)…"
-        className="min-h-14 resize-none border-border/70 text-sm"
-      />
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="studio-instruction" className="text-xs">
+          Instruksi tambahan{" "}
+          <span className="font-normal text-muted-foreground">(opsional)</span>
+        </Label>
+        <Textarea
+          id="studio-instruction"
+          value={instruction}
+          onChange={(e) => setInstruction(e.target.value)}
+          placeholder="Melengkapi konfigurasi — mis. ganti warna sofa…"
+          className="min-h-14 resize-none border-border/70 text-sm"
+        />
+      </div>
       <div className="flex flex-wrap items-center justify-end gap-1.5">
         {/* Sized to match the canvas tab/zoom controls (compact, text-xs). */}
         {resultUrl && resultRenderId && (
