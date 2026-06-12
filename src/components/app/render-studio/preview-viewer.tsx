@@ -24,6 +24,7 @@ import type { StudioView, ViewerTab } from "./types";
 export function RenderPreviewViewer({
   fileRef,
   referenceRef,
+  allowRemoveImage = true,
   hasUploadedImage,
   viewerTabs,
   view,
@@ -53,6 +54,8 @@ export function RenderPreviewViewer({
 }: {
   fileRef: RefObject<HTMLInputElement | null>;
   referenceRef: RefObject<HTMLInputElement | null>;
+  /** When false, the canvas hides the remove-image (X) control. */
+  allowRemoveImage?: boolean;
   hasUploadedImage: boolean;
   viewerTabs: ViewerTab[];
   view: StudioView;
@@ -81,8 +84,9 @@ export function RenderPreviewViewer({
   error: string;
 }) {
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="flex flex-col gap-4 py-4">
+    <Card className="overflow-hidden lg:h-full">
+      <CardContent className="flex flex-col gap-4 py-4 lg:h-full lg:min-h-0">
+        {/* Sticky toolbar: view tabs + zoom controls. */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           {hasUploadedImage ? (
             <Segmented
@@ -133,7 +137,7 @@ export function RenderPreviewViewer({
           )}
         </div>
 
-        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/35">
+        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/35 lg:aspect-auto lg:min-h-0 lg:flex-1">
           {canCompare && view === "komparasi" ? (
             <div className="relative size-full overflow-hidden bg-background">
               {/* Base = original, shown on the right. */}
@@ -194,11 +198,11 @@ export function RenderPreviewViewer({
               </span>
             </div>
           ) : shownImage ? (
-            <div className="size-full overflow-hidden">
+            <div className="flex size-full items-center justify-center overflow-hidden">
               <RenderImage
                 src={shownImage}
                 alt={view === "hasil" ? "Hasil render" : "Gambar asli"}
-                className="size-full transition-transform"
+                className="size-full object-contain transition-transform"
                 style={{ transform: `scale(${zoom})` }}
               />
             </div>
@@ -229,7 +233,7 @@ export function RenderPreviewViewer({
             </div>
           )}
 
-          {file && !isProcessing && (
+          {allowRemoveImage && file && !isProcessing && (
             <button
               type="button"
               onClick={() => pickFile(null)}

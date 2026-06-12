@@ -44,7 +44,7 @@ export function RenderActionBar({
         className="min-h-14 resize-none border-border/70 text-sm"
       />
       <div className="flex flex-wrap items-center justify-end gap-1.5">
-        {/* Secondary actions are icon-only to stay compact in the column. */}
+        {/* Sized to match the canvas tab/zoom controls (compact, text-xs). */}
         {resultUrl && resultRenderId && (
           <Button
             variant="outline"
@@ -53,7 +53,7 @@ export function RenderActionBar({
             disabled={sharing}
             aria-label={shareUrl ? "Link tersalin" : "Bagikan"}
             title={shareUrl ? "Link tersalin" : "Bagikan"}
-            className="size-7"
+            className="size-6 [&_svg]:size-3.5"
           >
             {sharing ? (
               <Loader2 className="animate-spin" />
@@ -72,13 +72,13 @@ export function RenderActionBar({
             disabled={downloading}
             aria-label="Unduh"
             title="Unduh"
-            className="size-7"
+            className="size-6 [&_svg]:size-3.5"
           >
             {downloading ? <Loader2 className="animate-spin" /> : <Download />}
           </Button>
         )}
         {balance <= 0 ? (
-          <Button size="sm" asChild className="h-7 px-2.5">
+          <Button size="sm" asChild className="h-6 gap-1 px-2.5 text-xs">
             <Link href="/payments">Top up kredit</Link>
           </Button>
         ) : (
@@ -86,7 +86,7 @@ export function RenderActionBar({
             size="sm"
             onClick={onRender}
             disabled={!canRender}
-            className="h-7 px-2.5"
+            className="h-6 gap-1 px-2.5 text-xs [&_svg]:size-3.5"
           >
             {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
             Render

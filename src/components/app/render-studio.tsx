@@ -359,7 +359,7 @@ export function RenderStudio({
           headerSlot,
         )}
 
-      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_340px]">
+      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_280px]">
       {/* Column 1 — Configuration */}
       <div className="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
         <RenderStudioControls
@@ -390,10 +390,11 @@ export function RenderStudio({
       </div>
 
       {/* Column 2 — Studio canvas (title is in the header). */}
-      <div className="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
+      <div className="flex flex-col lg:min-h-0">
           <RenderPreviewViewer
             fileRef={fileRef}
             referenceRef={referenceRef}
+            allowRemoveImage={!sourceRenderId}
             hasUploadedImage={hasUploadedImage}
             viewerTabs={viewerTabs}
             view={state.view}
