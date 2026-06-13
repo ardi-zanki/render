@@ -21,6 +21,8 @@ type Props = {
   tool: TextureTool;
   brushSize: number;
   tolerance: number;
+  /** Display zoom; pointer math stays correct via getBoundingClientRect. */
+  zoom?: number;
   onChange: (state: MaskState) => void;
   /** Surface a non-fatal issue (e.g. magic wand on a cross-origin image). */
   onError?: (message: string) => void;
@@ -35,7 +37,7 @@ type Props = {
  * add/erase paints circles. Undo/redo snapshots the mask (≥20 steps).
  */
 export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanvas(
-  { imageUrl, tool, brushSize, tolerance, onChange, onError, className },
+  { imageUrl, tool, brushSize, tolerance, zoom = 1, onChange, onError, className },
   ref,
 ) {
   const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -345,7 +347,10 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
         : "crosshair";
 
   return (
-    <div className={cn("relative inline-block max-h-full max-w-full", className)}>
+    <div
+      className={cn("relative inline-block max-h-full max-w-full", className)}
+      style={{ transform: `scale(${zoom})` }}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}

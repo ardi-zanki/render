@@ -156,7 +156,7 @@ export function RenderPreviewViewer({
             )}
           </div>
 
-          {studioMode !== "texture" && shownImage && (
+          {(studioMode === "texture" ? Boolean(textureCanvas) : shownImage) && (
             <div className="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1">
               <Button
                 type="button"
@@ -202,63 +202,66 @@ export function RenderPreviewViewer({
               </p>
             )
           ) : canCompare && view === "comparison" ? (
-            <div className="relative size-full overflow-hidden bg-background">
-              {/* Base = original, shown on the right. */}
-              <RenderImage
-                src={previewUrl ?? ""}
-                alt="Gambar asli"
-                className="size-full object-contain"
+            // The slider wrapper shrink-wraps the displayed image so the divider
+            // and handle stay over the image (never the letterbox).
+            <div className="flex size-full items-center justify-center">
+              <div
+                className="relative inline-block max-h-full max-w-full overflow-hidden"
                 style={{ transform: `scale(${zoom})` }}
-              />
-              {/* Overlay = result, revealed on the left as the handle moves. */}
-              <div
-                className="absolute inset-0 overflow-hidden"
-                style={{
-                  clipPath: `inset(0 ${100 - comparisonPosition}% 0 0)`,
-                }}
               >
+                {/* Base = original (right side); defines the box. */}
                 <RenderImage
-                  src={resultUrl ?? ""}
-                  alt="Hasil render"
-                  className="size-full object-contain"
-                  style={{ transform: `scale(${zoom})` }}
+                  src={previewUrl ?? ""}
+                  alt="Gambar asli"
+                  className="block max-h-full max-w-full select-none object-contain"
                 />
+                {/* Overlay = result, revealed on the left as the handle moves. */}
+                <div
+                  className="absolute inset-0 overflow-hidden"
+                  style={{ clipPath: `inset(0 ${100 - comparisonPosition}% 0 0)` }}
+                >
+                  <RenderImage
+                    src={resultUrl ?? ""}
+                    alt="Hasil render"
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                </div>
+                <div
+                  className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(15_23_42/0.12)]"
+                  style={{ left: `${comparisonPosition}%` }}
+                />
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={comparisonPosition}
+                  onChange={(event) =>
+                    setComparisonPosition(Number(event.target.value))
+                  }
+                  className="absolute inset-0 size-full cursor-ew-resize opacity-0"
+                  aria-label="Geser komparasi"
+                />
+                {/* Handle — centered exactly on the divider line. */}
+                <span
+                  className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating"
+                  style={{ left: `${comparisonPosition}%` }}
+                >
+                  <ArrowLeftRight className="size-4" />
+                </span>
+                {/* Labels — symmetric on each side of the handle. */}
+                <span
+                  className="pointer-events-none absolute top-1/2 -translate-x-full -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
+                  style={{ left: `calc(${comparisonPosition}% - 1.5rem)` }}
+                >
+                  Hasil
+                </span>
+                <span
+                  className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
+                  style={{ left: `calc(${comparisonPosition}% + 1.5rem)` }}
+                >
+                  Asli
+                </span>
               </div>
-              <div
-                className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(15_23_42/0.12)]"
-                style={{ left: `${comparisonPosition}%` }}
-              />
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={comparisonPosition}
-                onChange={(event) =>
-                  setComparisonPosition(Number(event.target.value))
-                }
-                className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
-                aria-label="Geser komparasi"
-              />
-              {/* Handle — centered exactly on the divider line. */}
-              <span
-                className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating"
-                style={{ left: `${comparisonPosition}%` }}
-              >
-                <ArrowLeftRight className="size-4" />
-              </span>
-              {/* Labels — symmetric on each side of the handle. */}
-              <span
-                className="pointer-events-none absolute top-1/2 -translate-x-full -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
-                style={{ left: `calc(${comparisonPosition}% - 1.5rem)` }}
-              >
-                Hasil
-              </span>
-              <span
-                className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
-                style={{ left: `calc(${comparisonPosition}% + 1.5rem)` }}
-              >
-                Asli
-              </span>
             </div>
           ) : shownImage ? (
             <div className="flex size-full items-center justify-center overflow-hidden">

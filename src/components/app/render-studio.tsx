@@ -434,6 +434,7 @@ export function RenderStudio({
         tool={texture.tool}
         brushSize={texture.brushSize}
         tolerance={texture.tolerance}
+        zoom={state.zoom}
         onChange={texture.setMask}
         onError={(message) => toast.error(message)}
       />

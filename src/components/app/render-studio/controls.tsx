@@ -80,7 +80,9 @@ export function RenderStudioControls({
       <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
-            <Label htmlFor="project">Project</Label>
+            <Label htmlFor="project" className="text-sm font-semibold">
+              Project
+            </Label>
             {onCollapse && (
               <button
                 type="button"
@@ -98,7 +100,7 @@ export function RenderStudioControls({
               id="project"
               value={projectId}
               onChange={(e) => onSwitchProject(e.target.value)}
-              className="flex-1"
+              className="h-8 flex-1"
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -113,6 +115,7 @@ export function RenderStudioControls({
               onClick={onCreateProject}
               title="Buat project baru"
               aria-label="Buat project baru"
+              className="size-8 shrink-0"
             >
               <Plus />
             </Button>
@@ -155,6 +158,7 @@ export function RenderStudioControls({
             id="style"
             value={style}
             onChange={(e) => setStyle(e.target.value)}
+            className="h-8"
           >
             {STYLES.map(([v, l]) => (
               <option key={v} value={v}>
@@ -170,6 +174,7 @@ export function RenderStudioControls({
             id="outputFormat"
             value={outputFormat}
             onChange={(e) => setOutputFormat(e.target.value as RenderOutputFormat)}
+            className="h-8"
           >
             {OUTPUT_FORMATS.map((format) => (
               <option key={format.value} value={format.value}>
@@ -186,6 +191,7 @@ export function RenderStudioControls({
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Bandung, Bali, Jakarta"
+            className="h-8"
           />
         </div>
 
@@ -195,6 +201,7 @@ export function RenderStudioControls({
             id="surrounding"
             value={surrounding}
             onChange={(e) => setSurrounding(e.target.value)}
+            className="h-8"
           >
             {surroundingOptions.map((option) => (
               <option key={option.value} value={option.value}>
