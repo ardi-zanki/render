@@ -14,9 +14,19 @@ import { zLayer } from "@/lib/z-layers";
 
 type Placement = "top" | "bottom";
 type Align = "start" | "end";
-type Position = { left?: number; right?: number; top?: number; bottom?: number };
+type Position = {
+  left?: number;
+  right?: number;
+  top?: number;
+  bottom?: number;
+  /** Effective width after clamping to the space on the anchored side. */
+  width?: number;
+};
 
 const MARGIN = 12;
+// Below this width the panel spans the viewport instead of anchoring to the
+// trigger, so every header popover looks the same on phones.
+const MOBILE_BREAKPOINT = 640;
 
 /**
  * Standard anchored dropdown / context menu. Renders into `document.body` so it
@@ -66,17 +76,24 @@ export function Popover<T extends HTMLElement>({
     if (placement === "bottom") next.top = rect.bottom + gap;
     else next.bottom = Math.max(window.innerHeight - rect.top + gap, MARGIN);
 
-    if (align === "end") {
+    if (window.innerWidth < MOBILE_BREAKPOINT) {
+      // Phone: full-width panel (minus side margins), consistent for every
+      // header trigger regardless of its x position.
+      next.left = MARGIN;
+      next.width = window.innerWidth - MARGIN * 2;
+    } else if (align === "end") {
       next.right = Math.max(
         window.innerWidth - rect.right + alignOffset,
         MARGIN,
       );
+      next.width = Math.min(width, window.innerWidth - next.right - MARGIN);
     } else {
       const left = rect.left + alignOffset;
       next.left = Math.max(
         MARGIN,
         Math.min(left, window.innerWidth - width - MARGIN),
       );
+      next.width = Math.min(width, window.innerWidth - next.left - MARGIN);
     }
     setPosition(next);
   }, [anchorRef, placement, align, gap, alignOffset, width]);
@@ -115,7 +132,7 @@ export function Popover<T extends HTMLElement>({
       />
       <div
         style={{
-          width,
+          width: position?.width ?? width,
           left: position?.left,
           right: position?.right,
           top: position?.top,
