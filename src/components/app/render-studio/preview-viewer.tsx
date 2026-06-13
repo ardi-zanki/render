@@ -138,7 +138,7 @@ export function RenderPreviewViewer({
         </div>
 
         <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/35 lg:aspect-auto lg:min-h-0 lg:flex-1">
-          {canCompare && view === "komparasi" ? (
+          {canCompare && view === "comparison" ? (
             <div className="relative size-full overflow-hidden bg-background">
               {/* Base = original, shown on the right. */}
               <RenderImage
@@ -201,7 +201,7 @@ export function RenderPreviewViewer({
             <div className="flex size-full items-center justify-center overflow-hidden">
               <RenderImage
                 src={shownImage}
-                alt={view === "hasil" ? "Hasil render" : "Gambar asli"}
+                alt={view === "result" ? "Hasil render" : "Gambar asli"}
                 className="size-full object-contain transition-transform"
                 style={{ transform: `scale(${zoom})` }}
               />

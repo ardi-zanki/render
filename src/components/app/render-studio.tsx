@@ -104,7 +104,7 @@ export function RenderStudio({
       },
       onSuccess: (render) => {
         state.setResultUrl(render.resultUrl);
-        state.setView("hasil");
+        state.setView("result");
         toast.success(copy.success);
         router.refresh();
       },
@@ -323,7 +323,7 @@ export function RenderStudio({
     state.setInstruction(cfg?.instruction ?? "");
     state.setResultUrl(version.fileUrl);
     state.setResultRenderId(sourceRenderId);
-    state.setView("hasil");
+    state.setView("result");
   }
 
   const isProcessing =
@@ -336,14 +336,14 @@ export function RenderStudio({
     !isProcessing;
   const hasUploadedImage = Boolean(state.previewUrl);
   const shownImage =
-    state.view === "hasil" && state.resultUrl
+    state.view === "result" && state.resultUrl
       ? state.resultUrl
       : state.previewUrl;
   const canCompare = Boolean(state.previewUrl && state.resultUrl);
   const viewerTabs: ViewerTab[] = [
-    { value: "asli", label: "Asli", disabled: !state.previewUrl },
-    { value: "komparasi", label: "Komparasi", disabled: !canCompare },
-    { value: "hasil", label: "Hasil", disabled: !state.resultUrl },
+    { value: "original", label: "Asli", disabled: !state.previewUrl },
+    { value: "comparison", label: "Komparasi", disabled: !canCompare },
+    { value: "result", label: "Hasil", disabled: !state.resultUrl },
   ];
 
   // Portal the title into the global header slot (rendered by the app shell).

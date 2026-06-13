@@ -2,7 +2,7 @@ import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
 import type { RenderListItem } from "@/lib/renders/service";
 
 export type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;
-export type StudioView = "asli" | "komparasi" | "hasil";
+export type StudioView = "original" | "comparison" | "result";
 export type ViewerTab = {
   value: StudioView;
   label: string;

@@ -29,7 +29,7 @@ const principles = [
   },
 ];
 
-export default function TentangPage() {
+export default function AboutPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader />

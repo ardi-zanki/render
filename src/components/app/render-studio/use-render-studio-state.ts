@@ -56,7 +56,7 @@ export function useRenderStudioState({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [view, setView] = useState<StudioView>("asli");
+  const [view, setView] = useState<StudioView>("original");
   const [comparisonPosition, setComparisonPosition] = useState(50);
   const [zoom, setZoom] = useState(1);
 
@@ -82,11 +82,11 @@ export function useRenderStudioState({
     if (f) {
       setFile(f);
       setPreviewUrl(URL.createObjectURL(f));
-      setView("asli");
+      setView("original");
     } else {
       setFile(null);
       setPreviewUrl(null);
-      setView("asli");
+      setView("original");
     }
   }
 

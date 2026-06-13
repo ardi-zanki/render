@@ -663,7 +663,7 @@ describe("render workflow integration", () => {
     const edit = await createRenderEdit({
       userId: testUser.id,
       renderId: created.renderId,
-      config: { style: "industrial", time: "malam" },
+      config: { style: "industrial", time: "night" },
       prompt: "Vitest edited prompt",
     });
     expect(edit.renderId).toBe(created.renderId);

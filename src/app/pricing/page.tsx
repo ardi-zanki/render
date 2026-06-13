@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default async function HargaPage() {
+export default async function PricingPage() {
   const packages = await listActivePaymentPackages();
 
   return (

@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 
 const LINKS = [
-  { label: "Harga", href: "/harga" },
-  { label: "Tentang", href: "/tentang" },
-  { label: "Syarat & Ketentuan", href: "/syarat" },
+  { label: "Harga", href: "/pricing" },
+  { label: "Tentang", href: "/about" },
+  { label: "Syarat & Ketentuan", href: "/terms" },
   { label: "Masuk", href: "/login" },
 ];
 

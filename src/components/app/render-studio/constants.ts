@@ -15,16 +15,16 @@ export const MODES: {
 export const STYLES = [
   ["auto", "Deteksi Otomatis"],
   ["modern", "Modern"],
-  ["minimalis", "Minimalis"],
+  ["minimalist", "Minimalis"],
   ["industrial", "Industrial"],
-  ["skandinavia", "Skandinavia"],
-  ["klasik", "Klasik"],
-  ["tropis", "Tropis"],
-  ["kontemporer", "Kontemporer"],
+  ["scandinavian", "Skandinavia"],
+  ["classic", "Klasik"],
+  ["tropical", "Tropis"],
+  ["contemporary", "Kontemporer"],
 ];
 
-export const TIMES = ["auto", "pagi", "siang", "sore", "malam"];
-export const WEATHERS = ["auto", "cerah", "berawan", "mendung", "hujan", "berkabut"];
+export const TIMES = ["auto", "morning", "midday", "evening", "night"];
+export const WEATHERS = ["auto", "clear", "cloudy", "overcast", "rain", "fog"];
 
 export const SURROUNDINGS = {
   exterior: [
@@ -75,5 +75,21 @@ export const OUTPUT_FORMATS: { value: RenderOutputFormat; label: string }[] = [
   { value: "avif", label: "AVIF" },
 ];
 
+// Indonesian display labels for the (English) time/weather chip values, so the
+// UI stays Bahasa while the stored values are English. Falls back to a simple
+// capitalize for any value not in the map.
+const CHIP_LABEL: Record<string, string> = {
+  auto: "Otomatis",
+  morning: "Pagi",
+  midday: "Siang",
+  evening: "Sore",
+  night: "Malam",
+  clear: "Cerah",
+  cloudy: "Berawan",
+  overcast: "Mendung",
+  rain: "Hujan",
+  fog: "Berkabut",
+};
+
 export const cap = (s: string) =>
-  s === "auto" ? "Otomatis" : s[0].toUpperCase() + s.slice(1);
+  CHIP_LABEL[s] ?? s[0].toUpperCase() + s.slice(1);

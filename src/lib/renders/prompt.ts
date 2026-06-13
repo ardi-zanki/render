@@ -28,41 +28,41 @@ const isAuto = (v?: string) => !v || v === "auto" || v === "otomatis";
 // Bare style adjectives, woven in as gentle reinforcement of the existing design.
 const STYLE: Record<string, string> = {
   modern: "modern",
-  minimalis: "minimalist",
+  minimalist: "minimalist",
   industrial: "industrial",
-  skandinavia: "Scandinavian",
-  klasik: "classic",
-  tropis: "tropical",
-  kontemporer: "contemporary",
+  scandinavian: "Scandinavian",
+  classic: "classic",
+  tropical: "tropical",
+  contemporary: "contemporary",
 };
 
 // Positive daylight descriptions per time of day (FLUX.2 processes no negation).
 const INTERIOR_DAYLIGHT: Record<string, string> = {
-  pagi:
+  morning:
     "Soft early-morning daylight enters low through the windows at about 4000K, gently warm and natural, casting long soft shadows.",
-  siang:
+  midday:
     "Bright, cool midday daylight at about 5500K fills the room evenly through the windows.",
-  sore:
+  evening:
     "Warm golden-hour light at about 3200K rakes in low through the windows, giving the room a soft amber glow.",
-  malam:
+  night:
     "Night outside the windows with a dark sky, the room reading clearly as a home at evening.",
 };
 
 const EXTERIOR_DAYLIGHT: Record<string, string> = {
-  pagi:
+  morning:
     "Soft early-morning sunlight at a low angle, warm and gentle, with long soft shadows.",
-  siang: "Bright midday sun with clear, strong natural daylight.",
-  sore:
+  midday: "Bright midday sun with clear, strong natural daylight.",
+  evening:
     "Warm golden-hour sunset light with long shadows and an amber glow across the sky.",
-  malam: "A deep blue dusk-to-night sky behind the building.",
+  night: "A deep blue dusk-to-night sky behind the building.",
 };
 
 const WEATHER_SKY: Record<string, string> = {
-  cerah: "a clear blue sky",
-  berawan: "a partly cloudy sky",
-  mendung: "a soft overcast sky with even, diffuse light",
-  hujan: "a rainy atmosphere with wet, reflective surfaces",
-  berkabut: "a soft, hazy foggy atmosphere",
+  clear: "a clear blue sky",
+  cloudy: "a partly cloudy sky",
+  overcast: "a soft overcast sky with even, diffuse light",
+  rain: "a rainy atmosphere with wet, reflective surfaces",
+  fog: "a soft, hazy foggy atmosphere",
 };
 
 const REALISM_CLOSER =
@@ -75,7 +75,7 @@ function styleWord(o: RenderOptions) {
 function interiorLighting(o: RenderOptions): string {
   const daylight = !isAuto(o.time) && o.time ? INTERIOR_DAYLIGHT[o.time] : undefined;
   // A dark interior photo is never useful, so night always reads with lamps on.
-  const lampsOn = Boolean(o.lightsOn) || o.time === "malam";
+  const lampsOn = Boolean(o.lightsOn) || o.time === "night";
 
   const sentences: string[] = [];
   if (daylight) sentences.push(daylight);
@@ -94,7 +94,7 @@ function interiorLighting(o: RenderOptions): string {
 function exteriorLighting(o: RenderOptions): string | undefined {
   const daylight = !isAuto(o.time) && o.time ? EXTERIOR_DAYLIGHT[o.time] : undefined;
   const sky = !isAuto(o.weather) && o.weather ? WEATHER_SKY[o.weather] : undefined;
-  const lampsOn = Boolean(o.lightsOn) || o.time === "malam";
+  const lampsOn = Boolean(o.lightsOn) || o.time === "night";
 
   const sentences: string[] = [];
   if (daylight && sky) sentences.push(`${daylight} The scene sits under ${sky}.`);
@@ -168,7 +168,7 @@ function buildStyleOrUpscale(o: RenderOptions): string {
  */
 export type PromptBase = "sketch" | "photo";
 
-/** Compose render controls (Bahasa Indonesia values) into an English prompt. */
+/** Compose render controls (English values) into an English prompt. */
 export function buildPrompt(o: RenderOptions, base: PromptBase = "sketch"): string {
   if (o.mode === "interior") return buildInterior(o, base);
   if (o.mode === "exterior") return buildExterior(o, base);

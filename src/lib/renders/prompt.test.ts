@@ -10,8 +10,8 @@ describe("buildPrompt", () => {
       location: "Bandung",
       surrounding: "urban street context with neighboring buildings",
       lightsOn: true,
-      time: "sore",
-      weather: "hujan",
+      time: "evening",
+      weather: "rain",
       instruction: "keep the original facade proportions",
     });
 
@@ -45,7 +45,7 @@ describe("buildPrompt", () => {
   });
 
   it("turns interior lamps off when not requested during daylight", () => {
-    const prompt = buildPrompt({ mode: "interior", time: "siang", lightsOn: false });
+    const prompt = buildPrompt({ mode: "interior", time: "midday", lightsOn: false });
     expect(prompt).toContain("cool midday daylight");
     expect(prompt).toContain("All interior lamps stay off");
   });
