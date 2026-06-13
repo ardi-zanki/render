@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -23,6 +23,11 @@ import { RenderPreviewViewer } from "./render-studio/preview-viewer";
 import { StudioRenderInfo } from "./render-studio/render-info";
 import { RenderSceneList } from "./render-studio/scene-list";
 import { StudioVersionHistory } from "./render-studio/version-history";
+import { ChangeTexturePanel } from "./render-studio/texture-edit/change-texture-panel";
+import { MaskCanvas } from "./render-studio/texture-edit/mask-canvas";
+import { SelectionToolbar } from "./render-studio/texture-edit/selection-toolbar";
+import type { MaskCanvasHandle } from "./render-studio/texture-edit/types";
+import { useTextureEditState } from "./render-studio/texture-edit/use-texture-edit-state";
 import {
   type CreateProjectResponse,
   type CreateRenderResponse,
@@ -84,6 +89,18 @@ export function RenderStudio({
     initialResultUrl,
     initialResultRenderId,
   });
+
+  // Region/texture editor. Available only when editing a completed render that
+  // already has a result to paint a mask over.
+  const texture = useTextureEditState();
+  const maskRef = useRef<MaskCanvasHandle>(null);
+  const [studioMode, setStudioMode] = useState<"render" | "texture">("render");
+  const editAvailable = Boolean(sourceRenderId) && Boolean(state.resultUrl);
+  const inTextureMode = studioMode === "texture" && editAvailable;
+  // Stable handlers so the ref is read only when invoked (not during render).
+  const handleMaskUndo = useCallback(() => maskRef.current?.undo(), []);
+  const handleMaskRedo = useCallback(() => maskRef.current?.redo(), []);
+  const handleMaskClear = useCallback(() => maskRef.current?.clear(), []);
 
   function switchProject(id: string) {
     if (id !== projectId) router.push(`/renders/new?project=${id}`);
@@ -326,6 +343,56 @@ export function RenderStudio({
     state.setView("result");
   }
 
+  // Apply a texture edit: export the mask, post the selection + texture, then
+  // reuse the shared polling/toast flow and switch back to the result view.
+  async function onApplyTexture() {
+    if (!sourceRenderId) return;
+    const blob = await maskRef.current?.toMaskBlob();
+    if (!blob) {
+      toast.error("Pilih dulu area yang ingin diganti.");
+      return;
+    }
+    texture.setApplying(true);
+    state.setError("");
+    try {
+      const fd = new FormData();
+      fd.append("mask", blob, "mask.png");
+      if (texture.textureSource === "library" && texture.selectedTextureId) {
+        fd.append("libraryTextureId", texture.selectedTextureId);
+      }
+      if (texture.textureSource === "upload" && texture.textureFile) {
+        fd.append("texture", texture.textureFile);
+      }
+      if (texture.instruction.trim()) {
+        fd.append("instruction", texture.instruction.trim());
+      }
+      if (selectedBaseAssetId) fd.append("baseAssetId", selectedBaseAssetId);
+
+      const json = await apiJson<CreateRenderResponse>(
+        `/api/renders/${sourceRenderId}/texture-edit`,
+        { method: "POST", body: fd },
+      );
+      state.setRenderStatus(json.status ?? "queued");
+      state.setResultRenderId(json.renderId);
+      state.setBalance((balance) => json.balance ?? balance - 1);
+      toast.success("Edit tekstur masuk antrean");
+      setStudioMode("render");
+      state.setView("result");
+      pollRenderStatus(json.renderId, {
+        success: "Edit tekstur selesai!",
+        failure: "Edit tekstur gagal. Kredit sudah dikembalikan.",
+        timeout: "Edit tekstur masih diproses. Cek beberapa saat lagi.",
+      });
+      router.refresh();
+    } catch (err) {
+      const message = apiErrorMessage(err, "Gagal menerapkan tekstur");
+      state.setError(message);
+      toast.error(message);
+    } finally {
+      texture.setApplying(false);
+    }
+  }
+
   const isProcessing =
     state.loading ||
     state.renderStatus === "queued" ||
@@ -353,6 +420,36 @@ export function RenderStudio({
     ? document.getElementById("app-header-slot")
     : null;
 
+  // Texture-edit canvas + toolbar live here (this component owns the mask ref),
+  // and are slotted into the viewer column.
+  const textureCanvas =
+    inTextureMode && state.resultUrl ? (
+      <MaskCanvas
+        ref={maskRef}
+        imageUrl={state.resultUrl}
+        tool={texture.tool}
+        brushSize={texture.brushSize}
+        tolerance={texture.tolerance}
+        onChange={texture.setMask}
+        onError={(message) => toast.error(message)}
+      />
+    ) : null;
+  const textureToolbar = inTextureMode ? (
+    <SelectionToolbar
+      tool={texture.tool}
+      setTool={texture.setTool}
+      brushSize={texture.brushSize}
+      setBrushSize={texture.setBrushSize}
+      tolerance={texture.tolerance}
+      setTolerance={texture.setTolerance}
+      canUndo={texture.mask.canUndo}
+      canRedo={texture.mask.canRedo}
+      onUndo={handleMaskUndo}
+      onRedo={handleMaskRedo}
+      onClear={handleMaskClear}
+    />
+  ) : null;
+
   return (
     // Fixed-height studio: the three columns stay put and each scrolls on its
     // own (Config / Studio / Info) instead of the whole page scrolling.
@@ -365,33 +462,37 @@ export function RenderStudio({
         )}
 
       <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_280px]">
-      {/* Column 1 — Configuration */}
+      {/* Column 1 — Configuration, or Change Texture panel in Edit mode. */}
       <div className="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
-        <RenderStudioControls
-          projectId={projectId}
-          projects={projects}
-          mode={state.mode}
-          setMode={state.setMode}
-          style={state.style}
-          setStyle={state.setStyle}
-          outputFormat={state.outputFormat}
-          setOutputFormat={state.setOutputFormat}
-          location={state.location}
-          setLocation={state.setLocation}
-          surrounding={state.surrounding}
-          setSurrounding={state.setSurrounding}
-          lightsOn={state.lightsOn}
-          setLightsOn={state.setLightsOn}
-          time={state.time}
-          setTime={state.setTime}
-          weather={state.weather}
-          setWeather={state.setWeather}
-          onSwitchProject={switchProject}
-          onCreateProject={() => {
-            state.setCreateOpen(true);
-            state.setNewProjectErrors({});
-          }}
-        />
+        {inTextureMode ? (
+          <ChangeTexturePanel state={texture} onApply={onApplyTexture} />
+        ) : (
+          <RenderStudioControls
+            projectId={projectId}
+            projects={projects}
+            mode={state.mode}
+            setMode={state.setMode}
+            style={state.style}
+            setStyle={state.setStyle}
+            outputFormat={state.outputFormat}
+            setOutputFormat={state.setOutputFormat}
+            location={state.location}
+            setLocation={state.setLocation}
+            surrounding={state.surrounding}
+            setSurrounding={state.setSurrounding}
+            lightsOn={state.lightsOn}
+            setLightsOn={state.setLightsOn}
+            time={state.time}
+            setTime={state.setTime}
+            weather={state.weather}
+            setWeather={state.setWeather}
+            onSwitchProject={switchProject}
+            onCreateProject={() => {
+              state.setCreateOpen(true);
+              state.setNewProjectErrors({});
+            }}
+          />
+        )}
       </div>
 
       {/* Column 2 — Studio canvas (title is in the header). */}
@@ -426,6 +527,11 @@ export function RenderStudio({
             negativePrompt={state.negativePrompt}
             setNegativePrompt={state.setNegativePrompt}
             error={state.error}
+            editAvailable={editAvailable}
+            studioMode={studioMode}
+            setStudioMode={setStudioMode}
+            textureCanvas={textureCanvas}
+            textureToolbar={textureToolbar}
           />
       </div>
 

@@ -30,6 +30,12 @@ export type RenderConfig = {
   location?: string;
   surrounding?: string;
   instruction?: string;
+  /** Marks a version produced by the region/texture editor (vs a normal render). */
+  editKind?: "texture";
+  /** Human-readable texture name (library item or "uploaded") for the marker. */
+  textureLabel?: string;
+  /** The composed inpaint prompt for this texture edit. */
+  texturePrompt?: string;
 };
 export type RenderStatus =
   | "queued"
@@ -44,7 +50,8 @@ export type RenderAssetType =
   | "reference"
   | "result"
   | "edit"
-  | "upscale";
+  | "upscale"
+  | "mask";
 export type CreditTxType =
   | "purchase"
   | "usage"

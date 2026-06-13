@@ -1,6 +1,7 @@
 "use client";
 
 import type { RenderMode } from "@/db/schema";
+import { Badge } from "@/components/ui/badge";
 import { MODE_LABEL } from "@/lib/renders/labels";
 
 const dateFmt = new Intl.DateTimeFormat("id-ID", {
@@ -17,6 +18,7 @@ export function StudioRenderInfo({
     mode: RenderMode;
     outputFormat: string;
     creditsUsed: number;
+    editKind?: "texture";
   };
 }) {
   const rows: [string, string][] = [
@@ -27,7 +29,12 @@ export function StudioRenderInfo({
   ];
   return (
     <div className="rounded-lg border border-border bg-card p-3">
-      <h2 className="mb-2 text-sm font-semibold text-foreground">Info Render</h2>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold text-foreground">Info Render</h2>
+        {info.editKind === "texture" && (
+          <Badge variant="info">Edit Texture</Badge>
+        )}
+      </div>
       <dl className="flex flex-col gap-1.5">
         {rows.map(([label, value]) => (
           <div

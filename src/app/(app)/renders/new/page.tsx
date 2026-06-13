@@ -56,7 +56,12 @@ export default async function CreateRenderPage({
       .filter((a) => a.type === "result" || a.type === "edit")
       .map((a, i) => ({
         id: a.id,
-        label: i === 0 ? "Hasil render" : `Edit ${i}`,
+        label:
+          a.config?.editKind === "texture"
+            ? "Edit Texture"
+            : i === 0
+              ? "Hasil render"
+              : `Edit ${i}`,
         fileUrl: a.fileUrl,
         config: a.config,
       })),
@@ -110,6 +115,7 @@ export default async function CreateRenderPage({
                 mode: sourceRender.mode,
                 outputFormat: sourceRender.outputFormat,
                 creditsUsed: sourceRender.creditsUsed,
+                editKind: sourceRender.config?.editKind,
               }
             : null
         }

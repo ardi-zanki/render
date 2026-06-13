@@ -2,12 +2,22 @@ import type { RenderMode, RenderOutputFormat } from "@/db/schema";
 
 export interface AiRenderInput {
   mode: RenderMode;
+  /**
+   * "render" (default) runs the mode's normal pipeline; "inpaint" replaces only
+   * the masked region (region/texture editor) using `maskUrl`/`maskBuffer`.
+   */
+  operation?: "render" | "inpaint";
   /** Public URL of the uploaded original image (real providers fetch it). */
   imageUrl: string;
   imageContentType?: string;
   /** Raw original bytes — lets the mock provider work without a reachable URL. */
   imageBuffer?: Buffer;
-  /** Reference image URL (Style Transfer). */
+  /** Inpaint mask URL (white = edit, black = keep). Required for `operation:"inpaint"`. */
+  maskUrl?: string;
+  maskContentType?: string;
+  /** Raw mask bytes for providers that cannot reach storage URLs. */
+  maskBuffer?: Buffer;
+  /** Reference image URL (Style Transfer, or texture reference for inpaint). */
   referenceUrl?: string;
   referenceContentType?: string;
   /** Raw reference bytes for self-hosted providers that cannot reach storage URLs. */

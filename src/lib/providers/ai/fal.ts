@@ -248,15 +248,42 @@ export function createFalAiProvider(): AiProvider {
             })
           : undefined;
 
-        const endpointId =
-          input.mode === "upscale"
+        const isInpaint = input.operation === "inpaint";
+        const endpointId = isInpaint
+          ? env.FAL_INPAINT_MODEL
+          : input.mode === "upscale"
             ? env.FAL_UPSCALE_MODEL
             : input.mode === "style_transfer"
               ? env.FAL_STYLE_TRANSFER_MODEL
               : env.FAL_RENDER_MODEL;
 
         let requestInput: JsonObject;
-        if (input.mode === "upscale") {
+        if (isInpaint) {
+          // Region/texture editor. Upload the mask, then call the fill model:
+          // only the white (masked) region is regenerated from the prompt; the
+          // texture is conditioned via the prompt (fill model is text-guided).
+          const maskUrl = await uploadImage({
+            client,
+            url: input.maskUrl ?? "",
+            data: input.maskBuffer,
+            contentType: input.maskContentType ?? "image/png",
+          });
+          if (!maskUrl) {
+            throw new AiProviderError(
+              "Mask wajib tersedia untuk inpaint",
+              "MISSING_MASK",
+            );
+          }
+          requestInput = {
+            prompt: input.prompt ?? "",
+            image_url: imageUrl,
+            mask_url: maskUrl,
+            num_images: 1,
+            output_format: modelOutputFormat,
+            safety_tolerance: env.FAL_RENDER_SAFETY_TOLERANCE,
+            enable_safety_checker: true,
+          };
+        } else if (input.mode === "upscale") {
           requestInput = {
             image_url: imageUrl,
             upscale_factor: 4,

@@ -88,6 +88,14 @@ export interface RenderListItem {
 export type ProviderRequestOptions = {
   negativePrompt?: string;
   styleTransferStrength?: number;
+  /** When true, the processor runs the inpaint (region/texture edit) path. */
+  inpaint?: boolean;
+  /** render_assets.id of the mask to use for the inpaint. */
+  maskAssetId?: string;
+  /** Composed inpaint prompt (overrides the studio config prompt). */
+  texturePrompt?: string;
+  /** Human-readable texture name for the "Edit Texture" marker. */
+  textureLabel?: string;
 };
 
 export function isFinalRenderStatus(status: string) {

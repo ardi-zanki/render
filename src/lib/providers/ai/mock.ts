@@ -34,16 +34,21 @@ export function createMockAiProvider(): AiProvider {
       }
 
       const isUpscale = input.mode === "upscale";
+      const isInpaint = input.operation === "inpaint";
       // Mock has no native format, so "original" maps to lossless png.
       const requested = input.outputFormat ?? "jpg";
       const format = requested === "original" ? "png" : requested;
-      const image = sharp(inputBuf)
-        .resize(isUpscale ? 2048 : 1024, isUpscale ? 2048 : 1024, {
-          fit: "inside",
-          withoutEnlargement: false,
-        })
-        .modulate({ saturation: 1.22, brightness: 1.04 })
-        .sharpen();
+      // Inpaint preserves the input dimensions (only a region changes for the
+      // real model); apply a visible hue shift so the mock output differs.
+      const image = isInpaint
+        ? sharp(inputBuf).modulate({ saturation: 1.3, hue: 30 }).sharpen()
+        : sharp(inputBuf)
+            .resize(isUpscale ? 2048 : 1024, isUpscale ? 2048 : 1024, {
+              fit: "inside",
+              withoutEnlargement: false,
+            })
+            .modulate({ saturation: 1.22, brightness: 1.04 })
+            .sharpen();
       const data =
         format === "png"
           ? await image.png().toBuffer()
@@ -58,7 +63,7 @@ export function createMockAiProvider(): AiProvider {
 
       return {
         outputs: [{ data, contentType: CONTENT_TYPE_BY_FORMAT[format] }],
-        raw: { provider: "mock", mode: input.mode },
+        raw: { provider: "mock", mode: input.mode, operation: input.operation ?? "render" },
       };
     },
   };

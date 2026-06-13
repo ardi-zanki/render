@@ -73,6 +73,7 @@ const CATEGORY_LABELS: Record<StorageUsageCategory["type"], string> = {
   result: "Hasil render",
   edit: "Hasil edit",
   upscale: "Hasil upscale",
+  mask: "Mask seleksi",
 };
 
 const DELETE_CONFIRM_TEXT = "HAPUS STORAGE";

@@ -47,6 +47,8 @@ export type RenderStudioProps = {
     mode: RenderMode;
     outputFormat: string;
     creditsUsed: number;
+    /** Set when the latest version was produced by the texture editor. */
+    editKind?: "texture";
   } | null;
 };
 

@@ -68,6 +68,8 @@ const schema = z.object({
   FAL_RENDER_MODEL: z.string().default("fal-ai/flux-2-pro/edit"),
   FAL_STYLE_TRANSFER_MODEL: z.string().default("fal-ai/uso"),
   FAL_UPSCALE_MODEL: z.string().default("fal-ai/aura-sr"),
+  // Region/texture editor (inpaint): mask + prompt → masked region replaced.
+  FAL_INPAINT_MODEL: z.string().default("fal-ai/flux-pro/v1/fill"),
   FAL_START_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(300),
   // FLUX.2 [pro] edit knobs. Target long edge keeps output ~2K matching the
   // input aspect ratio; safety_tolerance 1 (strict) – 5 (permissive); seed is

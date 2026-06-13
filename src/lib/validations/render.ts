@@ -51,3 +51,16 @@ export const createProjectSchema = z.object({
   name: z.string().min(1, "Nama project wajib diisi").max(80),
   description: z.string().max(500).optional(),
 });
+
+export const textureEditSchema = z.object({
+  /** Library texture id; resolved to a material prompt server-side. */
+  libraryTextureId: z.string().max(80).optional(),
+  instruction: z
+    .string()
+    .max(1000, "Instruksi maksimal 1.000 karakter")
+    .optional(),
+  /** Version (render_assets.id) to edit from; defaults to the latest. */
+  baseAssetId: z.uuid().optional(),
+});
+
+export type TextureEditInput = z.infer<typeof textureEditSchema>;

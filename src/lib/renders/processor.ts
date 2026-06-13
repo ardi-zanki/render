@@ -87,11 +87,30 @@ async function processLockedJob(jobId: string) {
         ? ((render.providerResponse as { requestOptions?: ProviderRequestOptions })
             .requestOptions ?? {})
         : {};
+
+    // Region/texture edit: locate this edit's mask and run the inpaint path.
+    const isInpaint = Boolean(requestOptions.inpaint);
+    const maskAsset = isInpaint
+      ? (requestOptions.maskAssetId &&
+          assets.find((a) => a.id === requestOptions.maskAssetId)) ||
+        assets.find((a) => a.type === "mask")
+      : undefined;
+    if (isInpaint && !maskAsset) {
+      throw new Error("Mask tidak ditemukan untuk edit tekstur");
+    }
+    const maskBytes = maskAsset
+      ? await fetchAssetBytes(maskAsset.fileUrl, maskAsset.fileKey)
+      : undefined;
+
     const result = await aiProvider().createRender({
       mode: render.mode,
+      operation: isInpaint ? "inpaint" : "render",
       imageUrl: baseAsset.fileUrl,
       imageContentType: baseAsset.mimeType ?? undefined,
       imageBuffer: baseBytes,
+      maskUrl: maskAsset?.fileUrl,
+      maskContentType: maskAsset?.mimeType ?? undefined,
+      maskBuffer: maskBytes,
       referenceUrl: reference?.fileUrl,
       referenceContentType: reference?.mimeType ?? undefined,
       referenceBuffer: referenceBytes,

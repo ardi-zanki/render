@@ -50,6 +50,8 @@ export function renderAssetKey(p: RenderAssetKeyParams): string {
       return `${base}/edit-${i}.${p.ext}`;
     case "upscale":
       return `${base}/upscale-${i}.${p.ext}`;
+    case "mask":
+      return `${base}/mask-${i}.${p.ext}`;
   }
 }
 

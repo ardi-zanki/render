@@ -174,3 +174,33 @@ export function buildPrompt(o: RenderOptions, base: PromptBase = "sketch"): stri
   if (o.mode === "exterior") return buildExterior(o, base);
   return buildStyleOrUpscale(o);
 }
+
+export interface TexturePromptOptions {
+  /** Library item name or "uploaded reference" — used when no description. */
+  textureLabel?: string;
+  /** Descriptive material phrase (library catalog prompt). */
+  textureDescription?: string;
+  /** Free-text user instruction for the edit. */
+  instruction?: string;
+}
+
+/**
+ * Build the inpaint prompt for the region/texture editor. The masked region is
+ * regenerated with the chosen material while the rest of the image is kept; the
+ * surrounding lighting/perspective is matched for a seamless blend. This
+ * OVERRIDES the studio config prompt — texture edits don't reuse render controls.
+ */
+export function buildTexturePrompt(o: TexturePromptOptions): string {
+  const texture = o.textureDescription?.trim() || o.textureLabel?.trim();
+  const parts: string[] = [
+    texture
+      ? `Replace the selected region with ${texture}.`
+      : "Replace the selected region with the requested material.",
+  ];
+  const instruction = o.instruction?.trim();
+  if (instruction) parts.push(instruction);
+  parts.push(
+    "Apply the new material only inside the masked area, matching the surrounding lighting, shadows, reflections and perspective, and keeping the region's original edges and geometry. Photorealistic, seamless blend with the rest of the image.",
+  );
+  return parts.join(" ");
+}

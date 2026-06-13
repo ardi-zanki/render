@@ -4,11 +4,12 @@ import {
   ArrowLeftRight,
   ImagePlus,
   Loader2,
+  Pencil,
   X,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 import { RenderImage } from "@/components/app/render-image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -19,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Segmented } from "@/components/ui/segmented";
 import { Textarea } from "@/components/ui/textarea";
 import type { RenderMode } from "@/db/schema";
+import { cn } from "@/lib/utils";
 import type { StudioView, ViewerTab } from "./types";
 
 export function RenderPreviewViewer({
@@ -51,6 +53,11 @@ export function RenderPreviewViewer({
   negativePrompt,
   setNegativePrompt,
   error,
+  editAvailable = false,
+  studioMode = "render",
+  setStudioMode,
+  textureCanvas,
+  textureToolbar,
 }: {
   fileRef: RefObject<HTMLInputElement | null>;
   referenceRef: RefObject<HTMLInputElement | null>;
@@ -82,24 +89,51 @@ export function RenderPreviewViewer({
   negativePrompt: string;
   setNegativePrompt: (value: string) => void;
   error: string;
+  /** Show the "Edit" (texture) toggle — only for a completed render w/ result. */
+  editAvailable?: boolean;
+  studioMode?: "render" | "texture";
+  setStudioMode?: (mode: "render" | "texture") => void;
+  /** Texture-edit canvas + toolbar, rendered by the studio (owns the ref). */
+  textureCanvas?: ReactNode;
+  textureToolbar?: ReactNode;
 }) {
   return (
     <Card className="overflow-hidden lg:h-full">
       <CardContent className="flex flex-col gap-4 py-4 lg:h-full lg:min-h-0">
-        {/* Sticky toolbar: view tabs + zoom controls. */}
+        {/* Sticky toolbar: view tabs (+ Edit) + zoom controls. */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          {hasUploadedImage ? (
-            <Segmented
-              options={viewerTabs}
-              value={view}
-              onChange={setView}
-              size="sm"
-            />
-          ) : (
-            <div />
-          )}
+          <div className="flex items-center gap-2">
+            {hasUploadedImage ? (
+              <Segmented
+                options={viewerTabs}
+                value={view}
+                onChange={(value) => {
+                  setStudioMode?.("render");
+                  setView(value);
+                }}
+                size="sm"
+              />
+            ) : (
+              <div />
+            )}
+            {editAvailable && (
+              <button
+                type="button"
+                onClick={() => setStudioMode?.("texture")}
+                aria-pressed={studioMode === "texture"}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors [&_svg]:size-4",
+                  studioMode === "texture"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted/80 text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <Pencil /> Edit
+              </button>
+            )}
+          </div>
 
-          {shownImage && (
+          {studioMode !== "texture" && shownImage && (
             <div className="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1">
               <Button
                 type="button"
@@ -138,7 +172,13 @@ export function RenderPreviewViewer({
         </div>
 
         <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/35 lg:aspect-auto lg:min-h-0 lg:flex-1">
-          {canCompare && view === "comparison" ? (
+          {studioMode === "texture" ? (
+            textureCanvas ?? (
+              <p className="px-4 text-center text-sm text-muted-foreground">
+                Tidak ada gambar hasil untuk diedit.
+              </p>
+            )
+          ) : canCompare && view === "comparison" ? (
             <div className="relative size-full overflow-hidden bg-background">
               {/* Base = original, shown on the right. */}
               <RenderImage
@@ -244,6 +284,8 @@ export function RenderPreviewViewer({
             </button>
           )}
         </div>
+
+        {studioMode === "texture" && textureToolbar}
 
         <input
           ref={fileRef}

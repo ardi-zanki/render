@@ -18,6 +18,7 @@ import {
   type CreateRenderParams,
   type CreateRenderResult,
   type ProviderRequestOptions,
+  type UploadedFile,
 } from "./types";
 
 /**
@@ -263,6 +264,170 @@ export async function createRenderEdit(
         type: "refund",
         amount: RENDER_COST,
         description: "Refund edit gagal dibuat",
+        renderId,
+        idempotencyKey: `render-refund:${editId}`,
+      });
+    }
+    throw err;
+  }
+}
+
+export interface CreateRenderTextureEditParams {
+  userId: string;
+  renderId: string;
+  /** Validated PNG mask (white = region to replace). */
+  mask: UploadedFile;
+  /** Optional uploaded texture reference image. */
+  texture?: UploadedFile;
+  /** Composed inpaint prompt (already built by the route). */
+  texturePrompt: string;
+  /** Human-readable texture name for the "Edit Texture" marker. */
+  textureLabel: string;
+  /** Version (render_assets.id) to edit from. Defaults to the latest version. */
+  baseAssetId?: string;
+}
+
+/**
+ * Region/texture edit: inpaint a masked area of an existing successful render,
+ * producing a NEW version (an `edit` asset) on the SAME render and reserving 1
+ * credit. The mask is stored as a `mask` asset and the inpaint parameters ride
+ * on `providerResponse.requestOptions` for the processor. Refunds on failure.
+ */
+export async function createRenderTextureEdit(
+  params: CreateRenderTextureEditParams,
+): Promise<CreateRenderResult> {
+  const { userId, renderId } = params;
+
+  const render = await db.query.renders.findFirst({
+    where: and(
+      eq(renders.id, renderId),
+      eq(renders.userId, userId),
+      isNull(renders.deletedAt),
+    ),
+  });
+  if (!render) throw new Error("Render tidak ditemukan");
+  if (render.status !== "success") {
+    throw new Error("Render harus selesai sebelum tekstur bisa diedit");
+  }
+
+  const original = await db.query.renderAssets.findFirst({
+    where: and(
+      eq(renderAssets.renderId, renderId),
+      eq(renderAssets.type, "original"),
+      isNull(renderAssets.deletedAt),
+    ),
+  });
+  if (!original) throw new Error("Gambar asli tidak ditemukan");
+
+  // Inpaint builds on the chosen version, or the latest one by default.
+  let baseAssetId = params.baseAssetId;
+  if (baseAssetId) {
+    const baseAsset = await db.query.renderAssets.findFirst({
+      where: and(
+        eq(renderAssets.id, baseAssetId),
+        eq(renderAssets.renderId, renderId),
+        isNull(renderAssets.deletedAt),
+      ),
+    });
+    if (!baseAsset) throw new Error("Versi dasar tidak ditemukan");
+  } else {
+    const latest = await db.query.renderAssets.findFirst({
+      where: and(
+        eq(renderAssets.renderId, renderId),
+        inArray(renderAssets.type, ["result", "edit"]),
+        isNull(renderAssets.deletedAt),
+      ),
+      orderBy: desc(renderAssets.createdAt),
+    });
+    baseAssetId = latest?.id ?? original.id;
+  }
+
+  if ((await getBalance(userId)) < RENDER_COST) {
+    throw new InsufficientCreditsError();
+  }
+
+  const editId = randomUUID();
+  const deduction = await applyCreditChange({
+    userId,
+    type: "usage",
+    amount: -RENDER_COST,
+    description: `Edit tekstur render ${render.mode}`,
+    renderId,
+    idempotencyKey: `render-usage:${editId}`,
+  });
+
+  try {
+    const maskAsset = await storeAsset({
+      renderId,
+      userId,
+      projectId: render.projectId,
+      type: "mask",
+      file: params.mask,
+    });
+    if (params.texture) {
+      await storeAsset({
+        renderId,
+        userId,
+        projectId: render.projectId,
+        type: "reference",
+        file: params.texture,
+      });
+    }
+
+    // The result asset inherits this config, marking the version as a texture
+    // edit (read by the studio's render info + version history).
+    const textureConfig: RenderConfig = {
+      editKind: "texture",
+      textureLabel: params.textureLabel,
+      texturePrompt: params.texturePrompt,
+    };
+    const requestOptions: ProviderRequestOptions = {
+      inpaint: true,
+      maskAssetId: maskAsset.id,
+      texturePrompt: params.texturePrompt,
+      textureLabel: params.textureLabel,
+    };
+
+    await db
+      .update(renders)
+      .set({
+        config: textureConfig,
+        prompt: params.texturePrompt,
+        status: "queued",
+        errorCode: null,
+        errorMessage: null,
+        providerResponse: { requestOptions },
+      })
+      .where(eq(renders.id, renderId));
+
+    await db.insert(renderJobs).values({
+      renderId,
+      userId,
+      editId,
+      baseAssetId,
+      status: "queued",
+      attempts: 0,
+      maxAttempts: 3,
+      availableAt: new Date(),
+    });
+
+    return {
+      renderId,
+      status: "queued",
+      originalUrl: original.fileUrl,
+      balance: deduction.balance,
+    };
+  } catch (err) {
+    await db
+      .update(renders)
+      .set({ status: "success" })
+      .where(eq(renders.id, renderId));
+    if (deduction.applied) {
+      await applyCreditChange({
+        userId,
+        type: "refund",
+        amount: RENDER_COST,
+        description: "Refund edit tekstur gagal dibuat",
         renderId,
         idempotencyKey: `render-refund:${editId}`,
       });
