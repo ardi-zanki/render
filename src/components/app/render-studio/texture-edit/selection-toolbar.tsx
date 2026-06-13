@@ -149,7 +149,7 @@ export function SelectionToolbar({
           disabled={downloading}
           aria-label="Unduh hasil"
           title="Unduh hasil"
-          className="flex size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-40 sm:size-6 [&_svg]:size-3 sm:[&_svg]:size-3.5"
+          className="hidden size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-40 sm:flex sm:size-6 [&_svg]:size-3 sm:[&_svg]:size-3.5"
         >
           {downloading ? (
             <Loader2 className="animate-spin" />
