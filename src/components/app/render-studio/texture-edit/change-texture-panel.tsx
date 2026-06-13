@@ -30,8 +30,8 @@ export function ChangeTexturePanel({
     : TEXTURE_LIBRARY;
 
   return (
-    <Card className="h-fit lg:min-h-full">
-      <CardContent className="flex flex-col gap-4 py-4">
+    <Card className="flex h-fit flex-col lg:h-full lg:min-h-full">
+      <CardContent className="flex flex-col gap-4 py-4 lg:min-h-0 lg:flex-1">
         <div className="flex flex-col gap-1">
           <h2 className="text-base font-semibold text-foreground">
             Ganti Tekstur
@@ -51,115 +51,126 @@ export function ChangeTexturePanel({
           onChange={(value) => state.setTextureSource(value)}
         />
 
-        {state.textureSource === "library" ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap gap-1.5">
-              {TEXTURE_CATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setCategory((prev) => (prev === c ? null : c))}
-                  className={cn(
-                    "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                    category === c
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground hover:bg-muted",
-                  )}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {textures.map((t) => {
-                const active = state.selectedTextureId === t.id;
-                return (
+        {/* Scrollable selection area — the footer below stays pinned. */}
+        <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+          {state.textureSource === "library" ? (
+            <>
+              <div className="flex flex-wrap gap-1.5">
+                {TEXTURE_CATEGORIES.map((c) => (
                   <button
-                    key={t.id}
+                    key={c}
                     type="button"
-                    onClick={() => state.setSelectedTextureId(t.id)}
-                    aria-pressed={active}
+                    onClick={() =>
+                      setCategory((prev) => (prev === c ? null : c))
+                    }
                     className={cn(
-                      "flex flex-col gap-1.5 rounded-md border p-1.5 text-left transition-colors",
-                      active
-                        ? "border-primary ring-1 ring-primary/30"
-                        : "border-border hover:border-primary/40",
+                      "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                      category === c
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-secondary-foreground hover:bg-muted",
                     )}
                   >
-                    <span
-                      className="h-12 w-full rounded-sm border border-border/60"
-                      style={{ background: t.thumbnail ? undefined : t.swatch }}
-                    />
-                    <span className="truncate text-xs font-medium text-foreground">
-                      {t.name}
-                    </span>
+                    {c}
                   </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="hidden"
-              onChange={(e) => state.pickTextureFile(e.target.files?.[0] ?? null)}
-            />
-            {state.texturePreviewUrl ? (
-              <div className="relative">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={state.texturePreviewUrl}
-                  alt="Tekstur referensi"
-                  className="h-32 w-full rounded-md border border-border object-cover"
-                />
+                ))}
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {textures.map((t) => {
+                  const active = state.selectedTextureId === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => state.setSelectedTextureId(t.id)}
+                      aria-pressed={active}
+                      className={cn(
+                        "flex flex-col gap-1.5 rounded-md border p-1.5 text-left transition-colors",
+                        active
+                          ? "border-primary ring-1 ring-primary/30"
+                          : "border-border hover:border-primary/40",
+                      )}
+                    >
+                      <span
+                        className="h-12 w-full rounded-sm border border-border/60"
+                        style={{ background: t.thumbnail ? undefined : t.swatch }}
+                      />
+                      <span className="truncate text-xs font-medium text-foreground">
+                        {t.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          ) : (
+            <>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) =>
+                  state.pickTextureFile(e.target.files?.[0] ?? null)
+                }
+              />
+              {state.texturePreviewUrl ? (
+                <div className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={state.texturePreviewUrl}
+                    alt="Tekstur referensi"
+                    className="h-32 w-full rounded-md border border-border object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => state.pickTextureFile(null)}
+                    aria-label="Hapus tekstur"
+                    className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-md bg-background/85 text-foreground shadow-floating hover:bg-background [&_svg]:size-3.5"
+                  >
+                    <X />
+                  </button>
+                </div>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => state.pickTextureFile(null)}
-                  aria-label="Hapus tekstur"
-                  className="absolute right-2 top-2 flex size-6 items-center justify-center rounded-md bg-background/85 text-foreground shadow-floating hover:bg-background [&_svg]:size-3.5"
+                  onClick={() => fileRef.current?.click()}
+                  className="flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border px-3 py-6 text-sm text-muted-foreground hover:border-primary/40"
                 >
-                  <X />
+                  <ImagePlus className="size-5" />
+                  Unggah gambar tekstur
                 </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                className="flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border px-3 py-6 text-sm text-muted-foreground hover:border-primary/40"
-              >
-                <ImagePlus className="size-5" />
-                Unggah gambar tekstur
-              </button>
-            )}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="texture-instruction" className="text-xs">
-            Instruksi tambahan{" "}
-            <span className="font-normal text-muted-foreground">(opsional)</span>
-          </Label>
-          <Textarea
-            id="texture-instruction"
-            value={state.instruction}
-            onChange={(e) => state.setInstruction(e.target.value)}
-            placeholder="mis. marmer putih dengan urat abu-abu halus"
-            className="min-h-16 resize-none text-sm"
-          />
+              )}
+            </>
+          )}
         </div>
 
-        <Button onClick={onApply} disabled={!state.canApply} className="w-full">
-          {state.applying ? <Loader2 className="animate-spin" /> : <Sparkles />}
-          Apply Texture
-        </Button>
-        {!state.mask.hasMask && (
-          <p className="-mt-2 text-center text-xs text-muted-foreground">
-            Pilih dulu area yang ingin diganti.
-          </p>
-        )}
+        {/* Pinned footer: instruction + Apply stay visible while scrolling. */}
+        <div className="flex shrink-0 flex-col gap-3 border-t border-border/80 pt-3">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="texture-instruction" className="text-xs">
+              Instruksi tambahan{" "}
+              <span className="font-normal text-muted-foreground">
+                (opsional)
+              </span>
+            </Label>
+            <Textarea
+              id="texture-instruction"
+              value={state.instruction}
+              onChange={(e) => state.setInstruction(e.target.value)}
+              placeholder="mis. marmer putih dengan urat abu-abu halus"
+              className="min-h-16 resize-none text-sm"
+            />
+          </div>
+          <Button onClick={onApply} disabled={!state.canApply} className="w-full">
+            {state.applying ? <Loader2 className="animate-spin" /> : <Sparkles />}
+            Apply Texture
+          </Button>
+          {!state.mask.hasMask && (
+            <p className="text-center text-xs text-muted-foreground">
+              Pilih dulu area yang ingin diganti.
+            </p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

@@ -184,7 +184,7 @@ export function RenderPreviewViewer({
               <RenderImage
                 src={previewUrl ?? ""}
                 alt="Gambar asli"
-                className="size-full"
+                className="size-full object-contain"
                 style={{ transform: `scale(${zoom})` }}
               />
               {/* Overlay = result, revealed on the left as the handle moves. */}
@@ -197,7 +197,7 @@ export function RenderPreviewViewer({
                 <RenderImage
                   src={resultUrl ?? ""}
                   alt="Hasil render"
-                  className="size-full"
+                  className="size-full object-contain"
                   style={{ transform: `scale(${zoom})` }}
                 />
               </div>

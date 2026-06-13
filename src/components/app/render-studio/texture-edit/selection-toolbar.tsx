@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  Download,
   Eraser,
   Hand,
   Lasso,
+  Loader2,
   Paintbrush,
   Redo2,
   Trash2,
@@ -68,6 +70,8 @@ export function SelectionToolbar({
   onUndo,
   onRedo,
   onClear,
+  onDownload,
+  downloading = false,
 }: {
   tool: TextureTool;
   setTool: (tool: TextureTool) => void;
@@ -80,6 +84,9 @@ export function SelectionToolbar({
   onUndo: () => void;
   onRedo: () => void;
   onClear: () => void;
+  /** Download the current result without leaving Edit mode. */
+  onDownload?: () => void;
+  downloading?: boolean;
 }) {
   const isBrush = tool === "brush-add" || tool === "brush-erase";
 
@@ -147,6 +154,22 @@ export function SelectionToolbar({
           disabled={!canRedo}
         />
         <ToolButton label="Hapus seleksi" icon={Trash2} onClick={onClear} />
+        {onDownload && (
+          <button
+            type="button"
+            onClick={onDownload}
+            disabled={downloading}
+            aria-label="Unduh hasil"
+            title="Unduh hasil"
+            className="flex size-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4"
+          >
+            {downloading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <Download />
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

@@ -303,7 +303,7 @@ export function SettingsModal({
             <div>
               <h3 className="text-base font-semibold text-foreground">Storage</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Pantau kapasitas file mentahan, referensi, hasil render, dan hasil edit.
+                Pantau kapasitas file mentahan, referensi, hasil render, hasil edit, dan mask seleksi.
               </p>
             </div>
 

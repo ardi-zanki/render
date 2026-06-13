@@ -15,6 +15,7 @@ import {
   apiJson,
   postJson,
 } from "@/lib/client-api";
+import { cn } from "@/lib/utils";
 import { RenderActionBar } from "./render-studio/action-bar";
 import { CreateProjectModal } from "./render-studio/create-project-modal";
 import { RenderStudioControls } from "./render-studio/controls";
@@ -447,6 +448,8 @@ export function RenderStudio({
       onUndo={handleMaskUndo}
       onRedo={handleMaskRedo}
       onClear={handleMaskClear}
+      onDownload={onDownload}
+      downloading={state.downloading}
     />
   ) : null;
 
@@ -463,7 +466,14 @@ export function RenderStudio({
 
       <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_280px]">
       {/* Column 1 — Configuration, or Change Texture panel in Edit mode. */}
-      <div className="flex flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
+      <div
+        className={cn(
+          "flex flex-col gap-4 lg:min-h-0",
+          // Texture panel manages its own internal scroll so the Apply button
+          // stays pinned; the config form scrolls the whole column.
+          inTextureMode ? "lg:overflow-hidden" : "lg:overflow-y-auto lg:pr-1",
+        )}
+      >
         {inTextureMode ? (
           <ChangeTexturePanel state={texture} onApply={onApplyTexture} />
         ) : (
@@ -548,24 +558,27 @@ export function RenderStudio({
           <RenderSceneList scenes={state.scenes} projectName={projectName} />
         )}
 
-        {/* Manual prompt + actions, pinned below the Scene History. */}
-        <div className="shrink-0 rounded-lg border border-border bg-card p-3 shadow-soft">
-          <RenderActionBar
-            instruction={state.instruction}
-            setInstruction={state.setInstruction}
-            balance={state.balance}
-            resultRenderId={state.resultRenderId}
-            resultUrl={state.resultUrl}
-            sharing={state.sharing}
-            shareUrl={state.shareUrl}
-            onShare={onShare}
-            downloading={state.downloading}
-            onDownload={onDownload}
-            loading={state.loading}
-            canRender={canRender}
-            onRender={onRender}
-          />
-        </div>
+        {/* Manual prompt + actions, pinned below the Scene History. Hidden in
+            texture mode — edits are submitted via the Apply Texture button. */}
+        {!inTextureMode && (
+          <div className="shrink-0 rounded-lg border border-border bg-card p-3 shadow-soft">
+            <RenderActionBar
+              instruction={state.instruction}
+              setInstruction={state.setInstruction}
+              balance={state.balance}
+              resultRenderId={state.resultRenderId}
+              resultUrl={state.resultUrl}
+              sharing={state.sharing}
+              shareUrl={state.shareUrl}
+              onShare={onShare}
+              downloading={state.downloading}
+              onDownload={onDownload}
+              loading={state.loading}
+              canRender={canRender}
+              onRender={onRender}
+            />
+          </div>
+        )}
       </aside>
       </div>
 

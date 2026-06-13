@@ -40,6 +40,7 @@ const CATEGORY_ORDER: RenderAssetType[] = [
   "result",
   "edit",
   "upscale",
+  "mask",
 ];
 
 function numberFrom(value: unknown) {
