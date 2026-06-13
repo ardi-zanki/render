@@ -4,7 +4,7 @@ Platform SaaS render arsitektur berbasis AI untuk pasar Indonesia. Brand &
 UX terinspirasi **Vrendr**, fungsionalitas mengacu **MyArchitectAI**. Lihat
 PRD lengkap di `../RenderAI_PRD_Final/`.
 
-> Upload gambar desain, pilih mode render, dan dapatkan visual arsitektur
+> Unggah gambar desain, pilih mode render, dan dapatkan visual arsitektur
 > realistis dalam hitungan detik.
 
 ## Tech stack
@@ -70,10 +70,18 @@ src/components/
 src/lib/utils.ts   # cn() — clsx + tailwind-merge
 ```
 
-Tombol `<Button>` default berbentuk pill (radius penuh) sesuai gaya Vrendr;
-varian: `default` (navy), `inverse` (ink, auto-adaptif tema), `secondary`,
-`outline`, `ghost`, `destructive`, `link`. Dukung `asChild` untuk render
-sebagai `<Link>`.
+Tombol `<Button>` memakai radius `rounded-md` (4px) sesuai kontrak design
+system; varian: `default` (navy), `inverse` (ink, auto-adaptif tema),
+`secondary`, `outline`, `ghost`, `destructive`, `link`. Dukung `asChild` untuk
+render sebagai `<Link>`.
+
+### Token tambahan
+
+- **Shadow:** `shadow-hairline` · `shadow-soft` · `shadow-floating` (kontrol
+  mengambang di atas gambar) · `shadow-elevated` (menu) · `shadow-dialog`
+  (modal). Jangan pakai `shadow-sm`/`shadow-md` default Tailwind.
+- **Type scale:** `text-display` (40px, headline landing) dan `text-micro`
+  (11px, counter/byline/badge mini) melengkapi skala Tailwind bawaan.
 
 ## Backend foundation (Phase 1b)
 
@@ -119,6 +127,39 @@ project ("Project Saya") on creation; the **3 free credits** are granted
 (idempotently) once the email is verified — or immediately for Google OAuth
 users (already verified). Without `RESEND_API_KEY`, verification/reset links
 are printed to the dev console instead of emailed.
+
+## Konvensi kode & istilah
+
+**`service.ts` = pintu publik domain.** Setiap modul `src/lib/<domain>/`
+mengekspos API-nya lewat `service.ts`. Untuk domain kecil, `service.ts` berisi
+implementasinya langsung (`projects`, `payments`, `account`, `admin`). Untuk
+domain yang dipecah ke banyak file (`renders`), `service.ts` adalah **barrel**
+yang me-`re-export` dari `create.ts`, `jobs.ts`, `queries.ts`, dst. Konsumen di
+luar domain mengimpor dari `service.ts`, bukan dari file internalnya.
+
+**Error API.** Petakan error domain ke HTTP lewat `errorResponse()` di
+`src/lib/api/errors.ts` agar status & payload konsisten antar-route.
+
+**Label status.** Satu sumber kebenaran per domain: render di
+`src/lib/renders/labels.ts`, pembayaran di `src/lib/payments/labels.ts`. Jangan
+menduplikasi map status di halaman.
+
+### Glosarium istilah UI
+
+Indonesia-first, formal tapi ramah ("Anda", tanpa slang seperti "nyalain"/"dulu
+ya"). Pakai kolom kiri, hindari kolom kanan:
+
+| Pakai | Hindari |
+| ----- | ------- |
+| Project | Proyek |
+| Unggah | Upload |
+| Render | Generate |
+| Kredit | Credit / koin |
+| Beli Kredit | Top up kredit |
+| Segera hadir | Coming Soon |
+
+Status: render memakai **Antri/Antrian**, pembayaran memakai **Menunggu** —
+keduanya warna `warning`, dibedakan karena beda konteks (antrean vs. transaksi).
 
 ## Auth & app UI
 

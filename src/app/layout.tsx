@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: "%s · RenderAI",
   },
   description:
-    "Upload gambar desain, pilih mode render, dan dapatkan visual arsitektur realistis dalam hitungan detik.",
+    "Unggah gambar desain, pilih mode render, dan dapatkan visual arsitektur realistis dalam hitungan detik.",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     shortcut: ["/icon.svg"],

@@ -178,20 +178,20 @@ export function RenderPreviewViewer({
               />
               {/* Handle — centered exactly on the divider line. */}
               <span
-                className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-md"
+                className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating"
                 style={{ left: `${comparisonPosition}%` }}
               >
                 <ArrowLeftRight className="size-4" />
               </span>
               {/* Labels — symmetric on each side of the handle. */}
               <span
-                className="pointer-events-none absolute top-1/2 -translate-x-full -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm"
+                className="pointer-events-none absolute top-1/2 -translate-x-full -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
                 style={{ left: `calc(${comparisonPosition}% - 1.5rem)` }}
               >
                 Hasil
               </span>
               <span
-                className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm"
+                className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
                 style={{ left: `calc(${comparisonPosition}% + 1.5rem)` }}
               >
                 Asli
@@ -216,7 +216,7 @@ export function RenderPreviewViewer({
                 <ImagePlus className="size-5" />
               </div>
               <span className="text-sm font-medium">
-                Klik untuk upload gambar desain
+                Klik untuk mengunggah gambar desain
               </span>
               <span className="text-xs">JPG, PNG, atau WebP · maks 10MB</span>
             </button>
@@ -237,7 +237,7 @@ export function RenderPreviewViewer({
             <button
               type="button"
               onClick={() => pickFile(null)}
-              className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-md bg-background/85 text-foreground shadow-sm hover:bg-background"
+              className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-md bg-background/85 text-foreground shadow-floating hover:bg-background"
               aria-label="Hapus gambar"
             >
               <X className="size-4" />
@@ -283,7 +283,7 @@ export function RenderPreviewViewer({
                   <button
                     type="button"
                     onClick={() => pickReference(null)}
-                    className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-md bg-background/85 text-foreground shadow-sm"
+                    className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-md bg-background/85 text-foreground shadow-floating"
                     aria-label="Hapus reference"
                   >
                     <X className="size-4" />
@@ -297,7 +297,7 @@ export function RenderPreviewViewer({
                 className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-border px-3 py-5 text-sm text-muted-foreground"
               >
                 <ImagePlus className="size-4" />
-                Upload gambar referensi style
+                Unggah gambar referensi
               </button>
             )}
             <input

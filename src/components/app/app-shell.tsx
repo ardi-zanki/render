@@ -165,8 +165,8 @@ export function AppShell({
               !expanded && "flex",
             )}
             onClick={() => updateSidebarExpanded(!sidebarExpanded)}
-            aria-label={expanded ? "Close Sidebar" : "Open Sidebar"}
-            title={expanded ? "Close Sidebar" : "Open Sidebar"}
+            aria-label={expanded ? "Ciutkan sidebar" : "Lebarkan sidebar"}
+            title={expanded ? "Ciutkan sidebar" : "Lebarkan sidebar"}
           >
             <PanelLeft className="size-5" />
           </button>

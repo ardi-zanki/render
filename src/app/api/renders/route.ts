@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 
 import { env } from "@/env";
-import { InsufficientCreditsError } from "@/lib/credits";
+import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
 import { getDefaultProject, getProject } from "@/lib/projects/service";
-import { AiProviderError } from "@/lib/providers/ai";
 import { buildPrompt } from "@/lib/renders/prompt";
 import { createRender } from "@/lib/renders/service";
-import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { StorageQuotaExceededError } from "@/lib/storage/usage";
-import { ImageUploadError, validateImageFile } from "@/lib/uploads/images";
+import { assertRateLimit } from "@/lib/rate-limit";
+import { validateImageFile } from "@/lib/uploads/images";
 import { createRenderSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
@@ -44,17 +42,8 @@ export async function POST(req: Request) {
     await assertRateLimit("create_render", userId);
     await assertRateLimit("upload_image", userId);
   } catch (err) {
-    if (err instanceof RateLimitError) {
-      return NextResponse.json(
-        {
-          success: false,
-          code: err.code,
-          message: err.message,
-          error: err.message,
-        },
-        { status: 429 },
-      );
-    }
+    const mapped = errorResponse(err);
+    if (mapped) return mapped;
     throw err;
   }
 
@@ -72,12 +61,12 @@ export async function POST(req: Request) {
   try {
     original = await validateImageFile(file);
   } catch (err) {
-    if (err instanceof ImageUploadError) {
-      return NextResponse.json({ error: err.message }, { status: err.status });
-    }
-    return NextResponse.json(
-      { error: "File gambar tidak dapat dibaca" },
-      { status: 400 },
+    return (
+      errorResponse(err) ??
+      NextResponse.json(
+        { error: "File gambar tidak dapat dibaca" },
+        { status: 400 },
+      )
     );
   }
 
@@ -133,15 +122,12 @@ export async function POST(req: Request) {
     try {
       reference = await validateImageFile(refFile);
     } catch (err) {
-      if (err instanceof ImageUploadError) {
-        return NextResponse.json(
-          { error: err.message },
-          { status: err.status },
-        );
-      }
-      return NextResponse.json(
-        { error: "File reference tidak dapat dibaca" },
-        { status: 400 },
+      return (
+        errorResponse(err) ??
+        NextResponse.json(
+          { error: "File referensi tidak dapat dibaca" },
+          { status: 400 },
+        )
       );
     }
   }
@@ -186,24 +172,8 @@ export async function POST(req: Request) {
     startInlineRenderProcessing(result.renderId, userId);
     return NextResponse.json(result);
   } catch (err) {
-    if (err instanceof InsufficientCreditsError) {
-      return NextResponse.json(
-        { error: err.message, code: "INSUFFICIENT_CREDITS" },
-        { status: 402 },
-      );
-    }
-    if (err instanceof AiProviderError) {
-      return NextResponse.json(
-        { error: `Render gagal: ${err.message}`, code: err.code },
-        { status: 502 },
-      );
-    }
-    if (err instanceof StorageQuotaExceededError) {
-      return NextResponse.json(
-        { error: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
+    const mapped = errorResponse(err);
+    if (mapped) return mapped;
     const msg = err instanceof Error ? err.message : "Render gagal";
     return NextResponse.json(
       { error: msg, code: "RENDER_FAILED" },

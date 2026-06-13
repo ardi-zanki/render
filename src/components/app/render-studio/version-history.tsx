@@ -47,7 +47,7 @@ export function StudioVersionHistory({
                 className="size-full"
               />
             </span>
-            <span className="truncate px-0.5 pb-0.5 text-[11px] font-medium text-foreground">
+            <span className="truncate px-0.5 pb-0.5 text-micro font-medium text-foreground">
               {version.label}
             </span>
           </button>

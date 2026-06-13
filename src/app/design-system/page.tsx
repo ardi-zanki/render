@@ -69,11 +69,12 @@ const colorGroups = [
 ];
 
 const typeScale = [
-  ["Display", "40/48", "Headline landing"],
+  ["Display", "40/48", "Headline landing (text-display)"],
   ["H1", "24/32", "Judul halaman app"],
   ["H2", "18/26", "Judul section"],
   ["Body", "14/24", "Form, card, tabel"],
   ["Caption", "12/18", "Meta dan helper text"],
+  ["Micro", "11/16", "Counter, byline, badge mini (text-micro)"],
 ];
 
 const foundations = [
@@ -360,7 +361,7 @@ export default function DesignSystemPage() {
                   <ChoiceCard active icon={ImageIcon} label="Interior" />
                   <ChoiceCard icon={Layers3} label="Exterior" />
                 </div>
-                <ToggleRow checked icon={Lightbulb} label="Nyalain Lampu" />
+                <ToggleRow checked icon={Lightbulb} label="Nyalakan Lampu" />
               </CardContent>
             </Card>
           </div>
@@ -585,8 +586,8 @@ export default function DesignSystemPage() {
                 <div className="rounded-lg border border-border bg-card p-4 shadow-elevated">
                   <p className="font-semibold text-foreground">Pola modal</p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Dialog memakai radius 8px, padding 20px, overlay 45%, dan
-                    shadow hanya untuk layer aktif.
+                    Dialog memakai radius 6px (rounded-lg), padding 20px, overlay
+                    45%, dan shadow hanya untuk layer aktif.
                   </p>
                   <div className="mt-4 flex justify-end gap-2">
                     <Button variant="outline">Batal</Button>

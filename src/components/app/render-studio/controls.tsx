@@ -117,9 +117,9 @@ export function RenderStudioControls({
                   m.comingSoon ? (
                     <Badge
                       variant="secondary"
-                      className="mt-0.5 px-1.5 py-0 text-[10px]"
+                      className="mt-0.5 px-1.5 py-0 text-micro"
                     >
-                      Coming Soon
+                      Segera hadir
                     </Badge>
                   ) : undefined
                 }
@@ -165,7 +165,7 @@ export function RenderStudioControls({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="location">Lokasi Proyek</Label>
+          <Label htmlFor="location">Lokasi Project</Label>
           <Input
             id="location"
             value={location}
@@ -202,12 +202,12 @@ export function RenderStudioControls({
         )}
 
         <div className="flex flex-col gap-2.5 border-t border-border/80 pt-4">
-          <Label className="font-semibold text-foreground">Objek</Label>
+          <Label className="font-semibold text-foreground">Pencahayaan</Label>
           <ToggleRow
             checked={lightsOn}
             onCheckedChange={(next) => setLightsOn(() => next)}
             icon={Lightbulb}
-            label="Nyalain Lampu"
+            label="Nyalakan Lampu"
           />
         </div>
       </CardContent>

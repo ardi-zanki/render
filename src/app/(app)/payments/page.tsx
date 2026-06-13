@@ -20,7 +20,7 @@ import {
   listActivePaymentPackages,
   listPayments,
 } from "@/lib/payments/service";
-import type { BadgeVariant } from "@/lib/renders/labels";
+import { paymentStatusBadge } from "@/lib/payments/labels";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Pembayaran" };
@@ -30,15 +30,6 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", {
   dateStyle: "medium",
   timeStyle: "short",
 });
-
-const PAY_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
-  paid: { label: "Lunas", variant: "success" },
-  pending: { label: "Menunggu", variant: "warning" },
-  failed: { label: "Gagal", variant: "destructive" },
-  expired: { label: "Kedaluwarsa", variant: "secondary" },
-  cancelled: { label: "Batal", variant: "secondary" },
-  refunded: { label: "Refund", variant: "info" },
-};
 
 export default async function PaymentsPage({
   searchParams,
@@ -135,10 +126,7 @@ export default async function PaymentsPage({
           <Card className="overflow-hidden p-0">
             <div className="divide-y divide-border">
               {history.map((p) => {
-                const s = PAY_STATUS[p.status] ?? {
-                  label: p.status,
-                  variant: "secondary" as BadgeVariant,
-                };
+                const s = paymentStatusBadge(p.status);
                 return (
                   <div
                     key={p.id}

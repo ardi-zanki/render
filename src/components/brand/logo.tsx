@@ -57,7 +57,7 @@ function Logo({
             RenderAI<span className="text-primary">.</span>
           </span>
           {byline && (
-            <span className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+            <span className="mt-0.5 text-micro font-medium text-muted-foreground">
               {byline}
             </span>
           )}

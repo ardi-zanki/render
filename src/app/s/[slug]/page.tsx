@@ -75,7 +75,7 @@ export default async function PublicRenderPage({ params }: Params) {
             Buat render arsitektur Anda sendiri
           </p>
           <p className="max-w-md text-sm leading-6 text-muted-foreground">
-            Upload desain, pilih mode, dan dapatkan visual yang siap dibahas.
+            Unggah desain, pilih mode, dan dapatkan visual yang siap dibahas.
             Akun baru mendapatkan kredit awal.
           </p>
           <Button asChild>

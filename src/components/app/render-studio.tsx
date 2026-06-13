@@ -5,7 +5,10 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { useRenderStatusPolling } from "@/hooks/use-render-status-polling";
+import {
+  useRenderStatusPolling,
+  type PolledRender,
+} from "@/hooks/use-render-status-polling";
 import {
   apiErrorMessage,
   apiFieldErrors,
@@ -86,6 +89,33 @@ export function RenderStudio({
     if (id !== projectId) router.push(`/renders/new?project=${id}`);
   }
 
+  // Shared status-polling wiring for both fresh renders and in-place edits.
+  // Only the toast/error copy differs; `onScene` lets the create flow also
+  // mirror the live status onto its scene list.
+  function pollRenderStatus(
+    renderId: string,
+    copy: { success: string; failure: string; timeout: string },
+    onScene?: (render: PolledRender) => void,
+  ) {
+    startPolling(renderId, {
+      onUpdate: (render) => {
+        state.setRenderStatus(render.status);
+        onScene?.(render);
+      },
+      onSuccess: (render) => {
+        state.setResultUrl(render.resultUrl);
+        state.setView("hasil");
+        toast.success(copy.success);
+        router.refresh();
+      },
+      onFailure: (render) => {
+        state.setError(render.errorMessage ?? copy.failure);
+        router.refresh();
+      },
+      onTimeout: () => state.setError(copy.timeout),
+    });
+  }
+
   async function submitCreateProject() {
     const name = state.newProjectName.trim();
     if (!name) {
@@ -147,23 +177,10 @@ export function RenderStudio({
       state.setResultRenderId(json.renderId);
       state.setBalance((balance) => json.balance ?? balance - 1);
       toast.success("Edit masuk antrean");
-      startPolling(json.renderId, {
-        onUpdate: (render) => state.setRenderStatus(render.status),
-        onSuccess: (render) => {
-          state.setResultUrl(render.resultUrl);
-          state.setView("hasil");
-          toast.success("Edit selesai!");
-          router.refresh();
-        },
-        onFailure: (render) => {
-          state.setError(
-            render.errorMessage ?? "Edit gagal. Kredit sudah dikembalikan.",
-          );
-          router.refresh();
-        },
-        onTimeout: () => {
-          state.setError("Edit masih diproses. Cek beberapa saat lagi.");
-        },
+      pollRenderStatus(json.renderId, {
+        success: "Edit selesai!",
+        failure: "Edit gagal. Kredit sudah dikembalikan.",
+        timeout: "Edit masih diproses. Cek beberapa saat lagi.",
       });
       router.refresh();
     } catch (err) {
@@ -178,11 +195,11 @@ export function RenderStudio({
   async function onRender() {
     if (sourceRenderId) return onEdit();
     if (!state.file) {
-      state.setError("Upload gambar desain dulu ya.");
+      state.setError("Unggah gambar desain terlebih dahulu.");
       return;
     }
     if (state.mode === "style_transfer" && !state.referenceFile) {
-      state.setError("Upload reference image untuk Style Transfer.");
+      state.setError("Unggah gambar referensi untuk Style Transfer.");
       return;
     }
     state.setLoading(true);
@@ -225,9 +242,14 @@ export function RenderStudio({
         ...scenes,
       ]);
       toast.success("Render masuk antrean");
-      startPolling(json.renderId, {
-        onUpdate: (render) => {
-          state.setRenderStatus(render.status);
+      pollRenderStatus(
+        json.renderId,
+        {
+          success: "Render selesai!",
+          failure: "Render gagal. Kredit sudah dikembalikan.",
+          timeout: "Render masih diproses. Cek Riwayat Render beberapa saat lagi.",
+        },
+        (render) => {
           state.setScenes((items) =>
             items.map((item) =>
               item.id === json.renderId
@@ -240,24 +262,7 @@ export function RenderStudio({
             ),
           );
         },
-        onSuccess: (render) => {
-          state.setResultUrl(render.resultUrl);
-          state.setView("hasil");
-          toast.success("Render selesai!");
-          router.refresh();
-        },
-        onFailure: (render) => {
-          state.setError(
-            render.errorMessage ?? "Render gagal. Kredit sudah dikembalikan.",
-          );
-          router.refresh();
-        },
-        onTimeout: () => {
-          state.setError(
-            "Render masih diproses. Cek Riwayat Render beberapa saat lagi.",
-          );
-        },
-      });
+      );
       router.refresh();
     } catch (err) {
       state.setError(

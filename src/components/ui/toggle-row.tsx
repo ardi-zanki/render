@@ -56,7 +56,7 @@ function ToggleRow({
       >
         <span
           className={cn(
-            "size-4 rounded-full bg-background shadow-sm transition-transform",
+            "size-4 rounded-full bg-background shadow-soft transition-transform",
             checked && "translate-x-4",
           )}
         />

@@ -327,7 +327,7 @@ export function ProjectsClient({
                     triggerRef.current = e.currentTarget;
                     setMenuId(menuId === p.id ? null : p.id);
                   }}
-                  className="flex size-8 cursor-pointer items-center justify-center rounded-md bg-card/90 text-foreground shadow-sm backdrop-blur hover:bg-card"
+                  className="flex size-8 cursor-pointer items-center justify-center rounded-md bg-card/90 text-foreground shadow-floating backdrop-blur hover:bg-card"
                   aria-label="Menu project"
                   aria-haspopup="menu"
                   aria-expanded={menuId === p.id}

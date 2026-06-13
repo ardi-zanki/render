@@ -53,7 +53,7 @@ export function RenderQueueButton() {
       >
         <Box className="size-4" />
         {count > 0 && (
-          <span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold leading-4 text-primary-foreground">
+          <span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-micro font-bold leading-4 text-primary-foreground">
             {count > 9 ? "9+" : count}
           </span>
         )}

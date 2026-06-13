@@ -20,11 +20,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getBalance } from "@/lib/credits";
 import { getUnreadCount } from "@/lib/notifications/service";
-import {
-  STATUS_LABEL,
-  statusBadgeVariant,
-  type BadgeVariant,
-} from "@/lib/renders/labels";
+import { STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
+import { paymentStatusBadge } from "@/lib/payments/labels";
 import { listPayments } from "@/lib/payments/service";
 import {
   countProjects,
@@ -38,15 +35,6 @@ export const metadata: Metadata = { title: "Dashboard" };
 
 const dateFmt = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" });
 const idr = new Intl.NumberFormat("id-ID");
-
-const PAY_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
-  paid: { label: "Lunas", variant: "success" },
-  pending: { label: "Menunggu", variant: "warning" },
-  failed: { label: "Gagal", variant: "destructive" },
-  expired: { label: "Kedaluwarsa", variant: "secondary" },
-  cancelled: { label: "Batal", variant: "secondary" },
-  refunded: { label: "Refund", variant: "info" },
-};
 
 export default async function DashboardPage() {
   const session = await requireVerifiedUser();
@@ -159,7 +147,7 @@ export default async function DashboardPage() {
               <Sparkles className="size-4" /> Buat opsi visual berikutnya
             </p>
             <p className="text-sm leading-6 text-primary-foreground/80">
-              Upload desain, tentukan konteks, lalu simpan hasilnya langsung ke
+              Unggah desain, tentukan konteks, lalu simpan hasilnya langsung ke
               project yang sesuai.
             </p>
           </div>
@@ -197,10 +185,8 @@ export default async function DashboardPage() {
               </div>
             </div>
             {latestPayment ? (
-              <Badge
-                variant={PAY_STATUS[latestPayment.status]?.variant ?? "secondary"}
-              >
-                {PAY_STATUS[latestPayment.status]?.label ?? latestPayment.status}
+              <Badge variant={paymentStatusBadge(latestPayment.status).variant}>
+                {paymentStatusBadge(latestPayment.status).label}
               </Badge>
             ) : (
               <Link

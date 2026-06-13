@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
 import type { PaymentStatus } from "@/db/schema";
 import { countAllPayments, listAllPayments } from "@/lib/admin/service";
-import type { BadgeVariant } from "@/lib/renders/labels";
+import { PAYMENT_STATUS, paymentStatusBadge } from "@/lib/payments/labels";
 import { requireAdmin } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Admin · Pembayaran" };
@@ -16,15 +16,6 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", {
   dateStyle: "medium",
   timeStyle: "short",
 });
-
-const PAY_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
-  paid: { label: "Lunas", variant: "success" },
-  pending: { label: "Menunggu", variant: "warning" },
-  failed: { label: "Gagal", variant: "destructive" },
-  expired: { label: "Kedaluwarsa", variant: "secondary" },
-  cancelled: { label: "Batal", variant: "secondary" },
-  refunded: { label: "Refund", variant: "info" },
-};
 
 function parseStatus(value?: string): PaymentStatus | undefined {
   if (
@@ -78,12 +69,12 @@ export default async function AdminPaymentsPage({
             value: filters.status,
             options: [
               { label: "Semua status", value: "" },
-              { label: PAY_STATUS.pending.label, value: "pending" },
-              { label: PAY_STATUS.paid.label, value: "paid" },
-              { label: PAY_STATUS.failed.label, value: "failed" },
-              { label: PAY_STATUS.expired.label, value: "expired" },
-              { label: PAY_STATUS.cancelled.label, value: "cancelled" },
-              { label: PAY_STATUS.refunded.label, value: "refunded" },
+              { label: PAYMENT_STATUS.pending.label, value: "pending" },
+              { label: PAYMENT_STATUS.paid.label, value: "paid" },
+              { label: PAYMENT_STATUS.failed.label, value: "failed" },
+              { label: PAYMENT_STATUS.expired.label, value: "expired" },
+              { label: PAYMENT_STATUS.cancelled.label, value: "cancelled" },
+              { label: PAYMENT_STATUS.refunded.label, value: "refunded" },
             ],
           },
           {
@@ -112,10 +103,7 @@ export default async function AdminPaymentsPage({
         empty="Tidak ada transaksi pembayaran yang cocok."
       >
         {rows.map((p) => {
-          const s = PAY_STATUS[p.status] ?? {
-            label: p.status,
-            variant: "secondary" as BadgeVariant,
-          };
+          const s = paymentStatusBadge(p.status);
           return (
             <tr key={p.id} className="hover:bg-muted/30">
               <td className="px-4 py-3 font-mono text-xs text-muted-foreground">

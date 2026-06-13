@@ -145,7 +145,7 @@ export default async function LandingPage() {
             Render AI untuk review konsep arsitektur & interior
           </div>
 
-          <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-foreground sm:text-[38px] lg:text-[40px]">
+          <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-foreground sm:text-4xl lg:text-display">
             Dari draft desain ke opsi visual yang siap dibahas klien
           </h1>
           <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground sm:text-[17px]">
@@ -235,7 +235,7 @@ export default async function LandingPage() {
         <section id="cara-kerja" className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
           <div className="grid gap-4 border-y border-border/70 py-6 md:grid-cols-3">
             {[
-              ["1", "Upload materi desain", "Mulai dari foto ruang, screenshot model, sketsa, atau referensi visual yang relevan."],
+              ["1", "Unggah materi desain", "Mulai dari foto ruang, screenshot model, sketsa, atau referensi visual yang relevan."],
               ["2", "Lengkapi arahan visual", "Pilih mode render, gaya, pencahayaan, suasana, dan detail yang perlu dipertahankan."],
               ["3", "Review, simpan, bagikan", "Bandingkan output, simpan per project, lalu unduh atau bagikan sebagai bahan diskusi."],
             ].map(([step, title, desc]) => (
@@ -266,7 +266,7 @@ export default async function LandingPage() {
                 key={plan.name}
                 className={
                   plan.highlighted
-                    ? "rounded-lg border-primary/80 shadow-sm ring-1 ring-primary/15"
+                    ? "rounded-lg border-primary/80 shadow-soft ring-1 ring-primary/15"
                     : "rounded-lg border-border/70 shadow-none"
                 }
               >
@@ -395,7 +395,7 @@ function SectionHeader({
 
 function ProductPreview() {
   return (
-    <div className="mt-10 w-full rounded-lg border border-border/70 bg-card p-2 shadow-sm shadow-foreground/5">
+    <div className="mt-10 w-full rounded-lg border border-border/70 bg-card p-2 shadow-soft">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md bg-primary px-3 py-2 text-primary-foreground">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Sparkles className="size-4" />
@@ -452,7 +452,7 @@ function ProductPreview() {
               className="size-full object-cover"
             />
             <div className="absolute inset-y-0 left-1/2 w-px bg-white/90" />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-full border border-overlay-foreground/80 bg-overlay/55 px-3 py-1 text-xs font-semibold text-overlay-foreground shadow">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-full border border-overlay-foreground/80 bg-overlay/55 px-3 py-1 text-xs font-semibold text-overlay-foreground shadow-floating">
               Draft / Opsi visual
             </div>
           </div>

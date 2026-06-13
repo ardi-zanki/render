@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { env } from "@/env";
+import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
-import { InsufficientCreditsError } from "@/lib/credits";
-import { AiProviderError } from "@/lib/providers/ai";
-import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
+import { assertRateLimit } from "@/lib/rate-limit";
 import { buildPrompt } from "@/lib/renders/prompt";
 import { createRenderEdit, getRenderDetail } from "@/lib/renders/service";
 import { renderIdSchema } from "@/lib/validations/api";
@@ -40,12 +39,8 @@ export async function POST(
   try {
     await assertRateLimit("create_render", userId);
   } catch (err) {
-    if (err instanceof RateLimitError) {
-      return NextResponse.json(
-        { error: err.message, code: err.code },
-        { status: 429 },
-      );
-    }
+    const mapped = errorResponse(err);
+    if (mapped) return mapped;
     throw err;
   }
 
@@ -104,18 +99,8 @@ export async function POST(
     startInlineRenderProcessing(result.renderId, userId);
     return NextResponse.json(result);
   } catch (err) {
-    if (err instanceof InsufficientCreditsError) {
-      return NextResponse.json(
-        { error: err.message, code: "INSUFFICIENT_CREDITS" },
-        { status: 402 },
-      );
-    }
-    if (err instanceof AiProviderError) {
-      return NextResponse.json(
-        { error: `Edit gagal: ${err.message}`, code: err.code },
-        { status: 502 },
-      );
-    }
+    const mapped = errorResponse(err, { aiPrefix: "Edit gagal" });
+    if (mapped) return mapped;
     const msg = err instanceof Error ? err.message : "Edit gagal";
     return NextResponse.json({ error: msg, code: "EDIT_FAILED" }, { status: 500 });
   }

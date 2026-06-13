@@ -87,7 +87,7 @@ export function RenderActionBar({
         )}
         {balance <= 0 ? (
           <Button size="sm" asChild className="h-6 gap-1 px-2.5 text-xs">
-            <Link href="/payments">Top up kredit</Link>
+            <Link href="/payments">Beli Kredit</Link>
           </Button>
         ) : (
           <Button

@@ -109,11 +109,11 @@ export function ProfileForm({
           />
           <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2">
             {emailVerified ? (
-              <Badge variant="success" className="h-6 px-1.5 text-[11px]">
+              <Badge variant="success" className="h-6 px-1.5 text-micro">
                 <BadgeCheck /> Terverifikasi
               </Badge>
             ) : (
-              <Badge variant="warning" className="h-6 px-1.5 text-[11px]">
+              <Badge variant="warning" className="h-6 px-1.5 text-micro">
                 <ShieldAlert /> Belum terverifikasi
               </Badge>
             )}
@@ -160,7 +160,7 @@ export function PreferencesForm({
         >
           <option value="interior">Interior</option>
           <option value="exterior" disabled>
-            Exterior (Coming Soon)
+            Exterior (Segera hadir)
           </option>
         </Select>
       </div>
