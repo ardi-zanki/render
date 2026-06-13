@@ -59,8 +59,8 @@ export function RenderActionBar({
             size="icon-sm"
             onClick={onShare}
             disabled={sharing}
-            aria-label={shareUrl ? "Link tersalin" : "Bagikan"}
-            title={shareUrl ? "Link tersalin" : "Bagikan"}
+            aria-label={shareUrl ? "Tautan tersalin" : "Bagikan"}
+            title={shareUrl ? "Tautan tersalin" : "Bagikan"}
             className="size-6 [&_svg]:size-3.5"
           >
             {sharing ? (
@@ -87,7 +87,7 @@ export function RenderActionBar({
         )}
         {balance <= 0 ? (
           <Button size="sm" asChild className="h-6 gap-1 px-2.5 text-xs">
-            <Link href="/payments">Beli Kredit</Link>
+            <Link href="/payments">Top up</Link>
           </Button>
         ) : (
           <Button

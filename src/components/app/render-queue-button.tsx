@@ -48,8 +48,8 @@ export function RenderQueueButton() {
           "relative flex size-9 cursor-pointer items-center justify-center rounded-md border border-border/80 bg-card text-muted-foreground transition-colors hover:bg-muted/80 hover:text-primary",
           count > 0 && "text-primary",
         )}
-        aria-label="Antrian render"
-        title="Antrian render"
+        aria-label="Antrean render"
+        title="Antrean render"
       >
         <Box className="size-4" />
         {count > 0 && (
@@ -69,7 +69,7 @@ export function RenderQueueButton() {
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
           <div className="flex items-center gap-2">
             <Box className="size-4 text-muted-foreground" />
-            <p className="font-semibold text-foreground">Antrian Render</p>
+            <p className="font-semibold text-foreground">Antrean render</p>
           </div>
           <Badge variant={count > 0 ? "warning" : "secondary"}>
             {count} Tugas
@@ -84,14 +84,14 @@ export function RenderQueueButton() {
           ) : loading && items.length === 0 ? (
             <div className="flex items-center justify-center gap-2 rounded-md border border-dashed border-border py-6 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
-              Memuat antrian
+              Memuat antrean
             </div>
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border py-6 text-sm text-muted-foreground">
               <span className="flex size-9 items-center justify-center rounded-md bg-muted text-foreground">
                 <Box className="size-4" />
               </span>
-              Antrian kosong
+              Antrean kosong
             </div>
           ) : (
             <div className="space-y-2">

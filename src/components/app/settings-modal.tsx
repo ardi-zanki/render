@@ -63,7 +63,7 @@ const TABS: Array<{
 }> = [
   { value: "profile", label: "Profil", icon: UserRound },
   { value: "preferences", label: "Preferensi", icon: Palette },
-  { value: "storage", label: "Storage", icon: HardDrive },
+  { value: "storage", label: "Penyimpanan", icon: HardDrive },
   { value: "security", label: "Keamanan", icon: ShieldCheck },
 ];
 
@@ -125,7 +125,7 @@ export function SettingsModal({
       });
       setUsage(json);
     } catch (err) {
-      setStorageError(apiErrorMessage(err, "Gagal memuat storage"));
+      setStorageError(apiErrorMessage(err, "Gagal memuat penyimpanan"));
     } finally {
       setRefreshingStorage(false);
     }
@@ -141,10 +141,10 @@ export function SettingsModal({
       setUsage(json.usage);
       setDeleteOpen(false);
       setDeleteText("");
-      toast.success("Storage render dikosongkan");
+      toast.success("Penyimpanan render dikosongkan");
       router.refresh();
     } catch (err) {
-      setStorageError(apiErrorMessage(err, "Gagal menghapus storage"));
+      setStorageError(apiErrorMessage(err, "Gagal menghapus penyimpanan"));
     } finally {
       setDeletingStorage(false);
     }
@@ -301,7 +301,7 @@ export function SettingsModal({
         {activeTab === "storage" && (
           <div className="mx-auto flex max-w-xl flex-col gap-5">
             <div>
-              <h3 className="text-base font-semibold text-foreground">Storage</h3>
+              <h3 className="text-base font-semibold text-foreground">Penyimpanan</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 Pantau kapasitas render dan file pendukung.
               </p>
@@ -382,7 +382,7 @@ export function SettingsModal({
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="font-semibold text-destructive">
-                    Hapus semua storage
+                    Hapus semua penyimpanan
                   </p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     Menghapus file render dan aset pendukung dari akun ini.
@@ -418,11 +418,11 @@ export function SettingsModal({
             id="delete-storage-title"
             className="text-base font-semibold text-foreground"
           >
-            Hapus semua storage render?
+            Hapus semua penyimpanan render?
           </h3>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             Catatan wajib: tindakan ini permanen. Semua file mentahan,
-            referensi, hasil render, dan hasil edit akan dihapus dari storage
+            referensi, hasil render, dan hasil edit akan dihapus dari penyimpanan
             dan render terkait tidak akan tampil lagi di riwayat.
           </p>
           <div className="mt-4 flex flex-col gap-1.5">

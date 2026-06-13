@@ -72,7 +72,7 @@ export function useRenderQueue(intervalMs = 10_000) {
         return next;
       });
     } catch (err) {
-      setError(apiErrorMessage(err, "Gagal memuat antrian render"));
+      setError(apiErrorMessage(err, "Gagal memuat antrean render"));
     } finally {
       setLoading(false);
     }

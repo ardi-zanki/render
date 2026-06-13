@@ -54,11 +54,11 @@ export const SURROUNDINGS = {
     },
     {
       value: "city view through the window",
-      label: "View Kota",
+      label: "Pemandangan Kota",
     },
     {
       value: "garden view through the window",
-      label: "View Taman",
+      label: "Pemandangan Taman",
     },
     {
       value: "no visible window, controlled interior lighting",

@@ -65,7 +65,7 @@ export default async function PaymentsPage({
       )}
 
       <PageHeader
-        title="Beli Kredit"
+        title="Top up"
         description={`Sisa kredit: ${idr.format(balance)}. Setiap render memakai 1 kredit.`}
       />
 
@@ -116,7 +116,7 @@ export default async function PaymentsPage({
 
       <section className="mt-7">
         <h2 className="mb-3 text-base font-semibold text-foreground">
-          Riwayat Transaksi
+          Riwayat transaksi
         </h2>
         {history.length === 0 ? (
           <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">

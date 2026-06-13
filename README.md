@@ -49,7 +49,7 @@ tombol, badge, form, kartu mode render, dan kartu harga.
 Semua warna didefinisikan sebagai CSS variable di `:root` (light) dan `.dark`,
 lalu dipetakan ke utility Tailwind via `@theme inline`. Token utama:
 
-- **Brand:** `--primary` navy `#1B2A5E` (dark mode `#3A4F94`) · `--brand-violet` (aksen AI) · `--foreground` ink
+- **Brand:** `--primary` navy `#173b67` (dark mode `#91b8f2`) · `--brand-violet` (aksen AI) · `--foreground` ink
 - **Permukaan:** `--background`, `--card`, `--muted`, `--border`
 - **Semantik:** `--success`, `--warning`, `--destructive`, `--info`
 
@@ -144,6 +144,14 @@ luar domain mengimpor dari `service.ts`, bukan dari file internalnya.
 `src/lib/renders/labels.ts`, pembayaran di `src/lib/payments/labels.ts`. Jangan
 menduplikasi map status di halaman.
 
+**Server action vs API route.** Pakai **server action** (`actions.ts` co-located
+dengan page) untuk mutasi yang dipicu dari form di halaman itu sendiri — mis.
+rename/arsip project, simpan pengaturan. Pakai **API route** (`src/app/api/...`)
+saat endpoint perlu dipanggil dari client lewat `fetch` (upload multipart,
+polling status, aksi yang dipakai dari beberapa tempat) atau oleh pihak luar
+(webhook provider). Singkatnya: form internal halaman → server action; kontrak
+HTTP yang dipanggil JS/eksternal → API route.
+
 ### Glosarium istilah UI
 
 Indonesia-first, formal tapi ramah ("Anda", tanpa slang seperti "nyalain"/"dulu
@@ -155,10 +163,10 @@ ya"). Pakai kolom kiri, hindari kolom kanan:
 | Unggah | Upload |
 | Render | Generate |
 | Kredit | Credit / koin |
-| Beli Kredit | Top up kredit |
+| Top up | Beli Kredit / Beli Paket |
 | Segera hadir | Coming Soon |
 
-Status: render memakai **Antri/Antrian**, pembayaran memakai **Menunggu** —
+Status: render memakai **Antri/Antrean**, pembayaran memakai **Menunggu** —
 keduanya warna `warning`, dibedakan karena beda konteks (antrean vs. transaksi).
 
 ## Auth & app UI
@@ -229,7 +237,7 @@ Buy-credits flow (`src/lib/payments/service.ts`): pick package → create a pend
 top-up (`applyCreditChange` keyed by `payment:<id>`; a payment already `paid` is
 a no-op, so duplicate webhooks never double-credit).
 
-- `/payments` — package cards with **Beli Paket**, live balance, transaction
+- `/payments` — package cards with **Top up**, live balance, transaction
   history; `/payments/finish` (result) and `/payments/simulate` (dev mock).
 - `POST /api/payments/checkout` (auth) → Snap token / redirect URL.
 - `POST /api/payments/webhook` (public; provider signature verified).

@@ -332,7 +332,7 @@ export function RenderPreviewViewer({
           <div className="rounded-lg border border-border/80 bg-muted/35 p-3">
             <div className="mb-2 flex items-center justify-between gap-3">
               <div>
-                <Label>Reference Image</Label>
+                <Label>Gambar referensi</Label>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   Wajib untuk Style Transfer.
                 </p>

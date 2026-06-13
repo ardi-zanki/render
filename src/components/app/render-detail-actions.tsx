@@ -116,12 +116,12 @@ export function RenderActionsMenu({
       });
       try {
         await navigator.clipboard.writeText(json.url);
-        toast.success("Link share disalin");
+        toast.success("Tautan disalin");
       } catch {
-        toast.success(`Link share: ${json.url}`);
+        toast.success(`Tautan: ${json.url}`);
       }
     } catch (err) {
-      toast.error(apiErrorMessage(err, "Gagal membuat link share"));
+      toast.error(apiErrorMessage(err, "Gagal membuat tautan"));
     } finally {
       setSharing(false);
     }

@@ -268,7 +268,7 @@ export function RenderStudio({
         {
           success: "Render selesai!",
           failure: "Render gagal. Kredit sudah dikembalikan.",
-          timeout: "Render masih diproses. Cek Riwayat Render beberapa saat lagi.",
+          timeout: "Render masih diproses. Cek Riwayat render beberapa saat lagi.",
         },
         (render) => {
           state.setScenes((items) =>
@@ -308,7 +308,7 @@ export function RenderStudio({
         // clipboard may be unavailable; the link is shown below regardless.
       }
     } catch (err) {
-      toast.error(apiErrorMessage(err, "Gagal membuat link share"));
+      toast.error(apiErrorMessage(err, "Gagal membuat tautan"));
     } finally {
       state.setSharing(false);
     }

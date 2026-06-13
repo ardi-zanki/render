@@ -66,11 +66,11 @@ export function RenderStudioControls({
   onCreateProject: () => void;
   onCollapse?: () => void;
 }) {
-  const styleLabel = mode === "interior" ? "Style Interior" : "Style Arsitektur";
+  const styleLabel = mode === "interior" ? "Style interior" : "Style arsitektur";
   const surroundingOptions =
     mode === "interior" ? SURROUNDINGS.interior : SURROUNDINGS.exterior;
   const surroundingLabel =
-    mode === "interior" ? "View Jendela" : "Lingkungan Sekitar";
+    mode === "interior" ? "Pemandangan jendela" : "Lingkungan sekitar";
 
   return (
     // In the fixed-height studio, fill the column so its bottom lines up with
@@ -122,7 +122,7 @@ export function RenderStudioControls({
         </div>
 
         <div className="flex flex-col gap-2">
-          <Label>Mode Render</Label>
+          <Label>Mode render</Label>
           <div className="grid grid-cols-2 gap-2">
             {MODES.map((m) => {
               const card = (
@@ -131,7 +131,7 @@ export function RenderStudioControls({
                   icon={m.icon}
                   label={m.label}
                   disabled={m.comingSoon}
-                  aria-label={m.comingSoon ? `${m.label} - Segera Hadir` : m.label}
+                  aria-label={m.comingSoon ? `${m.label} - Segera hadir` : m.label}
                   className="h-full w-full min-w-0"
                   onClick={() => {
                     setMode(m.value);
@@ -142,7 +142,7 @@ export function RenderStudioControls({
               );
 
               return m.comingSoon ? (
-                <span key={m.value} className="block min-w-0" title="Segera Hadir">
+                <span key={m.value} className="block min-w-0" title="Segera hadir">
                   {card}
                 </span>
               ) : (
@@ -171,7 +171,7 @@ export function RenderStudioControls({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="outputFormat">Format Output</Label>
+          <Label htmlFor="outputFormat">Format output</Label>
           <Select
             id="outputFormat"
             value={outputFormat}
@@ -187,7 +187,7 @@ export function RenderStudioControls({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="location">Lokasi Project</Label>
+          <Label htmlFor="location">Lokasi project</Label>
           <Input
             id="location"
             value={location}

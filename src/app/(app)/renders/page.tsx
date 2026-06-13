@@ -16,7 +16,7 @@ import { countRenders, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Riwayat Render" };
+export const metadata: Metadata = { title: "Riwayat render" };
 
 const dateFmt = new Intl.DateTimeFormat("id-ID", {
   dateStyle: "medium",

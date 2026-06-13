@@ -73,7 +73,7 @@ export function BuyButton({
         className="w-full"
       >
         {loading && <Loader2 className="animate-spin" />}
-        Beli Paket
+        Top up
       </Button>
       {error && <p className="text-center text-xs text-destructive">{error}</p>}
     </div>
