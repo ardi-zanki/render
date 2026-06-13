@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, Pencil } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { Popover } from "@/components/ui/popover";
@@ -44,9 +45,13 @@ export function StudioTitleBar({
 
   return (
     <div className="flex items-center gap-2">
-      <h1 className="shrink-0 text-sm font-semibold tracking-normal text-foreground">
+      <Link
+        href="/dashboard"
+        title="Kembali ke Dashboard"
+        className="shrink-0 rounded-sm text-sm font-semibold tracking-normal text-foreground transition-colors hover:text-primary"
+      >
         Render Studio
-      </h1>
+      </Link>
       <span className="text-border" aria-hidden="true">
         |
       </span>

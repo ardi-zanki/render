@@ -4,6 +4,7 @@ import {
   ArrowLeftRight,
   ImagePlus,
   Loader2,
+  PanelLeft,
   Pencil,
   X,
   ZoomIn,
@@ -56,6 +57,8 @@ export function RenderPreviewViewer({
   editAvailable = false,
   studioMode = "render",
   setStudioMode,
+  panelsCollapsed = false,
+  onExpandPanels,
   textureCanvas,
   textureToolbar,
 }: {
@@ -93,6 +96,9 @@ export function RenderPreviewViewer({
   editAvailable?: boolean;
   studioMode?: "render" | "texture";
   setStudioMode?: (mode: "render" | "texture") => void;
+  /** When both side panels are collapsed, show the reopen control by the tabs. */
+  panelsCollapsed?: boolean;
+  onExpandPanels?: () => void;
   /** Texture-edit canvas + toolbar, rendered by the studio (owns the ref). */
   textureCanvas?: ReactNode;
   textureToolbar?: ReactNode;
@@ -103,6 +109,20 @@ export function RenderPreviewViewer({
         {/* Sticky toolbar: view tabs (+ Edit) + zoom controls. */}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
+            {panelsCollapsed && onExpandPanels && (
+              // Reopen control, grouped with the view tabs (desktop only).
+              <div className="hidden items-center rounded-md bg-muted/80 p-1 lg:inline-flex">
+                <button
+                  type="button"
+                  onClick={onExpandPanels}
+                  aria-label="Buka panel"
+                  title="Buka panel"
+                  className="flex items-center rounded-sm px-2.5 py-1 text-muted-foreground transition-colors hover:text-foreground [&_svg]:size-4"
+                >
+                  <PanelLeft />
+                </button>
+              </div>
+            )}
             {hasUploadedImage ? (
               <Segmented
                 options={viewerTabs}
@@ -117,19 +137,22 @@ export function RenderPreviewViewer({
               <div />
             )}
             {editAvailable && (
-              <button
-                type="button"
-                onClick={() => setStudioMode?.("texture")}
-                aria-pressed={studioMode === "texture"}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors [&_svg]:size-4",
-                  studioMode === "texture"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted/80 text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <Pencil /> Edit
-              </button>
+              // Matches the sm Segmented above: muted track + py-1 text-xs pill.
+              <div className="inline-flex items-center rounded-md bg-muted/80 p-1">
+                <button
+                  type="button"
+                  onClick={() => setStudioMode?.("texture")}
+                  aria-pressed={studioMode === "texture"}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-sm px-3 py-1 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                    studioMode === "texture"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Pencil /> Edit
+                </button>
+              </div>
             )}
           </div>
 

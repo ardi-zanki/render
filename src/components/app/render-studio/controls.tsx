@@ -1,6 +1,6 @@
 "use client";
 
-import { Lightbulb, Plus } from "lucide-react";
+import { Lightbulb, PanelLeft, Plus } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,6 +43,7 @@ export function RenderStudioControls({
   setWeather,
   onSwitchProject,
   onCreateProject,
+  onCollapse,
 }: {
   projectId: string;
   projects: RenderStudioProject[];
@@ -64,6 +65,7 @@ export function RenderStudioControls({
   setWeather: (weather: string) => void;
   onSwitchProject: (projectId: string) => void;
   onCreateProject: () => void;
+  onCollapse?: () => void;
 }) {
   const styleLabel = mode === "interior" ? "Style Interior" : "Style Arsitektur";
   const surroundingOptions =
@@ -77,7 +79,20 @@ export function RenderStudioControls({
     <Card className="h-fit lg:min-h-full">
       <CardContent className="flex flex-col gap-4 py-4">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="project">Project</Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor="project">Project</Label>
+            {onCollapse && (
+              <button
+                type="button"
+                onClick={onCollapse}
+                aria-label="Ciutkan panel"
+                title="Ciutkan panel"
+                className="hidden size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex [&_svg]:size-4"
+              >
+                <PanelLeft />
+              </button>
+            )}
+          </div>
           <div className="flex gap-2">
             <Select
               id="project"

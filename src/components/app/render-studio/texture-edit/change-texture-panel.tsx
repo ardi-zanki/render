@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ImagePlus, Loader2, Sparkles, X } from "lucide-react";
+import { ImagePlus, Loader2, PanelLeft, Sparkles, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,9 +19,11 @@ import type { TextureEditState } from "./use-texture-edit-state";
 export function ChangeTexturePanel({
   state,
   onApply,
+  onCollapse,
 }: {
   state: TextureEditState;
   onApply: () => void;
+  onCollapse?: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [category, setCategory] = useState<TextureCategory | null>(null);
@@ -33,9 +35,22 @@ export function ChangeTexturePanel({
     <Card className="flex h-fit flex-col lg:h-full lg:min-h-full">
       <CardContent className="flex flex-col gap-4 py-4 lg:min-h-0 lg:flex-1">
         <div className="flex flex-col gap-1">
-          <h2 className="text-base font-semibold text-foreground">
-            Ganti Tekstur
-          </h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-foreground">
+              Ganti Tekstur
+            </h2>
+            {onCollapse && (
+              <button
+                type="button"
+                onClick={onCollapse}
+                aria-label="Ciutkan panel"
+                title="Ciutkan panel"
+                className="hidden size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex [&_svg]:size-4"
+              >
+                <PanelLeft />
+              </button>
+            )}
+          </div>
           <p className="text-xs leading-5 text-muted-foreground">
             Pilih area pada gambar, lalu pilih tekstur penggantinya.
           </p>
@@ -161,15 +176,15 @@ export function ChangeTexturePanel({
               className="min-h-16 resize-none text-sm"
             />
           </div>
-          <Button onClick={onApply} disabled={!state.canApply} className="w-full">
+          <Button
+            size="sm"
+            onClick={onApply}
+            disabled={!state.canApply}
+            className="w-full gap-1 text-xs [&_svg]:size-3.5"
+          >
             {state.applying ? <Loader2 className="animate-spin" /> : <Sparkles />}
             Apply Texture
           </Button>
-          {!state.mask.hasMask && (
-            <p className="text-center text-xs text-muted-foreground">
-              Pilih dulu area yang ingin diganti.
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

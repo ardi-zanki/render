@@ -98,6 +98,9 @@ export function RenderStudio({
   const [studioMode, setStudioMode] = useState<"render" | "texture">("render");
   const editAvailable = Boolean(sourceRenderId) && Boolean(state.resultUrl);
   const inTextureMode = studioMode === "texture" && editAvailable;
+  // Both side panels collapse together (toggle lives in Column 1) for a wider
+  // canvas; desktop only.
+  const [panelsCollapsed, setPanelsCollapsed] = useState(false);
   // Stable handlers so the ref is read only when invoked (not during render).
   const handleMaskUndo = useCallback(() => maskRef.current?.undo(), []);
   const handleMaskRedo = useCallback(() => maskRef.current?.redo(), []);
@@ -456,7 +459,7 @@ export function RenderStudio({
   return (
     // Fixed-height studio: the three columns stay put and each scrolls on its
     // own (Config / Studio / Info) instead of the whole page scrolling.
-    <div className="lg:h-[calc(100vh-5.5rem)]">
+    <div className="relative lg:h-[calc(100vh-5.5rem)]">
       {/* Title lives in the global header's top-left slot. */}
       {headerSlot &&
         createPortal(
@@ -464,45 +467,58 @@ export function RenderStudio({
           headerSlot,
         )}
 
-      <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[280px_minmax(0,1fr)_280px]">
+      <div
+        className={cn(
+          "grid h-full grid-cols-1 gap-4",
+          panelsCollapsed
+            ? "lg:grid-cols-[minmax(0,1fr)]"
+            : "lg:grid-cols-[280px_minmax(0,1fr)_280px]",
+        )}
+      >
       {/* Column 1 — Configuration, or Change Texture panel in Edit mode. */}
       <div
         className={cn(
           "flex flex-col gap-4 lg:min-h-0",
-          // Texture panel manages its own internal scroll so the Apply button
-          // stays pinned; the config form scrolls the whole column.
+          // Texture panel manages its own internal scroll so Apply stays
+          // pinned; the config form scrolls the whole column.
           inTextureMode ? "lg:overflow-hidden" : "lg:overflow-y-auto lg:pr-1",
+          panelsCollapsed && "lg:hidden",
         )}
       >
-        {inTextureMode ? (
-          <ChangeTexturePanel state={texture} onApply={onApplyTexture} />
-        ) : (
-          <RenderStudioControls
-            projectId={projectId}
-            projects={projects}
-            mode={state.mode}
-            setMode={state.setMode}
-            style={state.style}
-            setStyle={state.setStyle}
-            outputFormat={state.outputFormat}
-            setOutputFormat={state.setOutputFormat}
-            location={state.location}
-            setLocation={state.setLocation}
-            surrounding={state.surrounding}
-            setSurrounding={state.setSurrounding}
-            lightsOn={state.lightsOn}
-            setLightsOn={state.setLightsOn}
-            time={state.time}
-            setTime={state.setTime}
-            weather={state.weather}
-            setWeather={state.setWeather}
-            onSwitchProject={switchProject}
-            onCreateProject={() => {
-              state.setCreateOpen(true);
-              state.setNewProjectErrors({});
-            }}
-          />
-        )}
+          {inTextureMode ? (
+            <ChangeTexturePanel
+              state={texture}
+              onApply={onApplyTexture}
+              onCollapse={() => setPanelsCollapsed(true)}
+            />
+          ) : (
+            <RenderStudioControls
+              onCollapse={() => setPanelsCollapsed(true)}
+              projectId={projectId}
+              projects={projects}
+              mode={state.mode}
+              setMode={state.setMode}
+              style={state.style}
+              setStyle={state.setStyle}
+              outputFormat={state.outputFormat}
+              setOutputFormat={state.setOutputFormat}
+              location={state.location}
+              setLocation={state.setLocation}
+              surrounding={state.surrounding}
+              setSurrounding={state.setSurrounding}
+              lightsOn={state.lightsOn}
+              setLightsOn={state.setLightsOn}
+              time={state.time}
+              setTime={state.setTime}
+              weather={state.weather}
+              setWeather={state.setWeather}
+              onSwitchProject={switchProject}
+              onCreateProject={() => {
+                state.setCreateOpen(true);
+                state.setNewProjectErrors({});
+              }}
+            />
+          )}
       </div>
 
       {/* Column 2 — Studio canvas (title is in the header). */}
@@ -540,13 +556,21 @@ export function RenderStudio({
             editAvailable={editAvailable}
             studioMode={studioMode}
             setStudioMode={setStudioMode}
+            panelsCollapsed={panelsCollapsed}
+            onExpandPanels={() => setPanelsCollapsed(false)}
             textureCanvas={textureCanvas}
             textureToolbar={textureToolbar}
           />
       </div>
 
-      {/* Column 3 — Info, scrollable Scene History, then the manual prompt. */}
-      <aside className="flex flex-col gap-4 lg:min-h-0">
+      {/* Column 3 — Info, scrollable Scene History, then the manual prompt.
+          Collapses together with Column 1 via the Column 1 toggle. */}
+      <aside
+        className={cn(
+          "flex flex-col gap-4 lg:min-h-0",
+          panelsCollapsed && "lg:hidden",
+        )}
+      >
         {renderInfo && <StudioRenderInfo info={renderInfo} />}
         {initialVersions.length > 0 ? (
           <StudioVersionHistory

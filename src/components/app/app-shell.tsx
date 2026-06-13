@@ -275,11 +275,12 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — fully hidden in the focused Render Studio. */}
       <div
         className={cn(
-          "hidden lg:fixed lg:inset-y-0 lg:left-0 lg:block",
+          "hidden lg:fixed lg:inset-y-0 lg:left-0",
           zLayer.sidebar,
+          renderNewActive ? "lg:hidden" : "lg:block",
           effectiveExpanded ? "lg:w-60" : "lg:w-[72px]",
         )}
         suppressHydrationWarning
@@ -303,7 +304,11 @@ export function AppShell({
       <div
         className={cn(
           "transition-[padding] duration-200",
-          effectiveExpanded ? "lg:pl-60" : "lg:pl-[72px]",
+          renderNewActive
+            ? "lg:pl-0"
+            : effectiveExpanded
+              ? "lg:pl-60"
+              : "lg:pl-[72px]",
         )}
         suppressHydrationWarning
       >
