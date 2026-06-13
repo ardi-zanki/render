@@ -303,7 +303,7 @@ export function SettingsModal({
             <div>
               <h3 className="text-base font-semibold text-foreground">Storage</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Pantau kapasitas file mentahan, referensi, hasil render, hasil edit, dan mask seleksi.
+                Pantau kapasitas render dan file pendukung.
               </p>
             </div>
 
@@ -385,8 +385,7 @@ export function SettingsModal({
                     Hapus semua storage
                   </p>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    Menghapus semua file mentahan, referensi, hasil render, dan
-                    hasil edit milik akun ini. Render terkait akan hilang dari riwayat.
+                    Menghapus file render dan aset pendukung dari akun ini.
                   </p>
                 </div>
                 <Button

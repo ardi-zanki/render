@@ -460,7 +460,7 @@ export function RenderStudio({
   return (
     // Fixed-height studio: the three columns stay put and each scrolls on its
     // own (Config / Studio / Info) instead of the whole page scrolling.
-    <div className="relative lg:h-[calc(100vh-5.5rem)]">
+    <div className="relative pb-40 lg:h-[calc(100vh-5.5rem)] lg:pb-0">
       {/* Title lives in the global header's top-left slot. */}
       {headerSlot &&
         createPortal(
@@ -473,19 +473,19 @@ export function RenderStudio({
           "grid h-full grid-cols-1 gap-4",
           panelsCollapsed
             ? "lg:grid-cols-[minmax(0,1fr)]"
-            : "lg:grid-cols-[280px_minmax(0,1fr)_280px]",
+            : "lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)_minmax(0,240px)] xl:grid-cols-[280px_minmax(0,1fr)_280px]",
         )}
       >
-      {/* Column 1 — Configuration, or Change Texture panel in Edit mode. */}
-      <div
-        className={cn(
-          "flex flex-col gap-4 lg:min-h-0",
-          // Texture panel manages its own internal scroll so Apply stays
-          // pinned; the config form scrolls the whole column.
-          inTextureMode ? "lg:overflow-hidden" : "lg:overflow-y-auto lg:pr-1",
-          panelsCollapsed && "lg:hidden",
-        )}
-      >
+        {/* Column 1 — Configuration, or Change Texture panel in Edit mode. */}
+        <div
+          className={cn(
+            "order-2 flex flex-col gap-4 lg:order-none lg:min-h-0",
+            // Texture panel manages its own internal scroll so Apply stays
+            // pinned; the config form scrolls the whole column.
+            inTextureMode ? "lg:overflow-hidden" : "lg:overflow-y-auto lg:pr-1",
+            panelsCollapsed && "lg:hidden",
+          )}
+        >
           {inTextureMode ? (
             <ChangeTexturePanel
               state={texture}
@@ -520,10 +520,10 @@ export function RenderStudio({
               }}
             />
           )}
-      </div>
+        </div>
 
-      {/* Column 2 — Studio canvas (title is in the header). */}
-      <div className="flex flex-col lg:min-h-0">
+        {/* Column 2 — Studio canvas (title is in the header). */}
+        <div className="order-1 flex flex-col lg:order-none lg:min-h-0">
           <RenderPreviewViewer
             fileRef={fileRef}
             referenceRef={referenceRef}
@@ -562,49 +562,49 @@ export function RenderStudio({
             textureCanvas={textureCanvas}
             textureToolbar={textureToolbar}
           />
-      </div>
+        </div>
 
-      {/* Column 3 — Info, scrollable Scene History, then the manual prompt.
+        {/* Column 3 — Info, scrollable Scene History, then the manual prompt.
           Collapses together with Column 1 via the Column 1 toggle. */}
-      <aside
-        className={cn(
-          "flex flex-col gap-4 lg:min-h-0",
-          panelsCollapsed && "lg:hidden",
-        )}
-      >
-        {renderInfo && <StudioRenderInfo info={renderInfo} />}
-        {initialVersions.length > 0 ? (
-          <StudioVersionHistory
-            versions={initialVersions}
-            activeId={selectedBaseAssetId}
-            onSelect={loadVersion}
-          />
-        ) : (
-          <RenderSceneList scenes={state.scenes} projectName={projectName} />
-        )}
-
-        {/* Manual prompt + actions, pinned below the Scene History. Hidden in
-            texture mode — edits are submitted via the Apply Texture button. */}
-        {!inTextureMode && (
-          <div className="shrink-0 rounded-lg border border-border bg-card p-3 shadow-soft">
-            <RenderActionBar
-              instruction={state.instruction}
-              setInstruction={state.setInstruction}
-              balance={state.balance}
-              resultRenderId={state.resultRenderId}
-              resultUrl={state.resultUrl}
-              sharing={state.sharing}
-              shareUrl={state.shareUrl}
-              onShare={onShare}
-              downloading={state.downloading}
-              onDownload={onDownload}
-              loading={state.loading}
-              canRender={canRender}
-              onRender={onRender}
+        <aside
+          className={cn(
+            "order-3 flex flex-col gap-4 lg:order-none lg:min-h-0",
+            panelsCollapsed && "lg:hidden",
+          )}
+        >
+          {renderInfo && <StudioRenderInfo info={renderInfo} />}
+          {initialVersions.length > 0 ? (
+            <StudioVersionHistory
+              versions={initialVersions}
+              activeId={selectedBaseAssetId}
+              onSelect={loadVersion}
             />
-          </div>
-        )}
-      </aside>
+          ) : (
+            <RenderSceneList scenes={state.scenes} projectName={projectName} />
+          )}
+
+          {/* Manual prompt + actions, pinned below the Scene History. Hidden in
+            texture mode — edits are submitted via the Apply Texture button. */}
+          {!inTextureMode && (
+            <div className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 rounded-lg border border-border bg-card p-3 shadow-elevated lg:static lg:inset-auto lg:z-auto lg:shrink-0 lg:shadow-soft">
+              <RenderActionBar
+                instruction={state.instruction}
+                setInstruction={state.setInstruction}
+                balance={state.balance}
+                resultRenderId={state.resultRenderId}
+                resultUrl={state.resultUrl}
+                sharing={state.sharing}
+                shareUrl={state.shareUrl}
+                onShare={onShare}
+                downloading={state.downloading}
+                onDownload={onDownload}
+                loading={state.loading}
+                canRender={canRender}
+                onRender={onRender}
+              />
+            </div>
+          )}
+        </aside>
       </div>
 
       {state.createOpen && (

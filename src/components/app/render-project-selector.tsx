@@ -88,29 +88,31 @@ export function RenderProjectSelector({
   return (
     <>
       <div className="flex min-w-0 items-center gap-2">
-        <Select
-          aria-label="Pindah project render"
-          value={selectedProjectId}
-          onChange={(event) => {
-            const nextProject = normalizedProjects.find(
-              (project) => project.id === event.target.value,
-            );
-            if (!nextProject || nextProject.id === displayedProject.id) {
-              setSelectedProjectId(displayedProject.id);
-              return;
-            }
-            setSelectedProjectId(nextProject.id);
-            setPendingProject(nextProject);
-          }}
-          disabled={normalizedProjects.length <= 1 || saving}
-          className="h-8 max-w-[180px] truncate pr-8 text-right font-medium"
-        >
-          {normalizedProjects.map((project) => (
-            <option key={project.id} value={project.id}>
-              {project.name}
-            </option>
-          ))}
-        </Select>
+        <div className="w-[128px] min-w-0">
+          <Select
+            aria-label="Pindah project render"
+            value={selectedProjectId}
+            onChange={(event) => {
+              const nextProject = normalizedProjects.find(
+                (project) => project.id === event.target.value,
+              );
+              if (!nextProject || nextProject.id === displayedProject.id) {
+                setSelectedProjectId(displayedProject.id);
+                return;
+              }
+              setSelectedProjectId(nextProject.id);
+              setPendingProject(nextProject);
+            }}
+            disabled={normalizedProjects.length <= 1 || saving}
+            className="h-7 min-w-0 truncate rounded-md pl-2 pr-7 text-right text-xs font-medium"
+          >
+            {normalizedProjects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.name}
+              </option>
+            ))}
+          </Select>
+        </div>
       </div>
 
       {pendingProject && (

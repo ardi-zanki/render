@@ -101,13 +101,6 @@ export default async function DashboardPage() {
       <PageHeader
         title={`Halo, ${firstName}`}
         description="Pantau kredit, project aktif, dan visual terbaru dalam satu workspace."
-        action={
-          <Button asChild>
-            <Link href="/renders/new">
-              <Plus /> Buat render
-            </Link>
-          </Button>
-        }
       />
 
       {/* Stats */}

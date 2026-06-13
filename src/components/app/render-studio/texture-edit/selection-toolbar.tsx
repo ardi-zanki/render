@@ -47,7 +47,7 @@ function ToolButton({
       aria-pressed={active}
       title={label}
       className={cn(
-        "flex size-7 items-center justify-center rounded-sm transition-colors disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4",
+        "flex size-5 items-center justify-center rounded-sm transition-colors disabled:pointer-events-none disabled:opacity-40 sm:size-6 [&_svg]:size-3 sm:[&_svg]:size-3.5",
         active
           ? "bg-card text-primary shadow-soft"
           : "text-muted-foreground hover:text-foreground",
@@ -89,88 +89,75 @@ export function SelectionToolbar({
   downloading?: boolean;
 }) {
   const isBrush = tool === "brush-add" || tool === "brush-erase";
+  const showSlider = isBrush || tool === "wand";
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
-      <div className="inline-flex items-center gap-0.5 rounded-md bg-muted/80 p-1">
-        {TOOLS.map((t) => (
-          <ToolButton
-            key={t.value}
-            active={tool === t.value}
-            label={t.label}
-            icon={t.icon}
-            onClick={() => setTool(t.value)}
-          />
-        ))}
-      </div>
+    <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 rounded-md border border-border/70 bg-background/90 p-1 shadow-floating backdrop-blur sm:gap-1">
+      {TOOLS.map((t) => (
+        <ToolButton
+          key={t.value}
+          active={tool === t.value}
+          label={t.label}
+          icon={t.icon}
+          onClick={() => setTool(t.value)}
+        />
+      ))}
 
-      {isBrush && (
-        <label className="inline-flex items-center gap-2 rounded-md bg-muted/80 px-2.5 py-1 text-xs text-muted-foreground">
-          Ukuran
-          <input
-            type="range"
-            min={BRUSH_MIN}
-            max={BRUSH_MAX}
-            value={brushSize}
-            onChange={(e) => setBrushSize(Number(e.target.value))}
-            className="h-1 w-24 accent-primary"
-            aria-label="Ukuran brush"
-          />
-          <span className="w-6 text-right font-mono text-foreground">
-            {brushSize}
-          </span>
-        </label>
+      {showSlider && (
+        <>
+          <span aria-hidden="true" className="mx-0.5 h-4 w-px bg-border/80 sm:h-5" />
+          <label className="inline-flex h-5 items-center gap-1 rounded-sm px-1 text-micro text-muted-foreground sm:h-6 sm:gap-1.5 sm:px-1.5">
+            <span className="hidden sm:inline">{isBrush ? "Ukuran" : "Toleransi"}</span>
+            <input
+              type="range"
+              min={isBrush ? BRUSH_MIN : 0}
+              max={isBrush ? BRUSH_MAX : 100}
+              value={isBrush ? brushSize : tolerance}
+              onChange={(e) =>
+                isBrush
+                  ? setBrushSize(Number(e.target.value))
+                  : setTolerance(Number(e.target.value))
+              }
+              className="h-1 w-16 accent-primary sm:w-20"
+              aria-label={isBrush ? "Ukuran brush" : "Toleransi magic wand"}
+            />
+            <span className="w-4 text-right font-mono text-foreground sm:w-5">
+              {isBrush ? brushSize : tolerance}
+            </span>
+          </label>
+        </>
       )}
 
-      {tool === "wand" && (
-        <label className="inline-flex items-center gap-2 rounded-md bg-muted/80 px-2.5 py-1 text-xs text-muted-foreground">
-          Toleransi
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={tolerance}
-            onChange={(e) => setTolerance(Number(e.target.value))}
-            className="h-1 w-24 accent-primary"
-            aria-label="Toleransi magic wand"
-          />
-          <span className="w-6 text-right font-mono text-foreground">
-            {tolerance}
-          </span>
-        </label>
+      <span aria-hidden="true" className="mx-0.5 h-4 w-px bg-border/80 sm:h-5" />
+      <ToolButton
+        label="Undo"
+        icon={Undo2}
+        onClick={onUndo}
+        disabled={!canUndo}
+      />
+      <ToolButton
+        label="Redo"
+        icon={Redo2}
+        onClick={onRedo}
+        disabled={!canRedo}
+      />
+      <ToolButton label="Hapus seleksi" icon={Trash2} onClick={onClear} />
+      {onDownload && (
+        <button
+          type="button"
+          onClick={onDownload}
+          disabled={downloading}
+          aria-label="Unduh hasil"
+          title="Unduh hasil"
+          className="flex size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-40 sm:size-6 [&_svg]:size-3 sm:[&_svg]:size-3.5"
+        >
+          {downloading ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <Download />
+          )}
+        </button>
       )}
-
-      <div className="inline-flex items-center gap-0.5 rounded-md bg-muted/80 p-1">
-        <ToolButton
-          label="Undo"
-          icon={Undo2}
-          onClick={onUndo}
-          disabled={!canUndo}
-        />
-        <ToolButton
-          label="Redo"
-          icon={Redo2}
-          onClick={onRedo}
-          disabled={!canRedo}
-        />
-        <ToolButton label="Hapus seleksi" icon={Trash2} onClick={onClear} />
-        {onDownload && (
-          <button
-            type="button"
-            onClick={onDownload}
-            disabled={downloading}
-            aria-label="Unduh hasil"
-            title="Unduh hasil"
-            className="flex size-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground disabled:pointer-events-none disabled:opacity-40 [&_svg]:size-4"
-          >
-            {downloading ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              <Download />
-            )}
-          </button>
-        )}
-      </div>
     </div>
   );
 }

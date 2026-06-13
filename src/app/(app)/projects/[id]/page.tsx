@@ -1,15 +1,15 @@
-import { ImageIcon, Plus } from "lucide-react";
+import { ImageIcon, Plus, Search } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { ArchiveProjectButton } from "@/components/app/archive-project-button";
 import { PageHeader } from "@/components/app/page-header";
 import { RenderImage } from "@/components/app/render-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { getProject } from "@/lib/projects/service";
 import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
@@ -28,11 +28,12 @@ export default async function ProjectDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
   const { user } = await requireVerifiedUser();
   const { id } = await params;
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, q: queryParam } = await searchParams;
+  const query = queryParam?.trim() ?? "";
 
   const project = await getProject(user.id, id);
   if (!project) notFound();
@@ -44,8 +45,9 @@ export default async function ProjectDetailPage({
       projectId: id,
       limit: pageSize,
       offset: (page - 1) * pageSize,
+      search: query,
     }),
-    countRenders(user.id, { projectId: id }),
+    countRenders(user.id, { projectId: id, search: query }),
   ]);
   const totalPages = Math.ceil(total / pageSize);
 
@@ -55,9 +57,17 @@ export default async function ProjectDetailPage({
         title={project.name}
         description={`${total} render${project.isDefault ? " · Project default" : ""}`}
         action={
-          <div className="flex gap-2">
-            {!project.isDefault && <ArchiveProjectButton projectId={id} />}
-            <Button asChild>
+          <div className="flex w-full min-w-0 flex-row gap-2 sm:w-auto">
+            <form action={`/projects/${id}`} className="relative min-w-0 flex-1 sm:w-64">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                name="q"
+                defaultValue={query}
+                placeholder="Cari render..."
+                className="pl-9"
+              />
+            </form>
+            <Button asChild className="shrink-0">
               <Link href={`/renders/new?project=${id}`}>
                 <Plus /> Buat render
               </Link>
@@ -75,14 +85,21 @@ export default async function ProjectDetailPage({
       {total === 0 ? (
         <EmptyState
           icon={ImageIcon}
-          title="Belum ada render di project ini"
-          description="Mulai render pertama untuk project ini."
+          title={query ? "Render tidak ditemukan" : "Belum ada render di project ini"}
+          description={
+            query
+              ? "Coba kata kunci lain."
+              : "Mulai render pertama untuk project ini."
+          }
           action={
-            <Button asChild>
-              <Link href={`/renders/new?project=${id}`}>
-                <Plus /> Buat render
+            query ? undefined : (
+              <Link
+                href={`/renders/new?project=${id}`}
+                className="text-sm font-normal text-muted-foreground underline underline-offset-4 transition-colors hover:text-primary"
+              >
+                Buat render
               </Link>
-            </Button>
+            )
           }
         />
       ) : (

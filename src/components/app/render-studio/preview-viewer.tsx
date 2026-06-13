@@ -107,8 +107,8 @@ export function RenderPreviewViewer({
     <Card className="overflow-hidden lg:h-full">
       <CardContent className="flex flex-col gap-4 py-4 lg:h-full lg:min-h-0">
         {/* Sticky toolbar: view tabs (+ Edit) + zoom controls. */}
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             {panelsCollapsed && onExpandPanels && (
               // Reopen control, grouped with the view tabs (desktop only).
               <div className="hidden items-center rounded-md bg-muted/80 p-1 lg:inline-flex">
@@ -141,7 +141,10 @@ export function RenderPreviewViewer({
               <div className="inline-flex items-center rounded-md bg-muted/80 p-1">
                 <button
                   type="button"
-                  onClick={() => setStudioMode?.("texture")}
+                  onClick={() => {
+                    setView("result");
+                    setStudioMode?.("texture");
+                  }}
                   aria-pressed={studioMode === "texture"}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-sm px-3 py-1 text-xs font-medium transition-colors [&_svg]:size-3.5",
@@ -157,7 +160,7 @@ export function RenderPreviewViewer({
           </div>
 
           {(studioMode === "texture" ? Boolean(textureCanvas) : shownImage) && (
-            <div className="inline-flex h-9 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1">
+            <div className="inline-flex h-8 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1 sm:h-9">
               <Button
                 type="button"
                 variant="ghost"
@@ -166,14 +169,14 @@ export function RenderPreviewViewer({
                 disabled={zoom <= 0.5}
                 aria-label="Zoom out"
                 title="Zoom out"
-                className="size-7"
+                className="size-6 sm:size-7"
               >
                 <ZoomOut />
               </Button>
               <button
                 type="button"
                 onClick={resetZoom}
-                className="h-7 min-w-11 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card"
+                className="h-6 min-w-10 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card sm:h-7 sm:min-w-11"
                 title="Reset zoom"
               >
                 {Math.round(zoom * 100)}%
@@ -186,7 +189,7 @@ export function RenderPreviewViewer({
                 disabled={zoom >= 3}
                 aria-label="Zoom in"
                 title="Zoom in"
-                className="size-7"
+                className="size-6 sm:size-7"
               >
                 <ZoomIn />
               </Button>
@@ -202,18 +205,18 @@ export function RenderPreviewViewer({
               </p>
             )
           ) : canCompare && view === "comparison" ? (
-            // The slider wrapper shrink-wraps the displayed image so the divider
-            // and handle stay over the image (never the letterbox).
-            <div className="flex size-full items-center justify-center">
+            // Match the same stage sizing used by Asli/Hasil/Edit, so 100%
+            // zoom does not jump between tabs.
+            <div className="flex size-full items-center justify-center overflow-hidden">
               <div
-                className="relative inline-block max-h-full max-w-full overflow-hidden"
-                style={{ transform: `scale(${zoom})` }}
+                className="relative size-full overflow-hidden"
+                style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
               >
                 {/* Base = original (right side); defines the box. */}
                 <RenderImage
                   src={previewUrl ?? ""}
                   alt="Gambar asli"
-                  className="block max-h-full max-w-full select-none object-contain"
+                  className="block size-full select-none object-contain"
                 />
                 {/* Overlay = result, revealed on the left as the handle moves. */}
                 <div
@@ -223,7 +226,7 @@ export function RenderPreviewViewer({
                   <RenderImage
                     src={resultUrl ?? ""}
                     alt="Hasil render"
-                    className="absolute inset-0 size-full object-cover"
+                    className="absolute inset-0 size-full object-contain"
                   />
                 </div>
                 <div
@@ -309,9 +312,13 @@ export function RenderPreviewViewer({
               <X className="size-4" />
             </button>
           )}
-        </div>
 
-        {studioMode === "texture" && textureToolbar}
+          {studioMode === "texture" && textureToolbar && (
+            <div className="pointer-events-none absolute inset-x-2 bottom-2 z-10 flex justify-center sm:inset-x-3 sm:bottom-3">
+              <div className="pointer-events-auto">{textureToolbar}</div>
+            </div>
+          )}
+        </div>
 
         <input
           ref={fileRef}

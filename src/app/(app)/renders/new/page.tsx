@@ -11,6 +11,7 @@ import {
 } from "@/lib/projects/service";
 import { renderDisplayName } from "@/lib/renders/labels";
 import { getRenderDetail, listRenders } from "@/lib/renders/service";
+import { renderVersionLabels } from "@/lib/renders/version-labels";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Render Studio" };
@@ -41,6 +42,9 @@ export default async function CreateRenderPage({
   // its original image on the canvas. The composed prompt is never surfaced.
   const sourceRender = source ? await getRenderDetail(user.id, source) : null;
   const originalAsset = sourceRender?.assets.find((a) => a.type === "original");
+  const sourceVersionAssets = (sourceRender?.assets ?? []).filter(
+    (a) => a.type === "result" || a.type === "edit",
+  );
   const sourceVersions = [
     ...(originalAsset
       ? [
@@ -52,19 +56,12 @@ export default async function CreateRenderPage({
           },
         ]
       : []),
-    ...(sourceRender?.assets ?? [])
-      .filter((a) => a.type === "result" || a.type === "edit")
-      .map((a, i) => ({
-        id: a.id,
-        label:
-          a.config?.editKind === "texture"
-            ? "Edit Texture"
-            : i === 0
-              ? "Hasil render"
-              : `Edit ${i}`,
-        fileUrl: a.fileUrl,
-        config: a.config,
-      })),
+    ...renderVersionLabels(sourceVersionAssets).map(({ asset, label }) => ({
+      id: asset.id,
+      label,
+      fileUrl: asset.fileUrl,
+      config: asset.config,
+    })),
   ];
 
   const projectId = sourceRender?.projectId ?? projectParam;

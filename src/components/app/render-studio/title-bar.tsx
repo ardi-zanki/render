@@ -44,7 +44,7 @@ export function StudioTitleBar({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="hidden items-center gap-2 lg:flex">
       <Link
         href="/dashboard"
         title="Kembali ke Dashboard"

@@ -19,6 +19,7 @@ import {
 } from "@/lib/renders/labels";
 import { listProjects } from "@/lib/projects/service";
 import { getRenderDetail } from "@/lib/renders/service";
+import { renderVersionLabels } from "@/lib/renders/version-labels";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Detail Render" };
@@ -46,13 +47,14 @@ export default async function RenderDetailPage({
     name: project.name,
   }));
   // Versions in chronological order: first result, then each edit.
-  const versions = render.assets
-    .filter((a) => a.type === "result" || a.type === "edit")
-    .map((a, i) => ({
-      id: a.id,
-      fileUrl: a.fileUrl,
-      label: i === 0 ? "Hasil render" : `Edit ${i}`,
-    }));
+  const versionAssets = render.assets.filter(
+    (a) => a.type === "result" || a.type === "edit",
+  );
+  const versions = renderVersionLabels(versionAssets).map(({ asset, label }) => ({
+    id: asset.id,
+    fileUrl: asset.fileUrl,
+    label,
+  }));
 
   return (
     <>
@@ -67,7 +69,7 @@ export default async function RenderDetailPage({
         }
       />
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_340px]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_240px] xl:grid-cols-[minmax(0,1fr)_260px]">
         <div className="flex flex-col gap-4">
           <RenderVersions
             originalUrl={render.originalUrl}
@@ -92,11 +94,18 @@ export default async function RenderDetailPage({
           )}
         </div>
 
-        <aside className="flex flex-col gap-4">
+        <aside className="flex w-full flex-col gap-4 justify-self-stretch">
           <Card>
-            <CardContent className="flex flex-col gap-4 py-5">
+            <CardContent className="flex flex-col gap-2.5 p-3">
               <div className="flex items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold text-foreground">Detail</h2>
+                <div className="flex min-w-0 items-center gap-2">
+                  <h2 className="text-sm font-semibold text-foreground">
+                    Info Render
+                  </h2>
+                  {render.config?.editKind === "texture" && (
+                    <Badge variant="info">Edit Texture</Badge>
+                  )}
+                </div>
                 <RenderActionsMenu
                   renderId={render.id}
                   renderName={renderName}
@@ -104,15 +113,15 @@ export default async function RenderDetailPage({
                   canDownload={render.status === "success" && !!render.resultUrl}
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Status</span>
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <span className="text-muted-foreground">Status</span>
                 <Badge variant={statusBadgeVariant(render.status)}>
                   {STATUS_LABEL[render.status] ?? render.status}
                 </Badge>
               </div>
               <Info label="Dibuat" value={dateFmt.format(render.createdAt)} />
               <Info label="Mode" value={MODE_LABEL[render.mode]} />
-              <div className="flex items-center justify-between gap-4 text-sm">
+              <div className="flex items-center justify-between gap-3 text-xs">
                 <span className="text-muted-foreground">Project</span>
                 <RenderProjectSelector
                   renderId={render.id}
@@ -128,7 +137,7 @@ export default async function RenderDetailPage({
                   {render.errorMessage}
                 </div>
               )}
-              <Button asChild className="w-full">
+              <Button asChild size="sm" className="mt-1 w-full">
                 <Link href={`/renders/new?source=${render.id}`}>
                   <Wand2 /> Open Studio
                 </Link>
@@ -143,7 +152,7 @@ export default async function RenderDetailPage({
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 text-sm">
+    <div className="flex items-center justify-between gap-3 text-xs">
       <span className="text-muted-foreground">{label}</span>
       <span className="font-medium text-foreground">{value}</span>
     </div>

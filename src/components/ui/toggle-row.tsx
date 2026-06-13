@@ -35,7 +35,7 @@ function ToggleRow({
       data-state={checked ? "checked" : "unchecked"}
       {...(handleClick ? { onClick: handleClick } : {})}
       className={cn(
-        "flex h-10 cursor-pointer items-center justify-between gap-3 rounded-md border px-3 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/25 disabled:pointer-events-none disabled:opacity-50",
+        "flex h-10 max-w-full cursor-pointer items-center justify-between gap-3 overflow-hidden rounded-md border px-3 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/25 disabled:pointer-events-none disabled:opacity-50",
         checked
           ? "border-primary bg-accent text-primary"
           : "border-border bg-secondary/60 text-foreground hover:border-primary/40",
@@ -43,7 +43,7 @@ function ToggleRow({
       )}
       {...props}
     >
-      <span className="flex min-w-0 items-center gap-2">
+      <span className="flex min-w-0 flex-1 items-center gap-2">
         {Icon && <Icon className="size-4 shrink-0" />}
         <span className="truncate">{label}</span>
       </span>

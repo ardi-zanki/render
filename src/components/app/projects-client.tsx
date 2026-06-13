@@ -260,8 +260,8 @@ export function ProjectsClient({
           value={status}
           onChange={setTab}
         />
-        <div className="flex gap-2">
-          <div className="relative flex-1 sm:w-64 sm:flex-none">
+        <div className="flex min-w-0 gap-2">
+          <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={search}

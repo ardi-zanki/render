@@ -348,15 +348,15 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
 
   return (
     <div
-      className={cn("relative inline-block max-h-full max-w-full", className)}
-      style={{ transform: `scale(${zoom})` }}
+      className={cn("relative size-full overflow-hidden", className)}
+      style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={imageUrl}
         alt="Gambar yang diedit"
         draggable={false}
-        className="block max-h-full max-w-full select-none object-contain"
+        className="block size-full select-none object-contain"
       />
       <canvas
         ref={overlayRef}
@@ -365,7 +365,7 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
         style={{ cursor, opacity: 0.5, touchAction: "none" }}
-        className="absolute inset-0 h-full w-full"
+        className="absolute inset-0 size-full"
       />
     </div>
   );

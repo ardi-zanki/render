@@ -2,7 +2,6 @@
 
 import { Lightbulb, PanelLeft, Plus } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChoiceCard } from "@/components/ui/choice-card";
@@ -76,8 +75,8 @@ export function RenderStudioControls({
   return (
     // In the fixed-height studio, fill the column so its bottom lines up with
     // the prompt/info columns (grows taller and scrolls when content overflows).
-    <Card className="h-fit lg:min-h-full">
-      <CardContent className="flex flex-col gap-4 py-4">
+    <Card className="h-fit max-w-full overflow-hidden lg:min-h-full">
+      <CardContent className="flex min-w-0 flex-col gap-4 px-3 py-4 sm:px-4">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
             <Label htmlFor="project" className="text-sm font-semibold">
@@ -95,12 +94,12 @@ export function RenderStudioControls({
               </button>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex min-w-0 gap-2">
             <Select
               id="project"
               value={projectId}
               onChange={(e) => onSwitchProject(e.target.value)}
-              className="h-8 flex-1"
+              className="h-8 min-w-0 flex-1"
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -125,30 +124,33 @@ export function RenderStudioControls({
         <div className="flex flex-col gap-2">
           <Label>Mode Render</Label>
           <div className="grid grid-cols-2 gap-2">
-            {MODES.map((m) => (
-              <ChoiceCard
-                key={m.value}
-                active={mode === m.value}
-                icon={m.icon}
-                label={m.label}
-                description={
-                  m.comingSoon ? (
-                    <Badge
-                      variant="secondary"
-                      className="mt-0.5 px-1.5 py-0 text-micro"
-                    >
-                      Segera hadir
-                    </Badge>
-                  ) : undefined
-                }
-                disabled={m.comingSoon}
-                onClick={() => {
-                  setMode(m.value);
-                  setSurrounding("auto");
-                  if (m.value === "interior") setWeather("auto");
-                }}
-              />
-            ))}
+            {MODES.map((m) => {
+              const card = (
+                <ChoiceCard
+                  active={mode === m.value}
+                  icon={m.icon}
+                  label={m.label}
+                  disabled={m.comingSoon}
+                  aria-label={m.comingSoon ? `${m.label} - Segera Hadir` : m.label}
+                  className="h-full w-full min-w-0"
+                  onClick={() => {
+                    setMode(m.value);
+                    setSurrounding("auto");
+                    if (m.value === "interior") setWeather("auto");
+                  }}
+                />
+              );
+
+              return m.comingSoon ? (
+                <span key={m.value} className="block min-w-0" title="Segera Hadir">
+                  {card}
+                </span>
+              ) : (
+                <span key={m.value} className="block min-w-0">
+                  {card}
+                </span>
+              );
+            })}
           </div>
         </div>
 
@@ -230,6 +232,7 @@ export function RenderStudioControls({
             onCheckedChange={(next) => setLightsOn(() => next)}
             icon={Lightbulb}
             label="Nyalakan Lampu"
+            className="h-9 w-full min-w-0 gap-2 px-2.5 text-xs sm:text-sm"
           />
         </div>
       </CardContent>

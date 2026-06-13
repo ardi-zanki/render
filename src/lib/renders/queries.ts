@@ -5,8 +5,10 @@ import {
   desc,
   eq,
   inArray,
+  ilike,
   isNotNull,
   isNull,
+  or,
 } from "drizzle-orm";
 
 import { db } from "@/db";
@@ -17,6 +19,31 @@ import {
   type RenderStatus,
 } from "@/db/schema";
 import type { RenderDetail, RenderListItem } from "./types";
+
+async function renderSearchProjectIds(userId: string, search: string | undefined) {
+  const q = search?.trim();
+  if (!q) return [];
+  const rows = await db.query.projects.findMany({
+    where: and(
+      eq(projects.userId, userId),
+      isNull(projects.deletedAt),
+      ilike(projects.name, `%${q}%`),
+    ),
+    columns: { id: true },
+  });
+  return rows.map((row) => row.id);
+}
+
+function renderSearchClause(search: string | undefined, projectIds: string[]) {
+  const q = search?.trim();
+  if (!q) return undefined;
+  return or(
+    ilike(renders.name, `%${q}%`),
+    ilike(renders.prompt, `%${q}%`),
+    ilike(renders.mode, `%${q}%`),
+    projectIds.length > 0 ? inArray(renders.projectId, projectIds) : undefined,
+  );
+}
 
 export async function getRenderDetail(
   userId: string,
@@ -87,8 +114,11 @@ export async function listRenders(
     offset?: number;
     archived?: boolean;
     status?: RenderStatus;
+    search?: string;
   } = {},
 ): Promise<RenderListItem[]> {
+  const search = opts.search?.trim();
+  const searchProjectIds = await renderSearchProjectIds(userId, search);
   const rows = await db.query.renders.findMany({
     where: and(
       eq(renders.userId, userId),
@@ -96,6 +126,7 @@ export async function listRenders(
       opts.projectId ? eq(renders.projectId, opts.projectId) : undefined,
       opts.archived ? isNotNull(renders.archivedAt) : isNull(renders.archivedAt),
       opts.status ? eq(renders.status, opts.status) : undefined,
+      renderSearchClause(search, searchProjectIds),
     ),
     orderBy: desc(renders.createdAt),
     limit: opts.limit ?? 50,
@@ -147,8 +178,15 @@ export async function listRenders(
 /** Total non-deleted renders for a user, matching the same filters as listRenders. */
 export async function countRenders(
   userId: string,
-  opts: { projectId?: string; archived?: boolean; status?: RenderStatus } = {},
+  opts: {
+    projectId?: string;
+    archived?: boolean;
+    status?: RenderStatus;
+    search?: string;
+  } = {},
 ): Promise<number> {
+  const search = opts.search?.trim();
+  const searchProjectIds = await renderSearchProjectIds(userId, search);
   const [row] = await db
     .select({ value: count() })
     .from(renders)
@@ -161,6 +199,7 @@ export async function countRenders(
           ? isNotNull(renders.archivedAt)
           : isNull(renders.archivedAt),
         opts.status ? eq(renders.status, opts.status) : undefined,
+        renderSearchClause(search, searchProjectIds),
       ),
     );
   return row.value;

@@ -160,7 +160,7 @@ export function ChangeTexturePanel({
         </div>
 
         {/* Pinned footer: instruction + Apply stay visible while scrolling. */}
-        <div className="flex shrink-0 flex-col gap-3 border-t border-border/80 pt-3">
+        <div className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 flex flex-col gap-3 rounded-lg border border-border bg-card p-3 shadow-elevated lg:static lg:inset-auto lg:z-auto lg:shrink-0 lg:rounded-none lg:border-0 lg:border-t lg:border-border/80 lg:bg-transparent lg:p-0 lg:pt-3 lg:shadow-none">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="texture-instruction" className="text-xs">
               Instruksi tambahan{" "}
