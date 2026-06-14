@@ -247,15 +247,20 @@ export default async function DashboardPage() {
             {recentRenders.map((r) => {
               const thumb = r.resultUrl ?? r.originalUrl;
               return (
-                <div
+                <Link
                   key={r.id}
-                  className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
+                  href={`/renders/${r.id}`}
+                  className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted outline-none transition-colors hover:border-primary/35 focus-visible:ring-2 focus-visible:ring-ring/30"
                 >
                   {thumb && (
-                    <RenderImage src={thumb} alt={r.mode} className="size-full" />
+                    <RenderImage
+                      src={thumb}
+                      alt={r.mode}
+                      className="size-full transition-transform duration-200 group-hover:scale-[1.02]"
+                    />
                   )}
                   <RenderStatusBadge status={r.status} className="absolute left-1.5 top-1.5" />
-                </div>
+                </Link>
               );
             })}
           </div>
