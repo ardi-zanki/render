@@ -17,8 +17,6 @@ import { signOut } from "@/lib/auth-client";
 import type { UserStorageUsage } from "@/lib/storage/usage";
 import { cn } from "@/lib/utils";
 
-const WA_SUPPORT = "https://wa.me/6200012340001";
-
 type MenuUser = {
   name: string;
   email: string;
@@ -155,15 +153,16 @@ export function UserMenu({
         >
           <Settings /> Pengaturan
         </button>
-        <a
-          href={WA_SUPPORT}
-          target="_blank"
-          rel="noreferrer"
-          onClick={() => setOpen(false)}
+        <button
+          type="button"
+          onClick={() => {
+            router.push("/support");
+            setOpen(false);
+          }}
           className={itemClass}
         >
           <MessageCircle /> Support
-        </a>
+        </button>
         <div className="my-1 h-px bg-border" />
 
         <button
