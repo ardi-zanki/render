@@ -75,6 +75,7 @@ export interface RenderDetail {
 export interface RenderListItem {
   id: string;
   mode: RenderMode;
+  name: string | null;
   status: RenderStatus;
   prompt: string | null;
   createdAt: Date;

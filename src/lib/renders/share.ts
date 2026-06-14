@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { renderAssets, renders, type RenderMode } from "@/db/schema";
+import { renderAssets, renders, user, type RenderMode } from "@/db/schema";
 import { env } from "@/env";
 
 function genSlug() {
@@ -41,6 +41,7 @@ export interface PublicRender {
   mode: RenderMode;
   resultUrl: string;
   createdAt: Date;
+  creatorName: string;
 }
 
 /** Fetch a public render by share slug (only successful, non-deleted). */
@@ -61,11 +62,17 @@ export async function getPublicRender(
   });
   if (!asset) return null;
 
+  const owner = await db.query.user.findFirst({
+    where: eq(user.id, r.userId),
+    columns: { name: true },
+  });
+
   // The composed prompt is internal/secret — never expose it to the public
   // Share page (principle of least privilege: return only what the UI needs).
   return {
     mode: r.mode,
     resultUrl: asset.fileUrl,
     createdAt: r.createdAt,
+    creatorName: owner?.name ?? "RenderAI user",
   };
 }

@@ -164,6 +164,7 @@ export async function listRenders(
   return rows.map((r) => ({
     id: r.id,
     mode: r.mode,
+    name: r.name ?? null,
     status: r.status,
     prompt: r.prompt,
     createdAt: r.createdAt,

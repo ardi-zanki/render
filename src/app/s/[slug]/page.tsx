@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { MODE_LABEL } from "@/lib/renders/labels";
 import { getPublicRender } from "@/lib/renders/service";
+import { getServerSession } from "@/lib/session";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -31,8 +32,21 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function PublicRenderPage({ params }: Params) {
   const { slug } = await params;
-  const render = await getPublicRender(slug);
+  const [render, session] = await Promise.all([
+    getPublicRender(slug),
+    getServerSession(),
+  ]);
   if (!render) notFound();
+  const isAuthenticated = Boolean(session?.user && !session.user.isDisabled);
+  const studioHref = isAuthenticated ? "/renders/new" : "/register";
+  const headerCtaLabel = isAuthenticated ? "Open Studio" : "Buat akun";
+  const sectionTitle = isAuthenticated
+    ? "Lanjutkan eksplorasi di studio Anda"
+    : "Buat render arsitektur Anda sendiri";
+  const sectionDescription = isAuthenticated
+    ? "Gunakan hasil ini sebagai referensi, unggah desain berikutnya, dan kelola opsi visual di workspace Anda."
+    : "Unggah desain, pilih mode, dan dapatkan visual yang siap dibahas. Akun baru mendapatkan kredit awal.";
+  const sectionCtaLabel = isAuthenticated ? "Open Studio" : "Mulai eksplorasi";
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -43,9 +57,15 @@ export default async function PublicRenderPage({ params }: Params) {
           </Link>
           <div className="flex items-center gap-2">
             <ModeToggle />
-            <Button asChild>
-              <Link href="/register">Buat akun</Link>
-            </Button>
+            {isAuthenticated ? (
+              <Button asChild>
+                <a href={studioHref}>{headerCtaLabel}</a>
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link href={studioHref}>{headerCtaLabel}</Link>
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -66,23 +86,30 @@ export default async function PublicRenderPage({ params }: Params) {
           />
         </div>
 
-        <p className="mt-4 text-xs text-muted-foreground">
-          {dateFmt.format(render.createdAt)}
+        <p className="mt-4 text-xs font-medium text-muted-foreground">
+          {render.creatorName} · {dateFmt.format(render.createdAt)}
         </p>
 
-        <div className="mt-8 flex flex-col items-center gap-3 border-y border-border px-5 py-7 text-center">
+        <div className="mt-8 flex flex-col items-center gap-3 px-5 py-7 text-center">
           <p className="text-base font-semibold text-foreground">
-            Buat render arsitektur Anda sendiri
+            {sectionTitle}
           </p>
           <p className="max-w-md text-sm leading-6 text-muted-foreground">
-            Unggah desain, pilih mode, dan dapatkan visual yang siap dibahas.
-            Akun baru mendapatkan kredit awal.
+            {sectionDescription}
           </p>
-          <Button asChild>
-            <Link href="/register">
-              Mulai eksplorasi <ArrowRight />
-            </Link>
-          </Button>
+          {isAuthenticated ? (
+            <Button asChild>
+              <a href={studioHref}>
+                {sectionCtaLabel} <ArrowRight />
+              </a>
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link href={studioHref}>
+                {sectionCtaLabel} <ArrowRight />
+              </Link>
+            </Button>
+          )}
         </div>
       </main>
 

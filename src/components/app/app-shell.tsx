@@ -19,8 +19,8 @@ import { useState, type MouseEvent, type ReactNode } from "react";
 import { NotificationBell } from "@/components/app/notification-bell";
 import { RenderQueueButton } from "@/components/app/render-queue-button";
 import { UserMenu } from "@/components/app/user-menu";
+import { GlobalSearchCommand } from "@/components/app/global-search-command";
 import { CreditPill } from "@/components/brand/credit-pill";
-import { LogoMark } from "@/components/brand/logo";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import type { NotificationItem } from "@/lib/notifications/ui";
 import type { UserStorageUsage } from "@/lib/storage/usage";
@@ -150,18 +150,30 @@ export function AppShell({
         )}
         suppressHydrationWarning
       >
-        <div className="grid h-14 grid-cols-[72px_minmax(0,1fr)] border-b border-border/75">
-          <div className="relative flex items-center justify-center">
+        <div
+          className={cn(
+            "grid h-14 border-b border-border/75",
+            expanded
+              ? "grid-cols-[minmax(0,1fr)_48px]"
+              : "grid-cols-[72px_minmax(0,1fr)]",
+          )}
+        >
+          <div
+            className={cn(
+              "relative flex items-center",
+              expanded ? "min-w-0 pl-8" : "justify-center",
+            )}
+          >
             <Link
               href="/dashboard"
               aria-label="RenderAI dashboard"
               onClick={() => setOpen(false)}
               className={cn(
-                "absolute flex size-9 items-center justify-center transition-opacity duration-150 ease-out",
+                "min-w-0 truncate text-base font-extrabold tracking-normal text-foreground transition-opacity duration-150 ease-out",
                 expanded ? "opacity-100 delay-100" : "pointer-events-none opacity-0",
               )}
             >
-              <LogoMark size={28} />
+              RenderAI<span className="text-primary">.</span>
             </Link>
             <button
               type="button"
@@ -178,17 +190,10 @@ export function AppShell({
           </div>
           <div
             className={cn(
-              "flex min-w-0 items-center justify-between gap-2 overflow-hidden pr-4 transition-opacity duration-150 ease-out",
+              "flex min-w-0 items-center justify-end gap-1.5 overflow-hidden pr-3 transition-opacity duration-150 ease-out",
               expanded ? "opacity-100 delay-100" : "pointer-events-none opacity-0",
             )}
           >
-            <Link
-              href="/dashboard"
-              onClick={() => setOpen(false)}
-              className="min-w-0 truncate text-lg font-extrabold tracking-normal text-foreground"
-            >
-              RenderAI<span className="text-primary">.</span>
-            </Link>
             <button
               className="shrink-0 text-muted-foreground lg:hidden"
               onClick={() => setOpen(false)}
@@ -198,7 +203,7 @@ export function AppShell({
             </button>
             <button
               type="button"
-              className="hidden size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex"
+              className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex"
               onClick={() => updateSidebarExpanded(false)}
               aria-label="Ciutkan sidebar"
               title="Ciutkan sidebar"
@@ -208,7 +213,7 @@ export function AppShell({
           </div>
         </div>
 
-        <div className={cn("px-3 pt-3", expanded ? "pb-0.5" : "pb-1")}>
+        <div className={cn("space-y-1 px-3 pt-3", expanded ? "pb-0.5" : "pb-1")}>
           <Link
             href="/renders/new"
             onClick={() => setOpen(false)}
@@ -223,6 +228,10 @@ export function AppShell({
             <Plus className="mx-auto size-4 shrink-0" />
             {labelWithTooltip("Buat render", expanded)}
           </Link>
+          <GlobalSearchCommand
+            expanded={expanded}
+            onNavigate={() => setOpen(false)}
+          />
         </div>
 
         <nav className="flex-1 space-y-1 px-3 pb-2 pt-1">
