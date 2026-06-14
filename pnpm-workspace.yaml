@@ -11,6 +11,9 @@ overrides:
   # @better-auth/kysely-adapter 1.6.x imports DEFAULT_MIGRATION_TABLE which
   # kysely 0.29.x dropped; pin to 0.28.x (still within Better Auth's range).
   kysely: 0.28.17
+  # Keep Next's optional image dependency aligned with the root sharp version so
+  # only one libvips binary is loaded during production builds.
+  sharp: 0.35.1
 minimumReleaseAgeExclude:
   - '@aws-sdk/checksums@3.1000.4'
   - '@aws-sdk/client-s3@3.1065.0'
