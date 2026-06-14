@@ -6,7 +6,7 @@ import {
   getRenderDetail,
   moveRenderToProject,
 } from "@/lib/renders/service";
-import { renderDisplayName } from "@/lib/renders/labels";
+import { renderResolvedDisplayName } from "@/lib/renders/labels";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
 import {
   renderDeleteSchema,
@@ -93,7 +93,7 @@ export async function DELETE(
     return NextResponse.json({ error: "Render tidak ditemukan" }, { status: 404 });
   }
 
-  const expectedName = renderDisplayName(render.mode);
+  const expectedName = renderResolvedDisplayName(render.name, render.mode);
   if (parsed.data.confirmationName !== expectedName) {
     return NextResponse.json(
       { error: `Ketik "${expectedName}" untuk menghapus render` },

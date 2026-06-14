@@ -43,6 +43,7 @@ export interface RenderAssetView {
   mimeType: string | null;
   width: number | null;
   height: number | null;
+  createdAt: Date;
   /** For result/edit assets: the settings + prompt that produced this version. */
   config: RenderConfig | null;
   prompt: string | null;
@@ -101,4 +102,32 @@ export type ProviderRequestOptions = {
 
 export function isFinalRenderStatus(status: string) {
   return ["success", "failed", "cancelled", "refunded"].includes(status);
+}
+
+export function isRenderableVersion(type: RenderAssetType) {
+  return type === "result" || type === "edit";
+}
+
+function assetTime(value: Date | string | null | undefined) {
+  if (!value) return Number.NEGATIVE_INFINITY;
+  const time = new Date(value).getTime();
+  return Number.isFinite(time) ? time : Number.NEGATIVE_INFINITY;
+}
+
+export function getLatestRenderableAsset<
+  T extends { type: RenderAssetType; createdAt?: Date | string | null },
+>(assets: readonly T[]): T | null {
+  let latest: T | null = null;
+  let latestTime = Number.NEGATIVE_INFINITY;
+
+  for (const asset of assets) {
+    if (!isRenderableVersion(asset.type)) continue;
+    const time = assetTime(asset.createdAt);
+    if (!latest || time >= latestTime) {
+      latest = asset;
+      latestTime = time;
+    }
+  }
+
+  return latest;
 }

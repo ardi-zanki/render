@@ -153,6 +153,7 @@ export default async function RendersPage({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {renders.map((r) => {
             const thumb = r.resultUrl ?? r.originalUrl;
+            const displayName = r.name?.trim() || MODE_LABEL[r.mode];
             return (
               <Link key={r.id} href={`/renders/${r.id}`}>
                 <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
@@ -170,9 +171,10 @@ export default async function RendersPage({
                   </div>
                   <CardContent className="py-3.5">
                     <p className="truncate font-semibold text-foreground">
-                      {MODE_LABEL[r.mode]}
+                      {displayName}
                     </p>
                     <p className="text-xs text-muted-foreground">
+                      {MODE_LABEL[r.mode]} ·{" "}
                       {r.projectName ? `${r.projectName} · ` : ""}
                       {dateFmt.format(r.createdAt)}
                     </p>

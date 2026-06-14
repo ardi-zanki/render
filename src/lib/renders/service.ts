@@ -1,7 +1,9 @@
 export {
   LOW_CREDIT_THRESHOLD,
   RENDER_COST,
+  getLatestRenderableAsset,
   isFinalRenderStatus,
+  isRenderableVersion,
   type CreateRenderParams,
   type CreateRenderResult,
   type ProviderRequestOptions,
