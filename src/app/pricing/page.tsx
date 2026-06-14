@@ -7,6 +7,7 @@ import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getServerSession } from "@/lib/session";
 import { listActivePaymentPackages } from "@/lib/payments/service";
 import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
 
@@ -19,11 +20,16 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function PricingPage() {
-  const packages = await listActivePaymentPackages();
+  const [packages, session] = await Promise.all([
+    listActivePaymentPackages(),
+    getServerSession(),
+  ]);
+  const isAuthenticated = Boolean(session?.user && !session.user.isDisabled);
+  const packageCtaHref = isAuthenticated ? "/payments" : "/register";
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <PublicHeader />
+      <PublicHeader authenticated={isAuthenticated} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">
         <div className="max-w-2xl">
           <p className="text-xs font-semibold uppercase text-primary">
@@ -77,7 +83,7 @@ export default async function PricingPage() {
                     ))}
                   </ul>
                   <Button asChild className="mt-auto">
-                    <Link href="/register">Mulai render</Link>
+                    <Link href={packageCtaHref}>Mulai render</Link>
                   </Button>
                 </CardContent>
               </Card>

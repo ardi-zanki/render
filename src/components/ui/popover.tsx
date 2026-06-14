@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
   type RefObject,
@@ -12,7 +13,7 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { zLayer } from "@/lib/z-layers";
 
-type Placement = "top" | "bottom";
+type Placement = "top" | "bottom" | "auto";
 type Align = "start" | "end";
 type Position = {
   left?: number;
@@ -48,6 +49,7 @@ export function Popover<T extends HTMLElement>({
   align = "end",
   gap = 8,
   alignOffset = 0,
+  mobileFullWidth = true,
   className,
 }: {
   anchorRef: RefObject<T | null>;
@@ -64,19 +66,29 @@ export function Popover<T extends HTMLElement>({
   gap?: number;
   /** Extra px offset applied along the alignment axis. */
   alignOffset?: number;
+  /** Phones usually use a sheet-like full-width menu; card menus can opt out. */
+  mobileFullWidth?: boolean;
   className?: string;
 }) {
   const [position, setPosition] = useState<Position | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const reposition = useCallback(() => {
     const rect = anchorRef.current?.getBoundingClientRect();
     if (!rect) return;
     const next: Position = {};
+    const panelHeight = panelRef.current?.getBoundingClientRect().height ?? 0;
+    const spaceBelow = window.innerHeight - rect.bottom - gap - MARGIN;
+    const effectivePlacement =
+      placement === "auto" && panelHeight > spaceBelow ? "top" : placement;
 
-    if (placement === "bottom") next.top = rect.bottom + gap;
-    else next.bottom = Math.max(window.innerHeight - rect.top + gap, MARGIN);
+    if (effectivePlacement === "top") {
+      next.bottom = Math.max(window.innerHeight - rect.top + gap, MARGIN);
+    } else {
+      next.top = rect.bottom + gap;
+    }
 
-    if (window.innerWidth < MOBILE_BREAKPOINT) {
+    if (mobileFullWidth && window.innerWidth < MOBILE_BREAKPOINT) {
       // Phone: full-width panel (minus side margins), consistent for every
       // header trigger regardless of its x position.
       next.left = MARGIN;
@@ -96,7 +108,7 @@ export function Popover<T extends HTMLElement>({
       next.width = Math.min(width, window.innerWidth - next.left - MARGIN);
     }
     setPosition(next);
-  }, [anchorRef, placement, align, gap, alignOffset, width]);
+  }, [anchorRef, placement, align, gap, alignOffset, mobileFullWidth, width]);
 
   // Position the panel once it opens, and keep it anchored on scroll / resize.
   useEffect(() => {
@@ -131,6 +143,7 @@ export function Popover<T extends HTMLElement>({
         aria-hidden="true"
       />
       <div
+        ref={panelRef}
         style={{
           width: position?.width ?? width,
           left: position?.left,

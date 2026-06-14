@@ -1,14 +1,15 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Check, ChevronDown, Loader2 } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
-import { Select } from "@/components/ui/select";
+import { Popover } from "@/components/ui/popover";
 import { apiErrorMessage, apiJson, jsonInit } from "@/lib/client-api";
+import { cn } from "@/lib/utils";
 
 type ProjectOption = {
   id: string;
@@ -32,6 +33,7 @@ export function RenderProjectSelector({
   projects: ProjectOption[];
 }) {
   const router = useRouter();
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const activeProject = useMemo(
     () => ({
       id: currentProjectId,
@@ -44,6 +46,7 @@ export function RenderProjectSelector({
   const [pendingProject, setPendingProject] = useState<ProjectOption | null>(
     null,
   );
+  const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const displayedProject = movedProject ?? activeProject;
@@ -54,6 +57,10 @@ export function RenderProjectSelector({
     }
     return [displayedProject, ...projects];
   }, [displayedProject, projects]);
+  const selectedProject =
+    normalizedProjects.find((project) => project.id === selectedProjectId) ??
+    displayedProject;
+  const disabled = normalizedProjects.length <= 1 || saving;
 
   function closeConfirm() {
     if (saving) return;
@@ -89,31 +96,72 @@ export function RenderProjectSelector({
     <>
       <div className="flex min-w-0 items-center gap-2">
         <div className="w-[128px] min-w-0">
-          <Select
+          <button
+            ref={triggerRef}
+            type="button"
             aria-label="Pindah project render"
-            value={selectedProjectId}
-            onChange={(event) => {
-              const nextProject = normalizedProjects.find(
-                (project) => project.id === event.target.value,
-              );
-              if (!nextProject || nextProject.id === displayedProject.id) {
-                setSelectedProjectId(displayedProject.id);
-                return;
-              }
-              setSelectedProjectId(nextProject.id);
-              setPendingProject(nextProject);
-            }}
-            disabled={normalizedProjects.length <= 1 || saving}
-            className="h-7 min-w-0 truncate rounded-md pl-2 pr-7 text-right text-xs font-medium"
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            disabled={disabled}
+            onClick={() => setOpen((value) => !value)}
+            className="inline-flex h-7 w-full min-w-0 items-center justify-end gap-1 rounded-md border border-input bg-card pl-2 pr-1.5 text-right text-xs font-medium text-foreground shadow-hairline transition-colors hover:bg-muted/60 focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {normalizedProjects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.name}
-              </option>
-            ))}
-          </Select>
+            <span className="min-w-0 truncate">{selectedProject.name}</span>
+            {saving ? (
+              <Loader2 className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+            ) : (
+              <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+            )}
+          </button>
         </div>
       </div>
+
+      <Popover
+        anchorRef={triggerRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        width={176}
+        placement="auto"
+        align="end"
+        gap={6}
+        mobileFullWidth={false}
+        className="max-h-[176px] overflow-y-auto rounded-lg border border-border/80 bg-popover p-1 shadow-elevated"
+      >
+        <div role="listbox" aria-label="Pilih project render" className="space-y-0.5">
+          {normalizedProjects.map((project) => {
+            const active = project.id === displayedProject.id;
+            return (
+              <button
+                key={project.id}
+                type="button"
+                role="option"
+                aria-selected={active}
+                className={cn(
+                  "flex w-full cursor-pointer items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs font-medium text-foreground transition-colors hover:bg-muted/80",
+                  active && "bg-muted/70",
+                )}
+                onClick={() => {
+                  setOpen(false);
+                  if (project.id === displayedProject.id) {
+                    setSelectedProjectId(displayedProject.id);
+                    return;
+                  }
+                  setSelectedProjectId(project.id);
+                  setPendingProject(project);
+                }}
+              >
+                <Check
+                  className={cn(
+                    "size-3.5 shrink-0",
+                    active ? "opacity-100" : "opacity-0",
+                  )}
+                />
+                <span className="min-w-0 truncate">{project.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Popover>
 
       {pendingProject && (
         <Modal

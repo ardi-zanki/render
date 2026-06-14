@@ -103,6 +103,7 @@ export function UserMenu({
         open={open}
         onClose={() => setOpen(false)}
         width={220}
+        mobileFullWidth={false}
         placement="top"
         align="start"
         alignOffset={compact ? 8 : 0}

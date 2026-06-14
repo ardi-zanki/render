@@ -32,11 +32,12 @@ export function SimulatePayButton({ orderId }: { orderId: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row">
+    <div className="grid gap-2 sm:grid-cols-2">
       <Button
         onClick={() => notify("settlement", "success")}
         disabled={loading !== null}
-        className="flex-1"
+        size="lg"
+        className="w-full"
       >
         {loading === "pay" ? (
           <Loader2 className="animate-spin" />
@@ -49,7 +50,8 @@ export function SimulatePayButton({ orderId }: { orderId: string }) {
         variant="outline"
         onClick={() => notify("expire", "failed")}
         disabled={loading !== null}
-        className="flex-1"
+        size="lg"
+        className="w-full"
       >
         {loading === "fail" ? <Loader2 className="animate-spin" /> : <XCircle />}
         Batalkan

@@ -18,20 +18,20 @@ export default async function SimulatePaymentPage({
   const isMock = env.PAYMENT_PROVIDER === "mock";
 
   return (
-    <div className="mx-auto max-w-md">
+    <div className="mx-auto w-full max-w-lg">
       <PageHeader
         title="Simulasi Pembayaran"
         description="Halaman dev untuk menguji alur top-up tanpa Midtrans asli."
       />
-      <Card>
-        <CardContent className="flex flex-col gap-5 py-5">
-          <div className="flex items-center gap-3 rounded-lg bg-muted/60 px-4 py-3">
+      <Card className="w-full">
+        <CardContent className="flex flex-col gap-5 px-5 py-5 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3 rounded-lg bg-muted/60 px-4 py-3.5">
             <FlaskConical className="size-5 text-primary" />
-            <div className="flex flex-col">
+            <div className="flex min-w-0 flex-col">
               <span className="text-sm font-semibold text-foreground">
                 Mode mock
               </span>
-              <span className="font-mono text-xs text-muted-foreground">
+              <span className="truncate font-mono text-xs text-muted-foreground">
                 {order ?? "(tanpa order id)"}
               </span>
             </div>

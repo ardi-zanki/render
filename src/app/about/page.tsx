@@ -4,6 +4,7 @@ import { BadgeCheck, FolderKanban, Wand2 } from "lucide-react";
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
 import { Card, CardContent } from "@/components/ui/card";
+import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Tentang RenderAI",
@@ -29,10 +30,13 @@ const principles = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const session = await getServerSession();
+  const isAuthenticated = Boolean(session?.user && !session.user.isDisabled);
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <PublicHeader />
+      <PublicHeader authenticated={isAuthenticated} />
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
         <div className="max-w-3xl">

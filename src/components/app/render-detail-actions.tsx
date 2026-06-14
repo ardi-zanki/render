@@ -152,6 +152,7 @@ export function RenderActionsMenu({
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         width={200}
+        mobileFullWidth={false}
         align="end"
         className="rounded-lg border border-border/80 bg-popover p-1.5 shadow-elevated"
       >

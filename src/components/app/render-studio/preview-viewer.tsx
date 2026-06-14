@@ -160,7 +160,7 @@ export function RenderPreviewViewer({
           </div>
 
           {(studioMode === "texture" ? Boolean(textureCanvas) : shownImage) && (
-            <div className="inline-flex h-8 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1 sm:h-9">
+            <div className="hidden h-8 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1 sm:inline-flex sm:h-9">
               <Button
                 type="button"
                 variant="ghost"

@@ -25,6 +25,7 @@ import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getServerSession } from "@/lib/session";
 import { listActivePaymentPackages } from "@/lib/payments/service";
 import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
 
@@ -122,7 +123,12 @@ const faqs = [
 ];
 
 export default async function LandingPage() {
-  const dbPackages = await listActivePaymentPackages();
+  const [dbPackages, session] = await Promise.all([
+    listActivePaymentPackages(),
+    getServerSession(),
+  ]);
+  const isAuthenticated = Boolean(session?.user && !session.user.isDisabled);
+  const packageCtaHref = isAuthenticated ? "/payments" : "/register";
   const pricing = dbPackages.map((pkg) => {
     const copy = packageCopy(pkg.slug);
     return {
@@ -137,7 +143,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <PublicHeader nav={navItems} />
+      <PublicHeader nav={navItems} authenticated={isAuthenticated} />
 
       <main>
         <section className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-10 pt-8 text-center sm:px-6 sm:pb-12 sm:pt-10">
@@ -154,16 +160,20 @@ export default async function LandingPage() {
             keputusan sebelum produksi render final.
           </p>
 
-          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button asChild className="h-10 px-5 text-sm">
-              <Link href="/register">
-                Mulai workspace visual <Sparkles />
+          <div className="mt-5 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+            <Button
+              asChild
+              className="h-10 w-full max-w-[18.5rem] px-5 text-sm sm:w-[13.75rem] sm:max-w-none"
+            >
+              <Link href={isAuthenticated ? "/dashboard" : "/register"}>
+                {isAuthenticated ? "Open Studio" : "Mulai workspace visual"}
+                <Sparkles />
               </Link>
             </Button>
             <Button
               variant="outline"
               asChild
-              className="h-10 px-5 text-sm shadow-none"
+              className="h-10 w-full max-w-[18.5rem] px-5 text-sm shadow-none sm:w-[13.75rem] sm:max-w-none"
             >
               <Link href="#showcase">
                 Lihat contoh visual <Play />
@@ -306,7 +316,7 @@ export default async function LandingPage() {
                     className="mt-6 h-9 w-full text-sm shadow-none"
                     variant={plan.highlighted ? "default" : "outline"}
                   >
-                    <Link href="/register">
+                    <Link href={packageCtaHref}>
                       Pilih paket <ArrowRight />
                     </Link>
                   </Button>
@@ -356,8 +366,9 @@ export default async function LandingPage() {
               asChild
               className="mt-6 h-10 px-5 text-sm shadow-none"
             >
-              <Link href="/register">
-                Buat akun RenderAI <ArrowRight />
+              <Link href={isAuthenticated ? "/dashboard" : "/register"}>
+                {isAuthenticated ? "Open Studio" : "Buat akun RenderAI"}{" "}
+                <ArrowRight />
               </Link>
             </Button>
           </div>

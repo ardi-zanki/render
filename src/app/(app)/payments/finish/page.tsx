@@ -46,25 +46,29 @@ export default async function PaymentFinishPage({
   const Icon = v.icon;
 
   return (
-    <div className="mx-auto max-w-md">
-      <Card>
-        <CardContent className="flex flex-col items-center gap-4 py-10 text-center">
-          <Icon className={`size-14 ${v.color}`} />
-          <div className="flex flex-col gap-1">
-            <h1 className="text-xl font-semibold text-foreground">{v.title}</h1>
-            <p className="text-sm leading-6 text-muted-foreground">{v.desc}</p>
+    <div className="mx-auto flex w-full max-w-lg justify-center">
+      <Card className="w-full">
+        <CardContent className="flex flex-col items-center gap-5 px-5 py-8 text-center sm:px-8 sm:py-10">
+          <Icon className={`size-14 sm:size-16 ${v.color}`} />
+          <div className="flex max-w-sm flex-col gap-1.5">
+            <h1 className="text-xl font-semibold leading-tight text-foreground sm:text-2xl">
+              {v.title}
+            </h1>
+            <p className="text-sm leading-6 text-muted-foreground sm:text-base">
+              {v.desc}
+            </p>
           </div>
-          <div className="rounded-md bg-muted px-4 py-1.5 text-sm">
+          <div className="rounded-md bg-muted px-4 py-2 text-sm sm:text-base">
             Sisa kredit:{" "}
             <span className="font-semibold text-foreground">
               {balance.toLocaleString("id-ID")}
             </span>
           </div>
-          <div className="mt-2 flex w-full flex-col gap-2 sm:flex-row">
-            <Button asChild className="flex-1">
+          <div className="mt-1 grid w-full gap-2 sm:grid-cols-2">
+            <Button asChild size="lg" className="w-full">
               <Link href="/renders/new">Mulai render</Link>
             </Button>
-            <Button asChild variant="outline" className="flex-1">
+            <Button asChild variant="outline" size="lg" className="w-full">
               <Link href="/payments">Riwayat transaksi</Link>
             </Button>
           </div>

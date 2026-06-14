@@ -130,21 +130,24 @@ export default async function PaymentsPage({
                 return (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-muted/35"
+                    className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-0.5 px-4 py-3.5 transition-colors hover:bg-muted/35 sm:px-5"
                   >
-                    <div className="flex min-w-0 flex-col">
-                      <span className="truncate text-sm font-semibold text-foreground">
+                    <div className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-foreground">
                         {p.packageName} · {idr.format(p.credits)} kredit
                       </span>
-                      <span className="font-mono text-xs text-muted-foreground">
-                        {p.orderId} · {dateFmt.format(p.createdAt)}
-                      </span>
                     </div>
-                    <div className="flex shrink-0 items-center gap-3">
-                      <span className="text-sm font-semibold tabular-nums">
-                        Rp{idr.format(p.amount)}
-                      </span>
-                      <Badge variant={s.variant}>{s.label}</Badge>
+                    <Badge variant={s.variant} className="self-start justify-self-end">
+                      {s.label}
+                    </Badge>
+                    <div className="min-w-0 font-mono text-xs leading-5 text-muted-foreground">
+                      <span className="block truncate">{p.orderId}</span>
+                    </div>
+                    <span className="self-start justify-self-end text-sm font-semibold tabular-nums text-foreground sm:text-base">
+                      Rp{idr.format(p.amount)}
+                    </span>
+                    <div className="col-start-1 min-w-0 font-mono text-xs leading-5 text-muted-foreground">
+                      {dateFmt.format(p.createdAt)}
                     </div>
                   </div>
                 );

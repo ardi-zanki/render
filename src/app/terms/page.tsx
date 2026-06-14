@@ -5,6 +5,7 @@ import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Syarat & Ketentuan",
@@ -92,10 +93,13 @@ const sections = [
   },
 ];
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const session = await getServerSession();
+  const isAuthenticated = Boolean(session?.user && !session.user.isDisabled);
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <PublicHeader />
+      <PublicHeader authenticated={isAuthenticated} />
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
         <div className="max-w-3xl">
@@ -143,12 +147,15 @@ export default function TermsPage() {
               Siap mulai menggunakan RenderAI?
             </p>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Kembali ke halaman registrasi untuk membuat akun dan mencoba
-              workflow render pertama Anda.
+              {isAuthenticated
+                ? "Buka dashboard untuk melanjutkan workflow render Anda."
+                : "Kembali ke halaman registrasi untuk membuat akun dan mencoba workflow render pertama Anda."}
             </p>
           </div>
           <Button asChild className="shrink-0">
-            <Link href="/register">Buat akun</Link>
+            <Link href={isAuthenticated ? "/dashboard" : "/register"}>
+              {isAuthenticated ? "Open Studio" : "Buat akun"}
+            </Link>
           </Button>
         </div>
       </main>

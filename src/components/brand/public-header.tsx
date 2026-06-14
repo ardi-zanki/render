@@ -14,7 +14,13 @@ type NavItem = { label: string; href: string };
  * across every marketing surface. Pass `nav` to render centered section links
  * (landing only).
  */
-export function PublicHeader({ nav }: { nav?: NavItem[] }) {
+export function PublicHeader({
+  nav,
+  authenticated = false,
+}: {
+  nav?: NavItem[];
+  authenticated?: boolean;
+}) {
   const hasNav = !!nav && nav.length > 0;
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur-xl">
@@ -45,16 +51,18 @@ export function PublicHeader({ nav }: { nav?: NavItem[] }) {
           </nav>
         )}
         <div className="flex items-center justify-end gap-2 justify-self-end">
-          <Button
-            variant="ghost"
-            asChild
-            className="hidden h-9 px-4 sm:inline-flex"
-          >
-            <Link href="/login">Masuk</Link>
-          </Button>
+          {!authenticated && (
+            <Button
+              variant="ghost"
+              asChild
+              className="hidden h-9 px-4 sm:inline-flex"
+            >
+              <Link href="/login">Masuk</Link>
+            </Button>
+          )}
           <Button asChild className="h-9 px-4 text-sm">
-            <Link href="/register">
-              Buat akun <ArrowRight />
+            <Link href={authenticated ? "/dashboard" : "/register"}>
+              {authenticated ? "Open Studio" : "Buat akun"} <ArrowRight />
             </Link>
           </Button>
           <ModeToggle />

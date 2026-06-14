@@ -320,9 +320,6 @@ export function AppShell({
           >
             <Menu className="size-5" />
           </button>
-          <div className="lg:hidden">
-            <Logo size={26} withWordmark={false} />
-          </div>
           {/* Page-level header slot: the Render Studio title is portaled here
               so it sits top-left, aligned with the actions on the right. */}
           <div id="app-header-slot" className="flex min-w-0 items-center" />

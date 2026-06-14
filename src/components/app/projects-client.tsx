@@ -182,7 +182,7 @@ function ProjectFormModal({
 }
 
 const menuItem =
-  "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-foreground transition-colors hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
+  "flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
 const CONFIRM_COPY = {
   archive: {
@@ -327,7 +327,7 @@ export function ProjectsClient({
                     triggerRef.current = e.currentTarget;
                     setMenuId(menuId === p.id ? null : p.id);
                   }}
-                  className="flex size-8 cursor-pointer items-center justify-center rounded-md bg-card/90 text-foreground shadow-floating backdrop-blur hover:bg-card"
+                  className="flex size-8 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-card/90 focus-visible:bg-card/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
                   aria-label="Menu project"
                   aria-haspopup="menu"
                   aria-expanded={menuId === p.id}
@@ -345,8 +345,9 @@ export function ProjectsClient({
           anchorRef={triggerRef}
           open
           onClose={() => setMenuId(null)}
-          width={176}
-          className="rounded-lg border border-border/80 bg-popover p-1 shadow-elevated"
+          width={200}
+          mobileFullWidth={false}
+          className="rounded-lg border border-border/80 bg-popover p-1.5 shadow-elevated"
         >
           <button
             className={menuItem}
@@ -381,24 +382,27 @@ export function ProjectsClient({
             </button>
           )}
           {!activeProject.isDefault && (
-            <button
-              className={cn(
-                menuItem,
-                "text-destructive [&_svg]:text-destructive",
-              )}
-              onClick={() => {
-                setConfirm({ kind: "delete", project: activeProject });
-                setMenuId(null);
-              }}
-              disabled={activeProject.renderCount > 0}
-              title={
-                activeProject.renderCount > 0
-                  ? "Tidak bisa dihapus karena ada render"
-                  : undefined
-              }
-            >
-              <Trash2 /> Hapus
-            </button>
+            <>
+              <div className="my-1 h-px bg-border" />
+              <button
+                className={cn(
+                  menuItem,
+                  "text-destructive [&_svg]:text-destructive",
+                )}
+                onClick={() => {
+                  setConfirm({ kind: "delete", project: activeProject });
+                  setMenuId(null);
+                }}
+                disabled={activeProject.renderCount > 0}
+                title={
+                  activeProject.renderCount > 0
+                    ? "Tidak bisa dihapus karena ada render"
+                    : undefined
+                }
+              >
+                <Trash2 /> Hapus
+              </button>
+            </>
           )}
         </Popover>
       )}
