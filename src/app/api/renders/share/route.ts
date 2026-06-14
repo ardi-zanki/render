@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { enableShare } from "@/lib/renders/share";
+import { enableShare } from "@/lib/renders/service";
 import { renderShareSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";

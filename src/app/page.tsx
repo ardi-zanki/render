@@ -462,7 +462,7 @@ function ProductPreview() {
               sizes="(min-width: 1024px) 720px, 100vw"
               className="size-full object-cover"
             />
-            <div className="absolute inset-y-0 left-1/2 w-px bg-white/90" />
+            <div className="absolute inset-y-0 left-1/2 w-px bg-overlay-foreground/90" />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-full border border-overlay-foreground/80 bg-overlay/55 px-3 py-1 text-xs font-semibold text-overlay-foreground shadow-floating">
               Draft / Opsi visual
             </div>

@@ -230,7 +230,7 @@ export function RenderPreviewViewer({
                   />
                 </div>
                 <div
-                  className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(15_23_42/0.12)]"
+                  className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-overlay-foreground shadow-floating"
                   style={{ left: `${comparisonPosition}%` }}
                 />
                 <input

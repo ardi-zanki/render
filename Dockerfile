@@ -43,4 +43,4 @@ ENV PORT=3000
 EXPOSE 3000
 
 # Default role = web. The worker service overrides this with: pnpm worker
-CMD ["sh", "-c", "node_modules/.bin/next start -p ${PORT:-3000}"]
+CMD ["node", "scripts/start-standalone.mjs"]

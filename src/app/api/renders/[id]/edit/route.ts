@@ -1,25 +1,19 @@
 import { NextResponse } from "next/server";
 
-import { env } from "@/env";
 import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
 import { assertRateLimit } from "@/lib/rate-limit";
-import { buildPrompt } from "@/lib/renders/prompt";
-import { createRenderEdit, getRenderDetail } from "@/lib/renders/service";
+import {
+  buildPrompt,
+  createRenderEdit,
+  getRenderDetail,
+  startInlineRenderProcessing,
+} from "@/lib/renders/service";
 import { renderIdSchema } from "@/lib/validations/api";
 import { createRenderSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
-
-function startInlineRenderProcessing(renderId: string, userId: string) {
-  if (env.RENDER_PROCESSING_MODE !== "inline") return;
-  setTimeout(() => {
-    void import("@/lib/renders/processor")
-      .then(({ processRenderJob }) => processRenderJob(renderId, `api-${userId}`))
-      .catch((err) => console.error("Background edit job gagal:", err));
-  }, 0);
-}
 
 /**
  * Re-render ("edit") an existing render in place: a new version on the SAME
@@ -96,7 +90,11 @@ export async function POST(
       prompt,
       baseAssetId,
     });
-    startInlineRenderProcessing(result.renderId, userId);
+    startInlineRenderProcessing(
+      result.renderId,
+      userId,
+      "Background edit job gagal:",
+    );
     return NextResponse.json(result);
   } catch (err) {
     const mapped = errorResponse(err, { aiPrefix: "Edit gagal" });

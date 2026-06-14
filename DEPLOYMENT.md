@@ -6,7 +6,7 @@ from `Dockerfile` and is portable across hosts — no code differences, all conf
 via environment variables (12-factor).
 
 ```
-            ┌── web  (next start, $PORT)
+            ┌── web  (standalone Next server, $PORT)
 Dockerfile ─┤
             └── worker (pnpm worker)  ← MANDATORY: processes the render queue
 ```

@@ -16,7 +16,15 @@ export {
   createRenderEdit,
   createRenderTextureEdit,
 } from "./create";
+export { startInlineRenderProcessing } from "./inline-processing";
 export { listActiveRenderQueue } from "./jobs";
+export {
+  buildPrompt,
+  buildTexturePrompt,
+  type PromptBase,
+  type RenderOptions,
+  type TexturePromptOptions,
+} from "./prompt";
 export { processNextRenderJob, processRenderJob } from "./processor";
 export {
   countRenders,
@@ -35,3 +43,11 @@ export {
   renameRender,
   type MoveRenderProjectResult,
 } from "./update";
+export { enableShare, getPublicRender } from "./share";
+export {
+  findLibraryTexture,
+  TEXTURE_CATEGORIES,
+  TEXTURE_LIBRARY,
+  type LibraryTexture,
+  type TextureCategory,
+} from "./texture-library";

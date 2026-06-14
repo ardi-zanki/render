@@ -11,7 +11,7 @@ export type PolledRender = {
   errorMessage?: string | null;
 };
 
-type PollHandlers = {
+export type PollHandlers = {
   onUpdate?: (render: PolledRender) => void;
   onSuccess?: (render: PolledRender) => void;
   onFailure?: (render: PolledRender) => void;

@@ -1,29 +1,19 @@
 import { NextResponse } from "next/server";
 
-import { env } from "@/env";
 import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
 import { getDefaultProject, getProject } from "@/lib/projects/service";
-import { buildPrompt } from "@/lib/renders/prompt";
-import { createRender } from "@/lib/renders/service";
+import {
+  buildPrompt,
+  createRender,
+  startInlineRenderProcessing,
+} from "@/lib/renders/service";
 import { assertRateLimit } from "@/lib/rate-limit";
 import { validateImageFile } from "@/lib/uploads/images";
 import { createRenderSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
-
-function startInlineRenderProcessing(renderId: string, userId: string) {
-  if (env.RENDER_PROCESSING_MODE !== "inline") return;
-
-  setTimeout(() => {
-    void import("@/lib/renders/processor")
-      .then(({ processRenderJob }) => processRenderJob(renderId, `api-${userId}`))
-      .catch((err) => {
-        console.error("Background render job gagal:", err);
-      });
-  }, 0);
-}
 
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: req.headers });

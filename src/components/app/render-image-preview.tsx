@@ -57,7 +57,7 @@ export function RenderImagePreview({
         )}
       >
         <RenderImage src={src} alt={alt} className="size-full" />
-        <span className="pointer-events-none absolute right-2 top-2 flex size-8 items-center justify-center rounded-md bg-black/45 text-white opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="pointer-events-none absolute right-2 top-2 flex size-8 items-center justify-center rounded-md bg-overlay/45 text-overlay-foreground opacity-0 transition-opacity group-hover:opacity-100">
           <ZoomIn className="size-4" />
         </span>
       </button>

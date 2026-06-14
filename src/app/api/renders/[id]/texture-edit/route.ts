@@ -1,29 +1,20 @@
 import { NextResponse } from "next/server";
 
-import { env } from "@/env";
 import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
 import { assertRateLimit } from "@/lib/rate-limit";
-import { buildTexturePrompt } from "@/lib/renders/prompt";
-import { createRenderTextureEdit } from "@/lib/renders/service";
-import { findLibraryTexture } from "@/lib/renders/texture-library";
+import {
+  buildTexturePrompt,
+  createRenderTextureEdit,
+  findLibraryTexture,
+  startInlineRenderProcessing,
+} from "@/lib/renders/service";
 import { validateImageFile } from "@/lib/uploads/images";
 import { renderIdSchema } from "@/lib/validations/api";
 import { textureEditSchema } from "@/lib/validations/render";
 
 export const runtime = "nodejs";
 export const maxDuration = 10;
-
-function startInlineRenderProcessing(renderId: string, userId: string) {
-  if (env.RENDER_PROCESSING_MODE !== "inline") return;
-  setTimeout(() => {
-    void import("@/lib/renders/processor")
-      .then(({ processRenderJob }) =>
-        processRenderJob(renderId, `api-${userId}`),
-      )
-      .catch((err) => console.error("Background texture-edit job gagal:", err));
-  }, 0);
-}
 
 /**
  * Region/texture edit: inpaint a masked area of an existing successful render
@@ -143,7 +134,11 @@ export async function POST(
       textureLabel,
       baseAssetId: input.baseAssetId,
     });
-    startInlineRenderProcessing(result.renderId, userId);
+    startInlineRenderProcessing(
+      result.renderId,
+      userId,
+      "Background texture-edit job gagal:",
+    );
     return NextResponse.json(result);
   } catch (err) {
     const mapped = errorResponse(err, { aiPrefix: "Edit tekstur gagal" });

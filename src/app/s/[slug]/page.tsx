@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { MODE_LABEL } from "@/lib/renders/labels";
-import { getPublicRender } from "@/lib/renders/share";
+import { getPublicRender } from "@/lib/renders/service";
 
 type Params = { params: Promise<{ slug: string }> };
 

@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "next dev --port 3210",
     "build": "env RENDER_PROCESSING_MODE=worker next build",
-    "start": "next start --port 3210",
+    "start": "node scripts/start-standalone.mjs",
     "lint": "eslint",
+    "check:design-system": "node scripts/check-design-system.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts",
@@ -40,7 +41,7 @@
     "react": "19.2.7",
     "react-dom": "19.2.7",
     "resend": "^6.12.4",
-    "sharp": "^0.35.1",
+    "sharp": "0.34.5",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
