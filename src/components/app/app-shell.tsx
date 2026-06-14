@@ -21,7 +21,6 @@ import { RenderQueueButton } from "@/components/app/render-queue-button";
 import { UserMenu } from "@/components/app/user-menu";
 import { CreditPill } from "@/components/brand/credit-pill";
 import { LogoMark } from "@/components/brand/logo";
-import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import type { NotificationItem } from "@/lib/notifications/ui";
 import type { UserStorageUsage } from "@/lib/storage/usage";
@@ -210,26 +209,20 @@ export function AppShell({
         </div>
 
         <div className={cn("px-3 pt-3", expanded ? "pb-0.5" : "pb-1")}>
-          <Button
-            asChild
-            variant="ghost"
-            size="default"
+          <Link
+            href="/renders/new"
+            onClick={() => setOpen(false)}
+            title={!expanded ? "Buat render" : undefined}
             className={cn(
-              "group relative grid w-full grid-cols-[48px_minmax(0,1fr)] items-center rounded-md px-0 font-medium hover:bg-muted/80",
+              "group relative grid grid-cols-[48px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
               renderNewActive
                 ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                 : "text-primary hover:bg-accent/80",
             )}
           >
-            <Link
-              href="/renders/new"
-              onClick={() => setOpen(false)}
-              title={!expanded ? "Buat render" : undefined}
-            >
-              <Plus className="mx-auto size-4" />
-              {labelWithTooltip("Buat render", expanded)}
-            </Link>
-          </Button>
+            <Plus className="mx-auto size-4 shrink-0" />
+            {labelWithTooltip("Buat render", expanded)}
+          </Link>
         </div>
 
         <nav className="flex-1 space-y-1 px-3 pb-2 pt-1">
