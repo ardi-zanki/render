@@ -460,7 +460,7 @@ export function RenderStudio({
   return (
     // Fixed-height studio: the three columns stay put and each scrolls on its
     // own (Config / Studio / Info) instead of the whole page scrolling.
-    <div className="relative pb-40 lg:h-[calc(100vh-5.5rem)] lg:pb-0">
+    <div className="relative pb-56 sm:pb-48 lg:h-[calc(100vh-5.5rem)] lg:pb-0">
       {/* Title lives in the global header's top-left slot. */}
       {headerSlot &&
         createPortal(
@@ -482,7 +482,7 @@ export function RenderStudio({
             "order-2 flex flex-col gap-4 lg:order-none lg:min-h-0",
             // Texture panel manages its own internal scroll so Apply stays
             // pinned; the config form scrolls the whole column.
-            inTextureMode ? "lg:overflow-hidden" : "lg:overflow-y-auto lg:pr-1",
+            inTextureMode ? "lg:overflow-hidden" : "lg:overflow-hidden",
             panelsCollapsed && "lg:hidden",
           )}
         >

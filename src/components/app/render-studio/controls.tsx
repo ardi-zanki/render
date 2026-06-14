@@ -75,8 +75,8 @@ export function RenderStudioControls({
   return (
     // In the fixed-height studio, fill the column so its bottom lines up with
     // the prompt/info columns (grows taller and scrolls when content overflows).
-    <Card className="h-fit max-w-full overflow-hidden lg:min-h-full">
-      <CardContent className="flex min-w-0 flex-col gap-4 px-3 py-4 sm:px-4">
+    <Card className="h-fit max-w-full overflow-hidden lg:h-full lg:min-h-0">
+      <CardContent className="flex min-h-0 min-w-0 flex-col gap-4 overflow-visible px-3 py-4 sm:px-4 lg:overflow-y-auto lg:pr-3 [&>*]:shrink-0">
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
             <Label htmlFor="project" className="text-sm font-semibold">
