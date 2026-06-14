@@ -26,9 +26,9 @@ test("user can login and create a mock render", async ({ page }) => {
 
   await page.goto("/renders/new");
   await expect(
-    page.getByRole("heading", { name: "Render Studio" }),
+    page.getByRole("link", { name: "Render Studio" }),
   ).toBeVisible();
-  await expect(page.getByText(/sisa\s+3/i)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Top up" })).toBeVisible();
   // Output format now offers an "Original" (no re-encode) choice.
   await expect(page.locator("#outputFormat")).toContainText("Original");
 
@@ -99,7 +99,7 @@ test("user can login and create a mock render", async ({ page }) => {
   // result loaded, so all three viewer tabs are available.
   await page.getByRole("link", { name: "Open Studio" }).click();
   await expect(
-    page.getByRole("heading", { name: "Render Studio" }),
+    page.getByRole("link", { name: "Render Studio" }),
   ).toBeVisible();
   await expect(page.getByRole("tab", { name: "Komparasi" })).toBeVisible();
   await expect(page.locator("#style")).toHaveValue("modern");
@@ -129,4 +129,67 @@ test("user can login and create a mock render", async ({ page }) => {
       { timeout: 30_000, intervals: [1_000, 2_000] },
     )
     .toBeGreaterThan(0);
+
+  await expect
+    .poll(
+      async () => {
+        const response = await page.request.get(`/api/renders/${renderId}`);
+        const render = (await response.json()) as { status: string };
+        return render.status;
+      },
+      { timeout: 30_000, intervals: [1_000, 2_000] },
+    )
+    .toBe("success");
+
+  // Dashboard recent renders are navigable just like project cards.
+  await page.goto("/dashboard");
+  const dashboardRenderLink = page.locator(`a[href="/renders/${renderId}"]`).first();
+  await expect(dashboardRenderLink).toBeVisible();
+  await dashboardRenderLink.click();
+  await expect(page).toHaveURL(new RegExp(`/renders/${renderId}$`));
+
+  // Sidebar Search opens a command menu with recent renders and navigates to a
+  // selected render. Filtering is automatic through the debounced input.
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await expect(page.getByText("Render terbaru", { exact: true })).toBeVisible();
+  await page.getByPlaceholder("Cari render...").fill("Interior");
+  const commandResult = page.getByRole("button", {
+    name: /Render Interior/,
+  });
+  await expect(commandResult).toBeVisible();
+  await commandResult.click();
+  await expect(page).toHaveURL(new RegExp(`/renders/${renderId}$`));
+
+  // Support is now an internal app page with clear contact channels.
+  await page.goto("/support");
+  await expect(page.getByRole("heading", { name: "Support" })).toBeVisible();
+  await expect(
+    page.locator('a[href="mailto:support@renderai.app"]'),
+  ).toContainText("Email");
+  await expect(page.locator('a[href^="https://wa.me/"]')).toContainText(
+    "WhatsApp",
+  );
+  await expect(
+    page.locator('a[href^="https://www.instagram.com/"]'),
+  ).toContainText("Instagram");
+
+  // A logged-in visitor on the public share page should see creator metadata
+  // and land in a fully hydrated studio when choosing Open Studio.
+  const shareResponse = await page.request.post("/api/renders/share", {
+    data: { renderId },
+  });
+  expect(shareResponse.ok()).toBe(true);
+  const share = (await shareResponse.json()) as { slug: string };
+  await page.goto(`/s/${share.slug}`);
+  await expect(page.getByText(/E2E Render User ·/)).toBeVisible();
+  const shareStudioLink = page
+    .getByRole("link", { name: "Open Studio", exact: true })
+    .first();
+  await expect(shareStudioLink).toBeVisible();
+  await shareStudioLink.click();
+  await expect(page).toHaveURL(/\/renders\/new$/);
+  await expect(
+    page.getByRole("link", { name: "Render Studio" }),
+  ).toBeVisible();
 });

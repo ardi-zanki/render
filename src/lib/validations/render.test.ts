@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { createProjectSchema, createRenderSchema } from "./render";
+import {
+  createProjectSchema,
+  createRenderSchema,
+  textureEditSchema,
+} from "./render";
 
 describe("createRenderSchema", () => {
   it("coerces form values used by render creation", () => {
@@ -59,6 +63,33 @@ describe("createProjectSchema", () => {
     if (result.success) return;
     expect(result.error.flatten().fieldErrors.name).toEqual([
       "Nama project wajib diisi",
+    ]);
+  });
+});
+
+describe("textureEditSchema", () => {
+  it("accepts a description-only texture edit", () => {
+    const result = textureEditSchema.safeParse({
+      textureDescription: "Marmer putih dengan urat abu-abu halus",
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.textureDescription).toBe(
+      "Marmer putih dengan urat abu-abu halus",
+    );
+    expect(result.data.instruction).toBeUndefined();
+  });
+
+  it("rejects overly long texture descriptions", () => {
+    const result = textureEditSchema.safeParse({
+      textureDescription: "x".repeat(1001),
+    });
+
+    expect(result.success).toBe(false);
+    if (result.success) return;
+    expect(result.error.flatten().fieldErrors.textureDescription).toEqual([
+      "Deskripsi maksimal 1.000 karakter",
     ]);
   });
 });
