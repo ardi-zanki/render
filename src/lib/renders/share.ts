@@ -1,10 +1,11 @@
 import { randomBytes } from "node:crypto";
 
-import { and, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import { renderAssets, renders, user, type RenderMode } from "@/db/schema";
 import { env } from "@/env";
+import { getLatestRenderableAsset } from "./types";
 
 function genSlug() {
   return randomBytes(8).toString("base64url");
@@ -53,13 +54,15 @@ export async function getPublicRender(
   });
   if (!r || r.status !== "success") return null;
 
-  const asset = await db.query.renderAssets.findFirst({
+  const assets = await db.query.renderAssets.findMany({
     where: and(
       eq(renderAssets.renderId, r.id),
-      eq(renderAssets.type, "result"),
+      inArray(renderAssets.type, ["result", "edit"]),
       isNull(renderAssets.deletedAt),
     ),
+    orderBy: asc(renderAssets.createdAt),
   });
+  const asset = getLatestRenderableAsset(assets);
   if (!asset) return null;
 
   const owner = await db.query.user.findFirst({

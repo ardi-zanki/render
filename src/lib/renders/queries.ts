@@ -18,7 +18,11 @@ import {
   renders,
   type RenderStatus,
 } from "@/db/schema";
-import type { RenderDetail, RenderListItem } from "./types";
+import {
+  getLatestRenderableAsset,
+  type RenderDetail,
+  type RenderListItem,
+} from "./types";
 
 async function renderSearchProjectIds(userId: string, search: string | undefined) {
   const q = search?.trim();
@@ -76,9 +80,11 @@ export async function getRenderDetail(
     mimeType: a.mimeType,
     width: a.width,
     height: a.height,
+    createdAt: a.createdAt,
     config: a.config ?? null,
     prompt: a.prompt ?? null,
   }));
+  const latestResult = getLatestRenderableAsset(views);
 
   return {
     id: render.id,
@@ -98,7 +104,7 @@ export async function getRenderDetail(
     archivedAt: render.archivedAt,
     errorCode: render.errorCode,
     errorMessage: render.errorMessage,
-    resultUrl: views.find((a) => a.type === "result")?.fileUrl ?? null,
+    resultUrl: latestResult?.fileUrl ?? null,
     originalUrl: views.find((a) => a.type === "original")?.fileUrl ?? null,
     referenceUrl: views.find((a) => a.type === "reference")?.fileUrl ?? null,
     assets: views,
@@ -143,17 +149,21 @@ export async function listRenders(
         inArray(renderAssets.renderId, ids),
         isNull(renderAssets.deletedAt),
       ),
+      orderBy: asc(renderAssets.createdAt),
     }),
     db.query.projects.findMany({
       where: inArray(projects.id, projectIds),
     }),
   ]);
 
-  const resultByRender = new Map<string, string>();
+  const assetsByRender = new Map<string, Array<(typeof assets)[number]>>();
   const originalByRender = new Map<string, string>();
   for (const a of assets) {
-    if (a.type === "result" && !resultByRender.has(a.renderId)) {
-      resultByRender.set(a.renderId, a.fileUrl);
+    const groupedAssets = assetsByRender.get(a.renderId);
+    if (groupedAssets) {
+      groupedAssets.push(a);
+    } else {
+      assetsByRender.set(a.renderId, [a]);
     }
     if (a.type === "original" && !originalByRender.has(a.renderId)) {
       originalByRender.set(a.renderId, a.fileUrl);
@@ -171,7 +181,8 @@ export async function listRenders(
     projectId: r.projectId,
     projectName: projectById.get(r.projectId) ?? null,
     creditsUsed: r.creditsUsed,
-    resultUrl: resultByRender.get(r.id) ?? null,
+    resultUrl:
+      getLatestRenderableAsset(assetsByRender.get(r.id) ?? [])?.fileUrl ?? null,
     originalUrl: originalByRender.get(r.id) ?? null,
   }));
 }
@@ -235,12 +246,13 @@ export async function getResultAssetForDownload(userId: string, renderId: string
   });
   if (!render) return null;
 
-  const asset = await db.query.renderAssets.findFirst({
+  const assets = await db.query.renderAssets.findMany({
     where: and(
       eq(renderAssets.renderId, render.id),
-      eq(renderAssets.type, "result"),
+      inArray(renderAssets.type, ["result", "edit"]),
       isNull(renderAssets.deletedAt),
     ),
+    orderBy: asc(renderAssets.createdAt),
   });
-  return asset ?? null;
+  return getLatestRenderableAsset(assets);
 }

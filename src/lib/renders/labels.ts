@@ -11,6 +11,13 @@ export function renderDisplayName(mode: RenderMode) {
   return `Render ${MODE_LABEL[mode]}`;
 }
 
+export function renderResolvedDisplayName(
+  name: string | null | undefined,
+  mode: RenderMode,
+) {
+  return name?.trim() || renderDisplayName(mode);
+}
+
 export const STATUS_LABEL: Record<string, string> = {
   queued: "Antri",
   processing: "Proses",

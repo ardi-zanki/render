@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   MODE_LABEL,
   STATUS_LABEL,
-  renderDisplayName,
+  renderResolvedDisplayName,
   statusBadgeVariant,
 } from "@/lib/renders/labels";
 import { listProjects } from "@/lib/projects/service";
@@ -41,7 +41,7 @@ export default async function RenderDetailPage({
     listProjects(user.id),
   ]);
   if (!render) notFound();
-  const renderName = render.name ?? renderDisplayName(render.mode);
+  const renderName = renderResolvedDisplayName(render.name, render.mode);
   const projectOptions = projectRows.map((project) => ({
     id: project.id,
     name: project.name,
