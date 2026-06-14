@@ -3,6 +3,8 @@ import path from "node:path";
 
 const TARGET_DIRS = ["src/app", "src/components"];
 const FILE_EXTENSIONS = new Set([".ts", ".tsx"]);
+const PAGE_METADATA_PATTERN =
+  /\bexport\s+(?:const\s+metadata\b|(?:async\s+)?function\s+generateMetadata\b)/;
 
 const BANNED_PATTERNS = [
   {
@@ -58,6 +60,17 @@ function findViolations(file, content) {
     }
   });
 
+  if (path.basename(file) === "page.tsx" && !PAGE_METADATA_PATTERN.test(content)) {
+    violations.push({
+      file,
+      line: 1,
+      column: 1,
+      match: "page metadata",
+      message:
+        "Export page metadata with a title, or use generateMetadata for dynamic pages.",
+    });
+  }
+
   return violations;
 }
 
@@ -69,7 +82,7 @@ const violations = (
 ).flat();
 
 if (violations.length > 0) {
-  console.error("Design system guard found unsupported utility classes:\n");
+  console.error("Design system guard found issues:\n");
   for (const violation of violations) {
     console.error(
       `${violation.file}:${violation.line}:${violation.column} ${violation.match}`,
