@@ -13,12 +13,12 @@ PRD lengkap di `../RenderAI_PRD_Final/`.
 | ------------ | -------------------------------------------------- |
 | Package mgr  | pnpm 11.5.2                                         |
 | Runtime      | Node.js 22 (Docker/CI)                              |
-| Framework    | Next.js 16.2.7 (App Router, Turbopack)             |
-| UI runtime   | React 19.2                                          |
-| Language     | TypeScript 6.0                                      |
-| CSS          | Tailwind CSS v4                                     |
+| Framework    | Next.js 16.2.9 (App Router, Turbopack)             |
+| UI runtime   | React 19.2.7                                        |
+| Language     | TypeScript 6.0.3                                    |
+| CSS          | Tailwind CSS v4.3                                   |
 | Komponen     | Custom UI primitives di `src/components/ui`         |
-| Ikon         | `lucide-react` 1.17                                |
+| Ikon         | `lucide-react` 1.18                                 |
 | Tema         | Local `ThemeProvider` (light/dark/system, class-based) |
 | Font         | Plus Jakarta Sans (teks) · Geist Mono (angka/kode) |
 | Testing      | Vitest 4.1 + Playwright 1.60                        |
@@ -34,7 +34,7 @@ pnpm build     # build produksi
 pnpm lint      # eslint
 pnpm test      # unit test (Vitest)
 pnpm test:integration # integration test DB (credits + payments)
-pnpm test:e2e  # Playwright smoke + render mock flow
+pnpm test:e2e  # Playwright auth + render/search/share/support flow
 ```
 
 Dari folder induk (`RumAI/`): `pnpm --dir renderai dev`.
@@ -119,7 +119,7 @@ pnpm db:studio     # Drizzle Studio
 pnpm smoke:auth    # runtime test: signup → provisioning → credits → rate limit
 pnpm test          # unit test cepat (co-located di src)
 pnpm test:integration # test DB untuk credits + payments
-pnpm test:e2e      # Playwright; login + render memakai mock provider
+pnpm test:e2e      # Playwright; auth + render memakai mock provider
 ```
 
 Auth wiring: a new user gets a profile, a 0 credit balance, and a default
@@ -174,10 +174,11 @@ keduanya warna `warning`, dibedakan karena beda konteks (antrean vs. transaksi).
 Working pages on top of the Phase 1b backend:
 
 - **Public:** `/` (landing), `/design-system` (brand kit), `/login`,
-  `/register`, `/forgot-password`, `/reset-password`, `/verify-email`.
+  `/register`, `/forgot-password`, `/reset-password`, `/verify-email`,
+  and `/s/[slug]` (public render share).
 - **Protected** (app shell w/ sidebar + topbar): `/dashboard`, `/projects`,
   `/projects/[id]`, `/renders`, `/renders/new`, `/renders/[id]`, `/payments`,
-  `/notifications`, and `/settings`.
+  `/notifications`, `/support`, and `/settings`.
 - **Admin:** `/admin`, `/admin/users`, `/admin/projects`, `/admin/renders`,
   `/admin/payments`, `/admin/credits`, `/admin/packages`,
   `/admin/notifications`, `/admin/settings`, and `/admin/audit`.
@@ -188,6 +189,24 @@ credits + "Project Saya". Forms use the `authClient` (`signUp`, `signIn`,
 `requestPasswordReset`, `resetPassword`, `sendVerificationEmail`, `signOut`).
 Smoke scripts or E2E flows that use `demo@renderai.test` require that user to
 exist in the local/test database first.
+
+Sidebar behavior:
+
+- Header uses a compact text-only **RenderAI.** wordmark with a panel toggle.
+- **Buat render** opens the Studio.
+- **Search** opens a command menu with a quick **Buat Render** action and recent
+  renders. Search is global across render data only; selecting a result opens
+  `/renders/[id]`.
+- Page-level search on `/projects`, `/projects/[id]`, and `/renders` is
+  debounced, auto-submits, and includes a clear button that restores the default
+  list.
+
+Profile menu:
+
+- **Support** opens the in-app `/support` page, which provides Email, WhatsApp,
+  and Instagram contact channels.
+- **Logout** closes the menu immediately and shows a short loading overlay
+  before redirecting to `/login`.
 
 ## Render core & Render Studio (Phase 2)
 
@@ -202,10 +221,16 @@ for convenience. In production, use `RENDER_PROCESSING_MODE=worker` so the web
 service only enqueues jobs and `pnpm worker` processes the queue.
 
 - **Render Studio** (`/renders/new`) — the workspace: mode (Interior/Exterior/
-  Style Transfer/Upscale), style, location, time & weather, image upload,
-  instruction, **Render**, before/after view, download, and a scene grid.
+  Style Transfer/Upscale), editable render name, style, location, time &
+  weather, image upload, instruction, **Render**, before/after comparison,
+  download/share, and a scene grid.
+- **Open Studio** from a render detail or share page opens `/renders/new` with
+  the source render loaded, config pre-filled, and prior versions available.
+- **Edit Texture** lets users select a region and apply a texture from Library,
+  Upload, or Deskripsi. The Deskripsi path sends only the texture description
+  plus the selected mask, without an extra instruction field.
 - **Riwayat Render** (`/renders`) and **Project** (`/projects`) show real data;
-  the dashboard lists recent renders.
+  dashboard recent renders are clickable cards that open render details.
 
 **AI provider** (`src/lib/providers/ai/`): `fal` is the production provider. It
 uses the official `@fal-ai/client`: it uploads local/R2 image bytes to fal
@@ -265,7 +290,9 @@ Testing strategy is intentionally MVP-sized:
 - **Integration tests (Vitest):** `credits` and `payments` against PostgreSQL
   with test-only users/packages and cleanup.
 - **E2E tests (Playwright):** public auth pages plus login → Render Studio →
-  upload image → create render using `AI_PROVIDER=mock`.
+  upload image → create render using `AI_PROVIDER=mock`, edit an existing
+  render, open dashboard recent renders, use sidebar Search, visit Support, and
+  verify share-page **Open Studio** navigation.
 
 Local commands:
 
@@ -318,10 +345,11 @@ pnpm make:admin [email] [password]   # promote/create an admin (default admin@re
 
 - **Public render sharing** — a successful render can be shared via a public,
   no-auth page at `/s/<slug>` (Open Graph + Twitter card meta for nice link
-  previews). The Studio has a **Bagikan** button that calls
-  `POST /api/renders/share` (idempotent; stores a `share_slug` on the render)
-  and copies the link. Public viewer: `getPublicRender` in
-  `src/lib/renders/share.ts`.
+  previews). The page shows creator/date metadata; authenticated users see
+  **Open Studio**, while visitors are guided to create an account. The Studio
+  has a **Bagikan** button that calls `POST /api/renders/share` (idempotent;
+  stores a `share_slug` on the render) and copies the link. Public viewer:
+  `getPublicRender` in `src/lib/renders/share.ts`.
 - **Admin analytics** — the `/admin` overview adds dependency-free charts
   (`src/components/app/charts.tsx`): renders & revenue over the last 14 days,
   plus render breakdowns by mode and status (`getAdminAnalytics`).
