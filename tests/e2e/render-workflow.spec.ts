@@ -78,7 +78,7 @@ test("user can login and create a mock render", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Interior" })).toBeVisible();
   // Secondary actions are grouped under the ⋮ menu; Open Studio is the primary.
   await page.getByRole("button", { name: "Aksi lainnya" }).click();
-  await expect(page.getByRole("button", { name: "Download" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Unduh" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Bagikan" })).toBeVisible();
   await page.keyboard.press("Escape");
   // Detail page reopens in the studio (renamed from "Reuse prompt") and no
@@ -148,10 +148,10 @@ test("user can login and create a mock render", async ({ page }) => {
   await dashboardRenderLink.click();
   await expect(page).toHaveURL(new RegExp(`/renders/${renderId}$`));
 
-  // Sidebar Search opens a command menu with recent renders and navigates to a
+  // Sidebar search opens a command menu with recent renders and navigates to a
   // selected render. Filtering is automatic through the debounced input.
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await page.getByRole("button", { name: "Cari", exact: true }).click();
   await expect(page.getByText("Render terbaru", { exact: true })).toBeVisible();
   await page.getByPlaceholder("Cari render...").fill("Interior");
   const commandResult = page.getByRole("button", {
@@ -161,9 +161,9 @@ test("user can login and create a mock render", async ({ page }) => {
   await commandResult.click();
   await expect(page).toHaveURL(new RegExp(`/renders/${renderId}$`));
 
-  // Support is now an internal app page with clear contact channels.
+  // Bantuan is now an internal app page with clear contact channels.
   await page.goto("/support");
-  await expect(page.getByRole("heading", { name: "Support" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bantuan" })).toBeVisible();
   await expect(
     page.locator('a[href="mailto:support@renderai.app"]'),
   ).toContainText("Email");

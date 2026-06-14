@@ -12,6 +12,7 @@ import {
 
 import { db } from "@/db";
 import { projects, renderAssets, renders } from "@/db/schema";
+import { getLatestRenderableAsset } from "@/lib/renders/types";
 
 export async function getDefaultProject(userId: string) {
   const existing = await db.query.projects.findFirst({
@@ -155,7 +156,8 @@ export async function deleteProject(
 }
 
 /**
- * Cover image per project: the result of each project's most recent render.
+ * Cover image per project: the latest result/edit asset of each project's most
+ * recent render.
  * Derived at read-time (not a stored field) so the cover always tracks the
  * latest render — a project with no renders has no cover (falls back to the
  * default placeholder), and moving every render out reverts it automatically.
@@ -168,15 +170,18 @@ export async function coverImagesByProject(
 
   const rows = await db
     .select({
+      renderId: renders.id,
       projectId: renders.projectId,
+      type: renderAssets.type,
       fileUrl: renderAssets.fileUrl,
+      createdAt: renderAssets.createdAt,
     })
     .from(renders)
     .innerJoin(
       renderAssets,
       and(
         eq(renderAssets.renderId, renders.id),
-        eq(renderAssets.type, "result"),
+        inArray(renderAssets.type, ["result", "edit"]),
         isNull(renderAssets.deletedAt),
       ),
     )
@@ -189,9 +194,26 @@ export async function coverImagesByProject(
     )
     .orderBy(desc(renders.createdAt));
 
-  const cover = new Map<string, string>();
+  const renderProject = new Map<string, string>();
+  const assetsByRender = new Map<string, Array<(typeof rows)[number]>>();
+  const orderedRenderIds: string[] = [];
   for (const row of rows) {
-    if (!cover.has(row.projectId)) cover.set(row.projectId, row.fileUrl);
+    if (!assetsByRender.has(row.renderId)) {
+      assetsByRender.set(row.renderId, []);
+      renderProject.set(row.renderId, row.projectId);
+      orderedRenderIds.push(row.renderId);
+    }
+    assetsByRender.get(row.renderId)?.push(row);
+  }
+
+  const cover = new Map<string, string>();
+  for (const renderId of orderedRenderIds) {
+    const projectId = renderProject.get(renderId);
+    if (!projectId || cover.has(projectId)) continue;
+    const latestAsset = getLatestRenderableAsset(
+      assetsByRender.get(renderId) ?? [],
+    );
+    if (latestAsset) cover.set(projectId, latestAsset.fileUrl);
   }
   return cover;
 }

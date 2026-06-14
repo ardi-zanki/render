@@ -53,9 +53,20 @@ describe("createRenderSchema", () => {
 });
 
 describe("createProjectSchema", () => {
+  it("trims a project name before validation", () => {
+    const result = createProjectSchema.safeParse({
+      name: "  Rumah Baru  ",
+      description: "Project test",
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    expect(result.data.name).toBe("Rumah Baru");
+  });
+
   it("requires a project name", () => {
     const result = createProjectSchema.safeParse({
-      name: "",
+      name: "   ",
       description: "Project test",
     });
 

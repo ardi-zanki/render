@@ -7,15 +7,17 @@ export function AdminTable({
   children,
   empty,
   isEmpty,
+  minWidthClassName = "min-w-[640px]",
 }: {
   headers: { label: string; align?: "right" }[];
   children: ReactNode;
   empty?: string;
   isEmpty?: boolean;
+  minWidthClassName?: string;
 }) {
   return (
     <div className="overflow-x-auto rounded-lg border border-border/75 bg-card shadow-soft">
-      <table className="w-full min-w-[640px] text-sm">
+      <table className={cn("w-full text-sm", minWidthClassName)}>
         <thead className="bg-muted/55 text-left text-xs font-semibold text-muted-foreground">
           <tr>
             {headers.map((h, i) => (

@@ -76,6 +76,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Design system guard
+        run: pnpm check:design-system
+
       - name: Unit tests
         run: pnpm test
 

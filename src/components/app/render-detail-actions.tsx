@@ -102,7 +102,7 @@ export function RenderActionsMenu({
       );
       window.location.href = json.url;
     } catch (err) {
-      toast.error(apiErrorMessage(err, "Download belum tersedia"));
+      toast.error(apiErrorMessage(err, "Unduh belum tersedia"));
     } finally {
       setDownloading(false);
     }
@@ -171,7 +171,7 @@ export function RenderActionsMenu({
           onClick={() => runFromMenu(download)}
         >
           {downloading ? <Loader2 className="animate-spin" /> : <Download />}{" "}
-          Download
+          Unduh
         </button>
         {archived ? (
           <button

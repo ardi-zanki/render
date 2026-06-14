@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 
-export const metadata: Metadata = { title: "Support" };
+export const metadata: Metadata = { title: "Bantuan" };
 
 const SUPPORT_EMAIL = "support@renderai.app";
 const WHATSAPP_SUPPORT = "https://wa.me/6200012340001";
@@ -41,7 +41,7 @@ export default function SupportPage() {
   return (
     <>
       <PageHeader
-        title="Support"
+        title="Bantuan"
         description="Pilih kanal yang paling nyaman untuk menghubungi tim RenderAI."
       />
 

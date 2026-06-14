@@ -272,7 +272,7 @@ export function useRenderStudioActions({
       );
       window.location.href = json.url;
     } catch (err) {
-      toast.error(apiErrorMessage(err, "Download belum tersedia"));
+      toast.error(apiErrorMessage(err, "Unduh belum tersedia"));
     } finally {
       state.setDownloading(false);
     }

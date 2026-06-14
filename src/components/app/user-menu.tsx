@@ -161,7 +161,7 @@ export function UserMenu({
           }}
           className={itemClass}
         >
-          <MessageCircle /> Support
+          <MessageCircle /> Bantuan
         </button>
         <div className="my-1 h-px bg-border" />
 
