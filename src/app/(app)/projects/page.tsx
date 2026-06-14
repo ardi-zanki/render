@@ -17,13 +17,14 @@ export const metadata: Metadata = { title: "Project" };
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; q?: string }>;
 }) {
   const { user } = await requireVerifiedUser();
-  const { status } = await searchParams;
+  const { status, q } = await searchParams;
   const archived = status === "archived";
+  const query = q?.trim() ?? "";
 
-  const projects = await listProjects(user.id, { archived });
+  const projects = await listProjects(user.id, { archived, search: query });
   const [counts, covers] = await Promise.all([
     renderCountsByProject(user.id),
     coverImagesByProject(
@@ -51,6 +52,7 @@ export default async function ProjectsPage({
       <ProjectsClient
         projects={rows}
         status={archived ? "archived" : "active"}
+        query={query}
       />
     </>
   );

@@ -25,6 +25,7 @@ export function useTextureEditState() {
   const [selectedTextureId, setSelectedTextureId] = useState<string | null>(null);
   const [textureFile, setTextureFile] = useState<File | null>(null);
   const [texturePreviewUrl, setTexturePreviewUrl] = useState<string | null>(null);
+  const [textureDescription, setTextureDescription] = useState("");
   const [instruction, setInstruction] = useState("");
 
   const [applying, setApplying] = useState(false);
@@ -46,7 +47,9 @@ export function useTextureEditState() {
   const textureChosen =
     textureSource === "library"
       ? Boolean(selectedTextureId)
-      : Boolean(textureFile);
+      : textureSource === "upload"
+        ? Boolean(textureFile)
+        : Boolean(textureDescription.trim());
   const canApply = mask.hasMask && textureChosen && !applying;
 
   return {
@@ -63,6 +66,8 @@ export function useTextureEditState() {
     textureFile,
     texturePreviewUrl,
     pickTextureFile,
+    textureDescription,
+    setTextureDescription,
     instruction,
     setInstruction,
     applying,

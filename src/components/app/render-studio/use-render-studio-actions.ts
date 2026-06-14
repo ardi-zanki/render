@@ -311,7 +311,13 @@ export function useRenderStudioActions({
       if (texture.textureSource === "upload" && texture.textureFile) {
         fd.append("texture", texture.textureFile);
       }
-      if (texture.instruction.trim()) {
+      if (
+        texture.textureSource === "description" &&
+        texture.textureDescription.trim()
+      ) {
+        fd.append("textureDescription", texture.textureDescription.trim());
+      }
+      if (texture.textureSource !== "description" && texture.instruction.trim()) {
         fd.append("instruction", texture.instruction.trim());
       }
       if (selectedBaseAssetId) fd.append("baseAssetId", selectedBaseAssetId);

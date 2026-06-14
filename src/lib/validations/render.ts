@@ -55,6 +55,10 @@ export const createProjectSchema = z.object({
 export const textureEditSchema = z.object({
   /** Library texture id; resolved to a material prompt server-side. */
   libraryTextureId: z.string().max(80).optional(),
+  textureDescription: z
+    .string()
+    .max(1000, "Deskripsi maksimal 1.000 karakter")
+    .optional(),
   instruction: z
     .string()
     .max(1000, "Instruksi maksimal 1.000 karakter")

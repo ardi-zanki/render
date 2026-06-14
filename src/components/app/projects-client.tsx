@@ -8,7 +8,6 @@ import {
   Pencil,
   Plus,
   RotateCcw,
-  Search,
   Trash2,
   X,
 } from "lucide-react";
@@ -17,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { DebouncedSearchInput } from "@/components/app/debounced-search-input";
 import { RenderImage } from "@/components/app/render-image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -208,26 +208,28 @@ const CONFIRM_COPY = {
 export function ProjectsClient({
   projects,
   status,
+  query,
 }: {
   projects: ProjectRow[];
   status: "active" | "archived";
+  query: string;
 }) {
   const router = useRouter();
-  const [search, setSearch] = useState("");
   const [modal, setModal] = useState<ModalState>(null);
   const [confirm, setConfirm] = useState<ConfirmState>(null);
   const [menuId, setMenuId] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-  const filtered = projects.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()),
-  );
   const activeProject = menuId
-    ? (filtered.find((p) => p.id === menuId) ?? null)
+    ? (projects.find((p) => p.id === menuId) ?? null)
     : null;
 
   function setTab(s: "active" | "archived") {
-    router.push(`/projects?status=${s}`);
+    const params = new URLSearchParams();
+    if (s === "archived") params.set("status", "archived");
+    if (query) params.set("q", query);
+    const qs = params.toString();
+    router.push(qs ? `/projects?${qs}` : "/projects");
   }
 
   async function runConfirm() {
@@ -261,38 +263,30 @@ export function ProjectsClient({
           onChange={setTab}
         />
         <div className="flex min-w-0 gap-2">
-          <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari project..."
-              className="pl-9"
-            />
-          </div>
+          <DebouncedSearchInput value={query} placeholder="Cari project..." />
           <Button onClick={() => setModal({ mode: "create" })} className="shrink-0">
             <Plus /> Buat project
           </Button>
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {projects.length === 0 ? (
         <EmptyState
           icon={FolderOpen}
           title={
-            search
+            query
               ? "Project tidak ditemukan"
               : status === "archived"
                 ? "Belum ada project diarsip"
                 : "Belum ada project"
           }
           description={
-            search ? "Coba kata kunci lain." : "Buat project untuk mulai."
+            query ? "Coba kata kunci lain." : "Buat project untuk mulai."
           }
         />
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((p) => (
+          {projects.map((p) => (
             <div key={p.id} className="relative">
               <Link href={`/projects/${p.id}`}>
                 <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">

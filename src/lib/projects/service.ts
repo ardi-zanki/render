@@ -1,4 +1,14 @@
-import { and, count, desc, eq, inArray, isNotNull, isNull } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  isNull,
+  or,
+} from "drizzle-orm";
 
 import { db } from "@/db";
 import { projects, renderAssets, renders } from "@/db/schema";
@@ -22,8 +32,9 @@ export async function getDefaultProject(userId: string) {
 
 export async function listProjects(
   userId: string,
-  opts: { archived?: boolean } = {},
+  opts: { archived?: boolean; search?: string } = {},
 ) {
+  const search = opts.search?.trim();
   return db.query.projects.findMany({
     where: and(
       eq(projects.userId, userId),
@@ -31,6 +42,12 @@ export async function listProjects(
       opts.archived
         ? isNotNull(projects.archivedAt)
         : isNull(projects.archivedAt),
+      search
+        ? or(
+            ilike(projects.name, `%${search}%`),
+            ilike(projects.description, `%${search}%`),
+          )
+        : undefined,
     ),
     orderBy: desc(projects.updatedAt),
   });

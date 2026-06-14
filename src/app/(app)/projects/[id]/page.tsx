@@ -1,18 +1,18 @@
-import { ImageIcon, Plus, Search } from "lucide-react";
+import { ImageIcon, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { DebouncedSearchInput } from "@/components/app/debounced-search-input";
 import { PageHeader } from "@/components/app/page-header";
 import { RenderImage } from "@/components/app/render-image";
-import { Badge } from "@/components/ui/badge";
+import { RenderStatusBadge } from "@/components/app/render-status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import { getProject } from "@/lib/projects/service";
-import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
+import { MODE_LABEL } from "@/lib/renders/labels";
 import { countRenders, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 
@@ -58,15 +58,7 @@ export default async function ProjectDetailPage({
         description={`${total} render${project.isDefault ? " · Project default" : ""}`}
         action={
           <div className="flex w-full min-w-0 flex-row gap-2 sm:w-auto">
-            <form action={`/projects/${id}`} className="relative min-w-0 flex-1 sm:w-64">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                name="q"
-                defaultValue={query}
-                placeholder="Cari render..."
-                className="pl-9"
-              />
-            </form>
+            <DebouncedSearchInput value={query} placeholder="Cari render..." />
             <Button asChild className="shrink-0">
               <Link href={`/renders/new?project=${id}`}>
                 <Plus /> Buat render
@@ -119,12 +111,7 @@ export default async function ProjectDetailPage({
                     ) : (
                       <ImageIcon className="size-7 text-muted-foreground" />
                     )}
-                    <Badge
-                      variant={statusBadgeVariant(r.status)}
-                      className="absolute left-2 top-2"
-                    >
-                      {STATUS_LABEL[r.status] ?? r.status}
-                    </Badge>
+                    <RenderStatusBadge status={r.status} className="absolute left-2 top-2" />
                   </div>
                   <CardContent className="py-3.5">
                     <p className="truncate font-semibold text-foreground">

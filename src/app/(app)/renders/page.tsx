@@ -1,17 +1,17 @@
-import { ImageIcon, Plus, Search } from "lucide-react";
+import { ImageIcon, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { DebouncedSearchInput } from "@/components/app/debounced-search-input";
 import { PageHeader } from "@/components/app/page-header";
 import { RenderImage } from "@/components/app/render-image";
-import { Badge } from "@/components/ui/badge";
+import { RenderStatusBadge } from "@/components/app/render-status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
 import { Pagination } from "@/components/ui/pagination";
 import type { RenderStatus } from "@/db/schema";
-import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
+import { MODE_LABEL } from "@/lib/renders/labels";
 import { countRenders, listRenders } from "@/lib/renders/service";
 import { requireVerifiedUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -122,17 +122,7 @@ export default async function RendersPage({
         })}
         </div>
         <div className="flex min-w-0 gap-2">
-          <form action="/renders" className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
-            {showArchived && <input type="hidden" name="archived" value="1" />}
-            {statusFilter && <input type="hidden" name="status" value={statusFilter} />}
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              name="q"
-              defaultValue={query}
-              placeholder="Cari render..."
-              className="pl-9"
-            />
-          </form>
+          <DebouncedSearchInput value={query} placeholder="Cari render..." />
           <Button asChild className="shrink-0">
             <Link href="/renders/new">
               <Plus /> Buat render
@@ -176,12 +166,7 @@ export default async function RendersPage({
                     ) : (
                       <ImageIcon className="size-7 text-muted-foreground" />
                     )}
-                    <Badge
-                      variant={statusBadgeVariant(r.status)}
-                      className="absolute left-2 top-2"
-                    >
-                      {STATUS_LABEL[r.status] ?? r.status}
-                    </Badge>
+                    <RenderStatusBadge status={r.status} className="absolute left-2 top-2" />
                   </div>
                   <CardContent className="py-3.5">
                     <p className="truncate font-semibold text-foreground">

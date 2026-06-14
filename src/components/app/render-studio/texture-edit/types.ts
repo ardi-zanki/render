@@ -7,7 +7,7 @@ export type TextureTool =
   | "pan";
 
 /** Where the chosen texture comes from. */
-export type TextureSource = "library" | "upload";
+export type TextureSource = "library" | "upload" | "description";
 
 /** Live selection state the canvas reports up to drive the toolbar/Apply. */
 export type MaskState = {

@@ -24,6 +24,8 @@ import type { RenderMode } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import type { StudioView, ViewerTab } from "./types";
 
+const COMPARISON_EDGE_GUARD = 12;
+
 export function RenderPreviewViewer({
   fileRef,
   referenceRef,
@@ -103,6 +105,11 @@ export function RenderPreviewViewer({
   textureCanvas?: ReactNode;
   textureToolbar?: ReactNode;
 }) {
+  const comparisonHandlePosition = Math.min(
+    100 - COMPARISON_EDGE_GUARD,
+    Math.max(COMPARISON_EDGE_GUARD, comparisonPosition),
+  );
+
   return (
     <Card className="overflow-hidden lg:h-full">
       <CardContent className="flex flex-col gap-4 py-4 lg:h-full lg:min-h-0">
@@ -208,36 +215,37 @@ export function RenderPreviewViewer({
             // Match the same stage sizing used by Asli/Hasil/Edit, so 100%
             // zoom does not jump between tabs.
             <div className="flex size-full items-center justify-center overflow-hidden">
-              <div
-                className="relative size-full overflow-hidden"
-                style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
-              >
+              <div className="relative size-full overflow-hidden">
                 {/* Base = original (right side); defines the box. */}
                 <RenderImage
                   src={previewUrl ?? ""}
                   alt="Gambar asli"
-                  className="block size-full select-none object-contain"
+                  className="absolute inset-0 size-full select-none object-contain transition-transform"
+                  style={{ transform: `scale(${zoom})` }}
                 />
                 {/* Overlay = result, revealed on the left as the handle moves. */}
                 <div
                   className="absolute inset-0 overflow-hidden"
-                  style={{ clipPath: `inset(0 ${100 - comparisonPosition}% 0 0)` }}
+                  style={{
+                    clipPath: `inset(0 ${100 - comparisonHandlePosition}% 0 0)`,
+                  }}
                 >
                   <RenderImage
                     src={resultUrl ?? ""}
                     alt="Hasil render"
-                    className="absolute inset-0 size-full object-contain"
+                    className="absolute inset-0 size-full object-contain transition-transform"
+                    style={{ transform: `scale(${zoom})` }}
                   />
                 </div>
                 <div
                   className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-overlay-foreground shadow-floating"
-                  style={{ left: `${comparisonPosition}%` }}
+                  style={{ left: `${comparisonHandlePosition}%` }}
                 />
                 <input
                   type="range"
-                  min="0"
-                  max="100"
-                  value={comparisonPosition}
+                  min={COMPARISON_EDGE_GUARD}
+                  max={100 - COMPARISON_EDGE_GUARD}
+                  value={comparisonHandlePosition}
                   onChange={(event) =>
                     setComparisonPosition(Number(event.target.value))
                   }
@@ -245,25 +253,20 @@ export function RenderPreviewViewer({
                   aria-label="Geser komparasi"
                 />
                 {/* Handle — centered exactly on the divider line. */}
-                <span
-                  className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating"
-                  style={{ left: `${comparisonPosition}%` }}
+                <div
+                  className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5"
+                  style={{ left: `${comparisonHandlePosition}%` }}
                 >
-                  <ArrowLeftRight className="size-4" />
-                </span>
-                {/* Labels — symmetric on each side of the handle. */}
-                <span
-                  className="pointer-events-none absolute top-1/2 -translate-x-full -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
-                  style={{ left: `calc(${comparisonPosition}% - 1.5rem)` }}
-                >
-                  Hasil
-                </span>
-                <span
-                  className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-border bg-background/95 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-floating"
-                  style={{ left: `calc(${comparisonPosition}% + 1.5rem)` }}
-                >
-                  Asli
-                </span>
+                  <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
+                    Hasil
+                  </span>
+                  <span className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating">
+                    <ArrowLeftRight className="size-4" />
+                  </span>
+                  <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
+                    Asli
+                  </span>
+                </div>
               </div>
             </div>
           ) : shownImage ? (

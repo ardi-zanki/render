@@ -81,7 +81,7 @@ export async function POST(
   }
 
   const rawFields = Object.fromEntries(
-    ["libraryTextureId", "instruction", "baseAssetId"]
+    ["libraryTextureId", "textureDescription", "instruction", "baseAssetId"]
       .map((k) => [k, form.get(k)] as const)
       .filter(([, v]) => v != null && v !== "")
       .map(([k, v]) => [k, String(v)]),
@@ -111,9 +111,12 @@ export async function POST(
   } else if (texture) {
     textureLabel = "Tekstur diunggah";
     textureDescription = "the uploaded reference texture";
+  } else if (input.textureDescription?.trim()) {
+    textureLabel = "Deskripsi tekstur";
+    textureDescription = input.textureDescription.trim();
   } else {
     return NextResponse.json(
-      { error: "Pilih tekstur dari Library atau unggah referensi" },
+      { error: "Pilih tekstur dari Library, unggah referensi, atau isi deskripsi" },
       { status: 400 },
     );
   }

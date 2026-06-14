@@ -34,6 +34,12 @@ type MenuPreferences = {
 const itemClass =
   "flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/80 disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:text-muted-foreground";
 
+const LOGOUT_MIN_FEEDBACK_MS = 850;
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+}
+
 export function UserMenu({
   user,
   preferences,
@@ -54,7 +60,11 @@ export function UserMenu({
   const [loggingOut, setLoggingOut] = useState(false);
 
   async function handleLogout() {
+    if (loggingOut) return;
+    const startedAt = Date.now();
     setLoggingOut(true);
+    setOpen(false);
+    setSettingsOpen(false);
     try {
       await signOut();
     } catch {
@@ -67,6 +77,8 @@ export function UserMenu({
     } catch {
       // ignore
     }
+    const remainingFeedback = LOGOUT_MIN_FEEDBACK_MS - (Date.now() - startedAt);
+    if (remainingFeedback > 0) await wait(remainingFeedback);
     router.push("/login");
     router.refresh();
   }
@@ -79,8 +91,10 @@ export function UserMenu({
         title={compact ? user.name : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
+        disabled={loggingOut}
         className={cn(
           "group relative flex w-full cursor-pointer items-center gap-3 rounded-md py-2 transition-colors hover:bg-muted/80",
+          "disabled:cursor-wait disabled:opacity-80",
           compact ? "justify-center px-0" : "px-1",
         )}
       >
@@ -159,9 +173,22 @@ export function UserMenu({
           className={itemClass}
         >
           {loggingOut ? <Loader2 className="animate-spin" /> : <LogOut />}
-          Keluar
+          {loggingOut ? "Keluar..." : "Keluar"}
         </button>
       </Popover>
+
+      {loggingOut && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/75 backdrop-blur-sm"
+        >
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-dialog">
+            <Loader2 className="size-4 animate-spin text-primary" />
+            Keluar...
+          </div>
+        </div>
+      )}
 
       {settingsOpen && (
         <SettingsModal

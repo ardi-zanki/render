@@ -14,13 +14,13 @@ import Link from "next/link";
 
 import { PageHeader } from "@/components/app/page-header";
 import { RenderImage } from "@/components/app/render-image";
+import { RenderStatusBadge } from "@/components/app/render-status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getBalance } from "@/lib/credits";
 import { getUnreadCount } from "@/lib/notifications/service";
-import { STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
 import { paymentStatusBadge } from "@/lib/payments/labels";
 import { listPayments } from "@/lib/payments/service";
 import {
@@ -254,12 +254,7 @@ export default async function DashboardPage() {
                   {thumb && (
                     <RenderImage src={thumb} alt={r.mode} className="size-full" />
                   )}
-                  <Badge
-                    variant={statusBadgeVariant(r.status)}
-                    className="absolute left-1.5 top-1.5"
-                  >
-                    {STATUS_LABEL[r.status] ?? r.status}
-                  </Badge>
+                  <RenderStatusBadge status={r.status} className="absolute left-1.5 top-1.5" />
                 </div>
               );
             })}

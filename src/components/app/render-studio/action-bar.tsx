@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Download, Loader2, Share2, Sparkles } from "lucide-react";
+import { Check, Download, Loader2, Share2 } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -96,7 +96,7 @@ export function RenderActionBar({
             disabled={!canRender}
             className="h-6 gap-1 px-2.5 text-xs [&_svg]:size-3.5"
           >
-            {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
+            {loading && <Loader2 className="animate-spin" />}
             Render
           </Button>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ImagePlus, Loader2, PanelLeft, Sparkles, X } from "lucide-react";
+import { ImagePlus, Loader2, PanelLeft, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -58,9 +58,11 @@ export function ChangeTexturePanel({
 
         <Segmented
           size="sm"
+          className="grid w-full grid-cols-3"
           options={[
             { value: "library", label: "Library" },
             { value: "upload", label: "Upload" },
+            { value: "description", label: "Deskripsi" },
           ]}
           value={state.textureSource}
           onChange={(value) => state.setTextureSource(value)}
@@ -117,7 +119,7 @@ export function ChangeTexturePanel({
                 })}
               </div>
             </>
-          ) : (
+          ) : state.textureSource === "upload" ? (
             <>
               <input
                 ref={fileRef}
@@ -156,33 +158,47 @@ export function ChangeTexturePanel({
                 </button>
               )}
             </>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="texture-description">Deskripsi</Label>
+              <Textarea
+                id="texture-description"
+                value={state.textureDescription}
+                onChange={(e) => state.setTextureDescription(e.target.value)}
+                placeholder="mis. marmer putih dengan urat abu-abu halus"
+                className="min-h-32 resize-none text-sm"
+                maxLength={1000}
+              />
+            </div>
           )}
         </div>
 
         {/* Pinned footer: instruction + Apply stay visible while scrolling. */}
         <div className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 flex flex-col gap-3 rounded-lg border border-border bg-card p-3 shadow-elevated lg:static lg:inset-auto lg:z-auto lg:shrink-0 lg:rounded-none lg:border-0 lg:border-t lg:border-border/80 lg:bg-transparent lg:p-0 lg:pt-3 lg:shadow-none">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="texture-instruction" className="text-xs">
-              Instruksi tambahan{" "}
-              <span className="font-normal text-muted-foreground">
-                (opsional)
-              </span>
-            </Label>
-            <Textarea
-              id="texture-instruction"
-              value={state.instruction}
-              onChange={(e) => state.setInstruction(e.target.value)}
-              placeholder="mis. marmer putih dengan urat abu-abu halus"
-              className="min-h-16 resize-none text-sm"
-            />
-          </div>
+          {state.textureSource !== "description" && (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="texture-instruction" className="text-xs">
+                Instruksi tambahan{" "}
+                <span className="font-normal text-muted-foreground">
+                  (opsional)
+                </span>
+              </Label>
+              <Textarea
+                id="texture-instruction"
+                value={state.instruction}
+                onChange={(e) => state.setInstruction(e.target.value)}
+                placeholder="mis. marmer putih dengan urat abu-abu halus"
+                className="min-h-16 resize-none text-sm"
+              />
+            </div>
+          )}
           <Button
             size="sm"
             onClick={onApply}
             disabled={!state.canApply}
             className="w-full gap-1 text-xs [&_svg]:size-3.5"
           >
-            {state.applying ? <Loader2 className="animate-spin" /> : <Sparkles />}
+            {state.applying && <Loader2 className="animate-spin" />}
             Apply Texture
           </Button>
         </div>
