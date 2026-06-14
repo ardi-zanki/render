@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import {
@@ -38,6 +39,8 @@ import { Select } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleRow } from "@/components/ui/toggle-row";
+
+export const metadata: Metadata = { title: "Design System" };
 
 const colorGroups = [
   {
