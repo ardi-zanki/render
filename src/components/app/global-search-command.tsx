@@ -86,7 +86,7 @@ export function GlobalSearchCommand({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        title={!expanded ? "Search" : undefined}
+        title={!expanded ? "Cari" : undefined}
         className="group relative grid w-full grid-cols-[48px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
       >
         <Search className="mx-auto size-4 shrink-0" />
@@ -98,11 +98,11 @@ export function GlobalSearchCommand({
               : "pointer-events-none w-0 -translate-x-1 overflow-hidden opacity-0",
           )}
         >
-          Search
+          Cari
         </span>
         {!expanded && (
           <span className="pointer-events-none absolute left-full ml-3 hidden whitespace-nowrap rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-background shadow-elevated group-hover:block">
-            Search
+            Cari
           </span>
         )}
       </button>
@@ -110,7 +110,7 @@ export function GlobalSearchCommand({
       {open && (
         <Modal
           onClose={close}
-          label="Search"
+          label="Cari"
           panelClassName="w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-dialog"
           containerClassName="items-start pt-[12vh]"
         >
@@ -125,7 +125,7 @@ export function GlobalSearchCommand({
             <button
               type="button"
               onClick={close}
-              aria-label="Tutup Search"
+              aria-label="Tutup pencarian"
               title="Tutup"
               className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
