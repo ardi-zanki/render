@@ -80,8 +80,8 @@ export function UserMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
-          "group relative flex w-full cursor-pointer items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted/80",
-          compact && "justify-center px-0",
+          "group relative flex w-full cursor-pointer items-center gap-3 rounded-md py-2 transition-colors hover:bg-muted/80",
+          compact ? "justify-center px-0" : "px-1",
         )}
       >
         <Avatar name={user.name} src={user.image} />
