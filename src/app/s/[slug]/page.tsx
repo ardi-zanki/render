@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { RenderImage } from "@/components/app/render-image";
+import { RenderImagePreview } from "@/components/app/render-image-preview";
 import { Logo } from "@/components/brand/logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,6 @@ export default async function PublicRenderPage({ params }: Params) {
             <Logo size={28} />
           </Link>
           <div className="flex items-center gap-2">
-            <ModeToggle />
             {isAuthenticated ? (
               <Button asChild>
                 <a href={studioHref}>{headerCtaLabel}</a>
@@ -66,6 +65,7 @@ export default async function PublicRenderPage({ params }: Params) {
                 <Link href={studioHref}>{headerCtaLabel}</Link>
               </Button>
             )}
+            <ModeToggle />
           </div>
         </div>
       </header>
@@ -79,10 +79,13 @@ export default async function PublicRenderPage({ params }: Params) {
         </div>
 
         <div className="overflow-hidden rounded-lg border border-border bg-card">
-          <RenderImage
+          <RenderImagePreview
             src={render.resultUrl}
             alt={`Render ${MODE_LABEL[render.mode]}`}
-            className="w-full"
+            className="h-auto w-full"
+            imageClassName="h-auto w-full object-contain"
+            downloadUrl={render.resultUrl}
+            downloadName={`renderai-${slug}`}
           />
         </div>
 
