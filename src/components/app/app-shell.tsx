@@ -316,17 +316,31 @@ export function AppShell({
       </div>
 
       {/* Mobile drawer */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-overlay/45 backdrop-blur-[2px]"
-            onClick={() => setOpen(false)}
-          />
-          <div className="absolute inset-y-0 left-0 w-64">
-            {renderSidebar(true)}
-          </div>
+      <div
+        aria-hidden={!open}
+        className={cn(
+          "fixed inset-0 z-50 transition-[visibility] duration-0 lg:hidden",
+          open
+            ? "visible delay-0"
+            : "pointer-events-none invisible delay-300",
+        )}
+      >
+        <div
+          className={cn(
+            "absolute inset-0 bg-overlay/45 backdrop-blur-[2px] transition-opacity duration-200 ease-out",
+            open ? "opacity-100" : "opacity-0",
+          )}
+          onClick={() => setOpen(false)}
+        />
+        <div
+          className={cn(
+            "absolute inset-y-0 left-0 w-64 transform-gpu transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+            open ? "translate-x-0" : "-translate-x-full",
+          )}
+        >
+          {renderSidebar(true)}
         </div>
-      )}
+      </div>
 
       <div
         className={cn(
