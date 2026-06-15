@@ -1,6 +1,6 @@
 "use client";
 
-import { Minus, Plus, RotateCw, X, ZoomIn } from "lucide-react";
+import { Download, Minus, Plus, RotateCw, X, ZoomIn } from "lucide-react";
 import { useState } from "react";
 
 import { RenderImage } from "@/components/app/render-image";
@@ -20,10 +20,16 @@ export function RenderImagePreview({
   src,
   alt,
   className,
+  imageClassName,
+  downloadUrl,
+  downloadName,
 }: {
   src: string;
   alt: string;
   className?: string;
+  imageClassName?: string;
+  downloadUrl?: string;
+  downloadName?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -56,7 +62,11 @@ export function RenderImagePreview({
           className,
         )}
       >
-        <RenderImage src={src} alt={alt} className="size-full" />
+        <RenderImage
+          src={src}
+          alt={alt}
+          className={cn("size-full", imageClassName)}
+        />
         <span className="pointer-events-none absolute right-2 top-2 flex size-8 items-center justify-center rounded-md bg-overlay/45 text-overlay-foreground opacity-0 transition-opacity group-hover:opacity-100">
           <ZoomIn className="size-4" />
         </span>
@@ -110,6 +120,17 @@ export function RenderImagePreview({
               >
                 <RotateCw className="size-4" />
               </button>
+              <a
+                href={downloadUrl ?? src}
+                download={downloadName ?? ""}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Unduh gambar"
+                title="Unduh"
+                className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <Download className="size-4" />
+              </a>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
