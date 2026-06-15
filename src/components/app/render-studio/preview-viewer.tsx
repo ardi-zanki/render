@@ -10,7 +10,17 @@ import {
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
-import type { ReactNode, RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
 
 import { RenderImage } from "@/components/app/render-image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -24,7 +34,15 @@ import type { RenderMode } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import type { StudioView, ViewerTab } from "./types";
 
-const COMPARISON_EDGE_GUARD = 12;
+const clampComparisonPosition = (position: number) =>
+  Math.min(100, Math.max(0, position));
+
+type ComparisonBounds = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
 
 export function RenderPreviewViewer({
   fileRef,
@@ -105,9 +123,176 @@ export function RenderPreviewViewer({
   textureCanvas?: ReactNode;
   textureToolbar?: ReactNode;
 }) {
-  const comparisonHandlePosition = Math.min(
-    100 - COMPARISON_EDGE_GUARD,
-    Math.max(COMPARISON_EDGE_GUARD, comparisonPosition),
+  const comparisonStageRef = useRef<HTMLDivElement>(null);
+  const comparisonImageRef = useRef<HTMLImageElement>(null);
+  const comparisonDraggingRef = useRef(false);
+  const [comparisonBounds, setComparisonBounds] =
+    useState<ComparisonBounds | null>(null);
+  const comparisonHandlePosition = clampComparisonPosition(comparisonPosition);
+
+  const readComparisonBounds = useCallback(() => {
+    const stage = comparisonStageRef.current;
+    const image = comparisonImageRef.current;
+    if (!stage || !image) return null;
+
+    const stageRect = stage.getBoundingClientRect();
+    if (stageRect.width === 0 || stageRect.height === 0) return null;
+    if (image.naturalWidth === 0 || image.naturalHeight === 0) return null;
+
+    const fitScale = Math.min(
+      stageRect.width / image.naturalWidth,
+      stageRect.height / image.naturalHeight,
+    );
+    const width = image.naturalWidth * fitScale * zoom;
+    const height = image.naturalHeight * fitScale * zoom;
+
+    return {
+      left: (stageRect.width - width) / 2,
+      top: (stageRect.height - height) / 2,
+      width,
+      height,
+    } satisfies ComparisonBounds;
+  }, [zoom]);
+
+  const measureComparisonBounds = useCallback(() => {
+    const next = readComparisonBounds();
+    if (!next) return;
+
+    setComparisonBounds((current) => {
+      if (
+        current &&
+        Math.abs(current.left - next.left) < 0.5 &&
+        Math.abs(current.top - next.top) < 0.5 &&
+        Math.abs(current.width - next.width) < 0.5 &&
+        Math.abs(current.height - next.height) < 0.5
+      ) {
+        return current;
+      }
+      return next;
+    });
+  }, [readComparisonBounds]);
+
+  const setComparisonFromClientX = useCallback(
+    (clientX: number) => {
+      const stage = comparisonStageRef.current;
+      const bounds = readComparisonBounds();
+      if (!stage || !bounds) return;
+
+      const stageRect = stage.getBoundingClientRect();
+      if (bounds.width === 0) return;
+
+      setComparisonPosition(
+        clampComparisonPosition(
+          ((clientX - stageRect.left - bounds.left) / bounds.width) * 100,
+        ),
+      );
+    },
+    [readComparisonBounds, setComparisonPosition],
+  );
+
+  const startComparisonDrag = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      comparisonDraggingRef.current = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      event.preventDefault();
+      setComparisonFromClientX(event.clientX);
+    },
+    [setComparisonFromClientX],
+  );
+
+  const moveComparisonDrag = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (!comparisonDraggingRef.current) return;
+      event.preventDefault();
+      setComparisonFromClientX(event.clientX);
+    },
+    [setComparisonFromClientX],
+  );
+
+  const stopComparisonDrag = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      comparisonDraggingRef.current = false;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+    },
+    [],
+  );
+
+  const handleComparisonKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        setComparisonPosition(clampComparisonPosition(comparisonPosition - 1));
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        setComparisonPosition(clampComparisonPosition(comparisonPosition + 1));
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        setComparisonPosition(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        setComparisonPosition(100);
+      }
+    },
+    [comparisonPosition, setComparisonPosition],
+  );
+
+  useEffect(() => {
+    if (!canCompare || view !== "comparison") return;
+
+    const frame = window.requestAnimationFrame(measureComparisonBounds);
+    return () => window.cancelAnimationFrame(frame);
+  }, [
+    canCompare,
+    measureComparisonBounds,
+    panelsCollapsed,
+    previewUrl,
+    resultUrl,
+    view,
+    zoom,
+  ]);
+
+  useEffect(() => {
+    if (!canCompare || view !== "comparison") return;
+    const stage = comparisonStageRef.current;
+    const image = comparisonImageRef.current;
+    if (!stage || !image) return;
+
+    const resizeObserver = new ResizeObserver(measureComparisonBounds);
+    resizeObserver.observe(stage);
+    resizeObserver.observe(image);
+    window.addEventListener("resize", measureComparisonBounds);
+    const frame = window.requestAnimationFrame(measureComparisonBounds);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", measureComparisonBounds);
+    };
+  }, [canCompare, measureComparisonBounds, view]);
+
+  const comparisonFrameStyle = comparisonBounds
+    ? ({
+        left: comparisonBounds.left,
+        top: comparisonBounds.top,
+        width: comparisonBounds.width,
+        height: comparisonBounds.height,
+      } satisfies CSSProperties)
+    : undefined;
+
+  const comparisonClipStyle = {
+    clipPath: `inset(0 ${100 - comparisonHandlePosition}% 0 0)`,
+  } satisfies CSSProperties;
+
+  const comparisonHandleStyle = {
+    left: `${comparisonHandlePosition}%`,
+  } satisfies CSSProperties;
+
+  const canShowComparisonOverlay = Boolean(
+    comparisonBounds &&
+      comparisonBounds.width > 0 &&
+      comparisonBounds.height > 0,
   );
 
   return (
@@ -212,62 +397,70 @@ export function RenderPreviewViewer({
               </p>
             )
           ) : canCompare && view === "comparison" ? (
-            // Match the same stage sizing used by Asli/Hasil/Edit, so 100%
-            // zoom does not jump between tabs.
-            <div className="flex size-full items-center justify-center overflow-hidden">
-              <div className="relative size-full overflow-hidden">
-                {/* Base = original (right side); defines the box. */}
-                <RenderImage
-                  src={previewUrl ?? ""}
-                  alt="Gambar asli"
-                  className="absolute inset-0 size-full select-none object-contain transition-transform"
-                  style={{ transform: `scale(${zoom})` }}
-                />
-                {/* Overlay = result, revealed on the left as the handle moves. */}
-                <div
-                  className="absolute inset-0 overflow-hidden"
-                  style={{
-                    clipPath: `inset(0 ${100 - comparisonHandlePosition}% 0 0)`,
-                  }}
-                >
-                  <RenderImage
-                    src={resultUrl ?? ""}
-                    alt="Hasil render"
-                    className="absolute inset-0 size-full object-contain transition-transform"
-                    style={{ transform: `scale(${zoom})` }}
+            <div
+              ref={comparisonStageRef}
+              className="relative flex size-full items-center justify-center overflow-hidden"
+            >
+              <RenderImage
+                ref={comparisonImageRef}
+                src={previewUrl ?? ""}
+                alt="Gambar asli"
+                draggable={false}
+                onLoad={measureComparisonBounds}
+                className="absolute inset-0 size-full select-none object-contain transition-transform"
+                style={{
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "center",
+                }}
+              />
+
+              {canShowComparisonOverlay && comparisonFrameStyle && (
+                <div className="absolute" style={comparisonFrameStyle}>
+                  <div
+                    className="pointer-events-none absolute inset-0 overflow-hidden"
+                    style={comparisonClipStyle}
+                  >
+                    <RenderImage
+                      src={resultUrl ?? ""}
+                      alt="Hasil render"
+                      draggable={false}
+                      className="size-full select-none object-contain"
+                    />
+                  </div>
+                  <div
+                    className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-overlay-foreground shadow-floating"
+                    style={comparisonHandleStyle}
                   />
+                  <div
+                    role="slider"
+                    tabIndex={0}
+                    aria-label="Geser komparasi"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(comparisonHandlePosition)}
+                    onKeyDown={handleComparisonKeyDown}
+                    onPointerDown={startComparisonDrag}
+                    onPointerMove={moveComparisonDrag}
+                    onPointerUp={stopComparisonDrag}
+                    onPointerCancel={stopComparisonDrag}
+                    className="absolute inset-0 z-10 cursor-ew-resize touch-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  />
+                  <div
+                    className="pointer-events-none absolute top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5"
+                    style={comparisonHandleStyle}
+                  >
+                    <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
+                      Hasil
+                    </span>
+                    <span className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating">
+                      <ArrowLeftRight className="size-4" />
+                    </span>
+                    <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
+                      Asli
+                    </span>
+                  </div>
                 </div>
-                <div
-                  className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-overlay-foreground shadow-floating"
-                  style={{ left: `${comparisonHandlePosition}%` }}
-                />
-                <input
-                  type="range"
-                  min={COMPARISON_EDGE_GUARD}
-                  max={100 - COMPARISON_EDGE_GUARD}
-                  value={comparisonHandlePosition}
-                  onChange={(event) =>
-                    setComparisonPosition(Number(event.target.value))
-                  }
-                  className="absolute inset-0 size-full cursor-ew-resize opacity-0"
-                  aria-label="Geser komparasi"
-                />
-                {/* Handle — centered exactly on the divider line. */}
-                <div
-                  className="pointer-events-none absolute top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5"
-                  style={{ left: `${comparisonHandlePosition}%` }}
-                >
-                  <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
-                    Hasil
-                  </span>
-                  <span className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating">
-                    <ArrowLeftRight className="size-4" />
-                  </span>
-                  <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
-                    Asli
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
           ) : shownImage ? (
             <div className="flex size-full items-center justify-center overflow-hidden">
