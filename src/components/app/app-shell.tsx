@@ -150,48 +150,40 @@ export function AppShell({
         )}
         suppressHydrationWarning
       >
-        <div
-          className={cn(
-            "grid h-14 border-b border-border/75",
-            expanded
-              ? "grid-cols-[minmax(0,1fr)_48px]"
-              : "grid-cols-[72px_minmax(0,1fr)]",
-          )}
-        >
-          <div
+        <div className="relative h-14 border-b border-border/75">
+          <Link
+            href="/dashboard"
+            aria-label="RenderAI dashboard"
+            onClick={() => setOpen(false)}
             className={cn(
-              "relative flex items-center",
-              expanded ? "min-w-0 pl-8" : "justify-center",
+              "absolute left-8 top-1/2 min-w-0 -translate-y-1/2 whitespace-nowrap text-base font-extrabold tracking-normal text-foreground transition-opacity duration-150 ease-out",
+              expanded
+                ? "opacity-100 delay-100"
+                : "pointer-events-none opacity-0",
             )}
           >
-            <Link
-              href="/dashboard"
-              aria-label="RenderAI dashboard"
-              onClick={() => setOpen(false)}
-              className={cn(
-                "min-w-0 truncate text-base font-extrabold tracking-normal text-foreground transition-opacity duration-150 ease-out",
-                expanded ? "opacity-100 delay-100" : "pointer-events-none opacity-0",
-              )}
-            >
-              RenderAI<span className="text-primary">.</span>
-            </Link>
-            <button
-              type="button"
-              className={cn(
-                "absolute hidden size-9 items-center justify-center rounded-md text-muted-foreground transition-[opacity,background-color,color] duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex",
-                expanded ? "pointer-events-none opacity-0" : "opacity-100 delay-100",
-              )}
-              onClick={() => updateSidebarExpanded(true)}
-              aria-label="Lebarkan sidebar"
-              title="Lebarkan sidebar"
-            >
-              <PanelLeft className="size-5" />
-            </button>
-          </div>
+            RenderAI<span className="text-primary">.</span>
+          </Link>
+          <button
+            type="button"
+            className={cn(
+              "absolute left-1/2 top-1/2 hidden size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-[opacity,background-color,color] duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex",
+              expanded
+                ? "pointer-events-none opacity-0"
+                : "opacity-100 delay-100",
+            )}
+            onClick={() => updateSidebarExpanded(true)}
+            aria-label="Lebarkan sidebar"
+            title="Lebarkan sidebar"
+          >
+            <PanelLeft className="size-5" />
+          </button>
           <div
             className={cn(
-              "flex min-w-0 items-center justify-end gap-1.5 overflow-hidden pr-3 transition-opacity duration-150 ease-out",
-              expanded ? "opacity-100 delay-100" : "pointer-events-none opacity-0",
+              "absolute inset-y-0 right-3 flex min-w-0 items-center justify-end gap-1.5 transition-opacity duration-150 ease-out",
+              expanded
+                ? "opacity-100 delay-100"
+                : "pointer-events-none opacity-0",
             )}
           >
             <button
