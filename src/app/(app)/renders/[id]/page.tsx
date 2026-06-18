@@ -18,7 +18,7 @@ import {
   statusBadgeVariant,
 } from "@/lib/renders/labels";
 import { listProjects } from "@/lib/projects/service";
-import { getRenderDetail } from "@/lib/renders/service";
+import { getRenderDetail } from "@/lib/renders/queries";
 import { renderVersionLabels } from "@/lib/renders/version-labels";
 import { requireVerifiedUser } from "@/lib/session";
 

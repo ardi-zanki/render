@@ -1,5 +1,5 @@
 import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
-import type { RenderListItem } from "@/lib/renders/service";
+import type { RenderListItem } from "@/lib/renders/types";
 
 export type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;
 export type StudioView = "original" | "comparison" | "result";

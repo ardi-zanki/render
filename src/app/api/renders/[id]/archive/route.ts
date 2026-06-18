@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { archiveRender } from "@/lib/renders/service";
+import { archiveRender } from "@/lib/renders/archive-delete";
 import { renderIdSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { issueToken } from "@/lib/jwt";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { getResultAssetForDownload } from "@/lib/renders/service";
+import { getResultAssetForDownload } from "@/lib/renders/queries";
 import { renderIdSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";
