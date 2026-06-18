@@ -28,7 +28,7 @@ import {
   coverImagesByProject,
   listRecentProjects,
 } from "@/lib/projects/service";
-import { countUserRenders, listRenders } from "@/lib/renders/service";
+import { countUserRenders, listRenders } from "@/lib/renders/queries";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Dashboard" };

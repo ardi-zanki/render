@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
-import {
-  deleteRenderPermanently,
-  getRenderDetail,
-  moveRenderToProject,
-} from "@/lib/renders/service";
-import { renderResolvedDisplayName } from "@/lib/renders/labels";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
+import { deleteRenderPermanently } from "@/lib/renders/archive-delete";
+import { renderResolvedDisplayName } from "@/lib/renders/labels";
+import { getRenderDetail } from "@/lib/renders/queries";
+import { moveRenderToProject } from "@/lib/renders/update";
 import {
   renderDeleteSchema,
   renderIdSchema,

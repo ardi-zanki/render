@@ -12,7 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import type { RenderStatus } from "@/db/schema";
 import { MODE_LABEL } from "@/lib/renders/labels";
-import { countRenders, listRenders } from "@/lib/renders/service";
+import { countRenders, listRenders } from "@/lib/renders/queries";
 import { requireVerifiedUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
 

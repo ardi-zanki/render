@@ -13,7 +13,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { getProject } from "@/lib/projects/service";
 import { MODE_LABEL } from "@/lib/renders/labels";
-import { countRenders, listRenders } from "@/lib/renders/service";
+import { countRenders, listRenders } from "@/lib/renders/queries";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Project" };

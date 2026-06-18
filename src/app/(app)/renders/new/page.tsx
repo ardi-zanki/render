@@ -10,7 +10,7 @@ import {
   listProjects,
 } from "@/lib/projects/service";
 import { renderDisplayName } from "@/lib/renders/labels";
-import { getRenderDetail, listRenders } from "@/lib/renders/service";
+import { getRenderDetail, listRenders } from "@/lib/renders/queries";
 import { renderVersionLabels } from "@/lib/renders/version-labels";
 import { requireVerifiedUser } from "@/lib/session";
 

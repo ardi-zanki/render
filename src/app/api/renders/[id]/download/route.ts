@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { consumeToken, verifyToken } from "@/lib/jwt";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { getResultAssetForDownload } from "@/lib/renders/service";
+import { getResultAssetForDownload } from "@/lib/renders/queries";
 import { storage } from "@/lib/storage";
 import { renderIdSchema } from "@/lib/validations/api";
 

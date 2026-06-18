@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { renameRender } from "@/lib/renders/service";
+import { renameRender } from "@/lib/renders/update";
 import { renderIdSchema } from "@/lib/validations/api";
 import { renderNameSchema } from "@/lib/validations/render";
 

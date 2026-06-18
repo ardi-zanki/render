@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { MODE_LABEL } from "@/lib/renders/labels";
-import { listRenders } from "@/lib/renders/service";
+import { listRenders } from "@/lib/renders/queries";
 
 export const runtime = "nodejs";
 
