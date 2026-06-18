@@ -8,6 +8,7 @@ import { apiJson } from "@/lib/client-api";
 export type PolledRender = {
   status: RenderStatus;
   resultUrl: string | null;
+  errorCode?: string | null;
   errorMessage?: string | null;
 };
 
@@ -15,6 +16,7 @@ export type PollHandlers = {
   onUpdate?: (render: PolledRender) => void;
   onSuccess?: (render: PolledRender) => void;
   onFailure?: (render: PolledRender) => void;
+  onCancelled?: (render: PolledRender) => void;
   onTimeout?: () => void;
 };
 
@@ -63,13 +65,22 @@ export function useRenderStatusPolling({
 
           handlers.onUpdate?.(render);
 
+          if (
+            render.status === "cancelled" ||
+            render.errorCode === "USER_CANCELLED"
+          ) {
+            handlers.onCancelled?.(render);
+            finish();
+            return;
+          }
+
           if (render.status === "success") {
             handlers.onSuccess?.(render);
             finish();
             return;
           }
 
-          if (render.status === "failed") {
+          if (render.status === "failed" || render.status === "refunded") {
             handlers.onFailure?.(render);
             finish();
             return;

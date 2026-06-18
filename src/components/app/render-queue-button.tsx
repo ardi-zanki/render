@@ -1,13 +1,14 @@
 "use client";
 
-import { Box, CheckCircle2, Clock, Loader2, XCircle } from "lucide-react";
+import { Box, CheckCircle2, Clock3, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Popover } from "@/components/ui/popover";
 import { useRenderQueue, type RenderQueueItem } from "@/hooks/use-render-queue";
-import { apiErrorMessage, apiJson } from "@/lib/client-api";
+import { ApiClientError, apiErrorMessage, apiJson } from "@/lib/client-api";
 import { timeAgo } from "@/lib/notifications/ui";
 import {
   MODE_LABEL,
@@ -22,6 +23,9 @@ export function RenderQueueButton() {
   const [open, setOpen] = useState(false);
   const [cancelError, setCancelError] = useState("");
   const [cancelling, setCancelling] = useState<Set<string>>(new Set());
+  const [confirmCancel, setConfirmCancel] = useState<RenderQueueItem | null>(
+    null,
+  );
   const { count, items, loading, error, refresh, markSeen } = useRenderQueue();
 
   useEffect(() => {
@@ -41,7 +45,7 @@ export function RenderQueueButton() {
     }
   }
 
-  async function onCancel(item: RenderQueueItem) {
+  async function cancelRender(item: RenderQueueItem) {
     setCancelError("");
     setCancelling((prev) => new Set(prev).add(item.renderId));
     try {
@@ -49,8 +53,14 @@ export function RenderQueueButton() {
         method: "POST",
       });
       await refresh();
+      return true;
     } catch (err) {
+      if (err instanceof ApiClientError && err.status === 409) {
+        await refresh();
+        return true;
+      }
       setCancelError(apiErrorMessage(err, "Gagal membatalkan render"));
+      return false;
     } finally {
       setCancelling((prev) => {
         const next = new Set(prev);
@@ -99,11 +109,13 @@ export function RenderQueueButton() {
         </div>
 
         <div className="max-h-96 overflow-y-auto p-3">
-          {error || cancelError ? (
-            <div className="rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {(error || cancelError) && (
+            <div className="mb-3 rounded-md border border-destructive/25 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error || cancelError}
             </div>
-          ) : loading && items.length === 0 ? (
+          )}
+
+          {loading && items.length === 0 ? (
             <div className="flex items-center justify-center gap-2 rounded-md border border-dashed border-border py-6 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" />
               Memuat antrean
@@ -120,31 +132,30 @@ export function RenderQueueButton() {
               {items.map((item) => {
                 const done = item.status === "success";
                 const isCancelling = cancelling.has(item.renderId);
+                const progress =
+                  item.maxAttempts > 0
+                    ? Math.min(100, (item.attempts / item.maxAttempts) * 100)
+                    : 0;
                 return (
                   <div
                     key={item.id}
-                    className="rounded-md border border-border bg-card p-3 transition-colors hover:bg-muted/60"
+                    className="rounded-md border border-border/80 bg-card px-3 py-3 shadow-sm transition-colors hover:border-border hover:bg-muted/30"
                   >
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start justify-between gap-3">
                       <button
                         type="button"
                         onClick={() => onItem(item)}
-                        className="min-w-0 flex-1 text-left"
+                        className="min-w-0 flex-1 cursor-pointer text-left"
                       >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-foreground">
-                              {MODE_LABEL[item.mode]}
-                            </p>
-                            <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                              {item.projectName}
-                            </p>
-                          </div>
-                          <Badge variant={statusBadgeVariant(item.status)}>
-                            {STATUS_LABEL[item.status]}
-                          </Badge>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold leading-5 text-foreground">
+                            {MODE_LABEL[item.mode]}
+                          </p>
+                          <p className="mt-0.5 truncate text-xs leading-5 text-muted-foreground">
+                            {item.projectName}
+                          </p>
                         </div>
-                        <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
                           {done ? (
                             <>
                               <CheckCircle2 className="size-3.5" />
@@ -153,28 +164,44 @@ export function RenderQueueButton() {
                             </>
                           ) : (
                             <>
-                              <Clock className="size-3.5" />
-                              Percobaan {item.attempts}/{item.maxAttempts}
+                              <Clock3 className="size-3.5" />
+                              Percobaan {item.attempts} dari {item.maxAttempts}
                             </>
                           )}
                         </div>
+                        {!done && (
+                          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+                            <div
+                              className="h-full rounded-full bg-warning"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        )}
                       </button>
-                      {!done && (
-                        <button
-                          type="button"
-                          onClick={() => void onCancel(item)}
-                          disabled={isCancelling}
-                          className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:cursor-not-allowed disabled:opacity-60"
-                          aria-label="Batalkan render"
-                          title="Batalkan render"
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <Badge
+                          variant={statusBadgeVariant(item.status)}
+                          className="h-7 shrink-0 px-2.5"
                         >
-                          {isCancelling ? (
-                            <Loader2 className="size-4 animate-spin" />
-                          ) : (
-                            <XCircle className="size-4" />
-                          )}
-                        </button>
-                      )}
+                          {STATUS_LABEL[item.status]}
+                        </Badge>
+                        {!done && (
+                          <button
+                            type="button"
+                            onClick={() => setConfirmCancel(item)}
+                            disabled={isCancelling}
+                            className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-destructive/20 bg-destructive/5 text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-60"
+                            aria-label="Batalkan render"
+                            title="Batalkan render"
+                          >
+                            {isCancelling ? (
+                              <Loader2 className="size-3.5 animate-spin" />
+                            ) : (
+                              <X className="size-3.5" />
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -183,6 +210,20 @@ export function RenderQueueButton() {
           )}
         </div>
       </Popover>
+
+      {confirmCancel && (
+        <ConfirmDialog
+          title="Batalkan render?"
+          description={`Proses ${MODE_LABEL[confirmCancel.mode]} di ${confirmCancel.projectName} akan dihentikan. Kredit yang sudah dipakai akan dikembalikan otomatis.`}
+          confirmLabel="Batalkan render"
+          destructive
+          onConfirm={async () => {
+            const ok = await cancelRender(confirmCancel);
+            if (ok) setConfirmCancel(null);
+          }}
+          onClose={() => setConfirmCancel(null)}
+        />
+      )}
     </>
   );
 }

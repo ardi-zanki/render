@@ -81,6 +81,10 @@ export function useRenderStudioActions({
         state.setError(render.errorMessage ?? copy.failure);
         router.refresh();
       },
+      onCancelled: () => {
+        state.setError("");
+        router.refresh();
+      },
       onTimeout: () => state.setError(copy.timeout),
     });
   }
