@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - master
   workflow_dispatch:
 
 concurrency:
@@ -114,12 +113,18 @@ jobs:
       RENDER_WORKER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_WORKER_DEPLOY_HOOK_URL }}
 
     steps:
+      - name: Validate deploy hook secrets
+        if: ${{ (env.RENDER_WEB_DEPLOY_HOOK_URL == '' && env.RENDER_WORKER_DEPLOY_HOOK_URL != '') || (env.RENDER_WEB_DEPLOY_HOOK_URL != '' && env.RENDER_WORKER_DEPLOY_HOOK_URL == '') }}
+        run: |
+          echo "Both RENDER_WEB_DEPLOY_HOOK_URL and RENDER_WORKER_DEPLOY_HOOK_URL must be configured together."
+          exit 1
+
       - name: Trigger Render web deploy hook
-        if: env.RENDER_WEB_DEPLOY_HOOK_URL != ''
+        if: ${{ env.RENDER_WEB_DEPLOY_HOOK_URL != '' && env.RENDER_WORKER_DEPLOY_HOOK_URL != '' }}
         run: curl -fsS -X POST "$RENDER_WEB_DEPLOY_HOOK_URL"
 
       - name: Trigger Render worker deploy hook
-        if: env.RENDER_WORKER_DEPLOY_HOOK_URL != ''
+        if: ${{ env.RENDER_WEB_DEPLOY_HOOK_URL != '' && env.RENDER_WORKER_DEPLOY_HOOK_URL != '' }}
         run: curl -fsS -X POST "$RENDER_WORKER_DEPLOY_HOOK_URL"
 
       - name: Skip optional deploy hooks
