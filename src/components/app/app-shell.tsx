@@ -347,7 +347,6 @@ export function AppShell({
 
       <div
         className={cn(
-          "transition-[padding] duration-300 ease-out",
           renderNewActive
             ? "lg:pl-0"
             : effectiveExpanded
