@@ -260,7 +260,6 @@ export function RenderStudio({
             resetZoom={state.resetZoom}
             isProcessing={isProcessing}
             renderStatus={state.renderStatus}
-            file={state.file}
             pickFile={state.pickFile}
             mode={state.mode}
             referencePreviewUrl={state.referencePreviewUrl}

@@ -10,7 +10,7 @@ import {
   Unlink,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 
 import { PasswordInput } from "@/components/auth/password-input";
@@ -34,6 +34,18 @@ import { zodFieldErrors } from "@/lib/form";
 import { changePasswordSchema } from "@/lib/validations/account";
 
 const initial: ActionState = {};
+type PreferenceMode = "interior" | "exterior";
+type PreferenceOutputFormat = "original" | "jpg" | "png" | "webp" | "avif";
+
+function asPreferenceMode(value: string): PreferenceMode {
+  return value === "exterior" ? "exterior" : "interior";
+}
+
+function asPreferenceOutputFormat(value: string): PreferenceOutputFormat {
+  return ["original", "jpg", "png", "webp", "avif"].includes(value)
+    ? (value as PreferenceOutputFormat)
+    : "jpg";
+}
 
 function Saved() {
   return (
@@ -150,24 +162,40 @@ export function PreferencesForm({
   defaultOutputFormat: string;
 }) {
   const router = useRouter();
-  const [state, action, pending] = useActionState(
-    updatePreferencesAction,
-    initial,
+  const [renderMode, setRenderMode] = useState<PreferenceMode>(
+    asPreferenceMode(defaultRenderMode),
   );
-  const [renderMode, setRenderMode] = useState(defaultRenderMode);
-  const [outputFormat, setOutputFormat] = useState(defaultOutputFormat);
+  const [outputFormat, setOutputFormat] = useState<PreferenceOutputFormat>(
+    asPreferenceOutputFormat(defaultOutputFormat),
+  );
+  const [pending, setPending] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!state.ok) return;
+  async function savePreferences(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPending(true);
+    setSaved(false);
+    setError("");
+    const formData = new FormData();
+    formData.set("defaultRenderMode", renderMode);
+    formData.set("defaultOutputFormat", outputFormat);
+    const result = await updatePreferencesAction(initial, formData);
+    setPending(false);
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+    setSaved(true);
     toast.success("Preferensi disimpan");
     router.refresh();
-  }, [router, state.ok]);
+  }
 
   return (
-    <form action={action} className="flex flex-col gap-4">
-      {state.error && (
+    <form onSubmit={savePreferences} className="flex flex-col gap-4">
+      {error && (
         <Alert variant="destructive">
-          <AlertDescription>{state.error}</AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
       <div className="flex flex-col gap-1.5">
@@ -176,7 +204,11 @@ export function PreferencesForm({
           id="defaultRenderMode"
           name="defaultRenderMode"
           value={renderMode}
-          onChange={(event) => setRenderMode(event.target.value)}
+          disabled={pending}
+          onChange={(event) => {
+            setRenderMode(asPreferenceMode(event.target.value));
+            setSaved(false);
+          }}
         >
           <option value="interior">Interior</option>
           <option value="exterior">Exterior</option>
@@ -188,7 +220,11 @@ export function PreferencesForm({
           id="defaultOutputFormat"
           name="defaultOutputFormat"
           value={outputFormat}
-          onChange={(event) => setOutputFormat(event.target.value)}
+          disabled={pending}
+          onChange={(event) => {
+            setOutputFormat(asPreferenceOutputFormat(event.target.value));
+            setSaved(false);
+          }}
         >
           <option value="original">Original</option>
           <option value="jpg">JPG</option>
@@ -201,7 +237,7 @@ export function PreferencesForm({
         <Button type="submit" disabled={pending}>
           {pending && <Loader2 className="animate-spin" />} Simpan preferensi
         </Button>
-        {state.ok && <Saved />}
+        {saved && <Saved />}
       </div>
     </form>
   );
