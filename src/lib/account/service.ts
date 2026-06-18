@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -31,6 +31,28 @@ export async function hasLinkedAccount(userId: string, providerId: string) {
 
 export async function hasGoogleAccount(userId: string) {
   return hasLinkedAccount(userId, "google");
+}
+
+export async function hasPasswordAccount(userId: string) {
+  const [row] = await db
+    .select({ id: account.id })
+    .from(account)
+    .where(
+      and(
+        eq(account.userId, userId),
+        eq(account.providerId, "credential"),
+        isNotNull(account.password),
+      ),
+    )
+    .limit(1);
+
+  return Boolean(row);
+}
+
+export async function unlinkGoogleAccount(userId: string) {
+  await db
+    .delete(account)
+    .where(and(eq(account.userId, userId), eq(account.providerId, "google")));
 }
 
 export async function updateUserProfileDisplayName(

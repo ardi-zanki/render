@@ -64,6 +64,7 @@ export function AppShell({
   notifications,
   isAdmin,
   googleConnected,
+  passwordReady,
   storageUsage,
   children,
 }: {
@@ -75,6 +76,7 @@ export function AppShell({
   notifications: NotificationItem[];
   isAdmin: boolean;
   googleConnected: boolean;
+  passwordReady: boolean;
   storageUsage: UserStorageUsage;
   children: ReactNode;
 }) {
@@ -292,6 +294,7 @@ export function AppShell({
             user={user}
             preferences={preferences}
             googleConnected={googleConnected}
+            passwordReady={passwordReady}
             storageUsage={storageUsage}
             compact={!expanded}
           />

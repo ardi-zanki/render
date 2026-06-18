@@ -42,12 +42,14 @@ export function UserMenu({
   user,
   preferences,
   googleConnected,
+  passwordReady,
   storageUsage,
   compact = false,
 }: {
   user: MenuUser;
   preferences: MenuPreferences;
   googleConnected: boolean;
+  passwordReady: boolean;
   storageUsage: UserStorageUsage;
   compact?: boolean;
 }) {
@@ -194,6 +196,7 @@ export function UserMenu({
           user={user}
           preferences={preferences}
           googleConnected={googleConnected}
+          passwordReady={passwordReady}
           storageUsage={storageUsage}
           onClose={() => setSettingsOpen(false)}
         />

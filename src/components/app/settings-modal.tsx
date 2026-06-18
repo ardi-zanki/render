@@ -17,6 +17,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
+  GoogleAccountForm,
   PasswordForm,
   PreferencesForm,
   ProfileForm,
@@ -94,12 +95,14 @@ export function SettingsModal({
   user,
   preferences,
   googleConnected,
+  passwordReady,
   storageUsage,
   onClose,
 }: {
   user: SettingsUser;
   preferences: SettingsPreferences;
   googleConnected: boolean;
+  passwordReady: boolean;
   storageUsage: UserStorageUsage;
   onClose: () => void;
 }) {
@@ -258,7 +261,7 @@ export function SettingsModal({
               </p>
             </div>
 
-            <PasswordForm />
+            <PasswordForm passwordReady={passwordReady} />
 
             <div className="rounded-lg border border-border/80 bg-background/60 p-4">
               <div className="flex items-start gap-3">
@@ -289,6 +292,13 @@ export function SettingsModal({
                       ? "Akun Google Anda terhubung untuk login cepat."
                       : "Belum terhubung. Anda login dengan email dan password."}
                   </p>
+                  <div className="mt-4">
+                    <GoogleAccountForm
+                      email={user.email}
+                      googleConnected={googleConnected}
+                      passwordReady={passwordReady}
+                    />
+                  </div>
                 </div>
                 <Badge variant={googleConnected ? "success" : "secondary"}>
                   {googleConnected ? "Terhubung" : "Belum"}
