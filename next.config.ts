@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
     "kysely",
     "sharp",
   ],
+  outputFileTracingIncludes: {
+    "/*": ["./node_modules/sharp/**/*", "./node_modules/@img/**/*"],
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
