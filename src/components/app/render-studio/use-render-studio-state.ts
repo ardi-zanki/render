@@ -5,6 +5,9 @@ import { useEffect, useRef, useState } from "react";
 import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
 import type { Scene, StudioView } from "./types";
 
+const clampZoom = (value: number) =>
+  Math.min(3, Math.max(0.5, Number(value.toFixed(2))));
+
 export function useRenderStudioState({
   defaultRenderMode,
   defaultOutputFormat,
@@ -136,16 +139,22 @@ export function useRenderStudioState({
     })();
   }, [initialImageUrl]);
 
+  function setZoomValue(next: number | ((value: number) => number)) {
+    setZoom((value) =>
+      clampZoom(typeof next === "function" ? next(value) : next),
+    );
+  }
+
   function zoomOut() {
-    setZoom((value) => Math.max(0.5, Number((value - 0.25).toFixed(2))));
+    setZoomValue((value) => value - 0.25);
   }
 
   function zoomIn() {
-    setZoom((value) => Math.min(3, Number((value + 0.25).toFixed(2))));
+    setZoomValue((value) => value + 0.25);
   }
 
   function resetZoom() {
-    setZoom(1);
+    setZoomValue(1);
   }
 
   return {
@@ -190,6 +199,7 @@ export function useRenderStudioState({
     comparisonPosition,
     setComparisonPosition,
     zoom,
+    setZoom: setZoomValue,
     balance,
     setBalance,
     scenes,

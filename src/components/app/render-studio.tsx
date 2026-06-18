@@ -255,6 +255,7 @@ export function RenderStudio({
             comparisonPosition={state.comparisonPosition}
             setComparisonPosition={state.setComparisonPosition}
             zoom={state.zoom}
+            setZoom={state.setZoom}
             zoomOut={state.zoomOut}
             zoomIn={state.zoomIn}
             resetZoom={state.resetZoom}
