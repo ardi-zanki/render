@@ -22,9 +22,15 @@ vi.mock("@/lib/rate-limit", () => ({
   },
 }));
 
-vi.mock("@/lib/renders/service", () => ({
+vi.mock("@/lib/renders/archive-delete", () => ({
   deleteRenderPermanently: mocks.deleteRenderPermanently,
+}));
+
+vi.mock("@/lib/renders/queries", () => ({
   getRenderDetail: mocks.getRenderDetail,
+}));
+
+vi.mock("@/lib/renders/update", () => ({
   moveRenderToProject: vi.fn(),
 }));
 

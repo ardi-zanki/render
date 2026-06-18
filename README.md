@@ -18,10 +18,10 @@ PRD lengkap di `../RenderAI_PRD_Final/`.
 | Language     | TypeScript 6.0.3                                    |
 | CSS          | Tailwind CSS v4.3                                   |
 | Komponen     | Custom UI primitives di `src/components/ui`         |
-| Ikon         | `lucide-react` 1.18                                 |
+| Ikon         | `lucide-react` 1.20                                 |
 | Tema         | Local `ThemeProvider` (light/dark/system, class-based) |
 | Font         | Plus Jakarta Sans (teks) · Geist Mono (angka/kode) |
-| Testing      | Vitest 4.1 + Playwright 1.60                        |
+| Testing      | Vitest 4.1 + Playwright 1.61                        |
 
 Stack lengkap (auth, DB, storage, payment, AI provider) ada di PRD §5.
 
@@ -194,7 +194,7 @@ Sidebar behavior:
 
 - Header uses a compact text-only **RenderAI.** wordmark with a panel toggle.
 - **Buat render** opens the Studio.
-- **Search** opens a command menu with a quick **Buat Render** action and recent
+- **Cari render** opens a command menu with a quick **Buat Render** action and recent
   renders. Search is global across render data only; selecting a result opens
   `/renders/[id]`.
 - Page-level search on `/projects`, `/projects/[id]`, and `/renders` is
@@ -220,10 +220,10 @@ point: `POST /api/renders` (multipart upload). In local development,
 for convenience. In production, use `RENDER_PROCESSING_MODE=worker` so the web
 service only enqueues jobs and `pnpm worker` processes the queue.
 
-- **Render Studio** (`/renders/new`) — the workspace: mode (Interior/Exterior/
-  Style Transfer/Upscale), editable render name, style, location, time &
-  weather, image upload, instruction, **Render**, before/after comparison,
-  download/share, and a scene grid.
+- **Render Studio** (`/renders/new`) — the workspace: editable render name,
+  Interior/Exterior configuration, style, location, time & weather, image
+  upload, sticky instruction prompt, **Render**, before/after comparison,
+  wheel/trackpad zoom, texture edit, and version history.
 - **Open Studio** from a render detail or share page opens `/renders/new` with
   the source render loaded, config pre-filled, and prior versions available.
 - **Edit Texture** lets users select a region and apply a texture from Library,
