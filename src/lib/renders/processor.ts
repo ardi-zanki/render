@@ -124,6 +124,20 @@ async function processLockedJob(jobId: string) {
       throw new Error("Provider tidak mengembalikan hasil render");
     }
 
+    const currentJob = await db.query.renderJobs.findFirst({
+      where: eq(renderJobs.id, job.id),
+    });
+    const currentRender = await db.query.renders.findFirst({
+      where: eq(renders.id, render.id),
+    });
+    if (
+      !currentJob ||
+      currentJob.status !== "processing" ||
+      currentRender?.status === "cancelled"
+    ) {
+      return { processed: false, reason: "job_cancelled" as const };
+    }
+
     // An edit (job.editId set) appends a new version; the initial render
     // replaces any partial result from a prior failed attempt.
     const isEdit = Boolean(job.editId);
