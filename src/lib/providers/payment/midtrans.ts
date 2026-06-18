@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto";
 
 import { env } from "@/env";
-import { midtransWebhookSchema } from "@/lib/validations/payment";
+import {
+  midtransTransactionStatusSchema,
+  midtransWebhookSchema,
+} from "@/lib/validations/payment";
 import { mapMidtransStatus } from "./status";
 import type { PaymentProvider } from "./types";
 
@@ -9,6 +12,20 @@ function snapBase() {
   return env.MIDTRANS_IS_PRODUCTION
     ? "https://app.midtrans.com"
     : "https://app.sandbox.midtrans.com";
+}
+
+function apiBase() {
+  return env.MIDTRANS_IS_PRODUCTION
+    ? "https://api.midtrans.com"
+    : "https://api.sandbox.midtrans.com";
+}
+
+function authHeader() {
+  if (!env.MIDTRANS_SERVER_KEY) {
+    throw new Error("MIDTRANS_SERVER_KEY belum dikonfigurasi");
+  }
+  const auth = Buffer.from(`${env.MIDTRANS_SERVER_KEY}:`).toString("base64");
+  return `Basic ${auth}`;
 }
 
 /**
@@ -21,16 +38,12 @@ export function createMidtransProvider(): PaymentProvider {
     name: "midtrans",
 
     async createPayment(input) {
-      if (!env.MIDTRANS_SERVER_KEY) {
-        throw new Error("MIDTRANS_SERVER_KEY belum dikonfigurasi");
-      }
-      const auth = Buffer.from(`${env.MIDTRANS_SERVER_KEY}:`).toString("base64");
       const finishUrl = `${env.APP_URL.replace(/\/$/, "")}/payments/finish`;
 
       const res = await fetch(`${snapBase()}/snap/v1/transactions`, {
         method: "POST",
         headers: {
-          Authorization: `Basic ${auth}`,
+          Authorization: authHeader(),
           "Content-Type": "application/json",
           Accept: "application/json",
         },
@@ -70,6 +83,38 @@ export function createMidtransProvider(): PaymentProvider {
         snapToken: json.token,
         paymentUrl: json.redirect_url,
         raw: json,
+      };
+    },
+
+    async getPaymentStatus(providerOrderId) {
+      const res = await fetch(
+        `${apiBase()}/v2/${encodeURIComponent(providerOrderId)}/status`,
+        {
+          headers: {
+            Authorization: authHeader(),
+            Accept: "application/json",
+          },
+          cache: "no-store",
+        },
+      );
+      const json = (await res.json()) as unknown;
+      if (!res.ok) {
+        throw new Error(
+          `Midtrans status error: ${JSON.stringify(json).slice(0, 200)}`,
+        );
+      }
+
+      const parsed = midtransTransactionStatusSchema.safeParse(json);
+      if (!parsed.success) {
+        throw new Error("Status transaksi Midtrans tidak valid");
+      }
+      const b = parsed.data;
+
+      return {
+        providerOrderId: b.order_id,
+        providerTransactionId: b.transaction_id,
+        status: mapMidtransStatus(b.transaction_status, b.fraud_status),
+        raw: b,
       };
     },
 

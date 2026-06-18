@@ -27,6 +27,7 @@ type QueueResponse = {
 // Completed renders stay in the panel until the user opens them; we remember
 // which ones were opened (per browser) so they don't reappear on refresh.
 const SEEN_KEY = "renderai.queue.seen";
+export const RENDER_QUEUE_REFRESH_EVENT = "renderai:queue-refresh";
 
 function loadSeen(): Set<string> {
   if (typeof window === "undefined") return new Set();
@@ -81,12 +82,25 @@ export function useRenderQueue(intervalMs = 10_000) {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => void refresh(), 0);
+    return () => window.clearTimeout(timeout);
+  }, [refresh]);
+
+  const hasActiveJob = rawItems.some(
+    (item) => item.status === "queued" || item.status === "processing",
+  );
+
+  useEffect(() => {
+    if (!hasActiveJob) return;
     const interval = window.setInterval(() => void refresh(), intervalMs);
-    return () => {
-      window.clearTimeout(timeout);
-      window.clearInterval(interval);
-    };
-  }, [intervalMs, refresh]);
+    return () => window.clearInterval(interval);
+  }, [hasActiveJob, intervalMs, refresh]);
+
+  useEffect(() => {
+    const onQueueRefresh = () => void refresh();
+    window.addEventListener(RENDER_QUEUE_REFRESH_EVENT, onQueueRefresh);
+    return () =>
+      window.removeEventListener(RENDER_QUEUE_REFRESH_EVENT, onQueueRefresh);
+  }, [refresh]);
 
   // Dismiss a completed item once the user opens it.
   const markSeen = useCallback((renderId: string) => {
@@ -110,4 +124,9 @@ export function useRenderQueue(intervalMs = 10_000) {
   );
 
   return { count: items.length, items, loading, error, refresh, markSeen };
+}
+
+export function notifyRenderQueueChanged() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(RENDER_QUEUE_REFRESH_EVENT));
 }

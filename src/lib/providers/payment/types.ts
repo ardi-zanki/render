@@ -33,6 +33,8 @@ export interface NormalizedWebhook {
 export interface PaymentProvider {
   readonly name: string;
   createPayment(input: CreatePaymentInput): Promise<CreatePaymentResult>;
+  /** Fetch provider state for a known order. Used as a user-return fallback. */
+  getPaymentStatus?(providerOrderId: string): Promise<NormalizedWebhook>;
   /** Verify a webhook (signature) and normalize it; throws if invalid. */
   verifyAndParseWebhook(req: WebhookRequest): Promise<NormalizedWebhook>;
 }

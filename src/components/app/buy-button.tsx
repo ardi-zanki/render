@@ -8,13 +8,20 @@ import { Button } from "@/components/ui/button";
 import { apiErrorMessage, postJson } from "@/lib/client-api";
 
 type SnapCallbacks = {
-  onSuccess?: () => void;
-  onPending?: () => void;
-  onError?: () => void;
+  onSuccess?: (result?: SnapResult) => void | Promise<void>;
+  onPending?: (result?: SnapResult) => void;
+  onError?: (result?: SnapResult) => void;
   onClose?: () => void;
 };
 
+type SnapResult = {
+  order_id?: string;
+  transaction_status?: string;
+  status_code?: string;
+};
+
 type CheckoutResponse = {
+  orderId: string;
   provider: string;
   token?: string;
   redirectUrl?: string;
@@ -37,6 +44,22 @@ export function BuyButton({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  function finishHref(status: "success" | "pending" | "error", orderId?: string) {
+    const params = new URLSearchParams({ status });
+    if (orderId) params.set("order", orderId);
+    return `/payments/finish?${params.toString()}`;
+  }
+
+  async function syncPayment(orderId?: string) {
+    if (!orderId) return;
+    try {
+      await postJson("/api/payments/sync", { orderId });
+    } catch {
+      // The finish page and webhook remain the source of truth; this browser
+      // sync is only a fast-path after Snap reports success.
+    }
+  }
+
   async function buy() {
     setLoading(true);
     setError("");
@@ -47,9 +70,15 @@ export function BuyButton({
 
       if (json.provider === "midtrans" && json.token && window.snap) {
         window.snap.pay(json.token, {
-          onSuccess: () => router.push("/payments/finish?status=success"),
-          onPending: () => router.push("/payments/finish?status=pending"),
-          onError: () => router.push("/payments/finish?status=error"),
+          onSuccess: async (result) => {
+            const orderId = result?.order_id ?? json.orderId;
+            await syncPayment(orderId);
+            router.push(finishHref("success", orderId));
+          },
+          onPending: (result) =>
+            router.push(finishHref("pending", result?.order_id ?? json.orderId)),
+          onError: (result) =>
+            router.push(finishHref("error", result?.order_id ?? json.orderId)),
           onClose: () => setLoading(false),
         });
       } else if (json.redirectUrl) {

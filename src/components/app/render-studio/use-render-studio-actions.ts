@@ -4,6 +4,7 @@ import type { Dispatch, RefObject, SetStateAction } from "react";
 import { toast } from "sonner";
 
 import type { PollHandlers, PolledRender } from "@/hooks/use-render-status-polling";
+import { notifyRenderQueueChanged } from "@/hooks/use-render-queue";
 import {
   apiErrorMessage,
   apiFieldErrors,
@@ -149,6 +150,7 @@ export function useRenderStudioActions({
       state.setRenderStatus(json.status ?? "queued");
       state.setResultRenderId(json.renderId);
       state.setBalance((balance) => json.balance ?? balance - 1);
+      notifyRenderQueueChanged();
       toast.success("Edit masuk antrean");
       pollRenderStatus(json.renderId, {
         success: "Edit selesai!",
@@ -214,6 +216,7 @@ export function useRenderStudioActions({
         { id: json.renderId, mode: state.mode, status: "queued", resultUrl: null },
         ...scenes,
       ]);
+      notifyRenderQueueChanged();
       toast.success("Render masuk antrean");
       pollRenderStatus(
         json.renderId,
@@ -333,6 +336,7 @@ export function useRenderStudioActions({
       state.setRenderStatus(json.status ?? "queued");
       state.setResultRenderId(json.renderId);
       state.setBalance((balance) => json.balance ?? balance - 1);
+      notifyRenderQueueChanged();
       toast.success("Edit tekstur masuk antrean");
       setStudioMode("render");
       state.setView("result");
