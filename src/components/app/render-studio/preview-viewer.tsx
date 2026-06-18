@@ -58,6 +58,7 @@ export function RenderPreviewViewer({
   comparisonPosition,
   setComparisonPosition,
   zoom,
+  setZoom,
   zoomOut,
   zoomIn,
   resetZoom,
@@ -95,6 +96,7 @@ export function RenderPreviewViewer({
   comparisonPosition: number;
   setComparisonPosition: (position: number) => void;
   zoom: number;
+  setZoom: (next: number | ((value: number) => number)) => void;
   zoomOut: () => void;
   zoomIn: () => void;
   resetZoom: () => void;
@@ -120,6 +122,7 @@ export function RenderPreviewViewer({
   textureCanvas?: ReactNode;
   textureToolbar?: ReactNode;
 }) {
+  const canvasRef = useRef<HTMLDivElement>(null);
   const comparisonStageRef = useRef<HTMLDivElement>(null);
   const comparisonImageRef = useRef<HTMLImageElement>(null);
   const comparisonDraggingRef = useRef(false);
@@ -304,6 +307,30 @@ export function RenderPreviewViewer({
   const canRemoveImage = Boolean(
     allowRemoveImage && hasUploadedImage && !isProcessing,
   );
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !hasCanvasContent) return;
+
+    const handleCanvasWheel = (event: WheelEvent) => {
+      if (!hasCanvasContent) return;
+      event.preventDefault();
+      event.stopPropagation();
+
+      const delta =
+        Math.abs(event.deltaY) >= Math.abs(event.deltaX)
+          ? event.deltaY
+          : event.deltaX;
+      if (delta === 0) return;
+
+      const speed = event.ctrlKey || event.metaKey ? 0.006 : 0.0025;
+      setZoom((value) => value - delta * speed);
+    };
+
+    canvas.addEventListener("wheel", handleCanvasWheel, { passive: false });
+    return () => {
+      canvas.removeEventListener("wheel", handleCanvasWheel);
+    };
+  }, [hasCanvasContent, setZoom]);
 
   return (
     <div className="flex flex-col gap-3 lg:h-full lg:min-h-0">
@@ -486,6 +513,7 @@ export function RenderPreviewViewer({
       )}
 
       <div
+        ref={canvasRef}
         className={cn(
           "relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg lg:aspect-auto lg:min-h-0 lg:flex-1",
           hasCanvasContent
@@ -507,18 +535,21 @@ export function RenderPreviewViewer({
               <RenderImage
                 ref={comparisonImageRef}
                 src={previewUrl ?? ""}
-                alt="Gambar asli"
+                alt=""
                 draggable={false}
                 onLoad={measureComparisonBounds}
-                className="absolute inset-0 size-full select-none object-contain transition-transform"
-                style={{
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "center",
-                }}
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 size-full select-none object-contain opacity-0"
               />
 
               {canShowComparisonOverlay && comparisonFrameStyle && (
                 <div className="absolute" style={comparisonFrameStyle}>
+                  <RenderImage
+                    src={previewUrl ?? ""}
+                    alt="Gambar asli"
+                    draggable={false}
+                    className="size-full select-none object-contain"
+                  />
                   <div
                     className="pointer-events-none absolute inset-0 overflow-hidden"
                     style={comparisonClipStyle}
