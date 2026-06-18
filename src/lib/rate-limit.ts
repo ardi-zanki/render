@@ -19,6 +19,7 @@ export const RATE_LIMITS = {
   upload_image: { limit: 20, windowSec: 600 },
   create_render: { limit: 10, windowSec: 600 },
   create_payment: { limit: 10, windowSec: 600 },
+  payment_sync: { limit: 30, windowSec: 60 },
   payment_webhook: { limit: 120, windowSec: 60 },
   admin_action: { limit: 60, windowSec: 60 },
   public_api: { limit: 60, windowSec: 60 },

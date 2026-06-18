@@ -26,6 +26,20 @@ export class PackageNotFoundError extends Error {
   }
 }
 
+export class PaymentNotFoundError extends Error {
+  constructor() {
+    super("Pembayaran tidak ditemukan");
+    this.name = "PaymentNotFoundError";
+  }
+}
+
+export class PaymentSyncUnsupportedError extends Error {
+  constructor() {
+    super("Provider pembayaran belum mendukung sinkronisasi status");
+    this.name = "PaymentSyncUnsupportedError";
+  }
+}
+
 export interface CheckoutResult {
   orderId: string;
   provider: string;
@@ -210,6 +224,37 @@ export async function handlePaymentNotification(webhook: NormalizedWebhook) {
     });
   }
   return { handled: true, reason: webhook.status };
+}
+
+export async function syncPaymentStatus(userId: string, orderId: string) {
+  const payment = await db.query.payments.findFirst({
+    where: and(
+      eq(payments.userId, userId),
+      eq(payments.providerOrderId, orderId),
+    ),
+  });
+  if (!payment) throw new PaymentNotFoundError();
+
+  const provider = paymentProvider();
+  if (!provider.getPaymentStatus) throw new PaymentSyncUnsupportedError();
+
+  const webhook = await provider.getPaymentStatus(orderId);
+  const result = await handlePaymentNotification(webhook);
+  const updated = await getPaymentForUser(userId, orderId);
+
+  return {
+    ...result,
+    status: updated?.status ?? payment.status,
+  };
+}
+
+export async function getPaymentForUser(userId: string, orderId: string) {
+  return db.query.payments.findFirst({
+    where: and(
+      eq(payments.userId, userId),
+      eq(payments.providerOrderId, orderId),
+    ),
+  });
 }
 
 export async function countPayments(userId: string): Promise<number> {

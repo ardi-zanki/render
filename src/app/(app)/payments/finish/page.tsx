@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getBalance } from "@/lib/credits";
+import { getPaymentForUser } from "@/lib/payments/service";
 import { requireVerifiedUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Status Pembayaran" };
@@ -19,8 +20,8 @@ const VARIANTS = {
   pending: {
     icon: Clock,
     color: "text-warning",
-    title: "Pembayaran Diproses",
-    desc: "Pembayaran Anda sedang menunggu konfirmasi. Kredit ditambahkan setelah lunas.",
+    title: "Menunggu konfirmasi",
+    desc: "Pembayaran sedang menunggu konfirmasi dari Midtrans. Kredit akan ditambahkan otomatis setelah transaksi lunas.",
   },
   failed: {
     icon: XCircle,
@@ -33,15 +34,25 @@ const VARIANTS = {
 export default async function PaymentFinishPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; order?: string; order_id?: string }>;
 }) {
-  const { status } = await searchParams;
+  const { status, order, order_id: orderIdParam } = await searchParams;
   const { user } = await requireVerifiedUser();
-  const balance = await getBalance(user.id);
+  const orderId = order ?? orderIdParam;
+  const [balance, payment] = await Promise.all([
+    getBalance(user.id),
+    orderId ? getPaymentForUser(user.id, orderId) : Promise.resolve(null),
+  ]);
 
-  const key = (
-    status === "success" || status === "pending" ? status : "failed"
-  ) as keyof typeof VARIANTS;
+  const key = payment
+    ? payment.status === "paid"
+      ? "success"
+      : payment.status === "pending"
+        ? "pending"
+        : "failed"
+    : status === "success" || status === "pending"
+      ? status
+      : "failed";
   const v = VARIANTS[key];
   const Icon = v.icon;
 
