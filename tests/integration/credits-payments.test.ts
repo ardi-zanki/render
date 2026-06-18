@@ -27,6 +27,7 @@ async function modules() {
     credits,
     paymentsService,
     paymentProviderModule,
+    projectsService,
     rendersService,
     storageModule,
   ] = await Promise.all([
@@ -35,6 +36,7 @@ async function modules() {
     import("@/lib/credits"),
     import("@/lib/payments/service"),
     import("@/lib/providers/payment"),
+    import("@/lib/projects/service"),
     import("@/lib/renders/service"),
     import("@/lib/storage"),
   ]);
@@ -45,6 +47,7 @@ async function modules() {
     ...credits,
     ...paymentsService,
     ...paymentProviderModule,
+    ...projectsService,
     ...rendersService,
     ...storageModule,
   };
@@ -548,7 +551,7 @@ describe("render workflow integration", () => {
       getBalance,
       notifications,
       processRenderJob,
-      projects,
+      coverImagesByProject,
       renderAssets,
       renderJobs,
       renders,
@@ -610,10 +613,8 @@ describe("render workflow integration", () => {
     expect(assets.some((asset) => asset.type === "original")).toBe(true);
     expect(assets.some((asset) => asset.type === "result")).toBe(true);
 
-    const updatedProject = await db.query.projects.findFirst({
-      where: eq(projects.id, project.id),
-    });
-    expect(updatedProject?.coverImageUrl).toBeTruthy();
+    const covers = await coverImagesByProject(testUser.id, [project.id]);
+    expect(covers.get(project.id)).toBeTruthy();
 
     const renderNotifications = await db.query.notifications.findMany({
       where: eq(notifications.userId, testUser.id),

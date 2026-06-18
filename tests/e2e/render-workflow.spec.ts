@@ -39,7 +39,7 @@ test("user can login and create a mock render", async ({ page }) => {
   });
 
   // Pick a couple of controls so the persisted config can be asserted later.
-  await page.locator("#style").selectOption("modern");
+  await page.locator("#style").selectOption("contemporary");
   await page.locator("#location").fill("Bandung E2E");
 
   await expect(page.getByRole("tab", { name: "Asli" })).toBeVisible();
@@ -102,7 +102,7 @@ test("user can login and create a mock render", async ({ page }) => {
     page.getByRole("link", { name: "Render Studio" }),
   ).toBeVisible();
   await expect(page.getByRole("tab", { name: "Komparasi" })).toBeVisible();
-  await expect(page.locator("#style")).toHaveValue("modern");
+  await expect(page.locator("#style")).toHaveValue("contemporary");
   await expect(page.locator("#location")).toHaveValue("Bandung E2E");
   for (const name of ["Asli", "Komparasi", "Hasil"]) {
     await expect(
@@ -112,7 +112,7 @@ test("user can login and create a mock render", async ({ page }) => {
 
   // Edit-in-place: changing config and rendering adds a NEW version to the SAME
   // render (no new record) and charges a credit.
-  await page.locator("#style").selectOption("industrial");
+  await page.locator("#style").selectOption("brutalist");
   await page.getByRole("button", { name: "Render", exact: true }).click();
   await expect(
     page.getByText("Edit masuk antrean", { exact: true }),
@@ -151,7 +151,7 @@ test("user can login and create a mock render", async ({ page }) => {
   // Sidebar search opens a command menu with recent renders and navigates to a
   // selected render. Filtering is automatic through the debounced input.
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: "Cari", exact: true }).click();
+  await page.getByRole("button", { name: "Cari render", exact: true }).click();
   await expect(page.getByText("Render terbaru", { exact: true })).toBeVisible();
   await page.getByPlaceholder("Cari render...").fill("Interior");
   const commandResult = page.getByRole("button", {

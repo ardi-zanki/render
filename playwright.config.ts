@@ -9,6 +9,7 @@ const e2eEnvOverrides = {
   BETTER_AUTH_URL: "http://localhost:3210",
   PAYMENT_PROVIDER: "mock",
   RATE_LIMIT_ENABLED: "false",
+  RENDER_PROCESSING_MODE: "inline",
   STORAGE_PROVIDER: "local",
 };
 
@@ -39,7 +40,7 @@ export default defineConfig({
     command: "pnpm dev",
     env: webServerEnv,
     url: "http://localhost:3210",
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
   projects: [
