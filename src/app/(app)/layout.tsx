@@ -1,7 +1,11 @@
 import { cookies } from "next/headers";
 
 import { AppShell } from "@/components/app/app-shell";
-import { getUserProfile, hasGoogleAccount } from "@/lib/account/service";
+import {
+  getUserProfile,
+  hasGoogleAccount,
+  hasPasswordAccount,
+} from "@/lib/account/service";
 import { getBalance } from "@/lib/credits";
 import {
   getUnreadCount,
@@ -18,13 +22,21 @@ export default async function AppLayout({
   const session = await requireVerifiedUser();
   const cookieStore = await cookies();
   const sidebarCookie = cookieStore.get("renderai_sidebar_expanded")?.value;
-  const [balance, unreadCount, recent, profile, googleConnected, storageUsage] =
-    await Promise.all([
+  const [
+    balance,
+    unreadCount,
+    recent,
+    profile,
+    googleConnected,
+    passwordReady,
+    storageUsage,
+  ] = await Promise.all([
       getBalance(session.user.id),
       getUnreadCount(session.user.id),
       listNotifications(session.user.id, 8),
       getUserProfile(session.user.id),
       hasGoogleAccount(session.user.id),
+      hasPasswordAccount(session.user.id),
       getUserStorageUsage(session.user.id),
     ]);
 
@@ -46,6 +58,7 @@ export default async function AppLayout({
       unreadCount={unreadCount}
       isAdmin={session.user.role === "admin"}
       googleConnected={googleConnected}
+      passwordReady={passwordReady}
       storageUsage={storageUsage}
       notifications={recent.map((n) => ({
         id: n.id,

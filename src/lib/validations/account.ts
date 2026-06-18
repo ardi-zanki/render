@@ -26,6 +26,17 @@ export const changePasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const setPasswordSchema = z
+  .object({
+    newPassword: z.string().min(8, "Password minimal 8 karakter").max(128),
+    confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    error: "Konfirmasi password tidak cocok",
+    path: ["confirmPassword"],
+  });
+
 export type ProfileInput = z.infer<typeof profileSchema>;
 export type PreferencesInput = z.infer<typeof preferencesSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type SetPasswordInput = z.infer<typeof setPasswordSchema>;

@@ -1,7 +1,16 @@
 "use client";
 
-import { BadgeCheck, Check, Loader2, ShieldAlert } from "lucide-react";
-import { useActionState, useEffect, useState } from "react";
+import {
+  BadgeCheck,
+  Check,
+  KeyRound,
+  Link2,
+  Loader2,
+  ShieldAlert,
+  Unlink,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { PasswordInput } from "@/components/auth/password-input";
@@ -12,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import {
+  disconnectGoogleAction,
+  setPasswordAction,
   updatePreferencesAction,
   updateProfileAction,
   type ActionState,
@@ -188,7 +199,76 @@ export function PreferencesForm({
   );
 }
 
-export function PasswordForm() {
+function SetPasswordForm() {
+  const router = useRouter();
+  const [state, action, pending] = useActionState(setPasswordAction, initial);
+  const [clearedFields, setClearedFields] = useState<Record<string, boolean>>({});
+  const fieldErrors = state.fieldErrors ?? {};
+
+  useEffect(() => {
+    if (!state.ok) return;
+    toast.success("Password berhasil dibuat");
+    router.refresh();
+  }, [router, state.ok]);
+
+  return (
+    <form
+      action={action}
+      className="flex flex-col gap-4"
+      noValidate
+      onSubmit={() => setClearedFields({})}
+    >
+      {state.error && (
+        <Alert variant="destructive">
+          <AlertDescription>{state.error}</AlertDescription>
+        </Alert>
+      )}
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="setNewPassword">Password baru</Label>
+        <PasswordInput
+          id="setNewPassword"
+          name="newPassword"
+          autoComplete="new-password"
+          aria-invalid={!!fieldErrors.newPassword && !clearedFields.newPassword}
+          onChange={() =>
+            setClearedFields((prev) => ({ ...prev, newPassword: true }))
+          }
+        />
+        {fieldErrors.newPassword && !clearedFields.newPassword && (
+          <p className="text-xs text-destructive">{fieldErrors.newPassword}</p>
+        )}
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="setConfirmPassword">Konfirmasi password baru</Label>
+        <PasswordInput
+          id="setConfirmPassword"
+          name="confirmPassword"
+          autoComplete="new-password"
+          aria-invalid={
+            !!fieldErrors.confirmPassword && !clearedFields.confirmPassword
+          }
+          onChange={() =>
+            setClearedFields((prev) => ({ ...prev, confirmPassword: true }))
+          }
+        />
+        {fieldErrors.confirmPassword && !clearedFields.confirmPassword && (
+          <p className="text-xs text-destructive">
+            {fieldErrors.confirmPassword}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center gap-3">
+        <Button type="submit" disabled={pending}>
+          {pending ? <Loader2 className="animate-spin" /> : <KeyRound />}
+          Buat password
+        </Button>
+        {state.ok && <Saved />}
+      </div>
+    </form>
+  );
+}
+
+function ChangePasswordForm() {
   const [values, setValues] = useState({
     currentPassword: "",
     newPassword: "",
@@ -290,5 +370,118 @@ export function PasswordForm() {
         {done && <Saved />}
       </div>
     </form>
+  );
+}
+
+export function PasswordForm({ passwordReady }: { passwordReady: boolean }) {
+  return passwordReady ? <ChangePasswordForm /> : <SetPasswordForm />;
+}
+
+export function GoogleAccountForm({
+  email,
+  googleConnected,
+  passwordReady,
+}: {
+  email: string;
+  googleConnected: boolean;
+  passwordReady: boolean;
+}) {
+  const router = useRouter();
+  const [connecting, setConnecting] = useState(false);
+  const [connectError, setConnectError] = useState("");
+  const [disconnectError, setDisconnectError] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  async function connectGoogle() {
+    setConnecting(true);
+    setConnectError("");
+    try {
+      const response = await fetch("/api/auth/link-social", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          provider: "google",
+          callbackURL: "/dashboard",
+          errorCallbackURL: "/dashboard?google=link-error",
+          disableRedirect: true,
+        }),
+      });
+      const json = (await response.json()) as {
+        url?: string;
+        error?: { message?: string };
+        message?: string;
+      };
+      if (!response.ok || !json.url) {
+        throw new Error(
+          json.error?.message || json.message || "Gagal menghubungkan Google.",
+        );
+      }
+      window.location.href = json.url;
+    } catch (err) {
+      setConnecting(false);
+      setConnectError(
+        err instanceof Error ? err.message : "Gagal menghubungkan Google.",
+      );
+    }
+  }
+
+  function disconnectGoogle() {
+    setDisconnectError("");
+    startTransition(() => {
+      void (async () => {
+        const result = await disconnectGoogleAction();
+        if (result.error) {
+          setDisconnectError(result.error);
+          return;
+        }
+        toast.success("Akun Google dilepas");
+        router.refresh();
+      })();
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {(connectError || disconnectError) && (
+        <Alert variant="destructive">
+          <AlertDescription>{connectError || disconnectError}</AlertDescription>
+        </Alert>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        {googleConnected ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={disconnectGoogle}
+            disabled={!passwordReady || isPending}
+            title={
+              passwordReady
+                ? undefined
+                : "Buat password sebelum melepas Google"
+            }
+          >
+            {isPending ? <Loader2 className="animate-spin" /> : <Unlink />}
+            Disconnect
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={connectGoogle}
+            disabled={connecting}
+          >
+            {connecting ? <Loader2 className="animate-spin" /> : <Link2 />}
+            Connect
+          </Button>
+        )}
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        Google yang dihubungkan harus memakai email {email}.
+      </p>
+    </div>
   );
 }
