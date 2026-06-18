@@ -366,7 +366,7 @@ export async function cancelRenderJob(
         isEdit
           ? {
               status: "success",
-              errorCode: null,
+              errorCode: "USER_CANCELLED",
               errorMessage: null,
               failedAt: null,
             }
