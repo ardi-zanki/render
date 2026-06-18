@@ -1,5 +1,9 @@
-import { db } from "@/db";
-import { paymentPackages } from "@/db/schema";
+import { config } from "dotenv";
+
+config({ path: ".env.local" });
+
+const { db } = await import("@/db");
+const { paymentPackages } = await import("@/db/schema");
 
 /** Credit packages seed (PRD §23.2). Packages are managed via seed, not admin. */
 const packages = [
