@@ -34,19 +34,20 @@ export function RenderActionBar({
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           placeholder="Melengkapi konfigurasi — mis. ganti warna sofa…"
-          className="min-h-14 resize-none border-border/70 text-sm"
+          className="min-h-16 resize-none text-sm"
         />
       </div>
       <div className="flex">
         {balance <= 0 ? (
-          <Button asChild className="w-full">
+          <Button asChild size="sm" className="w-full gap-1 text-xs">
             <Link href="/payments">Top up</Link>
           </Button>
         ) : (
           <Button
+            size="sm"
             onClick={onRender}
             disabled={!canRender}
-            className="w-full"
+            className="w-full gap-1 text-xs [&_svg]:size-3.5"
           >
             {loading && <Loader2 className="animate-spin" />}
             Render

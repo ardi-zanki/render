@@ -302,12 +302,17 @@ export function ProjectsClient({
                         <FolderOpen className="size-7 text-muted-foreground" />
                       </div>
                     )}
+                    {p.isDefault && (
+                      <Badge
+                        variant="secondary"
+                        className="absolute left-2 top-2 bg-card/95 shadow-soft"
+                      >
+                        Default
+                      </Badge>
+                    )}
                   </div>
                   <CardContent className="py-3.5">
-                    <p className="flex items-center gap-2 truncate font-semibold text-foreground">
-                      {p.name}
-                      {p.isDefault && <Badge variant="secondary">Default</Badge>}
-                    </p>
+                    <p className="truncate font-semibold text-foreground">{p.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {p.renderCount} render · {dateFmt.format(new Date(p.updatedAt))}
                     </p>

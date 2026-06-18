@@ -73,7 +73,11 @@ export function StudioTitleBar({
         />
       ) : (
         <>
-          <span className="truncate text-sm font-semibold text-foreground">
+          <span
+            onDoubleClick={startRename}
+            title="Double click untuk rename"
+            className="cursor-text truncate rounded-sm text-sm font-semibold text-foreground"
+          >
             {name}
           </span>
           <button

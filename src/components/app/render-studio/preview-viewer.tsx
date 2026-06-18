@@ -63,7 +63,6 @@ export function RenderPreviewViewer({
   resetZoom,
   isProcessing,
   renderStatus,
-  file,
   pickFile,
   mode,
   referencePreviewUrl,
@@ -101,7 +100,6 @@ export function RenderPreviewViewer({
   resetZoom: () => void;
   isProcessing: boolean;
   renderStatus: string | null;
-  file: File | null;
   pickFile: (file: File | null) => void;
   mode: RenderMode;
   referencePreviewUrl: string | null;
@@ -303,16 +301,25 @@ export function RenderPreviewViewer({
   const showZoomControls = Boolean(
     studioMode === "texture" ? textureCanvas : shownImage,
   );
+  const canRemoveImage = Boolean(
+    allowRemoveImage && hasUploadedImage && !isProcessing,
+  );
 
   return (
     <div className="flex flex-col gap-3 lg:h-full lg:min-h-0">
       {showTopToolbar && (
         /* Sticky toolbar: view tabs (+ Edit) + canvas controls. */
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/80 bg-card px-2.5 py-2 shadow-soft sm:gap-3">
+        <div
+          className={cn(
+            "flex flex-wrap items-start justify-between gap-2 sm:items-center sm:gap-3",
+            !panelsCollapsed &&
+              "rounded-lg border border-border/80 bg-card px-2.5 py-2 shadow-soft",
+          )}
+        >
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             {panelsCollapsed && onExpandPanels && (
               // Reopen control, grouped with the view tabs (desktop only).
-              <div className="hidden items-center rounded-md bg-muted/80 p-1 lg:inline-flex">
+              <div className="hidden items-center rounded-md bg-muted/80 p-1 shadow-soft lg:inline-flex">
                 <button
                   type="button"
                   onClick={onExpandPanels}
@@ -338,8 +345,9 @@ export function RenderPreviewViewer({
               <div />
             )}
             {editAvailable && (
-              // Matches the sm Segmented above: muted track + py-1 text-xs pill.
-              <div className="inline-flex items-center rounded-md bg-muted/80 p-1">
+              // Desktop/tablet keeps Edit near the view tabs; mobile gets it on
+              // the right so the toolbar still feels balanced.
+              <div className="hidden items-center rounded-md bg-muted/80 p-1 sm:inline-flex">
                 <button
                   type="button"
                   onClick={() => {
@@ -348,7 +356,7 @@ export function RenderPreviewViewer({
                   }}
                   aria-pressed={studioMode === "texture"}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-sm px-3 py-1 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                    "inline-flex h-7 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
                     studioMode === "texture"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground",
@@ -361,56 +369,119 @@ export function RenderPreviewViewer({
           </div>
 
           {studioMode === "texture" && textureToolbar ? (
-            <div className="min-w-0 overflow-x-auto">{textureToolbar}</div>
-          ) : showZoomControls ? (
-            <div className="hidden h-8 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1 sm:inline-flex sm:h-9">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={zoomOut}
-                disabled={zoom <= 0.5}
-                aria-label="Zoom out"
-                title="Zoom out"
-                className="size-6 sm:size-7"
-              >
-                <ZoomOut />
-              </Button>
-              <button
-                type="button"
-                onClick={resetZoom}
-                className="h-6 min-w-10 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card sm:h-7 sm:min-w-11"
-                title="Reset zoom"
-              >
-                {Math.round(zoom * 100)}%
-              </button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={zoomIn}
-                disabled={zoom >= 3}
-                aria-label="Zoom in"
-                title="Zoom in"
-                className="size-6 sm:size-7"
-              >
-                <ZoomIn />
-              </Button>
-              {allowRemoveImage && file && !isProcessing && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => pickFile(null)}
-                  aria-label="Hapus gambar"
-                  title="Hapus gambar"
-                  className="size-6 sm:size-7"
-                >
-                  <X />
-                </Button>
+            <>
+              {editAvailable && (
+                <div className="inline-flex h-8 items-center rounded-md bg-muted/80 p-1 shadow-soft sm:hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setView("result");
+                      setStudioMode?.("texture");
+                    }}
+                    aria-pressed={studioMode === "texture"}
+                    className={cn(
+                      "inline-flex h-6 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                      studioMode === "texture"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-card hover:text-foreground",
+                    )}
+                  >
+                    <Pencil /> Edit
+                  </button>
+                </div>
+              )}
+              <div className="basis-full overflow-x-auto sm:min-w-0 sm:basis-auto">
+                {textureToolbar}
+              </div>
+            </>
+          ) : (
+            <div className="flex shrink-0 items-center">
+              {editAvailable && (
+                <div className="inline-flex h-8 items-center rounded-md bg-muted/80 p-1 shadow-soft sm:hidden">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setView("result");
+                      setStudioMode?.("texture");
+                    }}
+                    aria-pressed={studioMode === "texture"}
+                    className={cn(
+                      "inline-flex h-6 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                      studioMode === "texture"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-card hover:text-foreground",
+                    )}
+                  >
+                    <Pencil /> Edit
+                  </button>
+                </div>
+              )}
+              {!editAvailable && canRemoveImage && (
+                <div className="inline-flex h-8 items-center rounded-md bg-muted/80 p-1 shadow-soft sm:hidden">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => pickFile(null)}
+                    aria-label="Hapus gambar"
+                    title="Hapus gambar"
+                    className="size-6"
+                  >
+                    <X />
+                  </Button>
+                </div>
+              )}
+              {showZoomControls && (
+                <div className="hidden h-8 items-center gap-0.5 rounded-md bg-muted/80 p-1 shadow-soft sm:inline-flex sm:h-9">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={zoomOut}
+                    disabled={zoom <= 0.5}
+                    aria-label="Zoom out"
+                    title="Zoom out"
+                    className="size-6 sm:size-7"
+                  >
+                    <ZoomOut />
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={resetZoom}
+                    className="h-6 min-w-10 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card sm:h-7 sm:min-w-11"
+                    title="Reset zoom"
+                  >
+                    {Math.round(zoom * 100)}%
+                  </button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={zoomIn}
+                    disabled={zoom >= 3}
+                    aria-label="Zoom in"
+                    title="Zoom in"
+                    className="size-6 sm:size-7"
+                  >
+                    <ZoomIn />
+                  </Button>
+                  {canRemoveImage && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => pickFile(null)}
+                      aria-label="Hapus gambar"
+                      title="Hapus gambar"
+                      className="size-6 sm:size-7"
+                    >
+                      <X />
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
-          ) : null}
+          )}
         </div>
       )}
 
