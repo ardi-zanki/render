@@ -61,6 +61,7 @@ export interface RenderDetail {
   projectId: string;
   projectName: string;
   createdAt: Date;
+  updatedAt: Date;
   startedAt: Date | null;
   completedAt: Date | null;
   failedAt: Date | null;

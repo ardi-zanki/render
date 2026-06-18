@@ -1,9 +1,17 @@
 "use client";
 
-import { Lightbulb, PanelLeft, Plus } from "lucide-react";
+import {
+  Lightbulb,
+  MapPin,
+  PanelLeft,
+  Palette,
+  Plus,
+  Settings2,
+  type LucideIcon,
+} from "lucide-react";
+import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { ChoiceCard } from "@/components/ui/choice-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,13 +21,35 @@ import type { RenderMode, RenderOutputFormat } from "@/db/schema";
 import {
   MODES,
   OUTPUT_FORMATS,
-  STYLES,
+  STYLE_OPTIONS,
   SURROUNDINGS,
   TIMES,
   WEATHERS,
 } from "./constants";
 import { ChipGroup } from "./chip-group";
 import type { RenderStudioProject } from "./types";
+
+function ControlSection({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: LucideIcon;
+  children: ReactNode;
+}) {
+  return (
+    <section className="border-b border-border/70 pb-5 last:border-b-0 last:pb-0">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
+          <Icon className="size-4" />
+        </span>
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+      </div>
+      <div className="flex flex-col gap-3.5">{children}</div>
+    </section>
+  );
+}
 
 export function RenderStudioControls({
   projectId,
@@ -43,6 +73,7 @@ export function RenderStudioControls({
   onSwitchProject,
   onCreateProject,
   onCollapse,
+  footer,
 }: {
   projectId: string;
   projects: RenderStudioProject[];
@@ -65,177 +96,185 @@ export function RenderStudioControls({
   onSwitchProject: (projectId: string) => void;
   onCreateProject: () => void;
   onCollapse?: () => void;
+  footer?: ReactNode;
 }) {
   const styleLabel = mode === "interior" ? "Style interior" : "Style arsitektur";
+  const styleOptions =
+    mode === "interior" ? STYLE_OPTIONS.interior : STYLE_OPTIONS.exterior;
   const surroundingOptions =
     mode === "interior" ? SURROUNDINGS.interior : SURROUNDINGS.exterior;
   const surroundingLabel =
-    mode === "interior" ? "Pemandangan jendela" : "Lingkungan sekitar";
+    mode === "interior" ? "View Jendela" : "Lingkungan Sekitar";
 
   return (
     // In the fixed-height studio, fill the column so its bottom lines up with
     // the prompt/info columns (grows taller and scrolls when content overflows).
-    <Card className="h-fit max-w-full overflow-hidden lg:h-full lg:min-h-0">
-      <CardContent className="flex min-h-0 min-w-0 flex-col gap-4 overflow-visible px-3 py-4 sm:px-4 lg:overflow-y-auto lg:pr-3 [&>*]:shrink-0">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between gap-2">
-            <Label htmlFor="project" className="text-sm font-semibold">
-              Project
-            </Label>
-            {onCollapse && (
-              <button
-                type="button"
-                onClick={onCollapse}
-                aria-label="Ciutkan panel"
-                title="Ciutkan panel"
-                className="hidden size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex [&_svg]:size-4"
-              >
-                <PanelLeft />
-              </button>
-            )}
-          </div>
-          <div className="flex min-w-0 gap-2">
-            <Select
-              id="project"
-              value={projectId}
-              onChange={(e) => onSwitchProject(e.target.value)}
-              className="h-8 min-w-0 flex-1"
-            >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </Select>
-            <Button
+    <div className="h-fit max-w-full overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-0">
+      <div className="flex min-h-0 min-w-0 flex-col overflow-visible lg:h-full">
+        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/70 bg-card px-4 py-3">
+          <h1 className="text-sm font-semibold text-foreground">Konfigurasi</h1>
+          {onCollapse && (
+            <button
               type="button"
-              variant="outline"
-              size="icon"
-              onClick={onCreateProject}
-              title="Buat project baru"
-              aria-label="Buat project baru"
-              className="size-8 shrink-0"
+              onClick={onCollapse}
+              aria-label="Ciutkan panel"
+              title="Ciutkan panel"
+              className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex [&_svg]:size-4"
             >
-              <Plus />
-            </Button>
-          </div>
+              <PanelLeft />
+            </button>
+          )}
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label>Mode render</Label>
-          <div className="grid grid-cols-2 gap-2">
-            {MODES.map((m) => {
-              const card = (
-                <ChoiceCard
-                  active={mode === m.value}
-                  icon={m.icon}
-                  label={m.label}
-                  disabled={m.comingSoon}
-                  aria-label={m.comingSoon ? `${m.label} - Segera hadir` : m.label}
-                  className="h-full w-full min-w-0"
-                  onClick={() => {
-                    setMode(m.value);
-                    setSurrounding("auto");
-                    if (m.value === "interior") setWeather("auto");
-                  }}
+        <div className="flex flex-col gap-5 overflow-visible px-4 py-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto [&>*]:shrink-0">
+          <ControlSection title="Project" icon={Settings2}>
+            <div className="flex min-w-0 gap-2">
+              <Select
+                id="project"
+                value={projectId}
+                onChange={(e) => onSwitchProject(e.target.value)}
+                className="h-8 min-w-0 flex-1"
+              >
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={onCreateProject}
+                title="Buat project baru"
+                aria-label="Buat project baru"
+                className="size-8 shrink-0"
+              >
+                <Plus />
+              </Button>
+            </div>
+          </ControlSection>
+
+          <ControlSection title="Konteks & Style" icon={Palette}>
+            <div className="grid grid-cols-2 gap-2">
+              {MODES.map((m) => {
+                return (
+                  <ChoiceCard
+                    key={m.value}
+                    active={mode === m.value}
+                    icon={m.icon}
+                    label={m.label}
+                    aria-label={m.label}
+                    className="h-20 w-full min-w-0 flex-col justify-center gap-2 text-center [&>span]:items-center [&_svg]:size-5"
+                    onClick={() => {
+                      setMode(m.value);
+                      setStyle("auto");
+                      setSurrounding("auto");
+                      if (m.value === "interior") setWeather("auto");
+                    }}
+                  />
+                );
+              })}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="style">{styleLabel}</Label>
+              <Select
+                id="style"
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+                className="h-9 rounded-md"
+              >
+                {styleOptions.map(([v, l]) => (
+                  <option key={v} value={v}>
+                    {l}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </ControlSection>
+
+          <ControlSection title="Environment & Lighting" icon={MapPin}>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="location">Lokasi Proyek</Label>
+              <Input
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="contoh: Bandung, Bali, Jakarta"
+                className="h-9 rounded-md"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="surrounding">{surroundingLabel}</Label>
+              <Select
+                id="surrounding"
+                value={surrounding}
+                onChange={(e) => setSurrounding(e.target.value)}
+                className="h-9 rounded-md"
+              >
+                {surroundingOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>Waktu</Label>
+              <ChipGroup options={TIMES} value={time} onChange={setTime} />
+            </div>
+
+            {mode !== "interior" && (
+              <div className="flex flex-col gap-2">
+                <Label>Cuaca</Label>
+                <ChipGroup
+                  options={WEATHERS}
+                  value={weather}
+                  onChange={setWeather}
                 />
-              );
+              </div>
+            )}
+          </ControlSection>
 
-              return m.comingSoon ? (
-                <span key={m.value} className="block min-w-0" title="Segera hadir">
-                  {card}
-                </span>
-              ) : (
-                <span key={m.value} className="block min-w-0">
-                  {card}
-                </span>
-              );
-            })}
-          </div>
+          <ControlSection title="Output" icon={Settings2}>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="outputFormat">Format output</Label>
+              <Select
+                id="outputFormat"
+                value={outputFormat}
+                onChange={(e) =>
+                  setOutputFormat(e.target.value as RenderOutputFormat)
+                }
+                className="h-9 rounded-md"
+              >
+                {OUTPUT_FORMATS.map((format) => (
+                  <option key={format.value} value={format.value}>
+                    {format.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </ControlSection>
+
+          <ControlSection title="Objek" icon={Lightbulb}>
+            <ToggleRow
+              checked={lightsOn}
+              onCheckedChange={(next) => setLightsOn(() => next)}
+              icon={Lightbulb}
+              label="Nyalakan Lampu"
+              className="h-10 w-full min-w-0 gap-2 px-3 text-xs sm:text-sm"
+            />
+          </ControlSection>
         </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="style">{styleLabel}</Label>
-          <Select
-            id="style"
-            value={style}
-            onChange={(e) => setStyle(e.target.value)}
-            className="h-8"
-          >
-            {STYLES.map(([v, l]) => (
-              <option key={v} value={v}>
-                {l}
-              </option>
-            ))}
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="outputFormat">Format output</Label>
-          <Select
-            id="outputFormat"
-            value={outputFormat}
-            onChange={(e) => setOutputFormat(e.target.value as RenderOutputFormat)}
-            className="h-8"
-          >
-            {OUTPUT_FORMATS.map((format) => (
-              <option key={format.value} value={format.value}>
-                {format.label}
-              </option>
-            ))}
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="location">Lokasi project</Label>
-          <Input
-            id="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Bandung, Bali, Jakarta"
-            className="h-8"
-          />
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="surrounding">{surroundingLabel}</Label>
-          <Select
-            id="surrounding"
-            value={surrounding}
-            onChange={(e) => setSurrounding(e.target.value)}
-            className="h-8"
-          >
-            {surroundingOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label>Waktu</Label>
-          <ChipGroup options={TIMES} value={time} onChange={setTime} />
-        </div>
-
-        {mode !== "interior" && (
-          <div className="flex flex-col gap-2">
-            <Label>Cuaca</Label>
-            <ChipGroup options={WEATHERS} value={weather} onChange={setWeather} />
+        {footer && (
+          <div className="shrink-0 border-t border-border/70 bg-card p-3">
+            {footer}
           </div>
         )}
-
-        <div className="flex flex-col gap-2.5 border-t border-border/80 pt-4">
-          <Label className="font-semibold text-foreground">Pencahayaan</Label>
-          <ToggleRow
-            checked={lightsOn}
-            onCheckedChange={(next) => setLightsOn(() => next)}
-            icon={Lightbulb}
-            label="Nyalakan Lampu"
-            className="h-9 w-full min-w-0 gap-2 px-2.5 text-xs sm:text-sm"
-          />
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

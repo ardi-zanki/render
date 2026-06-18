@@ -85,6 +85,18 @@ export async function getRenderDetail(
     prompt: a.prompt ?? null,
   }));
   const latestResult = getLatestRenderableAsset(views);
+  const updatedAt = [
+    render.createdAt,
+    render.startedAt,
+    render.completedAt,
+    render.failedAt,
+    ...views.map((asset) => asset.createdAt),
+  ]
+    .filter((date): date is Date => date instanceof Date)
+    .reduce(
+      (latest, date) => (date.getTime() > latest.getTime() ? date : latest),
+      render.createdAt,
+    );
 
   return {
     id: render.id,
@@ -98,6 +110,7 @@ export async function getRenderDetail(
     projectId: render.projectId,
     projectName: project?.name ?? "Project",
     createdAt: render.createdAt,
+    updatedAt,
     startedAt: render.startedAt,
     completedAt: render.completedAt,
     failedAt: render.failedAt,

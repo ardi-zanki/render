@@ -1,10 +1,19 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ImagePlus, Loader2, PanelLeft, X } from "lucide-react";
+import {
+  ImagePlus,
+  Layers3,
+  Loader2,
+  PanelLeft,
+  Palette,
+  Wand2,
+  X,
+  type LucideIcon,
+} from "lucide-react";
+import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Segmented } from "@/components/ui/segmented";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +24,28 @@ import {
 } from "@/lib/renders/texture-library";
 import { cn } from "@/lib/utils";
 import type { TextureEditState } from "./use-texture-edit-state";
+
+function TextureSection({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: LucideIcon;
+  children: ReactNode;
+}) {
+  return (
+    <section className="border-b border-border/70 pb-5 last:border-b-0 last:pb-0">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
+          <Icon className="size-4" />
+        </span>
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+      </div>
+      <div className="flex flex-col gap-3">{children}</div>
+    </section>
+  );
+}
 
 export function ChangeTexturePanel({
   state,
@@ -32,44 +63,50 @@ export function ChangeTexturePanel({
     : TEXTURE_LIBRARY;
 
   return (
-    <Card className="flex h-fit flex-col lg:h-full lg:min-h-full">
-      <CardContent className="flex flex-col gap-4 py-4 lg:min-h-0 lg:flex-1">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-foreground">
-              Ganti Tekstur
-            </h2>
-            {onCollapse && (
-              <button
-                type="button"
-                onClick={onCollapse}
-                aria-label="Ciutkan panel"
-                title="Ciutkan panel"
-                className="hidden size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex [&_svg]:size-4"
-              >
-                <PanelLeft />
-              </button>
-            )}
-          </div>
+    <div className="flex h-fit flex-col overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-full">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border/70 bg-card/95 px-4 py-3 backdrop-blur">
+        <h1 className="text-sm font-semibold text-foreground">Edit Texture</h1>
+        {onCollapse && (
+          <button
+            type="button"
+            onClick={onCollapse}
+            aria-label="Ciutkan panel"
+            title="Ciutkan panel"
+            className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:flex [&_svg]:size-4"
+          >
+            <PanelLeft />
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-5 px-4 py-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <TextureSection title="Area & Sumber" icon={Wand2}>
           <p className="text-xs leading-5 text-muted-foreground">
-            Pilih area pada gambar, lalu pilih tekstur penggantinya.
+            Pilih area pada gambar, lalu tentukan tekstur penggantinya.
           </p>
-        </div>
+          <Segmented
+            size="sm"
+            className="grid w-full grid-cols-3"
+            options={[
+              { value: "library", label: "Library" },
+              { value: "upload", label: "Upload" },
+              { value: "description", label: "Deskripsi" },
+            ]}
+            value={state.textureSource}
+            onChange={(value) => state.setTextureSource(value)}
+          />
+        </TextureSection>
 
-        <Segmented
-          size="sm"
-          className="grid w-full grid-cols-3"
-          options={[
-            { value: "library", label: "Library" },
-            { value: "upload", label: "Upload" },
-            { value: "description", label: "Deskripsi" },
-          ]}
-          value={state.textureSource}
-          onChange={(value) => state.setTextureSource(value)}
-        />
-
-        {/* Scrollable selection area — the footer below stays pinned. */}
-        <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+        <TextureSection
+          title={
+            state.textureSource === "library"
+              ? "Library Material"
+              : state.textureSource === "upload"
+                ? "Upload Referensi"
+                : "Deskripsi Material"
+          }
+          icon={state.textureSource === "library" ? Layers3 : Palette}
+        >
           {state.textureSource === "library" ? (
             <>
               <div className="flex flex-wrap gap-1.5">
@@ -103,7 +140,7 @@ export function ChangeTexturePanel({
                       className={cn(
                         "flex flex-col gap-1.5 rounded-md border p-1.5 text-left transition-colors",
                         active
-                          ? "border-primary ring-1 ring-primary/30"
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/30"
                           : "border-border hover:border-primary/40",
                       )}
                     >
@@ -171,10 +208,12 @@ export function ChangeTexturePanel({
               />
             </div>
           )}
-        </div>
+        </TextureSection>
 
-        {/* Pinned footer: instruction + Apply stay visible while scrolling. */}
-        <div className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-40 flex flex-col gap-3 rounded-lg border border-border bg-card p-3 shadow-elevated lg:static lg:inset-auto lg:z-auto lg:shrink-0 lg:rounded-none lg:border-0 lg:border-t lg:border-border/80 lg:bg-transparent lg:p-0 lg:pt-3 lg:shadow-none">
+      </div>
+
+      <div className="shrink-0 border-t border-border/70 bg-card p-3">
+        <div className="flex flex-col gap-3">
           {state.textureSource !== "description" && (
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="texture-instruction" className="text-xs">
@@ -187,7 +226,7 @@ export function ChangeTexturePanel({
                 id="texture-instruction"
                 value={state.instruction}
                 onChange={(e) => state.setInstruction(e.target.value)}
-                placeholder="mis. marmer putih dengan urat abu-abu halus"
+                placeholder="mis. arah urat material, tingkat kilap, atau warna"
                 className="min-h-16 resize-none text-sm"
               />
             </div>
@@ -202,7 +241,7 @@ export function ChangeTexturePanel({
             Apply Texture
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

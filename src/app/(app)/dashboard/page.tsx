@@ -6,7 +6,6 @@ import {
   FolderOpen,
   Gem,
   ImageIcon,
-  Plus,
   Sparkles,
 } from "lucide-react";
 import type { Metadata } from "next";
@@ -235,11 +234,12 @@ export default async function DashboardPage() {
             title="Belum ada render"
             description="Render pertama Anda akan muncul di sini."
             action={
-              <Button asChild>
-                <Link href="/renders/new">
-                  <Plus /> Buat render
-                </Link>
-              </Button>
+              <Link
+                href="/renders/new"
+                className="text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80"
+              >
+                Buat render
+              </Link>
             }
           />
         ) : (
