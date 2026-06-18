@@ -2,10 +2,6 @@ import { config } from "dotenv";
 
 config({ path: ".env.local" });
 
-const { db } = await import("@/db");
-const { paymentPackages } = await import("@/db/schema");
-
-/** Credit packages seed (PRD §23.2). Packages are managed via seed, not admin. */
 const packages = [
   { name: "Starter", slug: "starter", price: 90_000, credits: 30, sortOrder: 1 },
   {
@@ -26,6 +22,9 @@ const packages = [
 ];
 
 async function main() {
+  const { db } = await import("@/db");
+  const { paymentPackages } = await import("@/db/schema");
+
   for (const p of packages) {
     await db
       .insert(paymentPackages)
@@ -43,11 +42,13 @@ async function main() {
         },
       });
   }
+
   console.log(`✓ Seeded ${packages.length} payment packages`);
-  process.exit(0);
 }
 
-main().catch((err) => {
-  console.error("Seed gagal:", err);
-  process.exit(1);
-});
+main()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error("Seed gagal:", err);
+    process.exit(1);
+  });
