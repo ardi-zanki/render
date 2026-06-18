@@ -19,7 +19,7 @@ export {
   createRenderTextureEdit,
 } from "./create";
 export { startInlineRenderProcessing } from "./inline-processing";
-export { listActiveRenderQueue } from "./jobs";
+export { cancelRenderJob, listActiveRenderQueue } from "./jobs";
 export {
   buildPrompt,
   buildTexturePrompt,

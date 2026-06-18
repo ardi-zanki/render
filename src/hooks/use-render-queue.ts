@@ -10,6 +10,7 @@ export type RenderQueueItem = {
   renderId: string;
   status: "queued" | "processing" | "success";
   attempts: number;
+  maxAttempts: number;
   mode: RenderMode;
   prompt: string | null;
   projectName: string;

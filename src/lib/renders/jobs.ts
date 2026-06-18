@@ -57,6 +57,7 @@ export async function listActiveRenderQueue(userId: string, limit = 20) {
         renderId: renderJobs.renderId,
         status: renderJobs.status,
         attempts: renderJobs.attempts,
+        maxAttempts: renderJobs.maxAttempts,
         mode: renders.mode,
         prompt: renders.prompt,
         projectName: projects.name,
@@ -113,44 +114,69 @@ export async function recoverStaleRenderJobs(now = new Date()) {
     now.getTime() - env.JOB_LOCK_TIMEOUT_SECONDS * 1000,
   );
 
-  const recovered = await db
-    .update(renderJobs)
-    .set({
-      status: "queued",
-      lockedAt: null,
-      lockedBy: null,
-      availableAt: now,
-      errorMessage: "Job dipulihkan setelah worker tidak merespons",
-      updatedAt: now,
-    })
+  const staleJobs = await db
+    .select()
+    .from(renderJobs)
     .where(
       and(
         eq(renderJobs.status, "processing"),
         lt(renderJobs.lockedAt, staleBefore),
       ),
-    )
-    .returning({ renderId: renderJobs.renderId });
-
-  if (recovered.length === 0) return 0;
-
-  await db
-    .update(renders)
-    .set({
-      status: "queued",
-      errorCode: "STALE_JOB_RECOVERED",
-      errorMessage: "Job dipulihkan setelah worker tidak merespons",
-    })
-    .where(
-      and(
-        inArray(
-          renders.id,
-          recovered.map((job) => job.renderId),
-        ),
-        eq(renders.status, "processing"),
-      ),
     );
 
-  return recovered.length;
+  if (staleJobs.length === 0) return 0;
+
+  const retryable = staleJobs.filter((job) => job.attempts < job.maxAttempts);
+  const exhausted = staleJobs.filter((job) => job.attempts >= job.maxAttempts);
+
+  if (retryable.length > 0) {
+    await db
+      .update(renderJobs)
+      .set({
+        status: "queued",
+        lockedAt: null,
+        lockedBy: null,
+        availableAt: now,
+        errorMessage: "Job dipulihkan setelah worker tidak merespons",
+        updatedAt: now,
+      })
+      .where(
+        inArray(
+          renderJobs.id,
+          retryable.map((job) => job.id),
+        ),
+      );
+
+    await db
+      .update(renders)
+      .set({
+        status: "queued",
+        errorCode: "STALE_JOB_RECOVERED",
+        errorMessage: "Job dipulihkan setelah worker tidak merespons",
+      })
+      .where(
+        and(
+          inArray(
+            renders.id,
+            retryable.map((job) => job.renderId),
+          ),
+          eq(renders.status, "processing"),
+        ),
+      );
+  }
+
+  for (const job of exhausted) {
+    await finalizeFailedRender({
+      renderId: job.renderId,
+      userId: job.userId,
+      jobId: job.id,
+      editId: job.editId,
+      message: "Job berhenti setelah mencapai batas percobaan maksimal.",
+      code: "MAX_ATTEMPTS_EXHAUSTED",
+    });
+  }
+
+  return staleJobs.length;
 }
 
 export async function lockNextJob(lockedBy: string) {
@@ -204,6 +230,8 @@ export async function finalizeFailedRender(params: {
       status: "failed",
       failedAt: now,
       completedAt: null,
+      lockedAt: null,
+      lockedBy: null,
       errorMessage: params.message,
       updatedAt: now,
     })
@@ -274,4 +302,100 @@ export async function rescheduleJob(params: {
       errorCode: "RETRYING",
     })
     .where(eq(renders.id, params.renderId));
+}
+
+export type CancelRenderJobResult =
+  | { ok: true; balance: number }
+  | {
+      ok: false;
+      reason: "render_not_found" | "job_not_active" | "max_attempts_reached";
+    };
+
+export async function cancelRenderJob(
+  userId: string,
+  renderId: string,
+): Promise<CancelRenderJobResult> {
+  const render = await db.query.renders.findFirst({
+    where: and(
+      eq(renders.id, renderId),
+      eq(renders.userId, userId),
+      isNull(renders.deletedAt),
+    ),
+  });
+  if (!render) return { ok: false, reason: "render_not_found" };
+
+  const cancelled = await db.transaction(async (tx) => {
+    const [job] = await tx
+      .select()
+      .from(renderJobs)
+      .where(
+        and(
+          eq(renderJobs.renderId, renderId),
+          inArray(renderJobs.status, ["queued", "processing"]),
+        ),
+      )
+      .orderBy(desc(renderJobs.createdAt))
+      .limit(1)
+      .for("update");
+
+    if (!job) {
+      return { ok: false as const, reason: "job_not_active" as const };
+    }
+    if (job.attempts >= job.maxAttempts) {
+      return { ok: false as const, reason: "max_attempts_reached" as const };
+    }
+
+    const now = new Date();
+    const isEdit = Boolean(job.editId);
+    await tx
+      .update(renderJobs)
+      .set({
+        status: "failed",
+        failedAt: now,
+        completedAt: null,
+        lockedAt: null,
+        lockedBy: null,
+        errorMessage: "Render dibatalkan oleh pengguna",
+        updatedAt: now,
+      })
+      .where(eq(renderJobs.id, job.id));
+
+    await tx
+      .update(renders)
+      .set(
+        isEdit
+          ? {
+              status: "success",
+              errorCode: null,
+              errorMessage: null,
+              failedAt: null,
+            }
+          : {
+              status: "cancelled",
+              failedAt: now,
+              errorCode: "USER_CANCELLED",
+              errorMessage: "Render dibatalkan oleh pengguna",
+            },
+      )
+      .where(eq(renders.id, renderId));
+
+    return { ok: true as const, editId: job.editId, isEdit };
+  });
+
+  if (!cancelled.ok) return cancelled;
+
+  const refund = await applyCreditChange({
+    userId,
+    type: "refund",
+    amount: RENDER_COST,
+    description: cancelled.isEdit
+      ? "Refund edit dibatalkan"
+      : "Refund render dibatalkan",
+    renderId,
+    idempotencyKey: cancelled.editId
+      ? `render-refund:${cancelled.editId}`
+      : `render-refund:${renderId}`,
+  });
+
+  return { ok: true, balance: refund.balance };
 }
