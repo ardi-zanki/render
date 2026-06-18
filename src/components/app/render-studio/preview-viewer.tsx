@@ -25,7 +25,6 @@ import {
 import { RenderImage } from "@/components/app/render-image";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Segmented } from "@/components/ui/segmented";
@@ -294,12 +293,22 @@ export function RenderPreviewViewer({
       comparisonBounds.width > 0 &&
       comparisonBounds.height > 0,
   );
+  const hasCanvasContent =
+    studioMode === "texture" ? Boolean(textureCanvas) : Boolean(shownImage);
+  const showTopToolbar =
+    hasUploadedImage ||
+    editAvailable ||
+    panelsCollapsed ||
+    (studioMode === "texture" && Boolean(textureToolbar));
+  const showZoomControls = Boolean(
+    studioMode === "texture" ? textureCanvas : shownImage,
+  );
 
   return (
-    <Card className="overflow-hidden lg:h-full">
-      <CardContent className="flex flex-col gap-4 py-4 lg:h-full lg:min-h-0">
-        {/* Sticky toolbar: view tabs (+ Edit) + zoom controls. */}
-        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+    <div className="flex flex-col gap-3 lg:h-full lg:min-h-0">
+      {showTopToolbar && (
+        /* Sticky toolbar: view tabs (+ Edit) + canvas controls. */
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border/80 bg-card px-2.5 py-2 shadow-soft sm:gap-3">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             {panelsCollapsed && onExpandPanels && (
               // Reopen control, grouped with the view tabs (desktop only).
@@ -351,7 +360,9 @@ export function RenderPreviewViewer({
             )}
           </div>
 
-          {(studioMode === "texture" ? Boolean(textureCanvas) : shownImage) && (
+          {studioMode === "texture" && textureToolbar ? (
+            <div className="min-w-0 overflow-x-auto">{textureToolbar}</div>
+          ) : showZoomControls ? (
             <div className="hidden h-8 shrink-0 items-center gap-0.5 rounded-md bg-muted/80 p-1 sm:inline-flex sm:h-9">
               <Button
                 type="button"
@@ -385,11 +396,32 @@ export function RenderPreviewViewer({
               >
                 <ZoomIn />
               </Button>
+              {allowRemoveImage && file && !isProcessing && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => pickFile(null)}
+                  aria-label="Hapus gambar"
+                  title="Hapus gambar"
+                  className="size-6 sm:size-7"
+                >
+                  <X />
+                </Button>
+              )}
             </div>
-          )}
+          ) : null}
         </div>
+      )}
 
-        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg border border-dashed border-border bg-muted/35 lg:aspect-auto lg:min-h-0 lg:flex-1">
+      <div
+        className={cn(
+          "relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg lg:aspect-auto lg:min-h-0 lg:flex-1",
+          hasCanvasContent
+            ? "bg-transparent"
+            : "border border-dashed border-border bg-muted/35",
+        )}
+      >
           {studioMode === "texture" ? (
             textureCanvas ?? (
               <p className="px-4 text-center text-sm text-muted-foreground">
@@ -498,22 +530,6 @@ export function RenderPreviewViewer({
             </div>
           )}
 
-          {allowRemoveImage && file && !isProcessing && (
-            <button
-              type="button"
-              onClick={() => pickFile(null)}
-              className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-md bg-background/85 text-foreground shadow-floating hover:bg-background"
-              aria-label="Hapus gambar"
-            >
-              <X className="size-4" />
-            </button>
-          )}
-
-          {studioMode === "texture" && textureToolbar && (
-            <div className="pointer-events-none absolute inset-x-2 bottom-2 z-10 flex justify-center sm:inset-x-3 sm:bottom-3">
-              <div className="pointer-events-auto">{textureToolbar}</div>
-            </div>
-          )}
         </div>
 
         <input
@@ -620,7 +636,6 @@ export function RenderPreviewViewer({
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }

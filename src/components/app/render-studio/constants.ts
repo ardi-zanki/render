@@ -9,61 +9,76 @@ export const MODES: {
   comingSoon?: boolean;
 }[] = [
   { value: "interior", label: "Interior", icon: Sofa },
-  { value: "exterior", label: "Exterior", icon: Building2, comingSoon: true },
+  { value: "exterior", label: "Exterior", icon: Building2 },
 ];
+
+export const STYLE_OPTIONS = {
+  interior: [
+    ["auto", "Deteksi Otomatis"],
+    ["tropical_modern", "Tropis Modern"],
+    ["japandi", "Japandi Minimalis"],
+    ["scandinavian", "Skandinavia"],
+    ["brutalist", "Brutalisme"],
+    ["contemporary", "Kontemporer"],
+    ["futuristic", "Futuristik"],
+    ["classic", "Klasik"],
+  ],
+  exterior: [
+    ["auto", "Deteksi Otomatis"],
+    ["tropical_modern", "Tropis Modern"],
+    ["japandi", "Japandi Minimalis"],
+    ["scandinavian", "Skandinavia"],
+    ["brutalist", "Brutalisme"],
+    ["contemporary", "Kontemporer"],
+    ["futuristic", "Futuristik"],
+    ["classic", "Klasik"],
+  ],
+} as const satisfies Record<"interior" | "exterior", readonly (readonly [string, string])[]>;
 
 export const STYLES = [
   ["auto", "Deteksi Otomatis"],
+  ["tropical_modern", "Tropis Modern"],
+  ["japandi", "Japandi Minimalis"],
+  ["scandinavian", "Skandinavia"],
+  ["brutalist", "Brutalisme"],
+  ["contemporary", "Kontemporer"],
+  ["futuristic", "Futuristik"],
+  ["classic", "Klasik"],
   ["modern", "Modern"],
   ["minimalist", "Minimalis"],
   ["industrial", "Industrial"],
-  ["scandinavian", "Skandinavia"],
-  ["classic", "Klasik"],
   ["tropical", "Tropis"],
-  ["contemporary", "Kontemporer"],
 ];
 
 export const TIMES = ["auto", "morning", "midday", "evening", "night"];
-export const WEATHERS = ["auto", "clear", "cloudy", "overcast", "rain", "fog"];
+export const WEATHERS = [
+  "auto",
+  "clear",
+  "cloudy",
+  "overcast",
+  "drizzle",
+  "rain",
+  "fog",
+];
 
 export const SURROUNDINGS = {
   exterior: [
     { value: "auto", label: "Otomatis" },
-    {
-      value: "urban street context with neighboring buildings",
-      label: "Kawasan Urban",
-    },
-    {
-      value: "quiet residential neighborhood context",
-      label: "Perumahan",
-    },
-    {
-      value: "tropical garden and lush greenery around the building",
-      label: "Taman Tropis",
-    },
-    {
-      value: "commercial streetscape context",
-      label: "Area Komersial",
-    },
+    { value: "dense city center context", label: "Tengah Kota" },
+    { value: "rural countryside context", label: "Pedesaan" },
+    { value: "coastal beachside context", label: "Pinggir Pantai" },
+    { value: "hillside terrain context", label: "Perbukitan" },
+    { value: "quiet residential neighborhood context", label: "Perumahan" },
+    { value: "forest and mature trees context", label: "Hutan" },
   ],
   interior: [
     { value: "auto", label: "Otomatis" },
-    {
-      value: "large window view with natural daylight",
-      label: "Jendela Besar",
-    },
-    {
-      value: "city view through the window",
-      label: "Pemandangan Kota",
-    },
-    {
-      value: "garden view through the window",
-      label: "Pemandangan Taman",
-    },
-    {
-      value: "no visible window, controlled interior lighting",
-      label: "Tanpa Jendela",
-    },
+    { value: "city center view through the windows", label: "Tengah Kota" },
+    { value: "rural countryside view through the windows", label: "Pedesaan" },
+    { value: "beachside coastal view through the windows", label: "Pinggir Pantai" },
+    { value: "hillside view through the windows", label: "Perbukitan" },
+    { value: "residential neighborhood view through the windows", label: "Perumahan" },
+    { value: "forest view through the windows", label: "Hutan" },
   ],
 };
 
@@ -87,6 +102,7 @@ const CHIP_LABEL: Record<string, string> = {
   clear: "Cerah",
   cloudy: "Berawan",
   overcast: "Mendung",
+  drizzle: "Gerimis",
   rain: "Hujan",
   fog: "Berkabut",
 };

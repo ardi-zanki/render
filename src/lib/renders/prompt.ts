@@ -34,6 +34,10 @@ const STYLE: Record<string, string> = {
   classic: "classic",
   tropical: "tropical",
   contemporary: "contemporary",
+  tropical_modern: "tropical modern",
+  japandi: "Japandi minimalist",
+  brutalist: "brutalist",
+  futuristic: "futuristic",
 };
 
 // Positive daylight descriptions per time of day (FLUX.2 processes no negation).
@@ -61,6 +65,7 @@ const WEATHER_SKY: Record<string, string> = {
   clear: "a clear blue sky",
   cloudy: "a partly cloudy sky",
   overcast: "a soft overcast sky with even, diffuse light",
+  drizzle: "a light drizzle with subtly wet, reflective surfaces",
   rain: "a rainy atmosphere with wet, reflective surfaces",
   fog: "a soft, hazy foggy atmosphere",
 };

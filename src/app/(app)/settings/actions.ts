@@ -70,6 +70,7 @@ export async function updatePreferencesAction(
   await updateUserPreferences(user.id, parsed.data);
 
   revalidatePath("/settings");
+  revalidatePath("/", "layout");
   return { ok: true };
 }
 

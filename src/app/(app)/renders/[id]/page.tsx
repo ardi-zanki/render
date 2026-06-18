@@ -1,7 +1,20 @@
-import { ArrowLeft, Wand2 } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  CircleCheck,
+  Clock3,
+  Coins,
+  FileType,
+  FolderOpen,
+  Layers3,
+  Sofa,
+  Wand2,
+  type LucideIcon,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { PageHeader } from "@/components/app/page-header";
 import { RenderActionsMenu } from "@/components/app/render-detail-actions";
@@ -95,10 +108,13 @@ export default async function RenderDetailPage({
         </div>
 
         <aside className="flex w-full flex-col gap-4 justify-self-stretch">
-          <Card>
-            <CardContent className="flex flex-col gap-2.5 p-3">
+          <Card className="rounded-lg border-border/80 shadow-soft">
+            <CardContent className="flex flex-col gap-3 p-4">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-2">
+                  <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
+                    <Layers3 className="size-4" />
+                  </span>
                   <h2 className="text-sm font-semibold text-foreground">
                     Info Render
                   </h2>
@@ -113,25 +129,56 @@ export default async function RenderDetailPage({
                   canDownload={render.status === "success" && !!render.resultUrl}
                 />
               </div>
-              <div className="flex items-center justify-between gap-3 text-xs">
-                <span className="text-muted-foreground">Status</span>
-                <Badge variant={statusBadgeVariant(render.status)}>
-                  {STATUS_LABEL[render.status] ?? render.status}
-                </Badge>
-              </div>
-              <Info label="Dibuat" value={dateFmt.format(render.createdAt)} />
-              <Info label="Mode" value={MODE_LABEL[render.mode]} />
-              <div className="flex items-center justify-between gap-3 text-xs">
-                <span className="text-muted-foreground">Project</span>
-                <RenderProjectSelector
-                  renderId={render.id}
-                  currentProjectId={render.projectId}
-                  currentProjectName={render.projectName}
-                  projects={projectOptions}
+
+              <dl className="flex flex-col divide-y divide-border/70">
+                <Info
+                  icon={CircleCheck}
+                  label="Status"
+                  value={
+                    <Badge variant={statusBadgeVariant(render.status)}>
+                      {STATUS_LABEL[render.status] ?? render.status}
+                    </Badge>
+                  }
                 />
-              </div>
-              <Info label="Format" value={render.outputFormat.toUpperCase()} />
-              <Info label="Kredit" value={`${render.creditsUsed || 1} kredit`} />
+                <Info
+                  icon={CalendarDays}
+                  label="Dibuat"
+                  value={dateFmt.format(render.createdAt)}
+                />
+                <Info
+                  icon={Clock3}
+                  label="Diperbarui"
+                  value={dateFmt.format(render.updatedAt)}
+                />
+                <Info
+                  icon={Sofa}
+                  label="Mode"
+                  value={MODE_LABEL[render.mode]}
+                />
+                <Info
+                  icon={FolderOpen}
+                  label="Project"
+                  value={
+                    <RenderProjectSelector
+                      renderId={render.id}
+                      currentProjectId={render.projectId}
+                      currentProjectName={render.projectName}
+                      projects={projectOptions}
+                    />
+                  }
+                />
+                <Info
+                  icon={FileType}
+                  label="Format"
+                  value={render.outputFormat.toUpperCase()}
+                />
+                <Info
+                  icon={Coins}
+                  label="Kredit"
+                  value={`${render.creditsUsed || 1} kredit`}
+                />
+              </dl>
+
               {render.errorMessage && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                   {render.errorMessage}
@@ -150,11 +197,22 @@ export default async function RenderDetailPage({
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function Info({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: ReactNode;
+}) {
   return (
-    <div className="flex items-center justify-between gap-3 text-xs">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground">{value}</span>
+    <div className="flex items-center justify-between gap-3 py-2 text-xs first:pt-0 last:pb-0">
+      <dt className="flex items-center gap-2 text-muted-foreground">
+        <Icon className="size-4 text-primary" />
+        {label}
+      </dt>
+      <dd className="text-right font-medium text-foreground">{value}</dd>
     </div>
   );
 }

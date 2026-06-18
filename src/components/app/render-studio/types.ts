@@ -44,6 +44,7 @@ export type RenderStudioProps = {
   /** Metadata of the render being edited, shown above the Scene panel. */
   renderInfo?: {
     createdAt: string;
+    updatedAt: string;
     mode: RenderMode;
     outputFormat: string;
     creditsUsed: number;

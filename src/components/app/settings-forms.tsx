@@ -10,13 +10,14 @@ import {
   Unlink,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PasswordInput } from "@/components/auth/password-input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
@@ -148,13 +149,20 @@ export function PreferencesForm({
   defaultRenderMode: string;
   defaultOutputFormat: string;
 }) {
+  const router = useRouter();
   const [state, action, pending] = useActionState(
     updatePreferencesAction,
     initial,
   );
+  const [renderMode, setRenderMode] = useState(defaultRenderMode);
+  const [outputFormat, setOutputFormat] = useState(defaultOutputFormat);
+
   useEffect(() => {
-    if (state.ok) toast.success("Preferensi disimpan");
-  }, [state]);
+    if (!state.ok) return;
+    toast.success("Preferensi disimpan");
+    router.refresh();
+  }, [router, state.ok]);
+
   return (
     <form action={action} className="flex flex-col gap-4">
       {state.error && (
@@ -167,12 +175,11 @@ export function PreferencesForm({
         <Select
           id="defaultRenderMode"
           name="defaultRenderMode"
-          defaultValue={defaultRenderMode}
+          value={renderMode}
+          onChange={(event) => setRenderMode(event.target.value)}
         >
           <option value="interior">Interior</option>
-          <option value="exterior" disabled>
-            Exterior (Segera hadir)
-          </option>
+          <option value="exterior">Exterior</option>
         </Select>
       </div>
       <div className="flex flex-col gap-1.5">
@@ -180,7 +187,8 @@ export function PreferencesForm({
         <Select
           id="defaultOutputFormat"
           name="defaultOutputFormat"
-          defaultValue={defaultOutputFormat}
+          value={outputFormat}
+          onChange={(event) => setOutputFormat(event.target.value)}
         >
           <option value="original">Original</option>
           <option value="jpg">JPG</option>
@@ -390,7 +398,8 @@ export function GoogleAccountForm({
   const [connecting, setConnecting] = useState(false);
   const [connectError, setConnectError] = useState("");
   const [disconnectError, setDisconnectError] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [disconnecting, setDisconnecting] = useState(false);
+  const [confirmDisconnectOpen, setConfirmDisconnectOpen] = useState(false);
 
   async function connectGoogle() {
     setConnecting(true);
@@ -425,19 +434,21 @@ export function GoogleAccountForm({
     }
   }
 
-  function disconnectGoogle() {
+  async function disconnectGoogle() {
     setDisconnectError("");
-    startTransition(() => {
-      void (async () => {
-        const result = await disconnectGoogleAction();
-        if (result.error) {
-          setDisconnectError(result.error);
-          return;
-        }
-        toast.success("Akun Google dilepas");
-        router.refresh();
-      })();
-    });
+    setDisconnecting(true);
+    try {
+      const result = await disconnectGoogleAction();
+      if (result.error) {
+        setDisconnectError(result.error);
+        return;
+      }
+      setConfirmDisconnectOpen(false);
+      toast.success("Akun Google dilepas");
+      router.refresh();
+    } finally {
+      setDisconnecting(false);
+    }
   }
 
   return (
@@ -454,15 +465,15 @@ export function GoogleAccountForm({
             type="button"
             variant="outline"
             size="sm"
-            onClick={disconnectGoogle}
-            disabled={!passwordReady || isPending}
+            onClick={() => setConfirmDisconnectOpen(true)}
+            disabled={!passwordReady || disconnecting}
             title={
               passwordReady
                 ? undefined
                 : "Buat password sebelum melepas Google"
             }
           >
-            {isPending ? <Loader2 className="animate-spin" /> : <Unlink />}
+            {disconnecting ? <Loader2 className="animate-spin" /> : <Unlink />}
             Disconnect
           </Button>
         ) : (
@@ -479,9 +490,27 @@ export function GoogleAccountForm({
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        Google yang dihubungkan harus memakai email {email}.
-      </p>
+      {googleConnected && !passwordReady ? (
+        <p className="text-xs leading-5 text-muted-foreground">
+          Buat password terlebih dahulu sebelum disconnect agar akun tetap bisa
+          diakses lewat email.
+        </p>
+      ) : !googleConnected ? (
+        <p className="text-xs text-muted-foreground">
+          Google yang dihubungkan harus memakai email {email}.
+        </p>
+      ) : null}
+
+      {confirmDisconnectOpen && (
+        <ConfirmDialog
+          title="Disconnect Akun Google?"
+          description="Setelah dilepas, login Google tidak bisa dipakai untuk akun ini. Pastikan password sudah aktif agar tetap bisa login dengan email."
+          confirmLabel="Disconnect"
+          destructive
+          onClose={() => setConfirmDisconnectOpen(false)}
+          onConfirm={disconnectGoogle}
+        />
+      )}
     </div>
   );
 }

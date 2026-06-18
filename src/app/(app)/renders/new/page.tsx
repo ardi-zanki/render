@@ -109,6 +109,7 @@ export default async function CreateRenderPage({
           sourceRender
             ? {
                 createdAt: sourceRender.createdAt.toISOString(),
+                updatedAt: sourceRender.updatedAt.toISOString(),
                 mode: sourceRender.mode,
                 outputFormat: sourceRender.outputFormat,
                 creditsUsed: sourceRender.creditsUsed,

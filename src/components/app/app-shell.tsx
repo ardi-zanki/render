@@ -5,8 +5,8 @@ import {
   ClipboardList,
   FolderOpen,
   Home,
-  ImageIcon,
   Menu,
+  Palette,
   PanelLeft,
   Plus,
   Shield,
@@ -30,7 +30,7 @@ import { zLayer } from "@/lib/z-layers";
 const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: Home },
   { label: "Project", href: "/projects", icon: FolderOpen },
-  { label: "Riwayat render", href: "/renders", icon: ImageIcon },
+  { label: "Riwayat render", href: "/renders", icon: Palette },
   { label: "Pembayaran", href: "/payments", icon: CreditCard },
 ];
 
