@@ -184,7 +184,7 @@ export function UserMenu({
           aria-live="polite"
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/75 backdrop-blur-sm"
         >
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-dialog">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
             <Loader2 className="size-4 animate-spin text-primary" />
             Keluar...
           </div>
