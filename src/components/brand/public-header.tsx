@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/ui/mode-toggle";
 import { publicNavItems } from "@/lib/marketing";
 import { cn } from "@/lib/utils";
 
@@ -17,11 +16,9 @@ type NavItem = { label: string; href: string };
 export function PublicHeader({
   nav,
   authenticated = false,
-  showThemeToggle = true,
 }: {
   nav?: NavItem[];
   authenticated?: boolean;
-  showThemeToggle?: boolean;
 }) {
   const items = nav ?? publicNavItems;
   const hasNav = items.length > 0;
@@ -68,7 +65,6 @@ export function PublicHeader({
               {authenticated ? "Buka studio" : "Buat akun"}
             </Link>
           </Button>
-          {showThemeToggle && <ModeToggle />}
         </div>
       </div>
     </header>

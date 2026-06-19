@@ -61,7 +61,6 @@ export default async function LandingPage() {
       <PublicHeader
         nav={landingNavItems}
         authenticated={isAuthenticated}
-        showThemeToggle={false}
       />
 
       <main>
