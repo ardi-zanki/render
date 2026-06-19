@@ -6,6 +6,7 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
+  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
@@ -345,28 +346,41 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
       : tool === "wand"
         ? "cell"
         : "crosshair";
+  const zoomFrameStyle = {
+    width: `${Math.max(zoom, 1) * 100}%`,
+    height: `${Math.max(zoom, 1) * 100}%`,
+  } satisfies CSSProperties;
+  const zoomSurfaceStyle = {
+    width: `${Math.min(zoom, 1) * 100}%`,
+    height: `${Math.min(zoom, 1) * 100}%`,
+  } satisfies CSSProperties;
 
   return (
     <div
-      className={cn("relative size-full overflow-hidden", className)}
-      style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
+      className={cn(
+        "relative flex min-h-full min-w-full shrink-0 items-center justify-center",
+        className,
+      )}
+      style={zoomFrameStyle}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={imageUrl}
-        alt="Gambar yang diedit"
-        draggable={false}
-        className="block size-full select-none object-contain"
-      />
-      <canvas
-        ref={overlayRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
-        style={{ cursor, opacity: 0.5, touchAction: "none" }}
-        className="absolute inset-0 size-full"
-      />
+      <div className="relative shrink-0" style={zoomSurfaceStyle}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageUrl}
+          alt="Gambar yang diedit"
+          draggable={false}
+          className="block size-full select-none object-contain"
+        />
+        <canvas
+          ref={overlayRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerLeave={onPointerUp}
+          style={{ cursor, opacity: 0.5, touchAction: "none" }}
+          className="absolute inset-0 size-full"
+        />
+      </div>
     </div>
   );
 });
