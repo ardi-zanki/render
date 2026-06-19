@@ -14,6 +14,7 @@ export function RenderActionBar({
   loading,
   canRender,
   onRender,
+  showInstruction = true,
 }: {
   instruction: string;
   setInstruction: (instruction: string) => void;
@@ -21,22 +22,25 @@ export function RenderActionBar({
   loading: boolean;
   canRender: boolean;
   onRender: () => void;
+  showInstruction?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-2.5">
-      <div className="flex flex-col gap-1">
-        <Label htmlFor="studio-instruction" className="text-xs">
-          Instruksi tambahan{" "}
-          <span className="font-normal text-muted-foreground">(opsional)</span>
-        </Label>
-        <Textarea
-          id="studio-instruction"
-          value={instruction}
-          onChange={(e) => setInstruction(e.target.value)}
-          placeholder="Melengkapi konfigurasi — mis. ganti warna sofa…"
-          className="min-h-16 resize-none text-sm"
-        />
-      </div>
+      {showInstruction && (
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="studio-instruction" className="text-xs">
+            Instruksi tambahan{" "}
+            <span className="font-normal text-muted-foreground">(opsional)</span>
+          </Label>
+          <Textarea
+            id="studio-instruction"
+            value={instruction}
+            onChange={(e) => setInstruction(e.target.value)}
+            placeholder="Melengkapi konfigurasi — mis. ganti warna sofa…"
+            className="min-h-16 resize-none text-sm"
+          />
+        </div>
+      )}
       <div className="flex">
         {balance <= 0 ? (
           <Button asChild size="sm" className="w-full gap-1 text-xs">

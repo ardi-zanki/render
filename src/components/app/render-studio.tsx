@@ -169,6 +169,7 @@ export function RenderStudio({
       loading={state.loading}
       canRender={canRender}
       onRender={actions.onRender}
+      showInstruction={state.mode !== "interior"}
     />
   ) : null;
 

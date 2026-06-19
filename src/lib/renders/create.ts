@@ -364,15 +364,15 @@ export async function createRenderTextureEdit(
       type: "mask",
       file: params.mask,
     });
-    if (params.texture) {
-      await storeAsset({
-        renderId,
-        userId,
-        projectId: render.projectId,
-        type: "reference",
-        file: params.texture,
-      });
-    }
+    const textureAsset = params.texture
+      ? await storeAsset({
+          renderId,
+          userId,
+          projectId: render.projectId,
+          type: "reference",
+          file: params.texture,
+        })
+      : null;
 
     // The result asset inherits this config, marking the version as a texture
     // edit (read by the studio's render info + version history).
@@ -384,6 +384,7 @@ export async function createRenderTextureEdit(
     const requestOptions: ProviderRequestOptions = {
       inpaint: true,
       maskAssetId: maskAsset.id,
+      referenceAssetId: textureAsset?.id,
       texturePrompt: params.texturePrompt,
       textureLabel: params.textureLabel,
     };

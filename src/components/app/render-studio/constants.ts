@@ -50,7 +50,8 @@ export const STYLES = [
   ["tropical", "Tropis"],
 ];
 
-export const TIMES = ["auto", "morning", "midday", "evening", "night"];
+export const INTERIOR_LIGHTING_MODES = ["morning", "midday", "night", "mixed"];
+export const EXTERIOR_TIMES = ["auto", "morning", "midday", "evening", "night"];
 export const WEATHERS = [
   "auto",
   "clear",
@@ -99,6 +100,7 @@ const CHIP_LABEL: Record<string, string> = {
   midday: "Siang",
   evening: "Sore",
   night: "Malam",
+  mixed: "Mix",
   clear: "Cerah",
   cloudy: "Berawan",
   overcast: "Mendung",

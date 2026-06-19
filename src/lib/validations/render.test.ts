@@ -33,6 +33,16 @@ describe("createRenderSchema", () => {
     expect(result.data.outputFormat).toBe("original");
   });
 
+  it("accepts the Mix interior lighting mode and drizzle weather", () => {
+    const result = createRenderSchema.safeParse({
+      mode: "interior",
+      time: "mixed",
+      weather: "drizzle",
+    });
+
+    expect(result.success).toBe(true);
+  });
+
   it("rejects invalid render options", () => {
     const result = createRenderSchema.safeParse({
       mode: "landscape",
