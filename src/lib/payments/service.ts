@@ -281,6 +281,36 @@ export async function getPaymentForUser(userId: string, orderId: string) {
   });
 }
 
+export async function getPaymentDetailForUser(userId: string, orderId: string) {
+  const payment = await getPaymentForUser(userId, orderId);
+  if (!payment) return null;
+
+  const pkg = payment.packageId
+    ? await db.query.paymentPackages.findFirst({
+        where: eq(paymentPackages.id, payment.packageId),
+      })
+    : null;
+
+  return {
+    id: payment.id,
+    orderId: payment.providerOrderId,
+    provider: payment.provider,
+    packageName: pkg?.name ?? "Paket kredit",
+    amount: payment.amount,
+    currency: payment.currency,
+    credits: payment.creditsAdded,
+    status: payment.status,
+    paymentType: payment.paymentType,
+    snapToken: payment.status === "pending" ? payment.snapToken : null,
+    paymentUrl: payment.status === "pending" ? payment.paymentUrl : null,
+    createdAt: payment.createdAt,
+    updatedAt: payment.updatedAt,
+    paidAt: payment.paidAt,
+    expiredAt: payment.expiredAt,
+    failedAt: payment.failedAt,
+  };
+}
+
 export async function countPayments(userId: string): Promise<number> {
   const [row] = await db
     .select({ value: count() })
@@ -311,6 +341,7 @@ export async function listPayments(
     amount: r.amount,
     credits: r.creditsAdded,
     status: r.status,
+    paymentType: r.paymentType,
     snapToken: r.status === "pending" ? r.snapToken : null,
     paymentUrl: r.status === "pending" ? r.paymentUrl : null,
     createdAt: r.createdAt,

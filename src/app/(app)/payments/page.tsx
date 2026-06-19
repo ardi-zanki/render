@@ -2,8 +2,9 @@ import { Check, Gem } from "lucide-react";
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import { BuyButton, ResumePaymentButton } from "@/components/app/buy-button";
+import { BuyButton } from "@/components/app/buy-button";
 import { PageHeader } from "@/components/app/page-header";
+import { PaymentDetailModal } from "@/components/app/payment-detail-modal";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -149,16 +150,23 @@ export default async function PaymentsPage({
                     <div className="col-start-1 min-w-0 font-mono text-xs leading-5 text-muted-foreground">
                       {dateFmt.format(p.createdAt)}
                     </div>
-                    {p.status === "pending" && (p.snapToken || p.paymentUrl) && (
-                      <div className="col-start-2 row-span-2 mt-1 justify-self-end">
-                        <ResumePaymentButton
-                          orderId={p.orderId}
-                          provider={p.provider}
-                          token={p.snapToken}
-                          redirectUrl={p.paymentUrl}
-                        />
-                      </div>
-                    )}
+                    <div className="col-start-2 mt-0.5 justify-self-end leading-5">
+                      <PaymentDetailModal
+                        payment={{
+                          orderId: p.orderId,
+                          provider: p.provider,
+                          packageName: p.packageName,
+                          amount: p.amount,
+                          credits: p.credits,
+                          status: p.status,
+                          paymentType: p.paymentType,
+                          snapToken: p.snapToken,
+                          paymentUrl: p.paymentUrl,
+                          createdAt: p.createdAt.toISOString(),
+                          paidAt: p.paidAt?.toISOString() ?? null,
+                        }}
+                      />
+                    </div>
                   </div>
                 );
               })}

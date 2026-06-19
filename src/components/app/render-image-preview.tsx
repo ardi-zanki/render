@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Minus, Plus, RotateCw, X, ZoomIn } from "lucide-react";
+import { Download, Minus, Plus, RotateCw, ZoomIn } from "lucide-react";
 import { useState } from "react";
 
 import { RenderImage } from "@/components/app/render-image";
@@ -78,7 +78,7 @@ export function RenderImagePreview({
           label={alt}
           panelClassName="flex h-[min(90vh,calc(100vh-2rem))] w-[min(96vw,72rem)] flex-col overflow-hidden rounded-lg border border-border bg-card shadow-dialog"
         >
-          <div className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-2.5">
+          <div className="flex items-center justify-between gap-3 border-b border-border bg-card py-2.5 pl-4 pr-14">
             <span className="truncate text-sm font-semibold text-foreground">
               {alt}
             </span>
@@ -131,14 +131,6 @@ export function RenderImagePreview({
               >
                 <Download className="size-4" />
               </a>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Tutup"
-                className="ml-1 flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <X className="size-4" />
-              </button>
             </div>
           </div>
 

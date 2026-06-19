@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageIcon, Loader2, Plus, Search, X } from "lucide-react";
+import { ImageIcon, Loader2, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -114,7 +114,7 @@ export function GlobalSearchCommand({
           panelClassName="w-full max-w-xl overflow-hidden rounded-lg border border-border bg-card shadow-dialog"
           containerClassName="items-start pt-[12vh]"
         >
-          <div className="flex h-14 items-center gap-3 border-b border-border px-4">
+          <div className="flex h-14 items-center gap-3 border-b border-border pl-4 pr-14">
             <Search className="size-4 shrink-0 text-muted-foreground" />
             <input
               value={query}
@@ -122,15 +122,6 @@ export function GlobalSearchCommand({
               placeholder="Cari render..."
               className="h-full min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
             />
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Tutup pencarian"
-              title="Tutup"
-              className="flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            >
-              <X className="size-4" />
-            </button>
           </div>
 
           <div className="max-h-[min(560px,70vh)] overflow-y-auto p-2">
