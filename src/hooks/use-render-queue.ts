@@ -12,7 +12,6 @@ export type RenderQueueItem = {
   attempts: number;
   maxAttempts: number;
   mode: RenderMode;
-  prompt: string | null;
   projectName: string;
   createdAt: string;
   startedAt: string | null;
