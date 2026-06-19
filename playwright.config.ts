@@ -3,10 +3,14 @@ import { config as loadEnv } from "dotenv";
 
 loadEnv({ path: ".env.local", override: false });
 
+const e2ePort = process.env.PLAYWRIGHT_PORT ?? "3210";
+const e2eBaseUrl = `http://localhost:${e2ePort}`;
+
 const e2eEnvOverrides = {
   AI_PROVIDER: "mock",
-  APP_URL: "http://localhost:3210",
-  BETTER_AUTH_URL: "http://localhost:3210",
+  APP_URL: e2eBaseUrl,
+  BETTER_AUTH_URL: e2eBaseUrl,
+  NEXT_DIST_DIR: ".next-e2e",
   PAYMENT_PROVIDER: "mock",
   RATE_LIMIT_ENABLED: "false",
   RENDER_PROCESSING_MODE: "inline",
@@ -33,13 +37,13 @@ export default defineConfig({
   globalSetup: "./tests/e2e/global-setup.ts",
   reporter: [["html"], ["list"]],
   use: {
-    baseURL: "http://localhost:3210",
+    baseURL: e2eBaseUrl,
     trace: "on-first-retry",
   },
   webServer: {
-    command: "pnpm dev",
+    command: `./node_modules/.bin/next dev --port ${e2ePort}`,
     env: webServerEnv,
-    url: "http://localhost:3210",
+    url: e2eBaseUrl,
     reuseExistingServer: false,
     timeout: 120_000,
   },

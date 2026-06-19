@@ -10,8 +10,9 @@ import { E2E_USER_EMAIL, E2E_USER_PASSWORD } from "./test-user";
 loadEnv({ path: ".env.local", override: false });
 
 process.env.AI_PROVIDER = "mock";
-process.env.APP_URL = "http://localhost:3210";
-process.env.BETTER_AUTH_URL = "http://localhost:3210";
+const e2eBaseUrl = `http://localhost:${process.env.PLAYWRIGHT_PORT ?? "3210"}`;
+process.env.APP_URL = e2eBaseUrl;
+process.env.BETTER_AUTH_URL = e2eBaseUrl;
 process.env.PAYMENT_PROVIDER = "mock";
 process.env.RATE_LIMIT_ENABLED = "false";
 process.env.STORAGE_PROVIDER = "local";

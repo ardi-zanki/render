@@ -70,11 +70,16 @@ test.describe("auth pages", () => {
     await page.goto("/reset-password");
 
     await expect(
-      page.getByRole("heading", { name: "Buat Password Baru" }),
+      page.getByRole("heading", { name: "Tautan tidak valid" }),
     ).toBeVisible();
     await expect(
-      page.getByText("Tautan reset tidak valid atau sudah kedaluwarsa."),
+      page.getByText(
+        "Tautan reset sudah kedaluwarsa atau tidak valid. Minta tautan baru untuk melanjutkan.",
+      ),
     ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Minta tautan baru" }),
+    ).toHaveAttribute("href", "/forgot-password");
     await expect(page.getByText("by Glasier Labs")).toHaveCount(0);
   });
 });
