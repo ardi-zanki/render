@@ -18,6 +18,7 @@ import {
   renderResolvedDisplayName,
   statusBadgeVariant,
 } from "@/lib/renders/labels";
+import { renderDetailBackLink } from "@/lib/renders/navigation";
 import { listProjects } from "@/lib/projects/service";
 import { getRenderDetail } from "@/lib/renders/queries";
 import { renderVersionLabels } from "@/lib/renders/version-labels";
@@ -32,17 +33,24 @@ const dateFmt = new Intl.DateTimeFormat("id-ID", {
 
 export default async function RenderDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ returnTo?: string }>;
 }) {
   const { user } = await requireVerifiedUser();
-  const { id } = await params;
+  const [{ id }, { returnTo }] = await Promise.all([params, searchParams]);
   const [render, projectRows] = await Promise.all([
     getRenderDetail(user.id, id),
     listProjects(user.id),
   ]);
   if (!render) notFound();
   const renderName = renderResolvedDisplayName(render.name, render.mode);
+  const backLink = renderDetailBackLink(
+    returnTo,
+    render.projectId,
+    render.projectName,
+  );
   const projectOptions = projectRows.map((project) => ({
     id: project.id,
     name: project.name,
@@ -61,7 +69,7 @@ export default async function RenderDetailPage({
     <>
       <PageHeader
         title={renderName}
-        backLink={{ href: "/renders", label: "Semua render" }}
+        backLink={backLink}
       />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_240px] xl:grid-cols-[minmax(0,1fr)_260px]">
