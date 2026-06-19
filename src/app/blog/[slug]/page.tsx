@@ -7,7 +7,6 @@ import { FinalCta } from "@/components/brand/marketing-blocks";
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { blogPosts } from "@/lib/marketing";
 import { getServerSession } from "@/lib/session";
 
@@ -38,7 +37,6 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
   if (!post) notFound();
 
   const isAuthenticated = Boolean(session?.user && !session.user.isDisabled);
-  const relatedPosts = blogPosts.filter((item) => item.slug !== post.slug).slice(0, 2);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -90,41 +88,6 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
             </div>
           </div>
         </article>
-
-        <section className="border-t border-border/70 bg-card px-4 py-12 sm:px-6 sm:py-16">
-          <div className="mx-auto max-w-6xl">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase text-primary">
-                  Artikel Lain
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-normal">
-                  Lanjutkan membaca
-                </h2>
-              </div>
-              <Button variant="outline" asChild>
-                <Link href="/blog">Semua artikel</Link>
-              </Button>
-            </div>
-            <div className="mt-8 grid gap-4 md:grid-cols-2">
-              {relatedPosts.map((item) => (
-                <Link
-                  key={item.slug}
-                  href={`/blog/${item.slug}`}
-                  className="rounded-lg border border-border/70 bg-background p-5 shadow-soft transition-colors hover:border-primary/35"
-                >
-                  <Badge variant="outline">{item.category}</Badge>
-                  <h3 className="mt-4 text-lg font-semibold leading-snug tracking-normal text-foreground">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {item.excerpt}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
 
         <FinalCta
           title="Ubah wawasan menjadi workflow render yang lebih terarah"
