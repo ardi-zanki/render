@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   Trash2,
   UserRound,
-  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -160,15 +159,6 @@ export function SettingsModal({
       containerClassName="p-3 sm:p-6"
       panelClassName="flex h-[min(680px,calc(100vh-1.5rem))] w-full max-w-3xl flex-col overflow-hidden rounded-lg border border-border bg-card shadow-dialog md:grid md:grid-cols-[196px_1fr]"
     >
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute right-4 top-4 z-10 text-muted-foreground transition-colors hover:text-foreground"
-        aria-label="Tutup pengaturan"
-      >
-        <X className="size-5" />
-      </button>
-
       <aside className="border-b border-border bg-muted/35 p-3 pr-12 md:border-b-0 md:border-r md:pr-3">
         <div className="px-2 py-1 md:mb-3">
           <h2 id="settings-title" className="text-base font-semibold text-foreground">

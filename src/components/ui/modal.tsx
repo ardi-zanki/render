@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
@@ -123,6 +124,15 @@ export function Modal({
         tabIndex={-1}
         className={cn("relative outline-none", zLayer.modal, panelClassName)}
       >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Tutup modal"
+          title="Tutup"
+          className="absolute right-3 top-3 z-10 flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <X className="size-4" />
+        </button>
         {children}
       </div>
     </div>,

@@ -9,7 +9,6 @@ import {
   Plus,
   RotateCcw,
   Trash2,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -109,20 +108,13 @@ function ProjectFormModal({
       labelledBy="project-modal-title"
       panelClassName="w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-dialog"
     >
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between pr-10">
         <h2
           id="project-modal-title"
           className="text-base font-semibold text-foreground"
         >
           {isEdit ? "Edit project" : "Buat project"}
         </h2>
-        <button
-          onClick={onClose}
-          aria-label="Tutup"
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <X className="size-5" />
-        </button>
       </div>
 
       <div className="flex flex-col gap-4">
