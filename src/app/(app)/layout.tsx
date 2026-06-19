@@ -1,6 +1,8 @@
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 
 import { AppShell } from "@/components/app/app-shell";
+import { GoogleLinkToast } from "@/components/app/google-link-toast";
 import {
   getUserProfile,
   hasGoogleAccount,
@@ -70,6 +72,9 @@ export default async function AppLayout({
         createdAt: n.createdAt.toISOString(),
       }))}
     >
+      <Suspense fallback={null}>
+        <GoogleLinkToast />
+      </Suspense>
       {children}
     </AppShell>
   );
