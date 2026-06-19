@@ -163,11 +163,9 @@ export default async function RenderDetailPage({
               </dl>
 
               {render.errorMessage && (
-                <p className="flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 px-2.5 py-1.5 text-xs text-destructive">
-                  <CircleAlert className="size-3.5 shrink-0" />
-                  <span className="truncate" title={render.errorMessage}>
-                    {render.errorMessage}
-                  </span>
+                <p className="flex items-start gap-1.5 text-xs leading-5 text-destructive">
+                  <CircleAlert className="mt-0.5 size-3.5 shrink-0" />
+                  <span>{render.errorMessage}</span>
                 </p>
               )}
               {render.status !== "cancelled" && (
