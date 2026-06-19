@@ -51,7 +51,7 @@ export const publicNavItems = [
 
 export const landingNavItems = [
   { label: "Fitur", href: "#fitur" },
-  { label: "Showcase", href: "#showcase" },
+  { label: "Galeri", href: "#showcase" },
   { label: "Cara Kerja", href: "#cara-kerja" },
   { label: "Harga", href: "#harga" },
   { label: "FAQ", href: "#faq" },

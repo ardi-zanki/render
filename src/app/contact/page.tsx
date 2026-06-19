@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { PageHero, SectionHeader } from "@/components/brand/marketing-blocks";
 import { PublicFooter } from "@/components/brand/public-footer";
@@ -42,9 +42,7 @@ export default async function ContactPage() {
                 Sertakan konteks akun atau project bila relevan.
               </p>
               <Button asChild className="mt-5 w-full">
-                <Link href="mailto:support@renderai.id">
-                  support@renderai.id <ArrowRight />
-                </Link>
+                <Link href="mailto:support@renderai.id">support@renderai.id</Link>
               </Button>
             </CardContent>
           </Card>
@@ -87,7 +85,7 @@ export default async function ContactPage() {
             </div>
             <Button asChild>
               <Link href={isAuthenticated ? "/dashboard" : "/login"}>
-                {isAuthenticated ? "Open Studio" : "Masuk"} <ArrowRight />
+                {isAuthenticated ? "Buka studio" : "Masuk"}
               </Link>
             </Button>
           </div>

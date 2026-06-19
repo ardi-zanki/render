@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { notFound } from "next/navigation";
 
 import { FinalCta } from "@/components/brand/marketing-blocks";
@@ -51,9 +50,8 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
             <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
               <Link
                 href="/blog"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                className="inline-flex text-sm font-semibold text-primary hover:underline"
               >
-                <ArrowLeft className="size-4" />
                 Kembali ke blog
               </Link>
               <div className="mt-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -105,9 +103,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
                 </h2>
               </div>
               <Button variant="outline" asChild>
-                <Link href="/blog">
-                  Semua artikel <ArrowRight />
-                </Link>
+                <Link href="/blog">Semua artikel</Link>
               </Button>
             </div>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -134,7 +130,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
           title="Ubah insight menjadi workflow render yang lebih rapi"
           description="Coba RenderAI untuk menyusun opsi visual project Anda berikutnya."
           href={isAuthenticated ? "/dashboard" : "/register"}
-          label={isAuthenticated ? "Open Studio" : "Buat akun RenderAI"}
+          label={isAuthenticated ? "Buka studio" : "Buat akun RenderAI"}
         />
       </main>
 

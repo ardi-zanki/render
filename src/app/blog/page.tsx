@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 import { PageHero, SectionHeader } from "@/components/brand/marketing-blocks";
 import { PublicFooter } from "@/components/brand/public-footer";
@@ -76,9 +75,7 @@ export default async function BlogPage() {
                 {featured.excerpt}
               </p>
               <Button asChild className="mt-5 w-fit">
-                <Link href={`/blog/${featured.slug}`}>
-                  Baca artikel <ArrowRight />
-                </Link>
+                <Link href={`/blog/${featured.slug}`}>Baca artikel</Link>
               </Button>
             </div>
           </article>
@@ -113,9 +110,9 @@ export default async function BlogPage() {
                   </p>
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                    className="mt-4 inline-flex text-sm font-semibold text-primary hover:underline"
                   >
-                    Baca selengkapnya <ArrowRight className="size-4" />
+                    Baca selengkapnya
                   </Link>
                 </div>
               </article>
