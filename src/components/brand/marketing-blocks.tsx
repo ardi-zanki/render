@@ -1,15 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Building2,
-  ImageIcon,
-  Sparkles,
-  Wand2,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, ImageIcon, Sparkles, Zap } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { BeforeAfterSlider } from "@/components/brand/before-after-slider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { showcase } from "@/lib/marketing";
@@ -89,99 +83,37 @@ export function ProductPreview({ compact = false }: { compact?: boolean }) {
           RenderAI Studio
         </div>
         <span className="text-xs font-medium text-muted-foreground">
-          Brief, opsi visual, dan review klien dalam satu workspace
+          Brief, render, review
         </span>
       </div>
-      <div className="grid overflow-hidden rounded-md border border-border/70 bg-background text-left lg:grid-cols-[220px_1fr_200px]">
-        <aside className="hidden border-r border-border/70 bg-card p-4 lg:block">
-          <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Wand2 className="size-4 text-primary" />
-            Arahan visual
+      <div className="overflow-hidden rounded-md border border-border/70 bg-background p-3 text-left sm:p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">
+              Project klien
+            </p>
+            <h3 className="font-semibold tracking-normal text-foreground">
+              Kamar utama
+            </h3>
           </div>
-          {[
-            ["Mode", "Interior"],
-            ["Gaya", "Japandi hangat"],
-            ["Cahaya", "Sore lembut"],
-            ["Suasana", "Tenang dan natural"],
-          ].map(([label, value]) => (
-            <div key={label} className="mb-4">
-              <p className="text-xs font-medium text-muted-foreground">
-                {label}
-              </p>
-              <div className="mt-1 rounded-md border border-border/80 bg-background px-3 py-2 text-sm font-semibold text-foreground">
-                {value}
-              </div>
-            </div>
-          ))}
-        </aside>
-
-        <div className="bg-secondary/35 p-4 sm:p-6">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-medium text-muted-foreground">
-                Project Interior Klien
-              </p>
-              <h3 className="font-semibold tracking-normal text-foreground">
-                Opsi Kamar Utama
-              </h3>
-            </div>
-            <Badge variant="success">
-              <Zap /> Siap ditinjau
-            </Badge>
-          </div>
-          <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-border/70 bg-card">
-            <Image
-              src="/marketing/renderai-architecture-collage.png"
-              alt="Preview render interior bedroom"
-              fill
-              priority
-              sizes="(min-width: 1024px) 720px, 100vw"
-              className="size-full object-cover object-left-top"
-            />
-            <div className="absolute inset-y-0 left-1/2 w-px bg-overlay-foreground/90" />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-full border border-overlay-foreground/80 bg-overlay/55 px-3 py-1 text-xs font-semibold text-overlay-foreground shadow-floating">
-              Draft / Opsi visual
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <ImageIcon className="size-4" />
-              Output siap diunduh dan dibandingkan
-            </div>
-            <Button size="sm" asChild>
-              <Link href="/renders/new">
-                Render <ArrowRight />
-              </Link>
-            </Button>
-          </div>
+          <Badge variant="success">
+            <Zap /> Siap ditinjau
+          </Badge>
         </div>
 
-        <aside className="hidden border-l border-border/70 bg-card p-4 lg:block">
-          <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Building2 className="size-4 text-primary" />
-            Opsi tersimpan
+        <BeforeAfterSlider />
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <ImageIcon className="size-4" />
+            Geser untuk membandingkan asli dan hasil.
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {showcase.slice(0, 4).map((item, index) => (
-              <Image
-                key={item.title}
-                src={item.src}
-                alt={item.title}
-                width={120}
-                height={120}
-                loading={index === 0 ? "eager" : "lazy"}
-                className={cn(
-                  "aspect-square rounded-md object-cover",
-                  item.imageClassName,
-                )}
-              />
-            ))}
-          </div>
-          <div className="mt-4 rounded-md bg-secondary p-3 text-xs leading-5 text-muted-foreground">
-            Setiap opsi tersimpan bersama project agar revisi dan keputusan
-            visual tetap mudah diikuti.
-          </div>
-        </aside>
+          <Button size="sm" asChild>
+            <Link href="/renders/new">
+              Render <ArrowRight />
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -204,10 +136,7 @@ export function ShowcaseGrid() {
             fill
             priority={index === 0}
             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-            className={cn(
-              "size-full object-cover transition-transform duration-500 group-hover:scale-105",
-              item.imageClassName,
-            )}
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-overlay/70 to-transparent p-4 text-left text-sm font-semibold text-overlay-foreground">
             {item.title}

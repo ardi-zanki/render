@@ -28,7 +28,6 @@ export type MarketingFeature = {
 export type ShowcaseItem = {
   title: string;
   src: string;
-  imageClassName?: string;
   className?: string;
 };
 
@@ -61,33 +60,33 @@ export const landingNavItems = [
 export const features: MarketingFeature[] = [
   {
     icon: Camera,
-    title: "Input desain lebih fleksibel",
-    desc: "Mulai dari screenshot model, sketsa, foto ruang, atau referensi visual yang sudah dimiliki tim.",
+    title: "Input fleksibel",
+    desc: "Mulai dari screenshot, sketsa, foto ruang, atau referensi visual.",
   },
   {
     icon: Palette,
-    title: "Kontrol gaya dan suasana",
-    desc: "Pilih arah style, pencahayaan, mood, lokasi, dan catatan material agar hasil tetap dekat dengan brief.",
+    title: "Arahan visual jelas",
+    desc: "Atur gaya, mood, cahaya, dan detail yang perlu dijaga.",
   },
   {
     icon: CloudSun,
-    title: "Eksplorasi mood lebih cepat",
-    desc: "Bandingkan suasana pagi, sore, natural, atau dramatis sebelum masuk ke produksi visual final.",
+    title: "Mood cepat dibandingkan",
+    desc: "Coba beberapa suasana sebelum produksi visual final.",
   },
   {
     icon: FolderKanban,
-    title: "Project tersimpan rapi",
-    desc: "Referensi, output, dan revisi berada di satu workspace sehingga keputusan visual mudah ditelusuri.",
+    title: "Project rapi",
+    desc: "Simpan referensi, output, dan revisi dalam satu tempat.",
   },
   {
     icon: RefreshCcw,
-    title: "Revisi tanpa mulai dari nol",
-    desc: "Buat variasi baru dari output sebelumnya untuk mengejar arah desain yang lebih tepat.",
+    title: "Variasi mudah dibuat",
+    desc: "Buat opsi baru dari arahan atau hasil sebelumnya.",
   },
   {
     icon: BadgeCheck,
-    title: "Siap untuk review klien",
-    desc: "Unduh hasil, bagikan preview, dan gunakan visual sebagai bahan diskusi yang lebih konkret.",
+    title: "Siap direview",
+    desc: "Gunakan output untuk diskusi internal atau review klien.",
   },
 ];
 
@@ -127,24 +126,20 @@ export const featureGroups: MarketingFeature[] = [
 export const showcase: ShowcaseItem[] = [
   {
     title: "Bedroom suite hangat",
-    src: "/marketing/renderai-architecture-collage.png",
-    imageClassName: "object-left-top",
+    src: "/marketing/renderai-bedroom.png",
     className: "md:row-span-2",
   },
   {
     title: "Studio kolaborasi",
-    src: "/marketing/renderai-architecture-collage.png",
-    imageClassName: "object-right-top",
+    src: "/marketing/renderai-studio.png",
   },
   {
     title: "Living area premium",
-    src: "/marketing/renderai-architecture-collage.png",
-    imageClassName: "object-left-bottom",
+    src: "/marketing/renderai-living.png",
   },
   {
     title: "Fasad residence kontemporer",
-    src: "/marketing/renderai-architecture-collage.png",
-    imageClassName: "object-right-bottom",
+    src: "/marketing/renderai-facade.png",
     className: "md:col-span-2",
   },
 ];
@@ -153,17 +148,17 @@ export const workflowSteps = [
   {
     step: "01",
     title: "Unggah materi desain",
-    desc: "Gunakan screenshot model, foto ruang, sketsa, atau referensi visual yang relevan.",
+    desc: "Mulai dari screenshot, foto ruang, atau sketsa.",
   },
   {
     step: "02",
     title: "Lengkapi arahan visual",
-    desc: "Pilih mode render, gaya, pencahayaan, suasana, dan detail yang perlu dipertahankan.",
+    desc: "Pilih gaya, mood, cahaya, dan detail penting.",
   },
   {
     step: "03",
     title: "Review dan bagikan",
-    desc: "Bandingkan output, simpan per project, lalu unduh atau bagikan sebagai bahan diskusi.",
+    desc: "Simpan hasil, bandingkan, lalu bagikan.",
   },
 ];
 
@@ -190,12 +185,6 @@ export const faqs = [
   },
 ];
 
-export const stats = [
-  { value: "3x", label: "lebih cepat menyusun opsi mood awal" },
-  { value: "1", label: "workspace untuk project, render, dan revisi" },
-  { value: "24/7", label: "alur eksplorasi visual saat tim butuh opsi baru" },
-];
-
 export const blogPosts: BlogPost[] = [
   {
     slug: "mempercepat-review-konsep-interior",
@@ -205,8 +194,7 @@ export const blogPosts: BlogPost[] = [
     category: "Workflow",
     date: "18 Juni 2026",
     readTime: "5 menit",
-    image:
-      "/marketing/renderai-architecture-collage.png",
+    image: "/marketing/renderai-living.png",
     body: [
       "Review konsep sering melambat bukan karena tim kekurangan ide, tetapi karena visual awal belum cukup jelas untuk dibandingkan. RenderAI membantu mengubah materi awal menjadi beberapa arah visual yang bisa dibahas lebih konkret.",
       "Mulai dengan satu screenshot model atau foto ruang yang paling representatif. Tambahkan arahan singkat tentang gaya, pencahayaan, elemen yang harus dipertahankan, dan mood yang ingin diuji.",
@@ -221,8 +209,7 @@ export const blogPosts: BlogPost[] = [
     category: "Project",
     date: "14 Juni 2026",
     readTime: "4 menit",
-    image:
-      "/marketing/renderai-architecture-collage.png",
+    image: "/marketing/renderai-studio.png",
     body: [
       "Revisi yang tercecer membuat tim sulit menjawab pertanyaan sederhana: visual mana yang disetujui, apa yang berubah, dan kenapa arah tertentu ditinggalkan.",
       "Dengan menyimpan render per project, setiap output memiliki konteks. Tim bisa melihat input, arahan, dan hasil dalam satu tempat sebelum membuat variasi berikutnya.",
@@ -237,8 +224,7 @@ export const blogPosts: BlogPost[] = [
     category: "Pricing",
     date: "9 Juni 2026",
     readTime: "3 menit",
-    image:
-      "/marketing/renderai-architecture-collage.png",
+    image: "/marketing/renderai-facade.png",
     body: [
       "Kebutuhan render AI biasanya naik turun mengikuti fase project. Di awal, studio butuh banyak eksplorasi mood. Setelah arah terkunci, kebutuhan bergeser ke revisi dan presentasi.",
       "Paket kecil cocok untuk mencoba alur atau project tunggal. Paket lebih besar lebih efisien ketika tim sedang menangani beberapa project aktif atau sering membuat variasi untuk review.",

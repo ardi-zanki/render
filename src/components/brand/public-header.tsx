@@ -18,9 +18,11 @@ type NavItem = { label: string; href: string };
 export function PublicHeader({
   nav,
   authenticated = false,
+  showThemeToggle = true,
 }: {
   nav?: NavItem[];
   authenticated?: boolean;
+  showThemeToggle?: boolean;
 }) {
   const items = nav ?? publicNavItems;
   const hasNav = items.length > 0;
@@ -67,7 +69,7 @@ export function PublicHeader({
               {authenticated ? "Open Studio" : "Buat akun"} <ArrowRight />
             </Link>
           </Button>
-          <ModeToggle />
+          {showThemeToggle && <ModeToggle />}
         </div>
       </div>
     </header>

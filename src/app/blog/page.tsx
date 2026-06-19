@@ -29,8 +29,8 @@ export default async function BlogPage() {
       <main className="flex-1">
         <PageHero
           eyebrow="Blog"
-          title="Catatan workflow untuk render AI yang lebih rapi"
-          description="Panduan praktis seputar review konsep, pengelolaan revisi, dan cara memakai RenderAI dalam kerja studio sehari-hari."
+          title="Catatan singkat untuk workflow visual"
+          description="Panduan praktis untuk review konsep, revisi, dan penggunaan RenderAI."
         >
           <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border/70 bg-card shadow-soft">
             <Image
@@ -48,8 +48,8 @@ export default async function BlogPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Artikel Terbaru"
-            title="Baca insight praktis untuk tim desain"
-            description="Mulai dari pengaturan brief sampai cara menjaga revisi tetap mudah ditelusuri."
+            title="Insight praktis untuk tim desain"
+            description="Brief lebih jelas, revisi lebih mudah diikuti."
           />
 
           <article className="mt-9 grid overflow-hidden rounded-lg border border-border/70 bg-card shadow-soft md:grid-cols-[1.1fr_0.9fr]">

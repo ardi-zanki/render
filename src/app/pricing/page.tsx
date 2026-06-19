@@ -25,9 +25,9 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 const notes = [
-  "Tidak perlu langganan bulanan untuk mulai mencoba.",
-  "Kredit digunakan saat proses render berjalan.",
-  "Paket dapat ditambah kapan saja sesuai kebutuhan project.",
+  "Tanpa langganan bulanan.",
+  "Kredit dipakai saat render.",
+  "Tambah paket kapan saja.",
 ];
 
 export default async function PricingPage() {
@@ -45,8 +45,8 @@ export default async function PricingPage() {
       <main className="flex-1">
         <PageHero
           eyebrow="Paket Kredit"
-          title="Kredit fleksibel untuk setiap ritme project desain"
-          description="Mulai dari kebutuhan eksplorasi kecil, lalu tambah kapasitas saat presentasi, revisi, dan jumlah project meningkat."
+          title="Kredit fleksibel untuk render AI"
+          description="Mulai kecil, tambah saat project membutuhkan lebih banyak opsi."
         >
           <div className="rounded-lg border border-border/70 bg-background p-5 shadow-soft">
             <p className="text-sm font-semibold text-foreground">
@@ -66,8 +66,8 @@ export default async function PricingPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Pilihan Paket"
-            title="Pilih kapasitas yang sesuai dengan fase project"
-            description="Paket kecil cocok untuk uji alur. Paket lebih besar membantu saat tim aktif mengejar banyak opsi visual."
+            title="Pilih kapasitas sesuai kebutuhan"
+            description="Cocok untuk eksplorasi kecil sampai banyak revisi."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {packages.map((pkg) => {
@@ -142,10 +142,10 @@ export default async function PricingPage() {
         </section>
 
         <FinalCta
-          title="Siapkan kapasitas visual untuk project berikutnya"
-          description="Mulai dengan paket yang sesuai, lalu tambah kredit ketika eksplorasi dan revisi mulai bergerak."
+          title="Siapkan kredit render Anda"
+          description="Pilih paket, lalu mulai membuat opsi visual."
           href={packageCtaHref}
-          label={isAuthenticated ? "Buka pembayaran" : "Buat akun RenderAI"}
+          label={isAuthenticated ? "Buka pembayaran" : "Mulai sekarang"}
         />
       </main>
 

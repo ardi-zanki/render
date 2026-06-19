@@ -30,8 +30,8 @@ export default async function FeaturesPage() {
       <main className="flex-1">
         <PageHero
           eyebrow="Fitur RenderAI"
-          title="Semua yang dibutuhkan untuk eksplorasi visual yang rapi"
-          description="RenderAI menggabungkan input desain, arahan visual, project, versi, kredit, dan output dalam satu workspace yang mudah diikuti."
+          title="Fitur untuk review visual yang rapi"
+          description="Input, arahan, output, dan project dalam satu workspace."
         >
           <ProductPreview compact />
         </PageHero>
@@ -39,8 +39,8 @@ export default async function FeaturesPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Kemampuan Utama"
-            title="Dari ide awal sampai output siap dibahas"
-            description="Setiap fitur dibuat untuk mengurangi langkah manual saat tim perlu melihat banyak opsi visual."
+            title="Dari ide awal ke visual siap bahas"
+            description="Lebih sedikit langkah manual, lebih cepat melihat opsi."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {featureGroups.map((feature) => (
@@ -65,8 +65,8 @@ export default async function FeaturesPage() {
           <div className="mx-auto max-w-6xl">
             <SectionHeader
               eyebrow="Workflow"
-              title="Alur pendek untuk mendapatkan visual yang layak ditinjau"
-              description="Mulai dari materi awal, beri arahan yang jelas, lalu gunakan hasilnya untuk mempercepat diskusi."
+              title="Alur pendek untuk review"
+              description="Unggah materi, beri arahan, lalu bandingkan hasil."
             />
             <div className="mt-9 grid gap-4 md:grid-cols-3">
               {workflowSteps.map((item) => (
@@ -92,8 +92,8 @@ export default async function FeaturesPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Output"
-            title="Visual yang mudah dibandingkan dan dibawa ke review"
-            description="Gunakan hasil sebagai pembanding mood, bahan presentasi awal, atau catatan arah desain berikutnya."
+            title="Visual yang mudah dibandingkan"
+            description="Pakai untuk mood, presentasi awal, atau catatan revisi."
           />
           <div className="mt-9">
             <ShowcaseGrid />
@@ -101,10 +101,10 @@ export default async function FeaturesPage() {
         </section>
 
         <FinalCta
-          title="Coba workflow RenderAI pada project aktif Anda"
-          description="Unggah materi awal, atur arahan visual, lalu lihat bagaimana opsi render membantu mempercepat review."
+          title="Coba RenderAI di project aktif"
+          description="Mulai dari materi desain yang sudah ada."
           href={isAuthenticated ? "/dashboard" : "/register"}
-          label={isAuthenticated ? "Open Studio" : "Buat akun RenderAI"}
+          label={isAuthenticated ? "Open Studio" : "Mulai sekarang"}
         />
       </main>
 

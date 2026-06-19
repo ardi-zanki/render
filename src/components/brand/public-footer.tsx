@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 const GROUPS = [
   {
@@ -35,10 +36,6 @@ export function PublicFooter() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.25fr_2fr]">
         <div>
           <Logo size={28} />
-          <p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">
-            Workspace render AI untuk arsitektur dan interior yang membantu tim
-            bergerak dari draft ke opsi visual dengan lebih rapi.
-          </p>
         </div>
         <nav className="grid gap-6 text-sm sm:grid-cols-3">
           {GROUPS.map((group) => (
@@ -62,7 +59,7 @@ export function PublicFooter() {
       <div className="border-t border-border/70">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>© {new Date().getFullYear()} RenderAI. Seluruh hak cipta dilindungi.</p>
-          <p>Dibuat untuk workflow visual yang lebih tenang dan terukur.</p>
+          <ModeToggle />
         </div>
       </div>
     </footer>
