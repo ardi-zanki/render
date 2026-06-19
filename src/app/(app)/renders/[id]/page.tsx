@@ -111,9 +111,6 @@ export default async function RenderDetailPage({
                   <h2 className="text-sm font-semibold text-foreground">
                     Info Render
                   </h2>
-                  {render.config?.editKind === "texture" && (
-                    <Badge variant="info">Edit Texture</Badge>
-                  )}
                 </div>
                 <RenderActionsMenu
                   renderId={render.id}
