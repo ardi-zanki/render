@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { SettingsModal } from "@/components/app/settings-modal";
 import { Avatar } from "@/components/ui/avatar";
@@ -16,6 +17,7 @@ import { Popover } from "@/components/ui/popover";
 import { signOut } from "@/lib/auth-client";
 import type { UserStorageUsage } from "@/lib/storage/usage";
 import { cn } from "@/lib/utils";
+import { zLayer } from "@/lib/z-layers";
 
 type MenuUser = {
   name: string;
@@ -91,6 +93,7 @@ export function UserMenu({
         title={compact ? user.name : undefined}
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-label={`Buka menu akun ${user.name}`}
         disabled={loggingOut}
         className={cn(
           "group relative flex w-full cursor-pointer items-center gap-3 rounded-md py-2 transition-colors hover:bg-muted/80",
@@ -178,18 +181,23 @@ export function UserMenu({
         </button>
       </Popover>
 
-      {loggingOut && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/75 backdrop-blur-sm"
-        >
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <Loader2 className="size-4 animate-spin text-primary" />
-            Keluar...
-          </div>
-        </div>
-      )}
+      {loggingOut &&
+        createPortal(
+          <div
+            role="status"
+            aria-live="polite"
+            className={cn(
+              "fixed inset-0 flex items-center justify-center bg-background/75 backdrop-blur-sm",
+              zLayer.modal,
+            )}
+          >
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Loader2 className="size-4 animate-spin text-primary" />
+              Keluar...
+            </div>
+          </div>,
+          document.body,
+        )}
 
       {settingsOpen && (
         <SettingsModal
