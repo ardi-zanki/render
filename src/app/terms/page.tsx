@@ -8,9 +8,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Syarat & Ketentuan",
+  title: "Ketentuan Layanan",
   description:
-    "Syarat dan ketentuan penggunaan RenderAI untuk akun, kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan.",
+    "Ketentuan layanan RenderAI untuk akun, kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan.",
 };
 
 const sections = [
@@ -74,7 +74,7 @@ const sections = [
   {
     title: "9. Privasi dan Data",
     body: [
-      "RenderAI memproses data akun, unggahan, hasil render, pembayaran, dan aktivitas aplikasi untuk menyediakan layanan, menjaga keamanan, meningkatkan pengalaman pengguna, dan memenuhi kewajiban operasional.",
+      "Pemrosesan data pribadi dan materi unggahan dijelaskan lebih rinci di halaman Kebijakan Privasi RenderAI.",
       "Anda bertanggung jawab memastikan materi yang diunggah tidak berisi data pribadi atau rahasia pihak lain tanpa izin yang sah.",
     ],
   },
@@ -107,12 +107,19 @@ export default async function TermsPage() {
             Legal RenderAI
           </p>
           <h1 className="mt-3 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
-            Syarat & Ketentuan
+            Ketentuan Layanan
           </h1>
           <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
             Ketentuan ini menjelaskan aturan penggunaan RenderAI, termasuk akun,
             kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan
             layanan.
+          </p>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Untuk penjelasan pemrosesan data pribadi, baca{" "}
+            <Link href="/privacy" className="font-semibold text-primary hover:underline">
+              Kebijakan Privasi
+            </Link>
+            .
           </p>
           <p className="mt-3 text-xs font-medium text-muted-foreground">
             Terakhir diperbarui: 1 Juni 2026

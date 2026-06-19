@@ -126,7 +126,11 @@ export function RegisterForm() {
         <span>
           Saya setuju dengan{" "}
           <Link href="/terms" className="font-medium text-primary underline">
-            Syarat &amp; Ketentuan
+            Ketentuan Layanan
+          </Link>{" "}
+          dan{" "}
+          <Link href="/privacy" className="font-medium text-primary underline">
+            Kebijakan Privasi
           </Link>
         </span>
       </label>

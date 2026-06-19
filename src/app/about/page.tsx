@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import { BadgeCheck, FolderKanban, Wand2 } from "lucide-react";
 
+import {
+  FinalCta,
+  PageHero,
+  ProductPreview,
+  SectionHeader,
+} from "@/components/brand/marketing-blocks";
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
 import { Card, CardContent } from "@/components/ui/card";
+import { audience } from "@/lib/marketing";
 import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -14,19 +20,16 @@ export const metadata: Metadata = {
 
 const principles = [
   {
-    icon: Wand2,
-    title: "Eksplorasi yang terarah",
+    title: "Eksplorasi tetap terarah",
     desc: "RenderAI membantu tim membuat opsi visual dari materi desain yang sudah ada tanpa kehilangan konteks brief.",
   },
   {
-    icon: FolderKanban,
-    title: "Alur kerja yang tertata",
-    desc: "Project, referensi, dan hasil render disimpan di satu tempat agar review dan revisi lebih mudah diikuti.",
+    title: "Keputusan lebih mudah dilacak",
+    desc: "Project, referensi, hasil render, dan variasi disimpan bersama agar review tidak tercecer.",
   },
   {
-    icon: BadgeCheck,
-    title: "Siap untuk diskusi",
-    desc: "Output digunakan sebagai bahan komunikasi konsep, mood approval, dan pengambilan keputusan visual awal.",
+    title: "AI sebagai alat bantu studio",
+    desc: "Tim tetap memegang keputusan desain. AI mempercepat opsi awal, bukan menggantikan penilaian profesional.",
   },
 ];
 
@@ -38,49 +41,71 @@ export default async function AboutPage() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader authenticated={isAuthenticated} />
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
-        <div className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase text-primary">
-            Tentang RenderAI
-          </p>
-          <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
-            Workspace visual untuk review desain yang lebih jelas
-          </h1>
-          <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
-            RenderAI dibangun untuk arsitek, interior designer, kontraktor,
-            developer properti, dan pemilik rumah yang membutuhkan opsi visual
-            cepat namun tetap rapi untuk diskusi dan pengambilan keputusan.
-          </p>
-        </div>
+      <main className="flex-1">
+        <PageHero
+          eyebrow="Tentang RenderAI"
+          title="Workspace visual untuk review desain yang lebih jelas"
+          description="RenderAI dibangun untuk arsitek, interior designer, kontraktor, developer properti, dan pemilik rumah yang membutuhkan opsi visual cepat namun tetap rapi untuk diskusi dan pengambilan keputusan."
+        >
+          <ProductPreview compact />
+        </PageHero>
 
-        <div className="mt-7 grid gap-4 md:grid-cols-3">
-          {principles.map((item) => (
-            <Card key={item.title}>
-              <CardContent className="flex flex-col gap-4 py-5">
-                <div className="flex size-9 items-center justify-center rounded-md bg-accent text-primary">
-                  <item.icon className="size-4" />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-foreground">{item.title}</h2>
+        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+          <SectionHeader
+            eyebrow="Prinsip Produk"
+            title="Dibuat untuk mempercepat proses tanpa mengacaukan workflow"
+            description="Fokus kami sederhana: visual yang lebih cepat dibaca, project yang lebih mudah diikuti, dan keputusan desain yang lebih tenang."
+          />
+          <div className="mt-9 grid gap-4 md:grid-cols-3">
+            {principles.map((item) => (
+              <Card key={item.title} className="shadow-none">
+                <CardContent className="py-5">
+                  <h2 className="text-base font-semibold text-foreground">
+                    {item.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    {item.desc}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="bg-card px-4 py-12 sm:px-6 sm:py-16">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader
+              eyebrow="Untuk Siapa"
+              title="Cocok untuk tim yang sering butuh opsi visual cepat"
+              description="RenderAI membantu berbagai peran di tahap eksplorasi, presentasi awal, dan review."
+            />
+            <div className="mt-9 grid gap-4 md:grid-cols-3">
+              {audience.map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-lg border border-border/70 bg-background p-5 shadow-soft"
+                >
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-accent text-primary">
+                    <item.icon className="size-4" />
+                  </div>
+                  <h3 className="mt-5 font-semibold text-foreground">
+                    {item.title}
+                  </h3>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {item.desc}
                   </p>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-        <Card className="mt-5">
-          <CardContent className="py-5">
-            <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-              Fokus RenderAI bukan menggantikan proses desain, melainkan
-              mempercepat tahap eksplorasi visual. Tim tetap memegang keputusan
-              desain, sementara AI membantu membuat opsi yang lebih cepat
-              dibanding memulai setiap visual dari nol.
-            </p>
-          </CardContent>
-        </Card>
+        <FinalCta
+          title="Bangun review visual yang lebih rapi sejak project berikutnya"
+          description="Mulai dari materi desain yang sudah ada, lalu susun opsi visual yang mudah dibandingkan bersama tim dan klien."
+          href={isAuthenticated ? "/dashboard" : "/register"}
+          label={isAuthenticated ? "Open Studio" : "Buat akun RenderAI"}
+        />
       </main>
 
       <PublicFooter />
