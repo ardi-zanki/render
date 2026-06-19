@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  CircleAlert,
   Layers3,
   Wand2,
 } from "lucide-react";
@@ -165,15 +166,20 @@ export default async function RenderDetailPage({
               </dl>
 
               {render.errorMessage && (
-                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-                  {render.errorMessage}
-                </div>
+                <p className="flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/10 px-2.5 py-1.5 text-xs text-destructive">
+                  <CircleAlert className="size-3.5 shrink-0" />
+                  <span className="truncate" title={render.errorMessage}>
+                    {render.errorMessage}
+                  </span>
+                </p>
               )}
-              <Button asChild size="sm" className="mt-1 w-full">
-                <Link href={`/renders/new?source=${render.id}`}>
-                  <Wand2 /> Open Studio
-                </Link>
-              </Button>
+              {render.status !== "cancelled" && (
+                <Button asChild size="sm" className="mt-1 w-full">
+                  <Link href={`/renders/new?source=${render.id}`}>
+                    <Wand2 /> Open Studio
+                  </Link>
+                </Button>
+              )}
             </CardContent>
           </Card>
         </aside>

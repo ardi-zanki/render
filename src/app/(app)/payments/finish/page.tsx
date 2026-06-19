@@ -2,6 +2,7 @@ import { CheckCircle2, Clock, XCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { RefreshOnMount } from "@/components/app/refresh-on-mount";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getPaymentForUser } from "@/lib/payments/service";
@@ -54,6 +55,7 @@ export default async function PaymentFinishPage({
 
   return (
     <div className="mx-auto flex w-full max-w-lg justify-center">
+      {key === "success" && <RefreshOnMount />}
       <Card className="w-full">
         <CardContent className="flex flex-col items-center gap-5 px-5 py-8 text-center sm:px-8 sm:py-10">
           <Icon className={`size-14 sm:size-16 ${v.color}`} />
