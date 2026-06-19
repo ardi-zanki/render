@@ -77,15 +77,15 @@ export function RenderQueueButton() {
         type="button"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          "relative flex size-9 cursor-pointer items-center justify-center rounded-md border border-border/80 bg-card text-muted-foreground transition-colors hover:bg-muted/80 hover:text-primary",
+          "relative flex size-8 cursor-pointer items-center justify-center rounded-md border border-border/80 bg-card text-muted-foreground transition-colors hover:bg-muted/80 hover:text-primary",
           count > 0 && "text-primary",
         )}
         aria-label="Antrean render"
         title="Antrean render"
       >
-        <Box className="size-4" />
+        <Box className="size-3.5" />
         {count > 0 && (
-          <span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-micro font-bold leading-4 text-primary-foreground">
+          <span className="absolute -right-1 -top-1 flex min-w-3.5 items-center justify-center rounded-full bg-primary px-1 text-micro font-bold leading-3.5 text-primary-foreground">
             {count > 9 ? "9+" : count}
           </span>
         )}

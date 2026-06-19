@@ -68,7 +68,7 @@ export function NotificationBell({
     <div ref={triggerRef} className="relative">
       <Button
         variant="outline"
-        size="icon"
+        size="icon-sm"
         aria-label="Notifikasi"
         aria-haspopup="menu"
         aria-expanded={open}
