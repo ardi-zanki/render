@@ -36,7 +36,16 @@ export function useRenderStudioState({
     initialConfig?.surrounding ?? "auto",
   );
   const [lightsOn, setLightsOn] = useState(initialConfig?.lightsOn ?? false);
-  const [time, setTime] = useState(initialConfig?.time ?? "auto");
+  const initialTime = (() => {
+    const saved = initialConfig?.time;
+    if (defaultRenderMode !== "interior") return saved ?? "auto";
+    if (["morning", "midday", "night", "mixed"].includes(saved ?? "")) {
+      return saved as string;
+    }
+    if (saved === "evening" || saved === "auto") return "mixed";
+    return "night";
+  })();
+  const [time, setTime] = useState(initialTime);
   const [weather, setWeather] = useState(initialConfig?.weather ?? "auto");
   const [instruction, setInstruction] = useState(initialInstruction);
   const [outputFormat, setOutputFormat] =

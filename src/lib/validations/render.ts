@@ -25,9 +25,11 @@ export const createRenderSchema = z.object({
   lightsOn: z
     .preprocess((value) => value === true || value === "true", z.boolean())
     .optional(),
-  time: z.enum(["auto", "morning", "midday", "evening", "night"]).optional(),
+  time: z
+    .enum(["auto", "morning", "midday", "evening", "night", "mixed"])
+    .optional(),
   weather: z
-    .enum(["auto", "clear", "cloudy", "overcast", "rain", "fog"])
+    .enum(["auto", "clear", "cloudy", "overcast", "drizzle", "rain", "fog"])
     .optional(),
   instruction: z
     .string()

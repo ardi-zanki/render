@@ -12,10 +12,11 @@ import { ToggleRow } from "@/components/ui/toggle-row";
 import type { RenderMode, RenderOutputFormat } from "@/db/schema";
 import {
   MODES,
+  EXTERIOR_TIMES,
+  INTERIOR_LIGHTING_MODES,
   OUTPUT_FORMATS,
   STYLE_OPTIONS,
   SURROUNDINGS,
-  TIMES,
   WEATHERS,
 } from "./constants";
 import { ChipGroup } from "./chip-group";
@@ -92,6 +93,8 @@ export function RenderStudioControls({
     mode === "interior" ? SURROUNDINGS.interior : SURROUNDINGS.exterior;
   const surroundingLabel =
     mode === "interior" ? "View Jendela" : "Lingkungan Sekitar";
+  const timeOptions =
+    mode === "interior" ? INTERIOR_LIGHTING_MODES : EXTERIOR_TIMES;
 
   return (
     // In the fixed-height studio, fill the column so its bottom lines up with
@@ -142,7 +145,9 @@ export function RenderStudioControls({
             </div>
           </ControlSection>
 
-          <ControlSection title="Konteks & Style">
+          <ControlSection
+            title={mode === "interior" ? "Mode Render" : "Konteks & Style"}
+          >
             <div className="grid grid-cols-2 gap-2">
               {MODES.map((m) => {
                 return (
@@ -157,61 +162,69 @@ export function RenderStudioControls({
                       setMode(m.value);
                       setStyle("auto");
                       setSurrounding("auto");
-                      if (m.value === "interior") setWeather("auto");
+                      setLightsOn(() => false);
+                      setWeather("auto");
+                      setTime(m.value === "interior" ? "night" : "auto");
                     }}
                   />
                 );
               })}
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="style">{styleLabel}</Label>
-              <Select
-                id="style"
-                value={style}
-                onChange={(e) => setStyle(e.target.value)}
-                className="h-9 rounded-md"
-              >
-                {styleOptions.map(([v, l]) => (
-                  <option key={v} value={v}>
-                    {l}
-                  </option>
-                ))}
-              </Select>
-            </div>
+            {mode !== "interior" && (
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="style">{styleLabel}</Label>
+                <Select
+                  id="style"
+                  value={style}
+                  onChange={(e) => setStyle(e.target.value)}
+                  className="h-9 rounded-md"
+                >
+                  {styleOptions.map(([v, l]) => (
+                    <option key={v} value={v}>
+                      {l}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            )}
           </ControlSection>
 
-          <ControlSection title="Environment & Lighting">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="location">Lokasi Proyek</Label>
-              <Input
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="contoh: Bandung, Bali, Jakarta"
-                className="h-9 rounded-md"
-              />
-            </div>
+          <ControlSection title="Lingkungan & Pencahayaan">
+            {mode !== "interior" && (
+              <>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="location">Lokasi Proyek</Label>
+                  <Input
+                    id="location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="contoh: Bandung, Bali, Jakarta"
+                    className="h-9 rounded-md"
+                  />
+                </div>
 
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="surrounding">{surroundingLabel}</Label>
-              <Select
-                id="surrounding"
-                value={surrounding}
-                onChange={(e) => setSurrounding(e.target.value)}
-                className="h-9 rounded-md"
-              >
-                {surroundingOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </Select>
-            </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="surrounding">{surroundingLabel}</Label>
+                  <Select
+                    id="surrounding"
+                    value={surrounding}
+                    onChange={(e) => setSurrounding(e.target.value)}
+                    className="h-9 rounded-md"
+                  >
+                    {surroundingOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </>
+            )}
 
             <div className="flex flex-col gap-2">
-              <Label>Waktu</Label>
-              <ChipGroup options={TIMES} value={time} onChange={setTime} />
+              <Label>{mode === "interior" ? "Mode Pencahayaan" : "Waktu"}</Label>
+              <ChipGroup options={timeOptions} value={time} onChange={setTime} />
             </div>
 
             {mode !== "interior" && (
@@ -246,14 +259,16 @@ export function RenderStudioControls({
             </div>
           </ControlSection>
 
-          <ControlSection title="Objek">
-            <ToggleRow
-              checked={lightsOn}
-              onCheckedChange={(next) => setLightsOn(() => next)}
-              label="Nyalakan Lampu"
-              className="h-10 w-full min-w-0 gap-2 px-3 text-xs sm:text-sm"
-            />
-          </ControlSection>
+          {mode !== "interior" && (
+            <ControlSection title="Objek">
+              <ToggleRow
+                checked={lightsOn}
+                onCheckedChange={(next) => setLightsOn(() => next)}
+                label="Nyalakan Lampu"
+                className="h-10 w-full min-w-0 gap-2 px-3 text-xs sm:text-sm"
+              />
+            </ControlSection>
+          )}
         </div>
         {footer && (
           <div className="shrink-0 border-t border-border/70 bg-card p-3">

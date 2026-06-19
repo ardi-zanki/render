@@ -19,6 +19,7 @@ vi.mock("@/env", () => ({
     FAL_RENDER_MODEL: "fal-ai/flux-2-pro/edit",
     FAL_STYLE_TRANSFER_MODEL: "fal-ai/uso",
     FAL_UPSCALE_MODEL: "fal-ai/aura-sr",
+    FAL_INPAINT_MODEL: "fal-ai/flux-pro/v1/fill",
     FAL_RENDER_MAX_EDGE: 2048,
     FAL_RENDER_SAFETY_TOLERANCE: "2",
     FAL_RENDER_SEED: undefined,
@@ -91,6 +92,47 @@ describe("fal provider (flux-2-pro/edit)", () => {
     // keepOriginal: the provider's bytes are returned untouched (no re-encode).
     expect(result.outputs[0].contentType).toBe("image/png");
     expect(result.outputs[0].data).toEqual(hoisted.responseBytes);
+  });
+
+  it("uses FLUX.1 Fill for text-guided masked texture edits", async () => {
+    await createFalAiProvider().createRender({
+      mode: "interior",
+      operation: "inpaint",
+      imageUrl: "https://fake.fal/base.png",
+      imageBuffer: await inputImage(800, 600),
+      maskUrl: "https://fake.fal/mask.png",
+      maskBuffer: await inputImage(800, 600),
+      prompt: "replace the masked surface with oak",
+    });
+
+    const { endpoint, input } = hoisted.subscribeCalls[0];
+    expect(endpoint).toBe("fal-ai/flux-pro/v1/fill");
+    expect(input.mask_url).toBe(hoisted.uploadUrl);
+    expect(input.image_url).toBe(hoisted.uploadUrl);
+  });
+
+  it("uses FLUX.2 multi-reference editing for an uploaded texture", async () => {
+    await createFalAiProvider().createRender({
+      mode: "interior",
+      operation: "inpaint",
+      imageUrl: "https://fake.fal/base.png",
+      imageBuffer: await inputImage(800, 600),
+      maskUrl: "https://fake.fal/mask.png",
+      maskBuffer: await inputImage(800, 600),
+      referenceUrl: "https://fake.fal/texture.png",
+      referenceBuffer: await inputImage(200, 200),
+      prompt: "use the uploaded material reference",
+    });
+
+    const { endpoint, input } = hoisted.subscribeCalls[0];
+    expect(endpoint).toBe("fal-ai/flux-2-pro/edit");
+    expect(input.image_urls).toEqual([
+      hoisted.uploadUrl,
+      hoisted.uploadUrl,
+      hoisted.uploadUrl,
+    ]);
+    expect(input.prompt).toContain("Image 2 is the material reference");
+    expect(input.image_size).toEqual({ width: 2048, height: 1536 });
   });
 
   it("re-encodes to the requested format when not original", async () => {

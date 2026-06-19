@@ -9,15 +9,15 @@ describe("buildTexturePrompt", () => {
       textureDescription: "polished white marble with subtle grey veining",
     });
     expect(prompt).toContain(
-      "Replace the selected region with polished white marble with subtle grey veining.",
+      "Replace the masked surface with polished white marble with subtle grey veining.",
     );
     // Always blends with surroundings.
-    expect(prompt).toContain("matching the surrounding lighting");
+    expect(prompt).toContain("surrounding lighting, shadows and reflections");
   });
 
   it("falls back to the label when there is no description", () => {
     const prompt = buildTexturePrompt({ textureLabel: "uploaded reference" });
-    expect(prompt).toContain("Replace the selected region with uploaded reference.");
+    expect(prompt).toContain("Replace the masked surface with uploaded reference.");
   });
 
   it("includes the user instruction when present", () => {
@@ -30,7 +30,7 @@ describe("buildTexturePrompt", () => {
 
   it("works with no texture and no instruction", () => {
     const prompt = buildTexturePrompt({});
-    expect(prompt).toContain("Replace the selected region with the requested material.");
+    expect(prompt).toContain("Replace the masked surface with the requested material.");
     expect(prompt.trim().length).toBeGreaterThan(0);
   });
 
@@ -40,6 +40,14 @@ describe("buildTexturePrompt", () => {
       instruction: "   ",
     });
     expect(prompt).not.toMatch(/\s{2,}\./);
-    expect(prompt).toContain("Replace the selected region with concrete.");
+    expect(prompt).toContain("Replace the masked surface with concrete.");
+  });
+
+  it("explicitly uses an uploaded material reference", () => {
+    const prompt = buildTexturePrompt({ referenceImage: true });
+    expect(prompt).toContain(
+      "Use the uploaded reference image as the material source",
+    );
+    expect(prompt).toContain("The unmasked image stays exactly as shown");
   });
 });

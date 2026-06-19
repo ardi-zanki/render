@@ -125,6 +125,7 @@ export async function POST(
     textureLabel,
     textureDescription,
     instruction: input.instruction,
+    referenceImage: Boolean(texture),
   });
 
   try {

@@ -92,6 +92,8 @@ export type ProviderRequestOptions = {
   inpaint?: boolean;
   /** render_assets.id of the mask to use for the inpaint. */
   maskAssetId?: string;
+  /** Exact uploaded material reference for this edit (avoids stale references). */
+  referenceAssetId?: string;
   /** Composed inpaint prompt (overrides the studio config prompt). */
   texturePrompt?: string;
   /** Human-readable texture name for the "Edit Texture" marker. */

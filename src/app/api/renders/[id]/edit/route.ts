@@ -72,15 +72,18 @@ export async function POST(
   const promptBase = baseAsset?.type === "original" ? "sketch" : "photo";
 
   const prompt = buildPrompt(input, promptBase);
-  const config = {
-    style: input.style,
-    time: input.time,
-    weather: input.weather,
-    lightsOn: input.lightsOn,
-    location: input.location,
-    surrounding: input.surrounding,
-    instruction: input.instruction,
-  };
+  const config =
+    input.mode === "interior"
+      ? { time: input.time }
+      : {
+          style: input.style,
+          time: input.time,
+          weather: input.weather,
+          lightsOn: input.lightsOn,
+          location: input.location,
+          surrounding: input.surrounding,
+          instruction: input.instruction,
+        };
 
   try {
     const result = await createRenderEdit({

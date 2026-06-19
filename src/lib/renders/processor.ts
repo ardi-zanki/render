@@ -69,8 +69,21 @@ async function processLockedJob(jobId: string) {
       where: and(eq(renderAssets.renderId, render.id), isNull(renderAssets.deletedAt)),
     });
     const original = assets.find((a) => a.type === "original");
-    const reference = assets.find((a) => a.type === "reference");
     if (!original) throw new Error("Asset original tidak ditemukan");
+
+    const requestOptions =
+      render.providerResponse &&
+      typeof render.providerResponse === "object" &&
+      "requestOptions" in render.providerResponse
+        ? ((render.providerResponse as { requestOptions?: ProviderRequestOptions })
+            .requestOptions ?? {})
+        : {};
+    const isInpaint = Boolean(requestOptions.inpaint);
+    const reference = isInpaint
+      ? requestOptions.referenceAssetId
+        ? assets.find((a) => a.id === requestOptions.referenceAssetId)
+        : undefined
+      : assets.find((a) => a.type === "reference");
 
     // Iterative edits build on a chosen prior version; otherwise use the original.
     const baseAsset =
@@ -80,16 +93,7 @@ async function processLockedJob(jobId: string) {
     const referenceBytes = reference
       ? await fetchAssetBytes(reference.fileUrl, reference.fileKey)
       : undefined;
-    const requestOptions =
-      render.providerResponse &&
-      typeof render.providerResponse === "object" &&
-      "requestOptions" in render.providerResponse
-        ? ((render.providerResponse as { requestOptions?: ProviderRequestOptions })
-            .requestOptions ?? {})
-        : {};
-
     // Region/texture edit: locate this edit's mask and run the inpaint path.
-    const isInpaint = Boolean(requestOptions.inpaint);
     const maskAsset = isInpaint
       ? (requestOptions.maskAssetId &&
           assets.find((a) => a.id === requestOptions.maskAssetId)) ||

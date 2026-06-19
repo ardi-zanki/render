@@ -250,7 +250,9 @@ export function createFalAiProvider(): AiProvider {
 
         const isInpaint = input.operation === "inpaint";
         const endpointId = isInpaint
-          ? env.FAL_INPAINT_MODEL
+          ? referenceUrl
+            ? env.FAL_RENDER_MODEL
+            : env.FAL_INPAINT_MODEL
           : input.mode === "upscale"
             ? env.FAL_UPSCALE_MODEL
             : input.mode === "style_transfer"
@@ -274,15 +276,37 @@ export function createFalAiProvider(): AiProvider {
               "MISSING_MASK",
             );
           }
-          requestInput = {
-            prompt: input.prompt ?? "",
-            image_url: imageUrl,
-            mask_url: maskUrl,
-            num_images: 1,
-            output_format: modelOutputFormat,
-            safety_tolerance: env.FAL_RENDER_SAFETY_TOLERANCE,
-            enable_safety_checker: true,
-          };
+          if (referenceUrl) {
+            // FLUX.1 Fill cannot consume a visual material reference. For an
+            // uploaded texture, use FLUX.2 Pro's multi-reference editor: image
+            // 1 is the base, image 2 the material, and image 3 the mask guide.
+            requestInput = {
+              prompt:
+                "Image 1 is the base architectural photograph. Image 2 is the material reference. Image 3 is a black-and-white mask whose white area identifies the surface to edit. " +
+                (input.prompt ?? ""),
+              image_urls: [imageUrl, referenceUrl, maskUrl],
+              image_size: await editImageSize(
+                input.imageBuffer,
+                env.FAL_RENDER_MAX_EDGE,
+              ),
+              output_format: modelOutputFormat,
+              safety_tolerance: env.FAL_RENDER_SAFETY_TOLERANCE,
+              enable_safety_checker: true,
+            };
+            if (typeof env.FAL_RENDER_SEED === "number") {
+              requestInput.seed = env.FAL_RENDER_SEED;
+            }
+          } else {
+            requestInput = {
+              prompt: input.prompt ?? "",
+              image_url: imageUrl,
+              mask_url: maskUrl,
+              num_images: 1,
+              output_format: modelOutputFormat,
+              safety_tolerance: env.FAL_RENDER_SAFETY_TOLERANCE,
+              enable_safety_checker: true,
+            };
+          }
         } else if (input.mode === "upscale") {
           requestInput = {
             image_url: imageUrl,

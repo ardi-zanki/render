@@ -135,17 +135,23 @@ export function useRenderStudioActions({
     try {
       const json = await postJson<CreateRenderResponse>(
         `/api/renders/${sourceRenderId}/edit`,
-        {
-          style: state.style,
-          time: state.time,
-          weather: state.weather,
-          location: state.location || undefined,
-          surrounding: state.surrounding,
-          lightsOn: state.lightsOn,
-          instruction: state.instruction || undefined,
-          outputFormat: state.outputFormat,
-          baseAssetId: selectedBaseAssetId ?? undefined,
-        },
+        state.mode === "interior"
+          ? {
+              time: state.time,
+              outputFormat: state.outputFormat,
+              baseAssetId: selectedBaseAssetId ?? undefined,
+            }
+          : {
+              style: state.style,
+              time: state.time,
+              weather: state.weather,
+              location: state.location || undefined,
+              surrounding: state.surrounding,
+              lightsOn: state.lightsOn,
+              instruction: state.instruction || undefined,
+              outputFormat: state.outputFormat,
+              baseAssetId: selectedBaseAssetId ?? undefined,
+            },
       );
       state.setRenderStatus(json.status ?? "queued");
       state.setResultRenderId(json.renderId);
@@ -186,15 +192,23 @@ export function useRenderStudioActions({
       fd.append("name", renderName);
       fd.append("projectId", projectId);
       fd.append("outputFormat", state.outputFormat);
-      if (state.style !== "auto") fd.append("style", state.style);
+      if (state.mode !== "interior" && state.style !== "auto") {
+        fd.append("style", state.style);
+      }
       fd.append("time", state.time);
       if (state.mode !== "interior") fd.append("weather", state.weather);
-      if (state.location) fd.append("location", state.location);
-      if (state.surrounding !== "auto") {
+      if (state.mode !== "interior" && state.location) {
+        fd.append("location", state.location);
+      }
+      if (state.mode !== "interior" && state.surrounding !== "auto") {
         fd.append("surrounding", state.surrounding);
       }
-      if (state.lightsOn) fd.append("lightsOn", "true");
-      if (state.instruction) fd.append("instruction", state.instruction);
+      if (state.mode !== "interior" && state.lightsOn) {
+        fd.append("lightsOn", "true");
+      }
+      if (state.mode !== "interior" && state.instruction) {
+        fd.append("instruction", state.instruction);
+      }
       if (state.referenceFile) {
         fd.append("reference", state.referenceFile);
         fd.append("styleTransferStrength", String(state.styleTransferStrength));
@@ -289,7 +303,9 @@ export function useRenderStudioActions({
     setSelectedBaseAssetId(version.id);
     const cfg = version.config;
     state.setStyle(cfg?.style ?? "auto");
-    state.setTime(cfg?.time ?? "auto");
+    state.setTime(
+      cfg?.time ?? (state.mode === "interior" ? "night" : "auto"),
+    );
     state.setWeather(cfg?.weather ?? "auto");
     state.setLightsOn(() => cfg?.lightsOn ?? false);
     state.setLocation(cfg?.location ?? "");
