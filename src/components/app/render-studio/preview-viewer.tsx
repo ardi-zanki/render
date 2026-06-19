@@ -143,8 +143,9 @@ export function RenderPreviewViewer({
       stageRect.width / image.naturalWidth,
       stageRect.height / image.naturalHeight,
     );
-    const width = image.naturalWidth * fitScale * zoom;
-    const height = image.naturalHeight * fitScale * zoom;
+    const shrinkScale = Math.min(zoom, 1);
+    const width = image.naturalWidth * fitScale * shrinkScale;
+    const height = image.naturalHeight * fitScale * shrinkScale;
 
     return {
       left: (stageRect.width - width) / 2,
@@ -307,12 +308,21 @@ export function RenderPreviewViewer({
   const canRemoveImage = Boolean(
     allowRemoveImage && hasUploadedImage && !isProcessing,
   );
+  const zoomFrameStyle = {
+    width: `${Math.max(zoom, 1) * 100}%`,
+    height: `${Math.max(zoom, 1) * 100}%`,
+  } satisfies CSSProperties;
+  const zoomSurfaceStyle = {
+    width: `${Math.min(zoom, 1) * 100}%`,
+    height: `${Math.min(zoom, 1) * 100}%`,
+  } satisfies CSSProperties;
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !hasCanvasContent) return;
 
     const handleCanvasWheel = (event: WheelEvent) => {
       if (!hasCanvasContent) return;
+      if (!event.ctrlKey && !event.metaKey) return;
       event.preventDefault();
       event.stopPropagation();
 
@@ -515,111 +525,112 @@ export function RenderPreviewViewer({
       <div
         ref={canvasRef}
         className={cn(
-          "relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-lg lg:aspect-auto lg:min-h-0 lg:flex-1",
+          "relative aspect-[4/3] overflow-auto rounded-lg overscroll-contain lg:aspect-auto lg:min-h-0 lg:flex-1",
           hasCanvasContent
             ? "bg-transparent"
             : "border border-dashed border-border bg-muted/35",
         )}
       >
-          {studioMode === "texture" ? (
-            textureCanvas ?? (
-              <p className="px-4 text-center text-sm text-muted-foreground">
-                Tidak ada gambar hasil untuk diedit.
-              </p>
-            )
-          ) : canCompare && view === "comparison" ? (
-            <div
-              ref={comparisonStageRef}
-              className="relative flex size-full items-center justify-center overflow-hidden"
-            >
-              <RenderImage
-                ref={comparisonImageRef}
-                src={previewUrl ?? ""}
-                alt=""
-                draggable={false}
-                onLoad={measureComparisonBounds}
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 size-full select-none object-contain opacity-0"
-              />
+        {studioMode === "texture" ? (
+          textureCanvas ?? (
+            <p className="flex min-h-full min-w-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
+              Tidak ada gambar hasil untuk diedit.
+            </p>
+          )
+        ) : canCompare && view === "comparison" ? (
+          <div
+            ref={comparisonStageRef}
+            className="relative min-h-full min-w-full"
+            style={zoomFrameStyle}
+          >
+            <RenderImage
+              ref={comparisonImageRef}
+              src={previewUrl ?? ""}
+              alt=""
+              draggable={false}
+              onLoad={measureComparisonBounds}
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 size-full select-none object-contain opacity-0"
+            />
 
-              {canShowComparisonOverlay && comparisonFrameStyle && (
-                <div className="absolute" style={comparisonFrameStyle}>
+            {canShowComparisonOverlay && comparisonFrameStyle && (
+              <div className="absolute" style={comparisonFrameStyle}>
+                <RenderImage
+                  src={previewUrl ?? ""}
+                  alt="Gambar asli"
+                  draggable={false}
+                  className="size-full select-none object-contain"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 overflow-hidden"
+                  style={comparisonClipStyle}
+                >
                   <RenderImage
-                    src={previewUrl ?? ""}
-                    alt="Gambar asli"
+                    src={resultUrl ?? ""}
+                    alt="Hasil render"
                     draggable={false}
                     className="size-full select-none object-contain"
                   />
-                  <div
-                    className="pointer-events-none absolute inset-0 overflow-hidden"
-                    style={comparisonClipStyle}
-                  >
-                    <RenderImage
-                      src={resultUrl ?? ""}
-                      alt="Hasil render"
-                      draggable={false}
-                      className="size-full select-none object-contain"
-                    />
-                  </div>
-                  <div
-                    className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-overlay-foreground shadow-floating"
-                    style={comparisonHandleStyle}
-                  />
-                  <div
-                    role="slider"
-                    tabIndex={0}
-                    aria-label="Geser komparasi"
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuenow={Math.round(comparisonHandlePosition)}
-                    onKeyDown={handleComparisonKeyDown}
-                    onPointerDown={startComparisonDrag}
-                    onPointerMove={moveComparisonDrag}
-                    onPointerUp={stopComparisonDrag}
-                    onPointerCancel={stopComparisonDrag}
-                    className="absolute inset-0 z-10 cursor-ew-resize touch-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  />
-                  <div
-                    className="pointer-events-none absolute top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5"
-                    style={comparisonHandleStyle}
-                  >
-                    <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
-                      Hasil
-                    </span>
-                    <span className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating">
-                      <ArrowLeftRight className="size-4" />
-                    </span>
-                    <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
-                      Asli
-                    </span>
-                  </div>
                 </div>
-              )}
-            </div>
-          ) : shownImage ? (
-            <div className="flex size-full items-center justify-center overflow-hidden">
-              <RenderImage
-                src={shownImage}
-                alt={view === "result" ? "Hasil render" : "Gambar asli"}
-                className="size-full object-contain transition-transform"
-                style={{ transform: `scale(${zoom})` }}
-              />
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="flex flex-col items-center gap-2 text-muted-foreground"
-            >
-              <div className="flex size-10 items-center justify-center rounded-md bg-secondary">
-                <ImagePlus className="size-5" />
+                <div
+                  className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-overlay-foreground shadow-floating"
+                  style={comparisonHandleStyle}
+                />
+                <div
+                  role="slider"
+                  tabIndex={0}
+                  aria-label="Geser komparasi"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(comparisonHandlePosition)}
+                  onKeyDown={handleComparisonKeyDown}
+                  onPointerDown={startComparisonDrag}
+                  onPointerMove={moveComparisonDrag}
+                  onPointerUp={stopComparisonDrag}
+                  onPointerCancel={stopComparisonDrag}
+                  className="absolute inset-0 z-10 cursor-ew-resize touch-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+                <div
+                  className="pointer-events-none absolute top-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5"
+                  style={comparisonHandleStyle}
+                >
+                  <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
+                    Hasil
+                  </span>
+                  <span className="flex size-8 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-floating">
+                    <ArrowLeftRight className="size-4" />
+                  </span>
+                  <span className="hidden rounded-full border border-border bg-background/95 px-2 py-0.5 text-xs font-semibold text-foreground shadow-floating sm:inline-flex">
+                    Asli
+                  </span>
+                </div>
               </div>
-              <span className="text-sm font-medium">
-                Klik untuk mengunggah gambar desain
-              </span>
-              <span className="text-xs">JPG, PNG, atau WebP · maks 10MB</span>
-            </button>
-          )}
+            )}
+          </div>
+        ) : shownImage ? (
+          <div className="relative min-h-full min-w-full" style={zoomFrameStyle}>
+            <RenderImage
+              src={shownImage}
+              alt={view === "result" ? "Hasil render" : "Gambar asli"}
+              className="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 select-none object-contain"
+              style={zoomSurfaceStyle}
+            />
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground"
+          >
+            <div className="flex size-10 items-center justify-center rounded-md bg-secondary">
+              <ImagePlus className="size-5" />
+            </div>
+            <span className="text-sm font-medium">
+              Klik untuk mengunggah gambar desain
+            </span>
+            <span className="text-xs">JPG, PNG, atau WebP · maks 10MB</span>
+          </button>
+        )}
 
           {isProcessing && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 backdrop-blur-sm">
