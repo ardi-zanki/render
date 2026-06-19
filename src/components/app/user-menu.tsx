@@ -73,8 +73,8 @@ export function UserMenu({
       // ignore - proceed to clear + redirect regardless
     }
     try {
-      // Keep user preferences and completed queue dismissals across sessions.
-      // Only the sidebar layout state is intentionally reset on logout.
+      // Keep browser-level preferences across sessions. Queue read state is
+      // persisted on the server; only sidebar layout is reset on logout.
       localStorage.removeItem("renderai.sidebar.expanded");
       document.cookie =
         "renderai_sidebar_expanded=; path=/; max-age=0; samesite=lax";
