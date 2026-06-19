@@ -187,9 +187,9 @@ export function ChangeTexturePanel({
             </>
           ) : (
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="texture-description">Deskripsi</Label>
               <Textarea
                 id="texture-description"
+                aria-label="Deskripsi material"
                 value={state.textureDescription}
                 onChange={(e) => state.setTextureDescription(e.target.value)}
                 placeholder="mis. marmer putih dengan urat abu-abu halus"
