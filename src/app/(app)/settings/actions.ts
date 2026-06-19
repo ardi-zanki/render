@@ -101,7 +101,10 @@ export async function setPasswordAction(
     return { error: "Gagal membuat password. Silakan coba lagi." };
   }
 
-  revalidatePath("/", "layout");
+  // No revalidatePath here: it would refresh the layout as part of the action
+  // response, flipping passwordReady → swapping SetPasswordForm out before its
+  // success toast effect runs. The client effect calls router.refresh() right
+  // after toast.success(), so the server state still refreshes — just in order.
   return { ok: true };
 }
 
