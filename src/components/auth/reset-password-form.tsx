@@ -60,15 +60,9 @@ export function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <Alert variant="destructive">
-        <AlertDescription>
-          Tautan reset tidak valid atau sudah kedaluwarsa. Silakan minta{" "}
-          <Link href="/forgot-password" className="font-medium underline">
-            tautan baru
-          </Link>
-          .
-        </AlertDescription>
-      </Alert>
+      <Button variant="outline" asChild className="w-full">
+        <Link href="/forgot-password">Minta tautan baru</Link>
+      </Button>
     );
   }
 

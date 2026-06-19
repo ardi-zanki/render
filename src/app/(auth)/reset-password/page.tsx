@@ -6,11 +6,22 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
 export const metadata: Metadata = { title: "Atur ulang password" };
 
-export default function ResetPasswordPage() {
+export default async function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string }>;
+}) {
+  const { token } = await searchParams;
+  const hasToken = Boolean(token);
+
   return (
     <AuthCard
-      title="Buat password baru"
-      subtitle="Gunakan password baru yang aman untuk melindungi akun RenderAI."
+      title={hasToken ? "Buat password baru" : "Tautan tidak valid"}
+      subtitle={
+        hasToken
+          ? "Gunakan password baru yang aman untuk melindungi akun RenderAI."
+          : "Tautan reset sudah kedaluwarsa atau tidak valid. Minta tautan baru untuk melanjutkan."
+      }
     >
       <Suspense fallback={null}>
         <ResetPasswordForm />
