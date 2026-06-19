@@ -76,6 +76,13 @@ export default async function RendersPage({
     }),
   ]);
   const totalPages = Math.ceil(total / pageSize);
+  const returnParams = new URLSearchParams();
+  if (showArchived) returnParams.set("archived", "1");
+  if (statusFilter) returnParams.set("status", statusFilter);
+  if (page > 1) returnParams.set("page", String(page));
+  if (query) returnParams.set("q", query);
+  const returnQuery = returnParams.toString();
+  const returnTo = `/renders${returnQuery ? `?${returnQuery}` : ""}`;
   const filterHref = (filter: (typeof FILTERS)[number]) => {
     const params = new URLSearchParams();
     if (filter.archived) params.set("archived", filter.archived);
@@ -155,7 +162,10 @@ export default async function RendersPage({
             const thumb = r.resultUrl ?? r.originalUrl;
             const displayName = r.name?.trim() || MODE_LABEL[r.mode];
             return (
-              <Link key={r.id} href={`/renders/${r.id}`}>
+              <Link
+                key={r.id}
+                href={{ pathname: `/renders/${r.id}`, query: { returnTo } }}
+              >
                 <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
                   <div className="relative flex aspect-video items-center justify-center bg-muted">
                     {thumb ? (

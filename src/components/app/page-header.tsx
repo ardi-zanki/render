@@ -22,13 +22,13 @@ export function PageHeader({
         {backLink && (
           <Link
             href={backLink.href}
-            className="group inline-flex w-fit items-center gap-1.5 rounded-sm text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="group inline-flex max-w-full items-center gap-1.5 rounded-sm text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <ArrowLeft
               aria-hidden="true"
-              className="size-4 transition-transform group-hover:-translate-x-0.5"
+              className="size-4 shrink-0 transition-transform group-hover:-translate-x-0.5"
             />
-            {backLink.label}
+            <span className="truncate">{backLink.label}</span>
           </Link>
         )}
         <div className="flex flex-col gap-1.5">
