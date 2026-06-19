@@ -139,7 +139,7 @@ export function RenderQueueButton() {
                 return (
                   <div
                     key={item.id}
-                    className="rounded-md border border-border/80 bg-card px-3 py-3 shadow-sm transition-colors hover:border-border hover:bg-muted/30"
+                    className="rounded-md border border-border/80 bg-card px-3 py-3 shadow-soft transition-colors hover:border-border hover:bg-muted/30"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <button

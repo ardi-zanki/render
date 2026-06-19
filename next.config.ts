@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Playwright can use an isolated cache so E2E does not collide with a
+  // developer's running `.next/dev/lock`.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   // Standalone server output → small, portable Docker image (deployment PRD §9).
   output: "standalone",
   // Load Better Auth (and its optional adapters) at runtime instead of letting

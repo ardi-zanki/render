@@ -32,15 +32,34 @@ test("user can login and create a mock render", async ({ page }) => {
   // Output format now offers an "Original" (no re-encode) choice.
   await expect(page.locator("#outputFormat")).toContainText("Original");
 
+  // Exterior keeps the richer architectural/environment controls; switching
+  // back to Interior restores the reference-prompt lighting-only UI.
+  await page.getByRole("button", { name: "Exterior", exact: true }).click();
+  await expect(page.locator("#style")).toBeVisible();
+  await expect(page.locator("#location")).toBeVisible();
+  await expect(page.getByText("Cuaca", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Interior", exact: true }).click();
+
   await page.locator('input[type="file"]').first().setInputFiles({
     name: "e2e-room.png",
     mimeType: "image/png",
     buffer: await makeRenderImage(),
   });
 
-  // Pick a couple of controls so the persisted config can be asserted later.
-  await page.locator("#style").selectOption("contemporary");
-  await page.locator("#location").fill("Bandung E2E");
+  // Interior uses the exact reference prompt: only its four lighting modes are
+  // configurable, while style/location/free instructions stay out of the UI.
+  await expect(page.locator("#style")).toHaveCount(0);
+  await expect(page.locator("#location")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Pagi" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Siang" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Malam" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "Mix", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Mix", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
 
   await expect(page.getByRole("tab", { name: "Asli" })).toBeVisible();
   await expect(
@@ -74,7 +93,51 @@ test("user can login and create a mock render", async ({ page }) => {
     )
     .toBe("success");
 
-  await page.goto(`/renders/${renderId}`);
+  const detailResponse = await page.request.get(`/api/renders/${renderId}`);
+  const createdRender = (await detailResponse.json()) as {
+    projectId: string;
+    projectName: string;
+    config: Record<string, unknown> | null;
+    prompt?: unknown;
+    enhancedPrompt?: unknown;
+    providerResponse?: unknown;
+  };
+  expect(createdRender.config).toEqual({ time: "mixed" });
+  expect(createdRender).not.toHaveProperty("prompt");
+  expect(createdRender).not.toHaveProperty("enhancedPrompt");
+  expect(createdRender).not.toHaveProperty("providerResponse");
+
+  // Render history carries a safe contextual return target into the detail.
+  await page.goto("/renders");
+  const historyRenderLink = page.locator(
+    `a[href^="/renders/${renderId}?returnTo="]`,
+  );
+  await expect(historyRenderLink).toHaveCount(1);
+  await historyRenderLink.click();
+  const allRendersLink = page.getByRole("link", {
+    name: "Semua render",
+    exact: true,
+  });
+  await expect(allRendersLink).toHaveAttribute("href", "/renders");
+  await allRendersLink.click();
+  await expect(page).toHaveURL(/\/renders$/);
+
+  // A render opened from a project returns to that exact project instead.
+  await page.goto(`/projects/${createdRender.projectId}`);
+  const projectRenderLink = page.locator(
+    `a[href^="/renders/${renderId}?returnTo="]`,
+  );
+  await expect(projectRenderLink).toHaveCount(1);
+  await projectRenderLink.click();
+  const projectBackLink = page.getByRole("link", {
+    name: createdRender.projectName,
+    exact: true,
+  });
+  await expect(projectBackLink).toHaveAttribute(
+    "href",
+    `/projects/${createdRender.projectId}`,
+  );
+
   await expect(page.getByRole("heading", { name: "Interior" })).toBeVisible();
   // Secondary actions are grouped under the ⋮ menu; Open Studio is the primary.
   await page.getByRole("button", { name: "Aksi lainnya" }).click();
@@ -102,17 +165,31 @@ test("user can login and create a mock render", async ({ page }) => {
     page.getByRole("link", { name: "Render Studio" }),
   ).toBeVisible();
   await expect(page.getByRole("tab", { name: "Komparasi" })).toBeVisible();
-  await expect(page.locator("#style")).toHaveValue("contemporary");
-  await expect(page.locator("#location")).toHaveValue("Bandung E2E");
+  await expect(page.locator("#style")).toHaveCount(0);
+  await expect(page.locator("#location")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Mix", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   for (const name of ["Asli", "Komparasi", "Hasil"]) {
     await expect(
       page.getByRole("tab", { name, exact: true }),
     ).not.toHaveAttribute("aria-disabled", "true");
   }
 
+  // Texture editor is available for a completed render and exposes all three
+  // supported material sources without exposing its composed prompt.
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Edit Texture", exact: true }),
+  ).toBeVisible();
+  for (const source of ["Library", "Upload", "Deskripsi"]) {
+    await expect(page.getByRole("tab", { name: source, exact: true })).toBeVisible();
+  }
+  await page.getByRole("tab", { name: "Hasil", exact: true }).click();
+
   // Edit-in-place: changing config and rendering adds a NEW version to the SAME
   // render (no new record) and charges a credit.
-  await page.locator("#style").selectOption("brutalist");
+  await page.getByRole("button", { name: "Malam", exact: true }).click();
   await page.getByRole("button", { name: "Render", exact: true }).click();
   await expect(
     page.getByText("Edit masuk antrean", { exact: true }),

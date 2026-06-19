@@ -34,7 +34,7 @@ pnpm build     # build produksi
 pnpm lint      # eslint
 pnpm test      # unit test (Vitest)
 pnpm test:integration # integration test DB (credits + payments)
-pnpm test:e2e  # Playwright auth + render/search/share/support flow
+pnpm test:e2e  # Playwright auth + Studio/render/navigation/share/support flow
 ```
 
 Dari folder induk (`RumAI/`): `pnpm --dir renderai dev`.
@@ -64,7 +64,8 @@ pakai token.
 src/components/
   ui/        button · card · input · textarea · label · badge ·
              separator · slot · mode-toggle · modal · popover ·
-             select · confirm-dialog
+             select · checkbox · segmented · choice-card · toggle-row ·
+             avatar · alert · empty-state · pagination · confirm-dialog
   brand/     logo (mark + wordmark) · credit-pill
   theme-provider.tsx
 src/lib/utils.ts   # cn() — clsx + tailwind-merge
@@ -103,8 +104,8 @@ src/
     email/               # provider layer + Resend + templates + email_logs
     storage/             # provider layer + R2 (S3) + render asset key builder
     providers/{ai,payment}/  # adapter interfaces + mock/real providers
-    renders/             # create, jobs, assets, queries, archive-delete, processor
-    validations/auth.ts  # Zod schemas (Bahasa Indonesia errors)
+    renders/             # create/edit, prompt, jobs, assets, queries, processor
+    validations/         # Zod schemas (Bahasa Indonesia errors)
   proxy.ts               # edge auth guard for protected routes (Next 16 convention)
   app/api/auth/[...all]/ # Better Auth route handler
 ```
@@ -173,9 +174,9 @@ keduanya warna `warning`, dibedakan karena beda konteks (antrean vs. transaksi).
 
 Working pages on top of the Phase 1b backend:
 
-- **Public:** `/` (landing), `/design-system` (brand kit), `/login`,
-  `/register`, `/forgot-password`, `/reset-password`, `/verify-email`,
-  and `/s/[slug]` (public render share).
+- **Public:** `/` (landing), `/features`, `/pricing`, `/about`, `/contact`,
+  `/blog`, `/blog/[slug]`, `/privacy`, `/terms`, `/design-system` (brand kit),
+  halaman auth, dan `/s/[slug]` (public render share).
 - **Protected** (app shell w/ sidebar + topbar): `/dashboard`, `/projects`,
   `/projects/[id]`, `/renders`, `/renders/new`, `/renders/[id]`, `/payments`,
   `/notifications`, `/support`, and `/settings`.
@@ -200,6 +201,9 @@ Sidebar behavior:
 - Page-level search on `/projects`, `/projects/[id]`, and `/renders` is
   debounced, auto-submits, and includes a clear button that restores the default
   list.
+- Detail Project dan Detail Render memakai back link kontekstual. Render yang
+  dibuka dari Project kembali ke Project asal; render yang dibuka dari Riwayat
+  Render kembali ke daftar beserta filter, pencarian, dan pagination sebelumnya.
 
 Profile menu:
 
@@ -227,27 +231,38 @@ point: `POST /api/renders` (multipart upload). Processing is controlled by
   Free). Fine for low volume; switch to `worker` once you scale out, since inline
   has no background poller to retry jobs orphaned by a restart.
 
-- **Render Studio** (`/renders/new`) — the workspace: editable render name,
-  Interior/Exterior configuration, style, location, time & weather, image
-  upload, sticky instruction prompt, **Render**, before/after comparison,
-  wheel/trackpad zoom, texture edit, and version history.
+- **Render Studio** (`/renders/new`) — workspace dengan nama render editable,
+  unggah gambar, format output, **Render**, perbandingan before/after,
+  wheel/trackpad zoom, texture edit, dan version history. Interior memakai empat
+  mode pencahayaan referensi (**Pagi / Siang / Malam / Mix**) tanpa style,
+  lokasi, view, toggle lampu, atau instruksi tambahan yang dapat mengubah prompt.
+  Exterior menyediakan style arsitektur, lokasi, lingkungan, waktu, cuaca,
+  lampu, dan instruksi tambahan.
 - **Open Studio** from a render detail or share page opens `/renders/new` with
   the source render loaded, config pre-filled, and prior versions available.
 - **Edit Texture** lets users select a region and apply a texture from Library,
-  Upload, or Deskripsi. The Deskripsi path sends only the texture description
-  plus the selected mask, without an extra instruction field.
+  Upload, or Deskripsi. Library/Deskripsi memakai masked FLUX Fill; Upload
+  memakai FLUX.2 multi-reference dengan base image, referensi material, dan mask
+  guide. Setiap edit menjadi versi baru pada render yang sama.
 - **Riwayat Render** (`/renders`) and **Project** (`/projects`) show real data;
   dashboard recent renders are clickable cards that open render details.
+
+Prompt komposit dibangun server-side dan disimpan untuk pemrosesan/search.
+Browser hanya mengirim pilihan Studio dan input user; response API tidak
+mengekspos `prompt`, `enhancedPrompt`, `texturePrompt`, atau `providerResponse`.
 
 **AI provider** (`src/lib/providers/ai/`): `fal` is the production provider. It
 uses the official `@fal-ai/client`: it uploads local/R2 image bytes to fal
 storage, calls queue-based model inference, fetches result URLs immediately, and
 normalizes the result to the requested output format. Defaults are
-`fal-ai/flux-2-pro/edit` for interior/exterior edits, `fal-ai/uso` for style
-transfer with a reference image, and `fal-ai/aura-sr` for upscale; override them
-with `FAL_RENDER_MODEL`, `FAL_STYLE_TRANSFER_MODEL`, and `FAL_UPSCALE_MODEL`.
-The FLUX.2 edit path sends positive, instruction-style prompts (no negative
-prompt), passes inputs via `image_urls`, and pins an explicit `image_size`
+`fal-ai/flux-2-pro/edit` for interior/exterior and uploaded-texture edits,
+`fal-ai/flux-pro/v1/fill` for masked Library/Deskripsi texture edits,
+`fal-ai/uso` for style transfer, and `fal-ai/aura-sr` for upscale; override them
+with `FAL_RENDER_MODEL`, `FAL_INPAINT_MODEL`, `FAL_STYLE_TRANSFER_MODEL`, and
+`FAL_UPSCALE_MODEL`. The Interior prompt is byte-equivalent to the four lighting
+modes in `../Documents/ruma_render_flux2pro.py`; Exterior follows the same
+positive preservation structure. The FLUX.2 path passes inputs via `image_urls`
+and pins an explicit `image_size`
 (~2K longest edge, controlled by `FAL_RENDER_MAX_EDGE`); `FAL_RENDER_SAFETY_TOLERANCE`
 (1 strict – 5 permissive) and an optional `FAL_RENDER_SEED` tune it further.
 A `mock` provider (sharp-based) and a `local` storage provider make the full
@@ -293,13 +308,16 @@ pnpm smoke:payment   # checkout → webhook → idempotent top-up
 Testing strategy is intentionally MVP-sized:
 
 - **Unit tests (Vitest, co-located):** validations, prompt builder, API helpers,
-  pricing, status mapping, rate-limit helper, and small UI utilities.
-- **Integration tests (Vitest):** `credits` and `payments` against PostgreSQL
-  with test-only users/packages and cleanup.
+  exact Interior prompt parity, provider request mapping, texture prompts,
+  navigation safety, pricing, status mapping, rate-limit helper, dan UI utility.
+- **Integration tests (Vitest):** credits, payments, project ownership/move,
+  render queue/edit/refund, dan notification routing against PostgreSQL dengan
+  test-only data serta cleanup.
 - **E2E tests (Playwright):** public auth pages plus login → Render Studio →
-  upload image → create render using `AI_PROVIDER=mock`, edit an existing
-  render, open dashboard recent renders, use sidebar Search, visit Support, and
-  verify share-page **Open Studio** navigation.
+  pilih pencahayaan Interior → upload → create/edit menggunakan
+  `AI_PROVIDER=mock`, memastikan prompt internal tidak terekspos, menguji back
+  link Riwayat/Project, dashboard, sidebar Search, Support, dan share-page
+  **Open Studio**.
 
 Local commands:
 
@@ -308,6 +326,11 @@ pnpm test
 pnpm test:integration
 pnpm test:e2e
 ```
+
+Playwright memakai port 3210 secara default. Jika port itu sedang dipakai oleh
+server development, jalankan pada port lain, misalnya
+`PLAYWRIGHT_PORT=3211 pnpm test:e2e`. Cache Next.js E2E terisolasi di
+`.next-e2e`, sehingga test dapat berjalan bersamaan dengan `pnpm dev`.
 
 GitHub Actions lives in `.github/workflows/ci.yml`. It starts a temporary
 PostgreSQL service, runs migrations, then runs lint, unit tests, integration
@@ -324,12 +347,11 @@ trigger deploy hooks after CI passes by setting GitHub secrets:
 
 ## Notifications & account settings (Phase 4)
 
-- **Notifications** (`src/lib/notifications/service.ts`): `notifyUser` writes an
-  in-app `notifications` row and, gated by
-  `user_profiles.emailNotificationsEnabled`, sends an email (never throws —
-  notifications can't break the originating flow). Wired into the render flow
-  (success / failed / low-credit) and payment flow (success). UI: a topbar bell
-  with unread badge + panel (mark read / mark all), a `/notifications` page, and
+- **Notifications** (`src/lib/notifications/service.ts`): `notifyUser` selalu
+  membuat notifikasi in-app. Render success/failed dan low-credit tetap in-app;
+  event transaksional seperti pembayaran dapat menyertakan payload email.
+  Kegagalan email tidak menggagalkan flow utama. UI: topbar bell dengan unread
+  badge + panel (mark read / mark all), halaman `/notifications`, dan
   `POST /api/notifications/read`.
 - **Account settings** (`/settings`): edit profile (name via Better Auth
   `updateUser`, display name in `user_profiles`), preferences (email
@@ -362,9 +384,10 @@ pnpm make:admin [email] [password]   # promote/create an admin (default admin@re
   plus render breakdowns by mode and status (`getAdminAnalytics`).
 - **Full project management** — the Render Studio has a project picker (+ inline
   "create"); renders go to the selected project (`/renders/new?project=<id>`).
-  Project detail page `/projects/[id]` lists that project's renders with rename
-  and archive (default project can't be archived). `POST /api/projects` creates
-  a project; `renameProject` / `archiveProject` in the project service.
+  Project detail `/projects/[id]` lists that project's renders; daftar Project
+  mendukung rename dan archive (default project tidak dapat diarsipkan).
+  `POST /api/projects` creates a project; `renameProject` / `archiveProject` ada
+  di project service.
 
 ## Status
 

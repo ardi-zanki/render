@@ -18,6 +18,7 @@ export function ChipGroup({
         <button
           key={o}
           type="button"
+          aria-pressed={value === o}
           onClick={() => onChange(o)}
           className={cn(
             "min-w-0 rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
