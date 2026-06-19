@@ -47,7 +47,7 @@ export default async function BlogPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Artikel Terbaru"
-            title="Insight praktis untuk tim desain"
+            title="Wawasan praktis untuk tim desain"
             description="Brief lebih jelas, revisi lebih mudah diikuti."
           />
 

@@ -127,10 +127,10 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
         </section>
 
         <FinalCta
-          title="Ubah insight menjadi workflow render yang lebih rapi"
+          title="Ubah wawasan menjadi workflow render yang lebih terarah"
           description="Coba RenderAI untuk menyusun opsi visual project Anda berikutnya."
           href={isAuthenticated ? "/dashboard" : "/register"}
-          label={isAuthenticated ? "Buka studio" : "Buat akun RenderAI"}
+          label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />
       </main>
 

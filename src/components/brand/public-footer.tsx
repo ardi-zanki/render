@@ -5,15 +5,14 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 
 const GROUPS = [
   {
-    title: "Product",
+    title: "Produk",
     links: [
       { label: "Fitur", href: "/features" },
       { label: "Harga", href: "/pricing" },
-      { label: "Support", href: "/support" },
     ],
   },
   {
-    title: "Company",
+    title: "Perusahaan",
     links: [
       { label: "Tentang", href: "/about" },
       { label: "Blog", href: "/blog" },

@@ -79,7 +79,7 @@ export default async function PrivacyPage() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase text-primary">
-            Legal RenderAI
+            Legal
           </p>
           <h1 className="mt-3 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
             Kebijakan Privasi

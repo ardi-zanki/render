@@ -36,7 +36,7 @@ export default async function ContactPage() {
                 <Mail className="size-4" />
               </div>
               <h2 className="mt-5 text-base font-semibold text-foreground">
-                Email support
+                Email dukungan
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Sertakan konteks akun atau project bila relevan.
@@ -51,7 +51,7 @@ export default async function ContactPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Bantuan"
-            title="Topik bantuan"
+            title="Pilih topik yang sesuai"
             description="Pilih konteks yang paling dekat dengan kebutuhan Anda."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-3">
