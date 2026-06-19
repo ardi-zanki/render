@@ -44,8 +44,8 @@ export default async function AboutPage() {
       <main className="flex-1">
         <PageHero
           eyebrow="Tentang RenderAI"
-          title="Workspace visual untuk review desain yang lebih jelas"
-          description="RenderAI dibangun untuk arsitek, interior designer, kontraktor, developer properti, dan pemilik rumah yang membutuhkan opsi visual cepat namun tetap rapi untuk diskusi dan pengambilan keputusan."
+          title="Workspace visual untuk tim desain"
+          description="RenderAI membantu membuat opsi visual cepat tanpa membuat workflow berantakan."
         >
           <ProductPreview compact />
         </PageHero>
@@ -53,8 +53,8 @@ export default async function AboutPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Prinsip Produk"
-            title="Dibuat untuk mempercepat proses tanpa mengacaukan workflow"
-            description="Fokus kami sederhana: visual yang lebih cepat dibaca, project yang lebih mudah diikuti, dan keputusan desain yang lebih tenang."
+            title="Cepat, rapi, tetap terarah"
+            description="Visual lebih mudah dibaca. Project lebih mudah diikuti."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-3">
             {principles.map((item) => (
@@ -76,8 +76,8 @@ export default async function AboutPage() {
           <div className="mx-auto max-w-6xl">
             <SectionHeader
               eyebrow="Untuk Siapa"
-              title="Cocok untuk tim yang sering butuh opsi visual cepat"
-              description="RenderAI membantu berbagai peran di tahap eksplorasi, presentasi awal, dan review."
+              title="Untuk tim yang butuh opsi cepat"
+              description="Cocok untuk eksplorasi, presentasi awal, dan review."
             />
             <div className="mt-9 grid gap-4 md:grid-cols-3">
               {audience.map((item) => (
@@ -101,10 +101,10 @@ export default async function AboutPage() {
         </section>
 
         <FinalCta
-          title="Bangun review visual yang lebih rapi sejak project berikutnya"
-          description="Mulai dari materi desain yang sudah ada, lalu susun opsi visual yang mudah dibandingkan bersama tim dan klien."
+          title="Mulai review visual yang lebih rapi"
+          description="Buat opsi visual dari materi desain Anda."
           href={isAuthenticated ? "/dashboard" : "/register"}
-          label={isAuthenticated ? "Open Studio" : "Buat akun RenderAI"}
+          label={isAuthenticated ? "Open Studio" : "Mulai sekarang"}
         />
       </main>
 

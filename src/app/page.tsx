@@ -27,7 +27,6 @@ import {
   faqs,
   features,
   landingNavItems,
-  stats,
   workflowSteps,
 } from "@/lib/marketing";
 
@@ -38,14 +37,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 3600;
-
-const trustedBy = [
-  "Interior Studio",
-  "Architecture Team",
-  "Property Developer",
-  "Contractor",
-  "Creative Lead",
-];
 
 export default async function LandingPage() {
   const [dbPackages, session] = await Promise.all([
@@ -69,24 +60,26 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <PublicHeader nav={landingNavItems} authenticated={isAuthenticated} />
+      <PublicHeader
+        nav={landingNavItems}
+        authenticated={isAuthenticated}
+        showThemeToggle={false}
+      />
 
       <main>
-        <section className="relative overflow-hidden border-b border-border/70 bg-card">
-          <div className="absolute inset-x-0 top-0 h-[28rem] bg-[linear-gradient(180deg,color-mix(in_oklch,var(--primary)_14%,transparent),transparent)]" />
-          <div className="relative mx-auto flex max-w-6xl flex-col items-center px-4 pb-10 pt-10 text-center sm:px-6 sm:pb-12 lg:pt-12">
+        <section className="overflow-hidden border-b border-border/70 bg-card">
+          <div className="mx-auto flex max-w-6xl flex-col items-center px-4 pb-10 pt-10 text-center sm:px-6 sm:pb-12 lg:pt-12">
             <div className="inline-flex items-center justify-center gap-2 rounded-md border border-border/70 bg-card/90 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-hairline">
               <Sparkles className="size-3.5 text-primary" />
-              Render AI untuk review konsep arsitektur & interior
+              Render AI untuk arsitektur & interior
             </div>
 
             <h1 className="mt-5 max-w-4xl text-3xl font-semibold leading-tight tracking-normal text-foreground sm:text-5xl lg:text-[3.4rem]">
-              Dari draft desain ke opsi visual yang siap dibahas klien
+              Render visual dari draft desain
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-[17px]">
-              RenderAI membantu studio desain mengubah materi awal menjadi
-              visual yang lebih jelas, menyimpan hasil per project, dan
-              mempercepat keputusan sebelum produksi render final.
+              Ubah screenshot, sketsa, atau foto ruang menjadi opsi visual yang
+              siap direview.
             </p>
 
             <div className="mt-6 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
@@ -95,7 +88,7 @@ export default async function LandingPage() {
                 className="h-10 w-full max-w-[18.5rem] px-5 text-sm sm:w-[13.75rem] sm:max-w-none"
               >
                 <Link href={primaryHref}>
-                  {isAuthenticated ? "Open Studio" : "Mulai workspace visual"}
+                  {isAuthenticated ? "Open Studio" : "Mulai sekarang"}
                   <ArrowRight />
                 </Link>
               </Button>
@@ -105,7 +98,7 @@ export default async function LandingPage() {
                 className="h-10 w-full max-w-[18.5rem] px-5 text-sm shadow-none sm:w-[13.75rem] sm:max-w-none"
               >
                 <Link href="#showcase">
-                  Lihat contoh visual <Play />
+                  Lihat contoh <Play />
                 </Link>
               </Button>
             </div>
@@ -114,24 +107,11 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="border-b border-border/70 bg-background px-4 py-6 sm:px-6">
-          <div className="mx-auto flex max-w-6xl flex-col gap-5 text-center md:flex-row md:items-center md:justify-between md:text-left">
-            <p className="text-xs font-semibold uppercase text-muted-foreground">
-              Dipakai untuk workflow visual yang butuh cepat dan tetap rapi
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold text-foreground/70 md:justify-end">
-              {trustedBy.map((item) => (
-                <span key={item}>{item}</span>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section id="fitur" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Workflow RenderAI"
-            title="Satu alur untuk eksplorasi, review, dan arsip visual"
-            description="Dari materi awal sampai hasil siap dibagikan, RenderAI menjaga proses visual tetap sederhana, terdokumentasi, dan mudah dipahami."
+            title="Eksplorasi visual dalam satu alur"
+            description="Unggah materi, atur arahan, simpan hasil."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
@@ -157,29 +137,11 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-card px-4 py-12 sm:px-6 sm:py-16">
-          <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
-            {stats.map((item) => (
-              <div
-                key={item.label}
-                className="border-l border-border/80 pl-5"
-              >
-                <p className="text-3xl font-semibold tracking-normal text-primary">
-                  {item.value}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {item.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         <section id="showcase" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Galeri Visual"
-            title="Buat arah desain terasa lebih konkret sejak awal"
-            description="Siapkan mood awal, bandingkan suasana ruang, dan bawa opsi visual yang lebih mudah dibahas ke sesi review."
+            title="Contoh visual siap direview"
+            description="Bandingkan mood interior dan eksterior dengan cepat."
           />
           <div className="mt-9">
             <ShowcaseGrid />
@@ -189,8 +151,8 @@ export default async function LandingPage() {
         <section id="cara-kerja" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Cara Kerja"
-            title="Tiga langkah untuk mendapatkan opsi visual yang bisa ditinjau"
-            description="Alurnya dibuat pendek agar tim bisa bergerak cepat tanpa kehilangan konteks project."
+            title="Dari input ke review"
+            description="Tiga langkah sederhana untuk membuat opsi visual."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-3">
             {workflowSteps.map((item) => (
@@ -215,8 +177,8 @@ export default async function LandingPage() {
         <section id="harga" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Paket Kredit"
-            title="Mulai kecil, tambah kapasitas saat project bergerak"
-            description="Sistem kredit menjaga biaya tetap fleksibel untuk eksplorasi, presentasi, dan revisi yang datang bertahap."
+            title="Paket kredit fleksibel"
+            description="Mulai kecil, tambah saat project butuh lebih banyak opsi."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {pricing.map((plan) => (
@@ -300,10 +262,10 @@ export default async function LandingPage() {
         </section>
 
         <FinalCta
-          title="Mulai review visual yang lebih jelas dari project berikutnya"
-          description="Buat beberapa opsi dari materi desain yang sudah ada, simpan per project, lalu bawa hasilnya ke diskusi klien dengan konteks yang lebih rapi."
+          title="Siap mencoba RenderAI?"
+          description="Buat opsi visual pertama dari materi desain Anda."
           href={primaryHref}
-          label={isAuthenticated ? "Open Studio" : "Buat akun RenderAI"}
+          label={isAuthenticated ? "Open Studio" : "Mulai sekarang"}
         />
       </main>
 

@@ -27,8 +27,8 @@ export default async function ContactPage() {
       <main className="flex-1">
         <PageHero
           eyebrow="Kontak"
-          title="Ada pertanyaan tentang RenderAI? Mulai dari sini."
-          description="Kami bisa membantu menjelaskan workflow produk, akun, pembayaran, atau kebutuhan privasi terkait materi project Anda."
+          title="Hubungi tim RenderAI"
+          description="Untuk produk, akun, pembayaran, atau privasi."
         >
           <Card className="shadow-soft">
             <CardContent className="py-5">
@@ -39,8 +39,7 @@ export default async function ContactPage() {
                 Email support
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Kirim pertanyaan melalui email dan sertakan konteks akun atau
-                project bila relevan.
+                Sertakan konteks akun atau project bila relevan.
               </p>
               <Button asChild className="mt-5 w-full">
                 <Link href="mailto:support@renderai.id">
@@ -54,8 +53,8 @@ export default async function ContactPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
             eyebrow="Bantuan"
-            title="Topik yang paling sering kami bantu"
-            description="Pilih konteks yang paling dekat agar pertanyaan Anda lebih cepat diarahkan."
+            title="Topik bantuan"
+            description="Pilih konteks yang paling dekat dengan kebutuhan Anda."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-3">
             {contactOptions.map((item) => (
@@ -83,8 +82,7 @@ export default async function ContactPage() {
                 Sudah punya akun?
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Buka dashboard untuk melihat project, pembayaran, dan pengaturan
-                akun Anda.
+                Buka dashboard untuk melihat project dan pengaturan akun.
               </p>
             </div>
             <Button asChild>
