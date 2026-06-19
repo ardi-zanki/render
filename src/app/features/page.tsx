@@ -30,7 +30,7 @@ export default async function FeaturesPage() {
       <main className="flex-1">
         <PageHero
           eyebrow="Fitur RenderAI"
-          title="Fitur untuk review visual yang rapi"
+          title="Fitur untuk eksplorasi visual yang terarah"
           description="Input, arahan, output, dan project dalam satu workspace."
         >
           <ProductPreview compact />

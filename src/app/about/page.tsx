@@ -101,7 +101,7 @@ export default async function AboutPage() {
         </section>
 
         <FinalCta
-          title="Mulai review visual yang lebih rapi"
+          title="Mulai eksplorasi visual yang lebih terarah"
           description="Buat opsi visual dari materi desain Anda."
           href={isAuthenticated ? "/dashboard" : "/register"}
           label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}

@@ -43,11 +43,11 @@ export function VerifyEmailActions({ email }: { email?: string }) {
       {email && (
         <Button onClick={resend} disabled={loading} className="w-full">
           {loading && <Loader2 className="animate-spin" />}
-          Kirim Ulang Email Verifikasi
+          Kirim ulang email verifikasi
         </Button>
       )}
       <Button variant="ghost" asChild>
-        <Link href="/login">Kembali ke Masuk</Link>
+        <Link href="/login">Kembali ke masuk</Link>
       </Button>
     </div>
   );

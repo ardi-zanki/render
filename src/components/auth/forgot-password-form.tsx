@@ -47,7 +47,7 @@ export function ForgotPasswordForm() {
           </AlertDescription>
         </Alert>
         <Button variant="outline" asChild>
-          <Link href="/login">Kembali ke Masuk</Link>
+          <Link href="/login">Kembali ke masuk</Link>
         </Button>
       </div>
     );

@@ -16,7 +16,7 @@ const sections = [
   {
     title: "1. Penerimaan Ketentuan",
     body: [
-      "Dengan membuat akun, mengakses, atau menggunakan RenderAI, Anda menyetujui Syarat & Ketentuan ini. Jika Anda tidak menyetujui salah satu bagian, mohon untuk tidak menggunakan layanan.",
+      "Dengan membuat akun, mengakses, atau menggunakan RenderAI, Anda menyetujui Ketentuan Layanan ini. Jika Anda tidak menyetujui salah satu bagian, mohon untuk tidak menggunakan layanan.",
       "RenderAI dapat memperbarui ketentuan ini dari waktu ke waktu. Perubahan penting akan diinformasikan melalui aplikasi, email, atau kanal komunikasi lain yang relevan.",
     ],
   },
@@ -87,7 +87,7 @@ const sections = [
   {
     title: "11. Kontak",
     body: [
-      "Jika Anda memiliki pertanyaan tentang Syarat & Ketentuan ini, hubungi tim RenderAI melalui kanal support yang tersedia di aplikasi.",
+      "Jika Anda memiliki pertanyaan tentang Ketentuan Layanan ini, hubungi tim RenderAI melalui kanal dukungan yang tersedia di aplikasi.",
     ],
   },
 ];
@@ -103,7 +103,7 @@ export default async function TermsPage() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase text-primary">
-            Legal RenderAI
+            Legal
           </p>
           <h1 className="mt-3 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
             Ketentuan Layanan
