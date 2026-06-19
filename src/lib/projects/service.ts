@@ -13,6 +13,7 @@ import {
 import { db } from "@/db";
 import { projects, renderAssets, renders } from "@/db/schema";
 import { getLatestRenderableAsset } from "@/lib/renders/types";
+import { browserAssetUrl } from "@/lib/storage";
 
 export async function getDefaultProject(userId: string) {
   const existing = await db.query.projects.findFirst({
@@ -174,6 +175,7 @@ export async function coverImagesByProject(
       projectId: renders.projectId,
       type: renderAssets.type,
       fileUrl: renderAssets.fileUrl,
+      fileKey: renderAssets.fileKey,
       createdAt: renderAssets.createdAt,
     })
     .from(renders)
@@ -213,7 +215,12 @@ export async function coverImagesByProject(
     const latestAsset = getLatestRenderableAsset(
       assetsByRender.get(renderId) ?? [],
     );
-    if (latestAsset) cover.set(projectId, latestAsset.fileUrl);
+    if (latestAsset) {
+      cover.set(
+        projectId,
+        browserAssetUrl(latestAsset.fileUrl, latestAsset.fileKey),
+      );
+    }
   }
   return cover;
 }

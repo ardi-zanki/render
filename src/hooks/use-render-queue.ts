@@ -46,6 +46,16 @@ function persistSeen(seen: Set<string>) {
   }
 }
 
+/** Mark a completed render as opened, including when Studio was opened from
+ * somewhere other than the queue popover. */
+export function markRenderQueueSeen(renderId: string) {
+  const seen = loadSeen();
+  if (seen.has(renderId)) return;
+  seen.add(renderId);
+  persistSeen(seen);
+  notifyRenderQueueChanged();
+}
+
 export function useRenderQueue(intervalMs = 10_000) {
   const [rawItems, setRawItems] = useState<RenderQueueItem[]>([]);
   const [seen, setSeen] = useState<Set<string>>(loadSeen);
@@ -95,7 +105,10 @@ export function useRenderQueue(intervalMs = 10_000) {
   }, [hasActiveJob, intervalMs, refresh]);
 
   useEffect(() => {
-    const onQueueRefresh = () => void refresh();
+    const onQueueRefresh = () => {
+      setSeen(loadSeen());
+      void refresh();
+    };
     window.addEventListener(RENDER_QUEUE_REFRESH_EVENT, onQueueRefresh);
     return () =>
       window.removeEventListener(RENDER_QUEUE_REFRESH_EVENT, onQueueRefresh);
@@ -103,13 +116,7 @@ export function useRenderQueue(intervalMs = 10_000) {
 
   // Dismiss a completed item once the user opens it.
   const markSeen = useCallback((renderId: string) => {
-    setSeen((prev) => {
-      if (prev.has(renderId)) return prev;
-      const next = new Set(prev);
-      next.add(renderId);
-      persistSeen(next);
-      return next;
-    });
+    markRenderQueueSeen(renderId);
   }, []);
 
   // One entry per render (a render's edits each have their own job row).

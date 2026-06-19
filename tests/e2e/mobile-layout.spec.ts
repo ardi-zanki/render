@@ -36,6 +36,11 @@ test("logout feedback covers the full mobile viewport", async ({ page }) => {
   await page.getByRole("button", { name: "Masuk", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
 
+  const seenQueueValue = JSON.stringify(["already-opened-render"]);
+  await page.evaluate((value) => {
+    window.localStorage.setItem("renderai.queue.seen", value);
+  }, seenQueueValue);
+
   await page.getByRole("button", { name: "Buka menu" }).click();
   await page
     .getByRole("button", { name: "Buka menu akun E2E Render User" })
@@ -51,4 +56,9 @@ test("logout feedback covers the full mobile viewport", async ({ page }) => {
   expect(box!.width).toBe(390);
   expect(box!.height).toBe(844);
   await expect(page).toHaveURL(/\/login$/, { timeout: 10_000 });
+  await expect
+    .poll(() =>
+      page.evaluate(() => window.localStorage.getItem("renderai.queue.seen")),
+    )
+    .toBe(seenQueueValue);
 });

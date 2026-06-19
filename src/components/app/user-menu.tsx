@@ -73,7 +73,9 @@ export function UserMenu({
       // ignore - proceed to clear + redirect regardless
     }
     try {
-      localStorage.clear();
+      // Keep user preferences and completed queue dismissals across sessions.
+      // Only the sidebar layout state is intentionally reset on logout.
+      localStorage.removeItem("renderai.sidebar.expanded");
       document.cookie =
         "renderai_sidebar_expanded=; path=/; max-age=0; samesite=lax";
     } catch {
