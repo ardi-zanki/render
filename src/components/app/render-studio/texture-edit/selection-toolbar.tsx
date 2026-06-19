@@ -92,7 +92,7 @@ export function SelectionToolbar({
   const showSlider = isBrush || tool === "wand";
 
   return (
-    <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 rounded-md border border-border/70 bg-background/90 p-1 shadow-floating backdrop-blur sm:gap-1">
+    <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-0.5 rounded-md border border-border/70 bg-background/90 px-1 py-[3px] shadow-floating backdrop-blur sm:gap-1">
       {TOOLS.map((t) => (
         <ToolButton
           key={t.value}

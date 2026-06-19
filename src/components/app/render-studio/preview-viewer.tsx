@@ -443,7 +443,7 @@ export function RenderPreviewViewer({
                   }}
                   aria-pressed={studioMode === "texture"}
                   className={cn(
-                    "inline-flex h-7 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                    "inline-flex h-6 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
                     studioMode === "texture"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground",
@@ -519,7 +519,7 @@ export function RenderPreviewViewer({
                 </div>
               )}
               {showZoomControls && (
-                <div className="hidden h-8 items-center gap-0.5 rounded-md bg-muted/80 p-1 shadow-soft sm:inline-flex sm:h-9">
+                <div className="hidden h-8 items-center gap-0.5 rounded-md bg-muted/80 p-1 shadow-soft sm:inline-flex">
                   <Button
                     type="button"
                     variant="ghost"
@@ -528,14 +528,14 @@ export function RenderPreviewViewer({
                     disabled={zoom <= 0.5}
                     aria-label="Zoom out"
                     title="Zoom out"
-                    className="size-6 sm:size-7"
+                    className="size-6"
                   >
                     <ZoomOut />
                   </Button>
                   <button
                     type="button"
                     onClick={resetZoom}
-                    className="h-6 min-w-10 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card sm:h-7 sm:min-w-11"
+                    className="h-6 min-w-10 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card sm:min-w-11"
                     title="Reset zoom"
                   >
                     {Math.round(zoom * 100)}%
@@ -548,7 +548,7 @@ export function RenderPreviewViewer({
                     disabled={zoom >= 3}
                     aria-label="Zoom in"
                     title="Zoom in"
-                    className="size-6 sm:size-7"
+                    className="size-6"
                   >
                     <ZoomIn />
                   </Button>
@@ -560,7 +560,7 @@ export function RenderPreviewViewer({
                       onClick={() => pickFile(null)}
                       aria-label="Hapus gambar"
                       title="Hapus gambar"
-                      className="size-6 sm:size-7"
+                      className="size-6"
                     >
                       <X />
                     </Button>
