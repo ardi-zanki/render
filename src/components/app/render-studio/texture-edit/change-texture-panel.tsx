@@ -3,13 +3,9 @@
 import { useRef, useState } from "react";
 import {
   ImagePlus,
-  Layers3,
   Loader2,
   PanelLeft,
-  Palette,
-  Wand2,
   X,
-  type LucideIcon,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -27,19 +23,14 @@ import type { TextureEditState } from "./use-texture-edit-state";
 
 function TextureSection({
   title,
-  icon: Icon,
   children,
 }: {
   title: string;
-  icon: LucideIcon;
   children: ReactNode;
 }) {
   return (
     <section className="border-b border-border/70 pb-5 last:border-b-0 last:pb-0">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
-          <Icon className="size-4" />
-        </span>
+      <div className="mb-3 flex items-center">
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
       </div>
       <div className="flex flex-col gap-3">{children}</div>
@@ -80,7 +71,7 @@ export function ChangeTexturePanel({
       </div>
 
       <div className="flex flex-col gap-5 px-4 py-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-        <TextureSection title="Area & Sumber" icon={Wand2}>
+        <TextureSection title="Area & Sumber">
           <p className="text-xs leading-5 text-muted-foreground">
             Pilih area pada gambar, lalu tentukan tekstur penggantinya.
           </p>
@@ -105,7 +96,6 @@ export function ChangeTexturePanel({
                 ? "Upload Referensi"
                 : "Deskripsi Material"
           }
-          icon={state.textureSource === "library" ? Layers3 : Palette}
         >
           {state.textureSource === "library" ? (
             <>

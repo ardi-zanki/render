@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Lightbulb,
-  MapPin,
-  PanelLeft,
-  Palette,
-  Plus,
-  Settings2,
-  type LucideIcon,
-} from "lucide-react";
+import { PanelLeft, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -31,19 +23,14 @@ import type { RenderStudioProject } from "./types";
 
 function ControlSection({
   title,
-  icon: Icon,
   children,
 }: {
   title: string;
-  icon: LucideIcon;
   children: ReactNode;
 }) {
   return (
     <section className="border-b border-border/70 pb-5 last:border-b-0 last:pb-0">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
-          <Icon className="size-4" />
-        </span>
+      <div className="mb-3 flex items-center">
         <h2 className="text-sm font-semibold text-foreground">{title}</h2>
       </div>
       <div className="flex flex-col gap-3.5">{children}</div>
@@ -127,7 +114,7 @@ export function RenderStudioControls({
         </div>
 
         <div className="flex flex-col gap-5 overflow-visible px-4 py-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto [&>*]:shrink-0">
-          <ControlSection title="Project" icon={Settings2}>
+          <ControlSection title="Project">
             <div className="flex min-w-0 gap-2">
               <Select
                 id="project"
@@ -155,7 +142,7 @@ export function RenderStudioControls({
             </div>
           </ControlSection>
 
-          <ControlSection title="Konteks & Style" icon={Palette}>
+          <ControlSection title="Konteks & Style">
             <div className="grid grid-cols-2 gap-2">
               {MODES.map((m) => {
                 return (
@@ -194,7 +181,7 @@ export function RenderStudioControls({
             </div>
           </ControlSection>
 
-          <ControlSection title="Environment & Lighting" icon={MapPin}>
+          <ControlSection title="Environment & Lighting">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="location">Lokasi Proyek</Label>
               <Input
@@ -239,7 +226,7 @@ export function RenderStudioControls({
             )}
           </ControlSection>
 
-          <ControlSection title="Output" icon={Settings2}>
+          <ControlSection title="Output">
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="outputFormat">Format output</Label>
               <Select
@@ -259,11 +246,10 @@ export function RenderStudioControls({
             </div>
           </ControlSection>
 
-          <ControlSection title="Objek" icon={Lightbulb}>
+          <ControlSection title="Objek">
             <ToggleRow
               checked={lightsOn}
               onCheckedChange={(next) => setLightsOn(() => next)}
-              icon={Lightbulb}
               label="Nyalakan Lampu"
               className="h-10 w-full min-w-0 gap-2 px-3 text-xs sm:text-sm"
             />
