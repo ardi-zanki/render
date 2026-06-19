@@ -16,6 +16,7 @@ import {
   projects,
   renderAssets,
   renders,
+  type RenderConfig,
   type RenderStatus,
 } from "@/db/schema";
 import {
@@ -23,6 +24,13 @@ import {
   type RenderDetail,
   type RenderListItem,
 } from "./types";
+
+function publicRenderConfig(config: RenderConfig | null | undefined) {
+  if (!config) return null;
+  const publicConfig = { ...config };
+  delete publicConfig.texturePrompt;
+  return publicConfig;
+}
 
 async function renderSearchProjectIds(userId: string, search: string | undefined) {
   const q = search?.trim();
@@ -81,7 +89,7 @@ export async function getRenderDetail(
     width: a.width,
     height: a.height,
     createdAt: a.createdAt,
-    config: a.config ?? null,
+    config: publicRenderConfig(a.config),
   }));
   const latestResult = getLatestRenderableAsset(views);
   const updatedAt = [
@@ -102,7 +110,7 @@ export async function getRenderDetail(
     mode: render.mode,
     name: render.name ?? null,
     status: render.status,
-    config: render.config ?? null,
+    config: publicRenderConfig(render.config),
     outputFormat: render.outputFormat,
     creditsUsed: render.creditsUsed,
     projectId: render.projectId,
