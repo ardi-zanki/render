@@ -1,7 +1,5 @@
 "use client";
 
-import { Layers3 } from "lucide-react";
-
 import type { RenderMode } from "@/db/schema";
 import { Badge } from "@/components/ui/badge";
 import { MODE_LABEL } from "@/lib/renders/labels";
@@ -34,10 +32,7 @@ export function StudioRenderInfo({
   return (
     <div className="rounded-lg border border-border/80 bg-card p-4 shadow-soft">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
-            <Layers3 className="size-4" />
-          </span>
+        <div className="flex items-center">
           <h2 className="text-sm font-semibold text-foreground">Info Render</h2>
         </div>
         {info.editKind === "texture" && (

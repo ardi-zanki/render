@@ -1,9 +1,4 @@
-import {
-  ArrowLeft,
-  CircleAlert,
-  Layers3,
-  Wand2,
-} from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -69,7 +64,7 @@ export default async function RenderDetailPage({
         action={
           <Button asChild variant="outline">
             <Link href="/renders">
-              <ArrowLeft /> Kembali
+              Kembali
             </Link>
           </Button>
         }
@@ -104,10 +99,7 @@ export default async function RenderDetailPage({
           <Card className="rounded-lg border-border/80 shadow-soft">
             <CardContent className="flex flex-col gap-3 p-4">
               <div className="flex items-center justify-between gap-2">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span className="flex size-7 items-center justify-center rounded-md bg-secondary text-primary">
-                    <Layers3 className="size-4" />
-                  </span>
+                <div className="flex min-w-0 items-center">
                   <h2 className="text-sm font-semibold text-foreground">
                     Info Render
                   </h2>
@@ -171,7 +163,7 @@ export default async function RenderDetailPage({
               {render.status !== "cancelled" && (
                 <Button asChild size="sm" className="mt-1 w-full">
                   <Link href={`/renders/new?source=${render.id}`}>
-                    <Wand2 /> Open Studio
+                    Open Studio
                   </Link>
                 </Button>
               )}

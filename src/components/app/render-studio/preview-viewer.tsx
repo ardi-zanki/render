@@ -5,7 +5,6 @@ import {
   ImagePlus,
   Loader2,
   PanelLeft,
-  Pencil,
   X,
   ZoomIn,
   ZoomOut,
@@ -443,13 +442,13 @@ export function RenderPreviewViewer({
                   }}
                   aria-pressed={studioMode === "texture"}
                   className={cn(
-                    "inline-flex h-6 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                    "inline-flex h-6 items-center rounded-sm px-3 text-xs font-medium transition-colors",
                     studioMode === "texture"
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <Pencil /> Edit
+                  Edit
                 </button>
               </div>
             )}
@@ -467,13 +466,13 @@ export function RenderPreviewViewer({
                     }}
                     aria-pressed={studioMode === "texture"}
                     className={cn(
-                      "inline-flex h-6 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                      "inline-flex h-6 items-center rounded-sm px-3 text-xs font-medium transition-colors",
                       studioMode === "texture"
                         ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-card hover:text-foreground",
                     )}
                   >
-                    <Pencil /> Edit
+                    Edit
                   </button>
                 </div>
               )}
@@ -493,13 +492,13 @@ export function RenderPreviewViewer({
                     }}
                     aria-pressed={studioMode === "texture"}
                     className={cn(
-                      "inline-flex h-6 items-center gap-1.5 rounded-sm px-3 text-xs font-medium transition-colors [&_svg]:size-3.5",
+                      "inline-flex h-6 items-center rounded-sm px-3 text-xs font-medium transition-colors",
                       studioMode === "texture"
                         ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-card hover:text-foreground",
                     )}
                   >
-                    <Pencil /> Edit
+                    Edit
                   </button>
                 </div>
               )}
@@ -724,7 +723,7 @@ export function RenderPreviewViewer({
                 onClick={() => referenceRef.current?.click()}
                 disabled={isProcessing}
               >
-                <ImagePlus /> Pilih
+                Pilih
               </Button>
             </div>
             {referencePreviewUrl ? (
@@ -749,9 +748,8 @@ export function RenderPreviewViewer({
               <button
                 type="button"
                 onClick={() => referenceRef.current?.click()}
-                className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-border px-3 py-5 text-sm text-muted-foreground"
+                className="flex w-full items-center justify-center rounded-md border border-dashed border-border px-3 py-5 text-sm text-muted-foreground"
               >
-                <ImagePlus className="size-4" />
                 Unggah gambar referensi
               </button>
             )}

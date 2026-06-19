@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Pencil } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -105,9 +105,9 @@ export function StudioTitleBar({
         <button
           type="button"
           onClick={startRename}
-          className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/80 [&_svg]:size-4 [&_svg]:text-muted-foreground"
+          className="flex w-full cursor-pointer items-center rounded-md px-2.5 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/80"
         >
-          <Pencil /> Rename
+          Rename
         </button>
       </Popover>
     </div>
