@@ -1,15 +1,20 @@
-import { Check } from "lucide-react";
+import { ArrowRight, Check, Layers3 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import {
+  FinalCta,
+  PageHero,
+  SectionHeader,
+} from "@/components/brand/marketing-blocks";
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getServerSession } from "@/lib/session";
 import { listActivePaymentPackages } from "@/lib/payments/service";
 import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
+import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Harga RenderAI",
@@ -18,6 +23,12 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 3600;
+
+const notes = [
+  "Tidak perlu langganan bulanan untuk mulai mencoba.",
+  "Kredit digunakan saat proses render berjalan.",
+  "Paket dapat ditambah kapan saja sesuai kebutuhan project.",
+];
 
 export default async function PricingPage() {
   const [packages, session] = await Promise.all([
@@ -30,67 +41,114 @@ export default async function PricingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader authenticated={isAuthenticated} />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6 sm:py-12">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase text-primary">
-            Paket Kredit
-          </p>
-          <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-normal sm:text-3xl">
-            Kredit fleksibel untuk setiap ritme project desain
-          </h1>
-          <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
-            Mulai dari kebutuhan eksplorasi kecil, lalu tambah kapasitas saat
-            presentasi, revisi, dan jumlah project meningkat.
-          </p>
-        </div>
 
-        <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {packages.map((pkg) => {
-            const copy = packageCopy(pkg.slug);
-            return (
-              <Card
-                key={pkg.id}
-                className={
-                  copy.highlighted
-                    ? "border-primary/70 ring-1 ring-primary/15"
-                    : ""
-                }
-              >
-                <CardContent className="flex h-full flex-col gap-3.5 py-5">
-                  <div className="flex items-start justify-between gap-2">
+      <main className="flex-1">
+        <PageHero
+          eyebrow="Paket Kredit"
+          title="Kredit fleksibel untuk setiap ritme project desain"
+          description="Mulai dari kebutuhan eksplorasi kecil, lalu tambah kapasitas saat presentasi, revisi, dan jumlah project meningkat."
+        >
+          <div className="rounded-lg border border-border/70 bg-background p-5 shadow-soft">
+            <p className="text-sm font-semibold text-foreground">
+              Yang sudah termasuk
+            </p>
+            <div className="mt-4 space-y-3">
+              {notes.map((note) => (
+                <div key={note} className="flex gap-3 text-sm text-muted-foreground">
+                  <Check className="mt-0.5 size-4 shrink-0 text-success" />
+                  <span>{note}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </PageHero>
+
+        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+          <SectionHeader
+            eyebrow="Pilihan Paket"
+            title="Pilih kapasitas yang sesuai dengan fase project"
+            description="Paket kecil cocok untuk uji alur. Paket lebih besar membantu saat tim aktif mengejar banyak opsi visual."
+          />
+          <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {packages.map((pkg) => {
+              const copy = packageCopy(pkg.slug);
+              return (
+                <Card
+                  key={pkg.id}
+                  className={
+                    copy.highlighted
+                      ? "border-primary/70 shadow-soft ring-1 ring-primary/15"
+                      : "shadow-none"
+                  }
+                >
+                  <CardContent className="flex h-full flex-col gap-4 py-5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h2 className="text-base font-semibold">{pkg.name}</h2>
+                        <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                          <Layers3 className="size-4 text-primary" />
+                          {formatCredits(pkg.credits, pkg.bonusCredits)}
+                        </p>
+                      </div>
+                      {copy.highlighted && <Badge>Populer</Badge>}
+                    </div>
                     <div>
-                      <h2 className="text-base font-semibold">{pkg.name}</h2>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {formatCredits(pkg.credits, pkg.bonusCredits)}
+                      <p className="text-2xl font-semibold tracking-normal">
+                        {formatPrice(pkg.price)}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        {copy.note}
                       </p>
                     </div>
-                    {copy.highlighted && <Badge>Populer</Badge>}
-                  </div>
-                  <div>
-                    <p className="text-2xl font-semibold tracking-normal">
-                      {formatPrice(pkg.price)}
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      {copy.note}
-                    </p>
-                  </div>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    {copy.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <Check className="mt-0.5 size-4 shrink-0 text-success" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button asChild className="mt-auto">
-                    <Link href={packageCtaHref}>Mulai render</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      {copy.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2">
+                          <Check className="mt-0.5 size-4 shrink-0 text-success" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      asChild
+                      className="mt-auto"
+                      variant={copy.highlighted ? "default" : "outline"}
+                    >
+                      <Link href={packageCtaHref}>
+                        Mulai render <ArrowRight />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="bg-card px-4 py-12 sm:px-6 sm:py-16">
+          <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
+            {[
+              ["Kontrol biaya", "Beli kredit saat dibutuhkan, tanpa komitmen bulanan yang berat."],
+              ["Cocok untuk revisi", "Tambah kapasitas ketika review klien membutuhkan variasi baru."],
+              ["Siap untuk tim", "Project dan hasil tetap tersimpan agar penggunaan kredit mudah diikuti."],
+            ].map(([title, desc]) => (
+              <div key={title} className="rounded-lg border border-border/70 bg-background p-5">
+                <h3 className="font-semibold text-foreground">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <FinalCta
+          title="Siapkan kapasitas visual untuk project berikutnya"
+          description="Mulai dengan paket yang sesuai, lalu tambah kredit ketika eksplorasi dan revisi mulai bergerak."
+          href={packageCtaHref}
+          label={isAuthenticated ? "Buka pembayaran" : "Buat akun RenderAI"}
+        />
       </main>
+
       <PublicFooter />
     </div>
   );

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { publicNavItems } from "@/lib/marketing";
 import { cn } from "@/lib/utils";
 
 type NavItem = { label: string; href: string };
@@ -21,12 +22,13 @@ export function PublicHeader({
   nav?: NavItem[];
   authenticated?: boolean;
 }) {
-  const hasNav = !!nav && nav.length > 0;
+  const items = nav ?? publicNavItems;
+  const hasNav = items.length > 0;
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-card/95 backdrop-blur-xl">
       <div
         className={cn(
-          "mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6",
+          "mx-auto flex h-[3.75rem] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6",
           hasNav && "md:grid md:grid-cols-[1fr_auto_1fr]",
         )}
       >
@@ -39,14 +41,14 @@ export function PublicHeader({
         </Link>
         {hasNav && (
           <nav className="hidden items-center justify-center gap-7 text-sm font-medium text-muted-foreground md:flex">
-            {nav.map((item) => (
-              <a
+            {items.map((item) => (
+              <Link
                 key={item.href}
                 href={item.href}
                 className="transition-colors hover:text-foreground"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
         )}

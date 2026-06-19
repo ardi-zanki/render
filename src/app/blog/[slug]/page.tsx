@@ -1,0 +1,144 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { notFound } from "next/navigation";
+
+import { FinalCta } from "@/components/brand/marketing-blocks";
+import { PublicFooter } from "@/components/brand/public-footer";
+import { PublicHeader } from "@/components/brand/public-header";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { blogPosts } from "@/lib/marketing";
+import { getServerSession } from "@/lib/session";
+
+type BlogDetailProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export function generateStaticParams() {
+  return blogPosts.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: BlogDetailProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = blogPosts.find((item) => item.slug === slug);
+  if (!post) return {};
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+  };
+}
+
+export default async function BlogDetailPage({ params }: BlogDetailProps) {
+  const [{ slug }, session] = await Promise.all([params, getServerSession()]);
+  const post = blogPosts.find((item) => item.slug === slug);
+  if (!post) notFound();
+
+  const isAuthenticated = Boolean(session?.user && !session.user.isDisabled);
+  const relatedPosts = blogPosts.filter((item) => item.slug !== post.slug).slice(0, 2);
+
+  return (
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <PublicHeader authenticated={isAuthenticated} />
+
+      <main className="flex-1">
+        <article>
+          <header className="border-b border-border/70 bg-card">
+            <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-12">
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+              >
+                <ArrowLeft className="size-4" />
+                Kembali ke blog
+              </Link>
+              <div className="mt-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <Badge variant="info">{post.category}</Badge>
+                <span>{post.date}</span>
+                <span>{post.readTime}</span>
+              </div>
+              <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-normal text-foreground sm:text-4xl">
+                {post.title}
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+                {post.excerpt}
+              </p>
+            </div>
+          </header>
+
+          <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+            <div className="relative aspect-[16/8] overflow-hidden rounded-lg border border-border/70 bg-card shadow-soft">
+              <Image
+                src={post.image}
+                alt={post.title}
+                fill
+                priority
+                unoptimized
+                sizes="(min-width: 1024px) 960px, 100vw"
+                className="object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="mx-auto max-w-3xl px-4 pb-12 sm:px-6 sm:pb-16">
+            <div className="space-y-5 text-base leading-8 text-muted-foreground">
+              {post.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </div>
+        </article>
+
+        <section className="border-t border-border/70 bg-card px-4 py-12 sm:px-6 sm:py-16">
+          <div className="mx-auto max-w-6xl">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase text-primary">
+                  Artikel Lain
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-normal">
+                  Lanjutkan membaca
+                </h2>
+              </div>
+              <Button variant="outline" asChild>
+                <Link href="/blog">
+                  Semua artikel <ArrowRight />
+                </Link>
+              </Button>
+            </div>
+            <div className="mt-8 grid gap-4 md:grid-cols-2">
+              {relatedPosts.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/blog/${item.slug}`}
+                  className="rounded-lg border border-border/70 bg-background p-5 shadow-soft transition-colors hover:border-primary/35"
+                >
+                  <Badge variant="outline">{item.category}</Badge>
+                  <h3 className="mt-4 text-lg font-semibold leading-snug tracking-normal text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {item.excerpt}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <FinalCta
+          title="Ubah insight menjadi workflow render yang lebih rapi"
+          description="Coba RenderAI untuk menyusun opsi visual project Anda berikutnya."
+          href={isAuthenticated ? "/dashboard" : "/register"}
+          label={isAuthenticated ? "Open Studio" : "Buat akun RenderAI"}
+        />
+      </main>
+
+      <PublicFooter />
+    </div>
+  );
+}
