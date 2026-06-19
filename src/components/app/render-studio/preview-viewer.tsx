@@ -126,6 +126,8 @@ export function RenderPreviewViewer({
   const comparisonStageRef = useRef<HTMLDivElement>(null);
   const comparisonImageRef = useRef<HTMLImageElement>(null);
   const comparisonDraggingRef = useRef(false);
+  const panDraggingRef = useRef(false);
+  const panStartRef = useRef({ x: 0, y: 0, left: 0, top: 0 });
   const [comparisonBounds, setComparisonBounds] =
     useState<ComparisonBounds | null>(null);
   const comparisonHandlePosition = clampComparisonPosition(comparisonPosition);
@@ -316,6 +318,54 @@ export function RenderPreviewViewer({
     width: `${Math.min(zoom, 1) * 100}%`,
     height: `${Math.min(zoom, 1) * 100}%`,
   } satisfies CSSProperties;
+  const canPanCanvas =
+    hasCanvasContent && studioMode !== "texture" && view !== "comparison";
+  const canvasCursorStyle =
+    canPanCanvas && zoom > 1
+      ? ({
+          cursor: "default",
+        } satisfies CSSProperties)
+      : undefined;
+
+  const startCanvasPan = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (!canPanCanvas || zoom <= 1 || event.button !== 0) return;
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      panDraggingRef.current = true;
+      panStartRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+        left: canvas.scrollLeft,
+        top: canvas.scrollTop,
+      };
+      event.currentTarget.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    },
+    [canPanCanvas, zoom],
+  );
+
+  const moveCanvasPan = useCallback((event: PointerEvent<HTMLDivElement>) => {
+    if (!panDraggingRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.scrollLeft =
+      panStartRef.current.left - (event.clientX - panStartRef.current.x);
+    canvas.scrollTop =
+      panStartRef.current.top - (event.clientY - panStartRef.current.y);
+    event.preventDefault();
+  }, []);
+
+  const stopCanvasPan = useCallback((event: PointerEvent<HTMLDivElement>) => {
+    if (!panDraggingRef.current) return;
+    panDraggingRef.current = false;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !hasCanvasContent) return;
@@ -524,12 +574,17 @@ export function RenderPreviewViewer({
 
       <div
         ref={canvasRef}
+        onPointerDown={startCanvasPan}
+        onPointerMove={moveCanvasPan}
+        onPointerUp={stopCanvasPan}
+        onPointerCancel={stopCanvasPan}
         className={cn(
           "relative aspect-[4/3] overflow-auto rounded-lg overscroll-contain lg:aspect-auto lg:min-h-0 lg:flex-1",
           hasCanvasContent
             ? "bg-transparent"
             : "border border-dashed border-border bg-muted/35",
         )}
+        style={canvasCursorStyle}
       >
         {studioMode === "texture" ? (
           textureCanvas ?? (
