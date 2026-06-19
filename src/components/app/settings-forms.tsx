@@ -446,7 +446,7 @@ export function GoogleAccountForm({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           provider: "google",
-          callbackURL: "/dashboard",
+          callbackURL: "/dashboard?google=linked",
           errorCallbackURL: "/dashboard?google=link-error",
           disableRedirect: true,
         }),
