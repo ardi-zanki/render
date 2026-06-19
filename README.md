@@ -215,10 +215,17 @@ The render pipeline (`src/lib/renders/`) is split by concern: `create`, `jobs`,
 create render row → deduct credit (idempotent) → store original → enqueue job →
 worker/process job → call AI provider → persist result asset → mark success. On
 final failure the render is marked failed and the credit is refunded. Entry
-point: `POST /api/renders` (multipart upload). In local development,
-`RENDER_PROCESSING_MODE=inline` can process the queued job from the web request
-for convenience. In production, use `RENDER_PROCESSING_MODE=worker` so the web
-service only enqueues jobs and `pnpm worker` processes the queue.
+point: `POST /api/renders` (multipart upload). Processing is controlled by
+`RENDER_PROCESSING_MODE`:
+
+- `worker` (recommended for production) — the web service only enqueues jobs and
+  a dedicated `pnpm worker` process drains the queue. Scales to multiple
+  instances and survives web restarts.
+- `inline` — the web process renders in-band right after the request commits
+  (same processing path, no separate service). The default locally, and a valid
+  choice for **single-instance deploys without a worker service** (e.g. Render
+  Free). Fine for low volume; switch to `worker` once you scale out, since inline
+  has no background poller to retry jobs orphaned by a restart.
 
 - **Render Studio** (`/renders/new`) — the workspace: editable render name,
   Interior/Exterior configuration, style, location, time & weather, image
@@ -373,6 +380,7 @@ The MVP feature set is complete. Before production, supply real credentials and
 flip providers: Google OAuth (`GOOGLE_CLIENT_*`), email (`RESEND_API_KEY`),
 `STORAGE_PROVIDER=r2` (+ R2 creds), `AI_PROVIDER=fal` (+ `FAL_KEY`),
 `PAYMENT_PROVIDER=midtrans` (+ Midtrans keys and notification URL). Render
-execution uses the DB-backed `render_jobs` queue and `pnpm worker` in
-production with `RENDER_PROCESSING_MODE=worker` (`pnpm render:worker` is the
-local `.env.local` helper).
+execution uses the DB-backed `render_jobs` queue, drained either by a dedicated
+`pnpm worker` (`RENDER_PROCESSING_MODE=worker`, recommended) or by the web
+process itself (`RENDER_PROCESSING_MODE=inline`, for single-instance deploys
+without a worker). `pnpm render:worker` is the local `.env.local` helper.

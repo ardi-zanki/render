@@ -92,18 +92,15 @@ if (!parsed.success) {
   );
 }
 
+// A dedicated worker owns the queue by default in production (inline locally).
+// Inline can be opted into explicitly in production for single-instance deploys
+// that have no separate worker service (e.g. Render Free): the web process then
+// renders in-band right after the request commits — identical processing path,
+// just no extra service. Fine for low volume; switch to a worker once you scale
+// to multiple instances.
 const renderProcessingMode =
   parsed.data.RENDER_PROCESSING_MODE ??
   (parsed.data.NODE_ENV === "production" ? "worker" : "inline");
-
-if (
-  parsed.data.NODE_ENV === "production" &&
-  parsed.data.RENDER_PROCESSING_MODE === "inline"
-) {
-  throw new Error(
-    "Environment variable tidak valid. Production wajib menggunakan RENDER_PROCESSING_MODE=worker.",
-  );
-}
 
 export const env = {
   ...parsed.data,
