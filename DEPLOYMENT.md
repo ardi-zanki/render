@@ -8,14 +8,23 @@ via environment variables (12-factor).
 ```
             ┌── web  (standalone Next server, $PORT)
 Dockerfile ─┤
-            └── worker (pnpm worker)  ← MANDATORY: processes the render queue
+            └── worker (pnpm worker)  ← drains the render queue (worker mode)
 ```
 
-The worker is **required**. Without a running worker, render jobs stay `queued`
-forever (deployment PRD §13). The queue is **PostgreSQL-backed**, so **no Redis
-is needed** for the current scale. Production web services must set
-`RENDER_PROCESSING_MODE=worker`; `inline` is reserved for local/dev convenience
-and is rejected when `NODE_ENV=production`.
+The render queue is **PostgreSQL-backed**, so **no Redis is needed** for the
+current scale. How it is drained depends on `RENDER_PROCESSING_MODE`:
+
+- **`worker` (recommended)** — the web service only enqueues; a separate
+  `pnpm worker` process drains the queue. **A running worker is required in this
+  mode** — without it, render jobs stay `queued` forever (deployment PRD §13).
+  Use this whenever you run more than one web instance or want renders to survive
+  web restarts.
+- **`inline`** — the web process renders in-band right after the request commits
+  (same processing path, no separate service). The default locally, and a valid
+  option for **single-instance deploys without a worker service** (e.g. Render
+  Free, where Background Workers and Shell are unavailable). Trade-offs: no
+  background poller, so a job orphaned by a web restart/spin-down is not retried,
+  and it does not scale past one instance. Switch to `worker` once you scale out.
 
 | Target | How | Config |
 |---|---|---|
@@ -142,6 +151,19 @@ firewall: 80/443/22, auto-updates) per deployment PRD §25.
 Approx cost: web (starter ~$7) + worker (starter ~$7) + Neon (free/launch) ≈
 **$14–21/mo** — within the $50 budget, minimal ops.
 
+### Budget variant — single web service, no worker (e.g. Render Free)
+
+On plans where a Background Worker (and Shell) is unavailable, run **only the web
+service** and let it render in-band:
+
+- Set **`RENDER_PROCESSING_MODE=inline`** in the web service env.
+- Build command (Native runtime): `pnpm install --frozen-lockfile && pnpm db:migrate && pnpm run build && mkdir -p .next/standalone/.next && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public`. Run `pnpm db:seed` once, manually — do **not** seed on every deploy (it overwrites package prices).
+- `/api/health` will report `renderProcessingMode: "inline"` — expected here.
+
+Caveats: inline has no background poller, so a render orphaned by a Free-tier
+spin-down/restart is not auto-retried, and it does not scale past one instance.
+Move to the worker setup above once volume or uptime matters.
+
 ---
 
 ## 5. Option C — Cloudflare Containers
@@ -162,10 +184,10 @@ pricing first — it's a newer product. DNS + R2 stay on Cloudflare either way.
   a VPS use a second compose project + `.env.staging` + subdomain.
 - **Workers:** scale by adding worker containers/replicas. Jobs are pulled with
   `SELECT … FOR UPDATE SKIP LOCKED`, so multiple workers won't collide.
-- **Web render mode:** production web services should return
-  `renderProcessingMode: "worker"` from `/api/health`. If it returns `inline`,
-  the environment is configured like local development and should not be used
-  for production traffic.
+- **Web render mode:** check `renderProcessingMode` at `/api/health`. Multi-
+  instance / worker-based production should return `"worker"`. `"inline"` is
+  expected only for the single-instance budget variant above; avoid it once you
+  run more than one web instance.
 - **Redis:** not required now. If you later move to BullMQ, uncomment the `redis`
   service in `docker-compose.yml`.
 
@@ -173,12 +195,13 @@ pricing first — it's a newer product. DNS + R2 stay on Cloudflare either way.
 
 ## 7. Post-deploy smoke checklist (deployment PRD §30)
 
-- [ ] HTTPS live; `/api/health` returns `ok: true` and
-  `renderProcessingMode: "worker"`; landing/login reachable.
+- [ ] HTTPS live; `/api/health` returns `ok: true` and the expected
+  `renderProcessingMode` (`worker`, or `inline` for the single-instance variant);
+  landing/login reachable.
 - [ ] Register → verify email (Resend) → 3 free credits granted.
-- [ ] Render each mode → worker processes → output stored in R2 → download works.
+- [ ] Render each mode → queue is processed → output stored in R2 → download works.
 - [ ] Force a provider error → credit auto-refunded after 3 attempts.
 - [ ] Buy credits via Midtrans → webhook marks `paid` once → credits added (no double).
 - [ ] Admin overview shows real numbers; retry a failed render.
 - [ ] Permanent delete removes the file from R2.
-- [ ] Worker logs show `Render worker started`.
+- [ ] In worker mode, worker logs show `Render worker started` (skip for inline).
