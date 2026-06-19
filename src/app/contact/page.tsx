@@ -28,7 +28,7 @@ export default async function ContactPage() {
         <PageHero
           eyebrow="Kontak"
           title="Hubungi tim RenderAI"
-          description="Untuk produk, akun, pembayaran, atau privasi."
+          description="Punya pertanyaan seputar produk, akun, pembayaran, atau privasi? Tim kami siap membantu Anda."
         >
           <Card className="shadow-soft">
             <CardContent className="py-5">
@@ -52,7 +52,7 @@ export default async function ContactPage() {
           <SectionHeader
             eyebrow="Bantuan"
             title="Pilih topik yang sesuai"
-            description="Pilih konteks yang paling dekat dengan kebutuhan Anda."
+            description="Pilih konteks yang paling dekat dengan kebutuhan Anda agar kami bisa membantu lebih cepat dan tepat."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-3">
             {contactOptions.map((item) => (

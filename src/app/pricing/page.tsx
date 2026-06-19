@@ -46,7 +46,7 @@ export default async function PricingPage() {
         <PageHero
           eyebrow="Paket Kredit"
           title="Kredit fleksibel untuk render AI"
-          description="Mulai kecil, tambah saat project membutuhkan lebih banyak opsi."
+          description="Mulai dari paket kecil, lalu tambah kapasitas kapan saja saat project membutuhkan lebih banyak opsi visual."
         >
           <div className="rounded-lg border border-border/70 bg-background p-5 shadow-soft">
             <p className="text-sm font-semibold text-foreground">
@@ -67,7 +67,7 @@ export default async function PricingPage() {
           <SectionHeader
             eyebrow="Pilihan Paket"
             title="Pilih kapasitas sesuai kebutuhan"
-            description="Cocok untuk eksplorasi kecil sampai banyak revisi."
+            description="Cocok untuk eksplorasi kecil pada satu project hingga banyak revisi pada beberapa project sekaligus."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {packages.map((pkg) => {
@@ -141,7 +141,7 @@ export default async function PricingPage() {
 
         <FinalCta
           title="Siapkan kredit render Anda"
-          description="Pilih paket, lalu mulai membuat opsi visual."
+          description="Pilih paket yang sesuai ritme tim, lalu mulai membuat opsi visual untuk project berikutnya."
           href={packageCtaHref}
           label={isAuthenticated ? "Buka pembayaran" : "Mulai sekarang"}
         />
