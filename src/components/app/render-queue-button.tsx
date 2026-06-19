@@ -33,12 +33,12 @@ export function RenderQueueButton() {
     void refresh();
   }, [open, refresh]);
 
-  function onItem(item: RenderQueueItem) {
+  async function onItem(item: RenderQueueItem) {
     setOpen(false);
     if (item.status === "success") {
       // Opening a finished render dismisses it from the queue, then lands in
       // the studio to view the result.
-      markSeen(item.renderId);
+      await markSeen(item.renderId);
       router.push(`/renders/new?source=${item.renderId}`);
     } else {
       router.push(`/renders/${item.renderId}`);
@@ -144,7 +144,7 @@ export function RenderQueueButton() {
                     <div className="flex items-start justify-between gap-3">
                       <button
                         type="button"
-                        onClick={() => onItem(item)}
+                  onClick={() => void onItem(item)}
                         className="min-w-0 flex-1 cursor-pointer text-left"
                       >
                         <div className="min-w-0">

@@ -231,6 +231,7 @@ export async function createRenderEdit(
         config: params.config ?? null,
         prompt: params.prompt,
         status: "queued",
+        seenAt: null,
         errorCode: null,
         errorMessage: null,
       })
@@ -257,7 +258,7 @@ export async function createRenderEdit(
     // Roll back: keep the prior successful version and refund the reservation.
     await db
       .update(renders)
-      .set({ status: "success" })
+      .set({ status: "success", seenAt: render.seenAt })
       .where(eq(renders.id, renderId));
     if (deduction.applied) {
       await applyCreditChange({
@@ -396,6 +397,7 @@ export async function createRenderTextureEdit(
         config: textureConfig,
         prompt: params.texturePrompt,
         status: "queued",
+        seenAt: null,
         errorCode: null,
         errorMessage: null,
         providerResponse: { requestOptions },
@@ -422,7 +424,7 @@ export async function createRenderTextureEdit(
   } catch (err) {
     await db
       .update(renders)
-      .set({ status: "success" })
+      .set({ status: "success", seenAt: render.seenAt })
       .where(eq(renders.id, renderId));
     if (deduction.applied) {
       await applyCreditChange({

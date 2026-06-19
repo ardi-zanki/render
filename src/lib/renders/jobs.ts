@@ -32,7 +32,7 @@ export async function listActiveRenderQueue(userId: string, limit = 20) {
   );
 
   // Active jobs, plus recently-finished ones so they linger as "Selesai" in the
-  // panel until the user opens them (the client dismisses seen completions).
+  // panel until the user opens the latest completed result.
   const queueWhere = and(
     eq(renderJobs.userId, userId),
     isNull(renders.deletedAt),
@@ -40,7 +40,9 @@ export async function listActiveRenderQueue(userId: string, limit = 20) {
       inArray(renderJobs.status, ["queued", "processing"]),
       and(
         eq(renderJobs.status, "success"),
+        eq(renders.status, "success"),
         gte(renderJobs.completedAt, completedCutoff),
+        isNull(renders.seenAt),
       ),
     ),
   );
@@ -77,6 +79,21 @@ export async function listActiveRenderQueue(userId: string, limit = 20) {
     count: totalRow[0]?.value ?? 0,
     items: rows,
   };
+}
+
+/** Persist that a user has opened a completed render from any entry point. */
+export async function markRenderQueueSeen(userId: string, renderId: string) {
+  await db
+    .update(renders)
+    .set({ seenAt: new Date() })
+    .where(
+      and(
+        eq(renders.userId, userId),
+        eq(renders.id, renderId),
+        eq(renders.status, "success"),
+        isNull(renders.seenAt),
+      ),
+    );
 }
 
 export async function lockJobByRenderId(renderId: string, lockedBy: string) {

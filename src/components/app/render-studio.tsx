@@ -91,7 +91,7 @@ export function RenderStudio({
   // regardless of whether Studio was opened from the queue or another page.
   useEffect(() => {
     if (activeRenderId && state.resultUrl) {
-      markRenderQueueSeen(activeRenderId);
+      void markRenderQueueSeen(activeRenderId);
     }
   }, [activeRenderId, state.resultUrl]);
 

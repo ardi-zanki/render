@@ -25,6 +25,10 @@ export const renderShareSchema = z.object({
   renderId: uuidSchema,
 });
 
+export const renderQueueReadSchema = z.object({
+  renderId: uuidSchema,
+});
+
 export const renderDeleteSchema = z.object({
   confirmationName: requiredText("Nama render", 120),
 });

@@ -158,6 +158,9 @@ export const renders = pgTable(
       .defaultNow(),
     startedAt: timestamp("started_at", { withTimezone: true }),
     completedAt: timestamp("completed_at", { withTimezone: true }),
+    // Persisted acknowledgement for the latest completed result in the queue.
+    // Reset when a new edit is queued.
+    seenAt: timestamp("seen_at", { withTimezone: true }),
     failedAt: timestamp("failed_at", { withTimezone: true }),
     archivedAt: timestamp("archived_at", { withTimezone: true }),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),

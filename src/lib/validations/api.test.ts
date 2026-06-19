@@ -4,6 +4,7 @@ import {
   adminCreditAdjustmentSchema,
   adminToggleDisableSchema,
   notificationReadSchema,
+  renderQueueReadSchema,
   renderDeleteSchema,
   renderMoveProjectSchema,
 } from "./api";
@@ -16,6 +17,17 @@ describe("api validation", () => {
         id: "f75bc311-6ca8-40b8-b5e6-0c57e168873d",
       }).success,
     ).toBe(true);
+  });
+
+  it("requires a valid render id when acknowledging a queue item", () => {
+    expect(
+      renderQueueReadSchema.safeParse({
+        renderId: "f75bc311-6ca8-40b8-b5e6-0c57e168873d",
+      }).success,
+    ).toBe(true);
+    expect(renderQueueReadSchema.safeParse({ renderId: "invalid" }).success).toBe(
+      false,
+    );
   });
 
   it("requires a render deletion confirmation name and trims it", () => {
