@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
-import { PageHero, SectionHeader } from "@/components/brand/marketing-blocks";
+import { SectionHeader } from "@/components/brand/marketing-blocks";
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
 import { Badge } from "@/components/ui/badge";
@@ -26,37 +26,24 @@ export default async function BlogPage() {
       <PublicHeader authenticated={isAuthenticated} />
 
       <main className="flex-1">
-        <PageHero
-          eyebrow="Blog"
-          title="Catatan singkat untuk workflow visual"
-          description="Panduan praktis untuk review konsep, revisi, dan penggunaan RenderAI."
-        >
-          <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border/70 bg-card shadow-soft">
-            <Image
-              src={featured.image}
-              alt={featured.title}
-              fill
-              priority
-              unoptimized
-              sizes="(min-width: 1024px) 440px, 100vw"
-              className="object-cover"
+        <section className="border-b border-border/70 bg-card">
+          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14">
+            <SectionHeader
+              eyebrow="Blog"
+              title="Catatan singkat untuk workflow visual"
+              description="Panduan praktis seputar review konsep, mengelola revisi, dan memanfaatkan RenderAI dalam workflow desain Anda."
             />
           </div>
-        </PageHero>
+        </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-          <SectionHeader
-            eyebrow="Artikel Terbaru"
-            title="Wawasan praktis untuk tim desain"
-            description="Brief lebih jelas, revisi lebih mudah diikuti."
-          />
-
-          <article className="mt-9 grid overflow-hidden rounded-lg border border-border/70 bg-card shadow-soft md:grid-cols-[1.1fr_0.9fr]">
+          <article className="grid overflow-hidden rounded-lg border border-border/70 bg-card shadow-soft md:grid-cols-[1.1fr_0.9fr]">
             <div className="relative min-h-[260px]">
               <Image
                 src={featured.image}
                 alt={featured.title}
                 fill
+                priority
                 unoptimized
                 sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-cover"

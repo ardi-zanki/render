@@ -105,7 +105,7 @@ export default async function LandingPage() {
           <SectionHeader
             eyebrow="Workflow RenderAI"
             title="Eksplorasi visual dalam satu alur"
-            description="Unggah materi, atur arahan, simpan hasil."
+            description="Unggah materi desain, atur arahan visual, lalu simpan dan bandingkan hasilnya — semuanya tertata dalam satu alur kerja."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
@@ -135,7 +135,7 @@ export default async function LandingPage() {
           <SectionHeader
             eyebrow="Galeri Visual"
             title="Contoh visual siap direview"
-            description="Bandingkan mood interior dan eksterior dengan cepat."
+            description="Lihat contoh hasil render interior dan eksterior, lalu bandingkan mood serta arah visualnya dengan cepat."
           />
           <div className="mt-9">
             <ShowcaseGrid />
@@ -146,7 +146,7 @@ export default async function LandingPage() {
           <SectionHeader
             eyebrow="Cara Kerja"
             title="Dari input ke review"
-            description="Tiga langkah sederhana untuk membuat opsi visual."
+            description="Tiga langkah sederhana — dari materi awal hingga opsi visual yang siap dibahas bersama tim atau klien."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-3">
             {workflowSteps.map((item) => (
@@ -172,7 +172,7 @@ export default async function LandingPage() {
           <SectionHeader
             eyebrow="Paket Kredit"
             title="Paket kredit fleksibel"
-            description="Mulai kecil, tambah saat project butuh lebih banyak opsi."
+            description="Mulai dari paket kecil, lalu tambah kapasitas saat project membutuhkan lebih banyak eksplorasi dan revisi."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {pricing.map((plan) => (
@@ -232,7 +232,7 @@ export default async function LandingPage() {
           <SectionHeader
             eyebrow="FAQ"
             title="Hal penting sebelum tim mulai"
-            description="Jawaban singkat tentang posisi RenderAI dalam workflow desain dan cara kerja kredit."
+            description="Jawaban singkat tentang posisi RenderAI dalam workflow desain Anda, cara kerja kredit, dan hasil yang bisa diharapkan."
           />
           <div className="mt-9 space-y-3">
             {faqs.map((item, index) => (
@@ -255,7 +255,7 @@ export default async function LandingPage() {
 
         <FinalCta
           title="Siap mencoba RenderAI?"
-          description="Buat opsi visual pertama dari materi desain Anda."
+          description="Buat opsi visual pertama dari materi desain yang sudah Anda miliki — tanpa perlu mengunggah ulang apa pun."
           href={primaryHref}
           label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />

@@ -100,7 +100,7 @@ export default async function TermsPage() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <PublicHeader authenticated={isAuthenticated} />
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-5 sm:py-12">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase text-primary">
             Legal

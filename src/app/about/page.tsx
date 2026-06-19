@@ -45,7 +45,7 @@ export default async function AboutPage() {
         <PageHero
           eyebrow="Tentang RenderAI"
           title="Workspace visual untuk tim desain"
-          description="RenderAI membantu membuat opsi visual cepat tanpa membuat workflow berantakan."
+          description="RenderAI membantu tim membuat opsi visual dengan cepat, sambil menjaga referensi, hasil, dan revisi tetap rapi."
         >
           <ProductPreview compact />
         </PageHero>
@@ -54,7 +54,7 @@ export default async function AboutPage() {
           <SectionHeader
             eyebrow="Prinsip Produk"
             title="Cepat, rapi, tetap terarah"
-            description="Visual lebih mudah dibaca. Project lebih mudah diikuti."
+            description="Tiga prinsip yang kami pegang agar visual lebih mudah dibaca dan setiap project lebih mudah diikuti tim."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-3">
             {principles.map((item) => (
@@ -77,7 +77,7 @@ export default async function AboutPage() {
             <SectionHeader
               eyebrow="Untuk Siapa"
               title="Untuk tim yang butuh opsi cepat"
-              description="Cocok untuk eksplorasi, presentasi awal, dan review."
+              description="Cocok untuk tim yang sering melakukan eksplorasi konsep, presentasi awal, dan review desain bersama klien."
             />
             <div className="mt-9 grid gap-4 md:grid-cols-3">
               {audience.map((item) => (
@@ -102,7 +102,7 @@ export default async function AboutPage() {
 
         <FinalCta
           title="Mulai eksplorasi visual yang lebih terarah"
-          description="Buat opsi visual dari materi desain Anda."
+          description="Buat opsi visual dari materi desain Anda dan bawa hasilnya ke diskusi tim maupun klien."
           href={isAuthenticated ? "/dashboard" : "/register"}
           label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />

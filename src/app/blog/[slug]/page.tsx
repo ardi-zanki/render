@@ -68,15 +68,15 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
             </div>
           </header>
 
-          <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-            <div className="relative aspect-[16/8] overflow-hidden rounded-lg border border-border/70 bg-card shadow-soft">
+          <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+            <div className="relative aspect-[16/9] overflow-hidden rounded-lg border border-border/70 bg-muted">
               <Image
                 src={post.image}
                 alt={post.title}
                 fill
                 priority
                 unoptimized
-                sizes="(min-width: 1024px) 960px, 100vw"
+                sizes="(min-width: 768px) 672px, 100vw"
                 className="object-cover"
               />
             </div>

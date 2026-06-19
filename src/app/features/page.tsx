@@ -31,7 +31,7 @@ export default async function FeaturesPage() {
         <PageHero
           eyebrow="Fitur RenderAI"
           title="Fitur untuk eksplorasi visual yang terarah"
-          description="Input, arahan, output, dan project dalam satu workspace."
+          description="Input, arahan visual, output, dan riwayat project tersimpan rapi dalam satu workspace yang mudah diikuti."
         >
           <ProductPreview compact />
         </PageHero>
@@ -40,7 +40,7 @@ export default async function FeaturesPage() {
           <SectionHeader
             eyebrow="Kemampuan Utama"
             title="Dari ide awal ke visual siap bahas"
-            description="Lebih sedikit langkah manual, lebih cepat melihat opsi."
+            description="Lebih sedikit langkah manual dan pengaturan berulang, sehingga tim lebih cepat melihat dan memilih opsi visual."
           />
           <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {featureGroups.map((feature) => (
@@ -66,7 +66,7 @@ export default async function FeaturesPage() {
             <SectionHeader
               eyebrow="Workflow"
               title="Alur pendek untuk review"
-              description="Unggah materi, beri arahan, lalu bandingkan hasil."
+              description="Unggah materi desain, beri arahan singkat, lalu bandingkan hasilnya untuk review — tanpa alur yang berbelit."
             />
             <div className="mt-9 grid gap-4 md:grid-cols-3">
               {workflowSteps.map((item) => (
@@ -93,7 +93,7 @@ export default async function FeaturesPage() {
           <SectionHeader
             eyebrow="Output"
             title="Visual yang mudah dibandingkan"
-            description="Pakai untuk mood, presentasi awal, atau catatan revisi."
+            description="Gunakan hasilnya untuk menyusun mood, presentasi awal, atau catatan revisi yang lebih mudah dipahami klien."
           />
           <div className="mt-9">
             <ShowcaseGrid />
@@ -102,7 +102,7 @@ export default async function FeaturesPage() {
 
         <FinalCta
           title="Coba RenderAI di project aktif"
-          description="Mulai dari materi desain yang sudah ada."
+          description="Mulai dari materi desain yang sudah ada, lalu lihat opsi visualnya dalam hitungan menit."
           href={isAuthenticated ? "/dashboard" : "/register"}
           label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />
