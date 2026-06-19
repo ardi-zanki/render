@@ -56,6 +56,7 @@ export default async function ProjectDetailPage({
       <PageHeader
         title={project.name}
         description={`${total} render${project.isDefault ? " · Project default" : ""}`}
+        backLink={{ href: "/projects", label: "Semua project" }}
         action={
           <div className="flex w-full min-w-0 flex-row gap-2 sm:w-auto">
             <DebouncedSearchInput value={query} placeholder="Cari render..." />
