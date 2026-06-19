@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowRight,
   Check,
   ChevronRight,
   Layers3,
-  Play,
   Sparkles,
 } from "lucide-react";
 
@@ -88,8 +86,7 @@ export default async function LandingPage() {
                 className="h-10 w-full max-w-[18.5rem] px-5 text-sm sm:w-[13.75rem] sm:max-w-none"
               >
                 <Link href={primaryHref}>
-                  {isAuthenticated ? "Open Studio" : "Mulai sekarang"}
-                  <ArrowRight />
+                  {isAuthenticated ? "Buka studio" : "Mulai sekarang"}
                 </Link>
               </Button>
               <Button
@@ -97,9 +94,7 @@ export default async function LandingPage() {
                 asChild
                 className="h-10 w-full max-w-[18.5rem] px-5 text-sm shadow-none sm:w-[13.75rem] sm:max-w-none"
               >
-                <Link href="#showcase">
-                  Lihat contoh <Play />
-                </Link>
+                <Link href="#showcase">Lihat contoh</Link>
               </Button>
             </div>
 
@@ -226,9 +221,7 @@ export default async function LandingPage() {
                     className="mt-6 h-9 w-full text-sm shadow-none"
                     variant={plan.highlighted ? "default" : "outline"}
                   >
-                    <Link href={packageCtaHref}>
-                      Pilih paket <ArrowRight />
-                    </Link>
+                    <Link href={packageCtaHref}>Pilih paket</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -265,7 +258,7 @@ export default async function LandingPage() {
           title="Siap mencoba RenderAI?"
           description="Buat opsi visual pertama dari materi desain Anda."
           href={primaryHref}
-          label={isAuthenticated ? "Open Studio" : "Mulai sekarang"}
+          label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />
       </main>
 

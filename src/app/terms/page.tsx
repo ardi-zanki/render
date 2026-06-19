@@ -155,13 +155,13 @@ export default async function TermsPage() {
             </p>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               {isAuthenticated
-                ? "Buka dashboard untuk melanjutkan workflow render Anda."
-                : "Kembali ke halaman registrasi untuk membuat akun dan mencoba workflow render pertama Anda."}
+                ? "Buka studio untuk melanjutkan workflow render Anda."
+                : "Buat akun untuk mencoba workflow render pertama Anda."}
             </p>
           </div>
           <Button asChild className="shrink-0">
             <Link href={isAuthenticated ? "/dashboard" : "/register"}>
-              {isAuthenticated ? "Open Studio" : "Buat akun"}
+              {isAuthenticated ? "Buka studio" : "Buat akun"}
             </Link>
           </Button>
         </div>

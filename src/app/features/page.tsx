@@ -104,7 +104,7 @@ export default async function FeaturesPage() {
           title="Coba RenderAI di project aktif"
           description="Mulai dari materi desain yang sudah ada."
           href={isAuthenticated ? "/dashboard" : "/register"}
-          label={isAuthenticated ? "Open Studio" : "Mulai sekarang"}
+          label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />
       </main>
 

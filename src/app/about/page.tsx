@@ -104,7 +104,7 @@ export default async function AboutPage() {
           title="Mulai review visual yang lebih rapi"
           description="Buat opsi visual dari materi desain Anda."
           href={isAuthenticated ? "/dashboard" : "/register"}
-          label={isAuthenticated ? "Open Studio" : "Mulai sekarang"}
+          label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />
       </main>
 

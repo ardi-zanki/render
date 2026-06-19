@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 
 export function BeforeAfterSlider() {
   const sliderRef = useRef<HTMLDivElement>(null);
+  const draggingRef = useRef(false);
   const [value, setValue] = useState(50);
   const [dragging, setDragging] = useState(false);
 
@@ -25,20 +26,35 @@ export function BeforeAfterSlider() {
       aria-valuemin={15}
       aria-valuemax={85}
       aria-valuenow={value}
-      className="relative aspect-[16/9] cursor-ew-resize touch-none overflow-hidden rounded-lg border border-border/70 bg-card outline-none focus-visible:ring-2 focus-visible:ring-ring/25"
+      className={`relative aspect-[16/9] cursor-ew-resize touch-none overflow-hidden rounded-lg border border-border/70 bg-card outline-none focus-visible:ring-2 focus-visible:ring-ring/25 ${
+        dragging ? "ring-2 ring-primary/20" : ""
+      }`}
       onPointerDown={(event) => {
+        event.preventDefault();
+        event.currentTarget.focus();
+        draggingRef.current = true;
         setDragging(true);
         event.currentTarget.setPointerCapture(event.pointerId);
         updateFromClientX(event.clientX);
       }}
       onPointerMove={(event) => {
-        if (dragging) updateFromClientX(event.clientX);
+        if (draggingRef.current) updateFromClientX(event.clientX);
       }}
       onPointerUp={(event) => {
+        draggingRef.current = false;
         setDragging(false);
-        event.currentTarget.releasePointerCapture(event.pointerId);
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
       }}
-      onPointerCancel={() => setDragging(false)}
+      onLostPointerCapture={() => {
+        draggingRef.current = false;
+        setDragging(false);
+      }}
+      onPointerCancel={() => {
+        draggingRef.current = false;
+        setDragging(false);
+      }}
       onKeyDown={(event) => {
         if (event.key === "ArrowLeft") {
           event.preventDefault();
@@ -55,8 +71,9 @@ export function BeforeAfterSlider() {
         alt="Gambar asli sebelum render"
         fill
         priority
+        draggable={false}
         sizes="(min-width: 1024px) 780px, 100vw"
-        className="size-full object-cover"
+        className="select-none object-cover"
       />
       <div
         className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -67,8 +84,9 @@ export function BeforeAfterSlider() {
           alt="Hasil render AI"
           fill
           priority
+          draggable={false}
           sizes="(min-width: 1024px) 780px, 100vw"
-          className="size-full object-cover"
+          className="select-none object-cover"
         />
       </div>
 
@@ -77,7 +95,7 @@ export function BeforeAfterSlider() {
         style={{ left: `${value}%` }}
       />
       <div
-        className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border/80 bg-card text-xs font-semibold text-foreground shadow-floating"
+        className="pointer-events-none absolute top-1/2 flex size-9 -translate-x-1/2 -translate-y-1/2 select-none items-center justify-center rounded-full border border-border/80 bg-card text-xs font-semibold text-foreground shadow-floating"
         style={{ left: `${value}%` }}
         aria-hidden
       >

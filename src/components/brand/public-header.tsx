@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { Logo } from "@/components/brand/logo";
@@ -66,7 +65,7 @@ export function PublicHeader({
           )}
           <Button asChild className="h-9 px-4 text-sm">
             <Link href={authenticated ? "/dashboard" : "/register"}>
-              {authenticated ? "Open Studio" : "Buat akun"} <ArrowRight />
+              {authenticated ? "Buka studio" : "Buat akun"}
             </Link>
           </Button>
           {showThemeToggle && <ModeToggle />}

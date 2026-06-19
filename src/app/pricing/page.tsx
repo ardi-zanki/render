@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Layers3 } from "lucide-react";
+import { Check, Layers3 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -113,9 +113,7 @@ export default async function PricingPage() {
                       className="mt-auto"
                       variant={copy.highlighted ? "default" : "outline"}
                     >
-                      <Link href={packageCtaHref}>
-                        Mulai render <ArrowRight />
-                      </Link>
+                      <Link href={packageCtaHref}>Mulai render</Link>
                     </Button>
                   </CardContent>
                 </Card>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ImageIcon, Sparkles, Zap } from "lucide-react";
+import { ImageIcon, Sparkles, Zap } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { BeforeAfterSlider } from "@/components/brand/before-after-slider";
@@ -109,9 +109,7 @@ export function ProductPreview({ compact = false }: { compact?: boolean }) {
             Geser untuk membandingkan asli dan hasil.
           </div>
           <Button size="sm" asChild>
-            <Link href="/renders/new">
-              Render <ArrowRight />
-            </Link>
+            <Link href="/renders/new">Render</Link>
           </Button>
         </div>
       </div>
@@ -172,9 +170,7 @@ export function FinalCta({
           asChild
           className="mt-6 h-10 px-5 text-sm shadow-none"
         >
-          <Link href={href}>
-            {label} <ArrowRight />
-          </Link>
+          <Link href={href}>{label}</Link>
         </Button>
       </div>
     </section>
