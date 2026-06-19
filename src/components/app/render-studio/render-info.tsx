@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Clock3, Coins, FileType, Layers3, Sofa } from "lucide-react";
+import { Layers3 } from "lucide-react";
 
 import type { RenderMode } from "@/db/schema";
 import { Badge } from "@/components/ui/badge";
@@ -25,11 +25,11 @@ export function StudioRenderInfo({
   };
 }) {
   const rows = [
-    { label: "Dibuat", value: dateFmt.format(new Date(info.createdAt)), icon: CalendarDays },
-    { label: "Diperbarui", value: dateFmt.format(new Date(info.updatedAt)), icon: Clock3 },
-    { label: "Mode", value: MODE_LABEL[info.mode], icon: Sofa },
-    { label: "Format", value: info.outputFormat.toUpperCase(), icon: FileType },
-    { label: "Kredit", value: `${info.creditsUsed || 1} kredit`, icon: Coins },
+    { label: "Dibuat", value: dateFmt.format(new Date(info.createdAt)) },
+    { label: "Diperbarui", value: dateFmt.format(new Date(info.updatedAt)) },
+    { label: "Mode", value: MODE_LABEL[info.mode] },
+    { label: "Format", value: info.outputFormat.toUpperCase() },
+    { label: "Kredit", value: `${info.creditsUsed || 1} kredit` },
   ];
   return (
     <div className="rounded-lg border border-border/80 bg-card p-4 shadow-soft">
@@ -45,15 +45,12 @@ export function StudioRenderInfo({
         )}
       </div>
       <dl className="flex flex-col divide-y divide-border/70">
-        {rows.map(({ label, value, icon: Icon }) => (
+        {rows.map(({ label, value }) => (
           <div
             key={label}
             className="flex items-center justify-between gap-3 py-2 text-xs first:pt-0 last:pb-0"
           >
-            <dt className="flex items-center gap-2 text-muted-foreground">
-              <Icon className="size-4 text-primary" />
-              {label}
-            </dt>
+            <dt className="text-muted-foreground">{label}</dt>
             <dd className="text-right font-medium text-foreground">{value}</dd>
           </div>
         ))}

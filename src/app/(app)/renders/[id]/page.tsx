@@ -1,15 +1,7 @@
 import {
   ArrowLeft,
-  CalendarDays,
-  CircleCheck,
-  Clock3,
-  Coins,
-  FileType,
-  FolderOpen,
   Layers3,
-  Sofa,
   Wand2,
-  type LucideIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -132,7 +124,6 @@ export default async function RenderDetailPage({
 
               <dl className="flex flex-col divide-y divide-border/70">
                 <Info
-                  icon={CircleCheck}
                   label="Status"
                   value={
                     <Badge variant={statusBadgeVariant(render.status)}>
@@ -141,22 +132,18 @@ export default async function RenderDetailPage({
                   }
                 />
                 <Info
-                  icon={CalendarDays}
                   label="Dibuat"
                   value={dateFmt.format(render.createdAt)}
                 />
                 <Info
-                  icon={Clock3}
                   label="Diperbarui"
                   value={dateFmt.format(render.updatedAt)}
                 />
                 <Info
-                  icon={Sofa}
                   label="Mode"
                   value={MODE_LABEL[render.mode]}
                 />
                 <Info
-                  icon={FolderOpen}
                   label="Project"
                   value={
                     <RenderProjectSelector
@@ -168,12 +155,10 @@ export default async function RenderDetailPage({
                   }
                 />
                 <Info
-                  icon={FileType}
                   label="Format"
                   value={render.outputFormat.toUpperCase()}
                 />
                 <Info
-                  icon={Coins}
                   label="Kredit"
                   value={`${render.creditsUsed || 1} kredit`}
                 />
@@ -198,20 +183,15 @@ export default async function RenderDetailPage({
 }
 
 function Info({
-  icon: Icon,
   label,
   value,
 }: {
-  icon: LucideIcon;
   label: string;
   value: ReactNode;
 }) {
   return (
     <div className="flex items-center justify-between gap-3 py-2 text-xs first:pt-0 last:pb-0">
-      <dt className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="size-4 text-primary" />
-        {label}
-      </dt>
+      <dt className="text-muted-foreground">{label}</dt>
       <dd className="text-right font-medium text-foreground">{value}</dd>
     </div>
   );
