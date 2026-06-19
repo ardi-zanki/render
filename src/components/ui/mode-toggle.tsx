@@ -15,7 +15,7 @@ function ModeToggle() {
   return (
     <Button
       variant="outline"
-      size="icon"
+      size="icon-sm"
       aria-label="Ganti tema terang/gelap"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >

@@ -152,13 +152,13 @@ export function AppShell({
         )}
         suppressHydrationWarning
       >
-        <div className="relative h-14 border-b border-border/75">
+        <div className="relative h-12 border-b border-border/75">
           <Link
             href="/dashboard"
             aria-label="RenderAI dashboard"
             onClick={() => setOpen(false)}
             className={cn(
-              "absolute left-8 top-1/2 min-w-0 -translate-y-1/2 whitespace-nowrap text-base font-extrabold tracking-normal text-foreground transition-opacity duration-150 ease-out",
+              "absolute left-6 top-1/2 min-w-0 -translate-y-1/2 whitespace-nowrap text-sm font-extrabold tracking-normal text-foreground transition-opacity duration-150 ease-out",
               expanded
                 ? "opacity-100 delay-100"
                 : "pointer-events-none opacity-0",
@@ -169,7 +169,7 @@ export function AppShell({
           <button
             type="button"
             className={cn(
-              "absolute left-1/2 top-1/2 hidden size-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-[opacity,background-color,color] duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex",
+              "absolute left-1/2 top-1/2 hidden size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-[opacity,background-color,color] duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex",
               expanded
                 ? "pointer-events-none opacity-0"
                 : "opacity-100 delay-100",
@@ -178,11 +178,11 @@ export function AppShell({
             aria-label="Lebarkan sidebar"
             title="Lebarkan sidebar"
           >
-            <PanelLeft className="size-5" />
+            <PanelLeft className="size-4" />
           </button>
           <div
             className={cn(
-              "absolute inset-y-0 right-3 flex min-w-0 items-center justify-end gap-1.5 transition-opacity duration-150 ease-out",
+              "absolute inset-y-0 right-2.5 flex min-w-0 items-center justify-end gap-1 transition-opacity duration-150 ease-out",
               expanded
                 ? "opacity-100 delay-100"
                 : "pointer-events-none opacity-0",
@@ -193,16 +193,16 @@ export function AppShell({
               onClick={() => setOpen(false)}
               aria-label="Tutup menu"
             >
-              <X className="size-5" />
+              <X className="size-4" />
             </button>
             <button
               type="button"
-              className="hidden size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex"
+              className="hidden size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 ease-out hover:bg-muted/80 hover:text-primary lg:flex"
               onClick={() => updateSidebarExpanded(false)}
               aria-label="Ciutkan sidebar"
               title="Ciutkan sidebar"
             >
-              <PanelLeft className="size-5" />
+              <PanelLeft className="size-4" />
             </button>
           </div>
         </div>
@@ -213,7 +213,7 @@ export function AppShell({
             onClick={() => setOpen(false)}
             title={!expanded ? "Buat render" : undefined}
             className={cn(
-              "group relative grid grid-cols-[48px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+              "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
               renderNewActive
                 ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                 : "text-primary hover:bg-accent/80",
@@ -238,7 +238,7 @@ export function AppShell({
                 onClick={() => setOpen(false)}
                 title={!expanded ? item.label : undefined}
                 className={cn(
-                  "group relative grid grid-cols-[48px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
                   active
                     ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
@@ -257,7 +257,7 @@ export function AppShell({
                 onClick={() => setOpen(false)}
                 title={!expanded ? "Admin" : undefined}
                 className={cn(
-                  "group relative grid grid-cols-[48px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
                   isActive("/admin") && !isActive("/admin/audit")
                     ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
@@ -271,7 +271,7 @@ export function AppShell({
                 onClick={() => setOpen(false)}
                 title={!expanded ? "Log Audit" : undefined}
                 className={cn(
-                  "group relative grid grid-cols-[48px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
                   isActive("/admin/audit")
                     ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
@@ -355,7 +355,7 @@ export function AppShell({
         )}
         suppressHydrationWarning
       >
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/75 bg-background/90 px-4 backdrop-blur-xl sm:px-5">
+        <header className="sticky top-0 z-30 flex h-12 items-center gap-2.5 border-b border-border/75 bg-background/90 px-3 backdrop-blur-xl sm:px-4">
           <button
             className="text-foreground lg:hidden"
             onClick={() => setOpen(true)}
@@ -366,7 +366,7 @@ export function AppShell({
           {/* Page-level header slot: the Render Studio title is portaled here
               so it sits top-left, aligned with the actions on the right. */}
           <div id="app-header-slot" className="flex min-w-0 items-center" />
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1.5">
             <CreditPill balance={balance} />
             <RenderQueueButton />
             <NotificationBell initialUnread={unreadCount} items={notifications} />

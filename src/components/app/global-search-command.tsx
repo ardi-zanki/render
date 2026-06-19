@@ -87,7 +87,7 @@ export function GlobalSearchCommand({
         type="button"
         onClick={() => setOpen(true)}
         title={!expanded ? "Cari render" : undefined}
-        className="group relative grid w-full grid-cols-[48px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
+        className="group relative grid w-full grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
       >
         <Search className="mx-auto size-4 shrink-0" />
         <span
