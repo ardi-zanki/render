@@ -170,13 +170,13 @@ export function SettingsModal({
       </button>
 
       <aside className="border-b border-border bg-muted/35 p-3 pr-12 md:border-b-0 md:border-r md:pr-3">
-        <div className="px-2 py-1 md:mb-4">
+        <div className="px-2 py-1 md:mb-3">
           <h2 id="settings-title" className="text-base font-semibold text-foreground">
             Pengaturan
           </h2>
         </div>
 
-        <nav className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
+        <nav className="flex gap-0.5 overflow-x-auto md:flex-col md:overflow-visible">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const selected = activeTab === tab.value;
@@ -186,7 +186,7 @@ export function SettingsModal({
                 type="button"
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                   selected
                     ? "bg-card text-primary shadow-soft"
                     : "text-muted-foreground hover:bg-card/70 hover:text-foreground",

@@ -207,13 +207,13 @@ export function AppShell({
           </div>
         </div>
 
-        <div className={cn("space-y-1 px-3 pt-3", expanded ? "pb-0.5" : "pb-1")}>
+        <div className={cn("space-y-0.5 px-3 pt-3", expanded ? "pb-0.5" : "pb-1")}>
           <Link
             href="/renders/new"
             onClick={() => setOpen(false)}
             title={!expanded ? "Buat render" : undefined}
             className={cn(
-              "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+              "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-1.5 text-sm font-medium transition-colors",
               renderNewActive
                 ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                 : "text-primary hover:bg-accent/80",
@@ -228,7 +228,7 @@ export function AppShell({
           />
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 pb-2 pt-1">
+        <nav className="flex-1 space-y-0.5 px-3 pb-2 pt-1">
           {NAV.map((item) => {
             const active = isNavActive(item.href);
             return (
@@ -238,7 +238,7 @@ export function AppShell({
                 onClick={() => setOpen(false)}
                 title={!expanded ? item.label : undefined}
                 className={cn(
-                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-1.5 text-sm font-medium transition-colors",
                   active
                     ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
@@ -257,7 +257,7 @@ export function AppShell({
                 onClick={() => setOpen(false)}
                 title={!expanded ? "Admin" : undefined}
                 className={cn(
-                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-1.5 text-sm font-medium transition-colors",
                   isActive("/admin") && !isActive("/admin/audit")
                     ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
@@ -271,7 +271,7 @@ export function AppShell({
                 onClick={() => setOpen(false)}
                 title={!expanded ? "Log Audit" : undefined}
                 className={cn(
-                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-2 text-sm font-medium transition-colors",
+                  "group relative grid grid-cols-[40px_minmax(0,1fr)] items-center rounded-md py-1.5 text-sm font-medium transition-colors",
                   isActive("/admin/audit")
                     ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
