@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, isNotNull, or } from "drizzle-orm";
 
 import { db } from "@/db";
 import { creditTransactions, paymentPackages, payments } from "@/db/schema";
@@ -51,6 +51,15 @@ type PaymentRow = typeof payments.$inferSelect;
 
 function paymentCreditKey(paymentId: string) {
   return `payment:${paymentId}`;
+}
+
+function checkoutResultFromPayment(payment: PaymentRow): CheckoutResult {
+  return {
+    orderId: payment.providerOrderId,
+    provider: payment.provider,
+    token: payment.snapToken ?? undefined,
+    redirectUrl: payment.paymentUrl ?? undefined,
+  };
 }
 
 async function ensurePaymentCreditsApplied(payment: PaymentRow) {
@@ -111,8 +120,23 @@ export async function createCheckout(
   const pkg = await getActivePaymentPackage(packageSlug);
   if (!pkg) throw new PackageNotFoundError();
 
-  const orderId = generateOrderId();
   const totalCredits = pkg.credits + pkg.bonusCredits;
+  const reusablePayment = await db.query.payments.findFirst({
+    where: and(
+      eq(payments.userId, userId),
+      eq(payments.packageId, pkg.id),
+      eq(payments.provider, env.PAYMENT_PROVIDER),
+      eq(payments.amount, pkg.price),
+      eq(payments.currency, pkg.currency),
+      eq(payments.creditsAdded, totalCredits),
+      eq(payments.status, "pending"),
+      or(isNotNull(payments.snapToken), isNotNull(payments.paymentUrl)),
+    ),
+    orderBy: desc(payments.createdAt),
+  });
+  if (reusablePayment) return checkoutResultFromPayment(reusablePayment);
+
+  const orderId = generateOrderId();
 
   const [payment] = await db
     .insert(payments)
@@ -282,10 +306,13 @@ export async function listPayments(
   return rows.map((r) => ({
     id: r.id,
     orderId: r.providerOrderId,
+    provider: r.provider,
     packageName: r.packageId ? pkgName.get(r.packageId) ?? "—" : "—",
     amount: r.amount,
     credits: r.creditsAdded,
     status: r.status,
+    snapToken: r.status === "pending" ? r.snapToken : null,
+    paymentUrl: r.status === "pending" ? r.paymentUrl : null,
     createdAt: r.createdAt,
     paidAt: r.paidAt,
   }));
