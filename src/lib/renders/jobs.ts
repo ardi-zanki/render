@@ -59,7 +59,6 @@ export async function listActiveRenderQueue(userId: string, limit = 20) {
         attempts: renderJobs.attempts,
         maxAttempts: renderJobs.maxAttempts,
         mode: renders.mode,
-        prompt: renders.prompt,
         projectName: projects.name,
         createdAt: renderJobs.createdAt,
         startedAt: renderJobs.startedAt,

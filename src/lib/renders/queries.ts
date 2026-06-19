@@ -82,7 +82,6 @@ export async function getRenderDetail(
     height: a.height,
     createdAt: a.createdAt,
     config: a.config ?? null,
-    prompt: a.prompt ?? null,
   }));
   const latestResult = getLatestRenderableAsset(views);
   const updatedAt = [
@@ -103,7 +102,6 @@ export async function getRenderDetail(
     mode: render.mode,
     name: render.name ?? null,
     status: render.status,
-    prompt: render.prompt,
     config: render.config ?? null,
     outputFormat: render.outputFormat,
     creditsUsed: render.creditsUsed,
@@ -189,7 +187,6 @@ export async function listRenders(
     mode: r.mode,
     name: r.name ?? null,
     status: r.status,
-    prompt: r.prompt,
     createdAt: r.createdAt,
     projectId: r.projectId,
     projectName: projectById.get(r.projectId) ?? null,

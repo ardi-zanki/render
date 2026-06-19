@@ -44,9 +44,8 @@ export interface RenderAssetView {
   width: number | null;
   height: number | null;
   createdAt: Date;
-  /** For result/edit assets: the settings + prompt that produced this version. */
+  /** For result/edit assets: the settings that produced this version. */
   config: RenderConfig | null;
-  prompt: string | null;
 }
 
 export interface RenderDetail {
@@ -54,7 +53,6 @@ export interface RenderDetail {
   mode: RenderMode;
   name: string | null;
   status: RenderStatus;
-  prompt: string | null;
   config: RenderConfig | null;
   outputFormat: string;
   creditsUsed: number;
@@ -79,7 +77,6 @@ export interface RenderListItem {
   mode: RenderMode;
   name: string | null;
   status: RenderStatus;
-  prompt: string | null;
   createdAt: Date;
   projectId: string;
   projectName: string | null;
