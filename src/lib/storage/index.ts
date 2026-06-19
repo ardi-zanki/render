@@ -22,6 +22,26 @@ export function storage(): StorageProvider {
   return cached;
 }
 
+/**
+ * URL exposed to the browser for a stored asset.
+ *
+ * Local asset records may have been created while the app was running on a
+ * different port (for example by Playwright). A root-relative URL keeps those
+ * records usable from whichever local origin is currently serving the app.
+ * Remote providers keep their persisted public URL unchanged.
+ */
+export function browserAssetUrl(
+  fileUrl: string,
+  fileKey: string,
+  provider: "local" | "r2" = env.STORAGE_PROVIDER,
+): string {
+  if (provider !== "local") return fileUrl;
+  return `/uploads/${fileKey
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/")}`;
+}
+
 export interface RenderAssetKeyParams {
   userId: string;
   projectId: string;

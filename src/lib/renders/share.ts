@@ -5,6 +5,7 @@ import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { renderAssets, renders, user, type RenderMode } from "@/db/schema";
 import { env } from "@/env";
+import { browserAssetUrl } from "@/lib/storage";
 import { getLatestRenderableAsset } from "./types";
 
 function genSlug() {
@@ -74,7 +75,7 @@ export async function getPublicRender(
   // Share page (principle of least privilege: return only what the UI needs).
   return {
     mode: r.mode,
-    resultUrl: asset.fileUrl,
+    resultUrl: browserAssetUrl(asset.fileUrl, asset.fileKey),
     createdAt: r.createdAt,
     creatorName: owner?.name ?? "RenderAI user",
   };

@@ -19,6 +19,7 @@ import {
   type RenderConfig,
   type RenderStatus,
 } from "@/db/schema";
+import { browserAssetUrl } from "@/lib/storage";
 import {
   getLatestRenderableAsset,
   type RenderDetail,
@@ -81,7 +82,7 @@ export async function getRenderDetail(
   const views = assets.map((a) => ({
     id: a.id,
     type: a.type,
-    fileUrl: a.fileUrl,
+    fileUrl: browserAssetUrl(a.fileUrl, a.fileKey),
     fileKey: a.fileKey,
     fileName: a.fileName,
     fileSize: a.fileSize,
@@ -185,7 +186,10 @@ export async function listRenders(
       assetsByRender.set(a.renderId, [a]);
     }
     if (a.type === "original" && !originalByRender.has(a.renderId)) {
-      originalByRender.set(a.renderId, a.fileUrl);
+      originalByRender.set(
+        a.renderId,
+        browserAssetUrl(a.fileUrl, a.fileKey),
+      );
     }
   }
   const projectById = new Map(projectRows.map((p) => [p.id, p.name]));
@@ -199,8 +203,10 @@ export async function listRenders(
     projectId: r.projectId,
     projectName: projectById.get(r.projectId) ?? null,
     creditsUsed: r.creditsUsed,
-    resultUrl:
-      getLatestRenderableAsset(assetsByRender.get(r.id) ?? [])?.fileUrl ?? null,
+    resultUrl: (() => {
+      const asset = getLatestRenderableAsset(assetsByRender.get(r.id) ?? []);
+      return asset ? browserAssetUrl(asset.fileUrl, asset.fileKey) : null;
+    })(),
     originalUrl: originalByRender.get(r.id) ?? null,
   }));
 }

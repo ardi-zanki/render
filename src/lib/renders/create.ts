@@ -10,6 +10,7 @@ import {
   getBalance,
   InsufficientCreditsError,
 } from "@/lib/credits";
+import { browserAssetUrl } from "@/lib/storage";
 import { assertUserStorageCapacity } from "@/lib/storage/usage";
 import { storeAsset } from "./assets";
 import { renderDisplayName } from "./labels";
@@ -116,7 +117,7 @@ export async function createRender(
     return {
       renderId: render.id,
       status: "queued",
-      originalUrl: original.fileUrl,
+      originalUrl: browserAssetUrl(original.fileUrl, original.fileKey),
       balance: balanceAfterDeduction,
     };
   } catch (err) {
@@ -249,7 +250,7 @@ export async function createRenderEdit(
     return {
       renderId,
       status: "queued",
-      originalUrl: original.fileUrl,
+      originalUrl: browserAssetUrl(original.fileUrl, original.fileKey),
       balance: deduction.balance,
     };
   } catch (err) {
@@ -415,7 +416,7 @@ export async function createRenderTextureEdit(
     return {
       renderId,
       status: "queued",
-      originalUrl: original.fileUrl,
+      originalUrl: browserAssetUrl(original.fileUrl, original.fileKey),
       balance: deduction.balance,
     };
   } catch (err) {

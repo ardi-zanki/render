@@ -1,11 +1,18 @@
 "use client";
 
-import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { useRenderStatusPolling } from "@/hooks/use-render-status-polling";
+import { markRenderQueueSeen } from "@/hooks/use-render-queue";
 import { cn } from "@/lib/utils";
 import { RenderActionBar } from "./render-studio/action-bar";
 import { CreateProjectModal } from "./render-studio/create-project-modal";
@@ -79,6 +86,14 @@ export function RenderStudio({
   // through sourceRenderId; fresh renders become active once a result exists.
   const activeRenderId =
     sourceRenderId ?? (state.resultUrl ? state.resultRenderId : null);
+
+  // A completed result already visible in Studio has effectively been read,
+  // regardless of whether Studio was opened from the queue or another page.
+  useEffect(() => {
+    if (activeRenderId && state.resultUrl) {
+      markRenderQueueSeen(activeRenderId);
+    }
+  }, [activeRenderId, state.resultUrl]);
 
   // Region/texture editor. Available only when editing a completed render that
   // already has a result to paint a mask over.
