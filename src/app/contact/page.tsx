@@ -72,24 +72,6 @@ export default async function ContactPage() {
             ))}
           </div>
         </section>
-
-        <section className="bg-card px-4 py-12 sm:px-6 sm:py-16">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 rounded-lg border border-border/70 bg-background p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold tracking-normal text-foreground">
-                Sudah punya akun?
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Buka dashboard untuk melihat project dan pengaturan akun.
-              </p>
-            </div>
-            <Button asChild>
-              <Link href={isAuthenticated ? "/dashboard" : "/login"}>
-                {isAuthenticated ? "Buka studio" : "Masuk"}
-              </Link>
-            </Button>
-          </div>
-        </section>
       </main>
 
       <PublicFooter />

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getServerSession } from "@/lib/session";
 
@@ -117,21 +115,6 @@ export default async function PrivacyPage() {
             ))}
           </CardContent>
         </Card>
-
-        <div className="mt-7 flex flex-col gap-3 border-y border-border/80 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-semibold text-foreground">
-              Butuh membaca aturan penggunaan?
-            </p>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Ketentuan layanan menjelaskan aturan akun, kredit, pembayaran,
-              unggahan, dan hasil render.
-            </p>
-          </div>
-          <Button asChild className="shrink-0">
-            <Link href="/terms">Buka Ketentuan Layanan</Link>
-          </Button>
-        </div>
       </main>
 
       <PublicFooter />

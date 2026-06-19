@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { PublicFooter } from "@/components/brand/public-footer";
 import { PublicHeader } from "@/components/brand/public-header";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getServerSession } from "@/lib/session";
 
@@ -147,24 +146,6 @@ export default async function TermsPage() {
             ))}
           </CardContent>
         </Card>
-
-        <div className="mt-7 flex flex-col gap-3 border-y border-border/80 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-semibold text-foreground">
-              Siap mulai menggunakan RenderAI?
-            </p>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              {isAuthenticated
-                ? "Buka studio untuk melanjutkan workflow render Anda."
-                : "Buat akun untuk mencoba workflow render pertama Anda."}
-            </p>
-          </div>
-          <Button asChild className="shrink-0">
-            <Link href={isAuthenticated ? "/dashboard" : "/register"}>
-              {isAuthenticated ? "Buka studio" : "Buat akun"}
-            </Link>
-          </Button>
-        </div>
       </main>
 
       <PublicFooter />
