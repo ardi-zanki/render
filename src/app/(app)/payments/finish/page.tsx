@@ -4,7 +4,6 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { getBalance } from "@/lib/credits";
 import { getPaymentForUser } from "@/lib/payments/service";
 import { requireVerifiedUser } from "@/lib/session";
 
@@ -39,10 +38,7 @@ export default async function PaymentFinishPage({
   const { status, order, order_id: orderIdParam } = await searchParams;
   const { user } = await requireVerifiedUser();
   const orderId = order ?? orderIdParam;
-  const [balance, payment] = await Promise.all([
-    getBalance(user.id),
-    orderId ? getPaymentForUser(user.id, orderId) : Promise.resolve(null),
-  ]);
+  const payment = orderId ? await getPaymentForUser(user.id, orderId) : null;
 
   const key = payment
     ? payment.status === "paid"
@@ -68,12 +64,6 @@ export default async function PaymentFinishPage({
             <p className="text-sm leading-6 text-muted-foreground sm:text-base">
               {v.desc}
             </p>
-          </div>
-          <div className="rounded-md bg-muted px-4 py-2 text-sm sm:text-base">
-            Sisa kredit:{" "}
-            <span className="font-semibold text-foreground">
-              {balance.toLocaleString("id-ID")}
-            </span>
           </div>
           <div className="mt-1 grid w-full gap-2 sm:grid-cols-2">
             <Button asChild size="lg" className="w-full">
