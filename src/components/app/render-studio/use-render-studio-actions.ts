@@ -28,6 +28,7 @@ type StudioMode = "render" | "texture";
 
 type RouterLike = {
   push: (href: string) => void;
+  replace: (href: string) => void;
   refresh: () => void;
 };
 
@@ -66,6 +67,7 @@ export function useRenderStudioActions({
     renderId: string,
     copy: { success: string; failure: string; timeout: string },
     onScene?: (render: PolledRender) => void,
+    onSuccess?: (render: PolledRender) => void,
   ) {
     startPolling(renderId, {
       onUpdate: (render) => {
@@ -76,7 +78,8 @@ export function useRenderStudioActions({
         state.setResultUrl(render.resultUrl);
         state.setView("result");
         toast.success(copy.success);
-        router.refresh();
+        if (onSuccess) onSuccess(render);
+        else router.refresh();
       },
       onFailure: (render) => {
         state.setError(render.errorMessage ?? copy.failure);
@@ -252,6 +255,7 @@ export function useRenderStudioActions({
             ),
           );
         },
+        () => router.replace(`/renders/new?source=${json.renderId}`),
       );
       router.refresh();
     } catch (err) {

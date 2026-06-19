@@ -74,13 +74,18 @@ export function RenderStudio({
     initialResultUrl,
     initialResultRenderId,
   });
+  // A successful first render becomes the active editable resource without a
+  // detour through Render History. Existing Studio links provide the same id
+  // through sourceRenderId; fresh renders become active once a result exists.
+  const activeRenderId =
+    sourceRenderId ?? (state.resultUrl ? state.resultRenderId : null);
 
   // Region/texture editor. Available only when editing a completed render that
   // already has a result to paint a mask over.
   const texture = useTextureEditState();
   const maskRef = useRef<MaskCanvasHandle>(null);
   const [studioMode, setStudioMode] = useState<"render" | "texture">("render");
-  const editAvailable = Boolean(sourceRenderId) && Boolean(state.resultUrl);
+  const editAvailable = Boolean(activeRenderId) && Boolean(state.resultUrl);
   const inTextureMode = studioMode === "texture" && editAvailable;
   // Both side panels collapse together (toggle lives in Column 1) for a wider
   // canvas; desktop only.
@@ -91,7 +96,7 @@ export function RenderStudio({
   const handleMaskClear = useCallback(() => maskRef.current?.clear(), []);
   const actions = useRenderStudioActions({
     projectId,
-    sourceRenderId,
+    sourceRenderId: activeRenderId,
     renderName,
     setRenderName,
     selectedBaseAssetId,
@@ -109,7 +114,7 @@ export function RenderStudio({
     state.renderStatus === "queued" ||
     state.renderStatus === "processing";
   const canRender =
-    (Boolean(sourceRenderId) || !!state.file) &&
+    (Boolean(activeRenderId) || !!state.file) &&
     state.balance > 0 &&
     !isProcessing;
   const hasUploadedImage = Boolean(state.previewUrl);
@@ -244,7 +249,7 @@ export function RenderStudio({
           <RenderPreviewViewer
             fileRef={fileRef}
             referenceRef={referenceRef}
-            allowRemoveImage={!sourceRenderId}
+            allowRemoveImage={!activeRenderId}
             hasUploadedImage={hasUploadedImage}
             viewerTabs={viewerTabs}
             view={state.view}

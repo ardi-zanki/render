@@ -93,6 +93,17 @@ test("user can login and create a mock render", async ({ page }) => {
     )
     .toBe("success");
 
+  // A fresh render becomes editable in the same Studio session. The canonical
+  // source URL makes the state refresh-safe and exposes Edit without a detour
+  // through render history.
+  await expect(page).toHaveURL(
+    new RegExp(`/renders/new\\?source=${renderId}$`),
+    { timeout: 30_000 },
+  );
+  await expect(
+    page.getByRole("button", { name: "Edit", exact: true }),
+  ).toBeVisible();
+
   const detailResponse = await page.request.get(`/api/renders/${renderId}`);
   const createdRender = (await detailResponse.json()) as {
     projectId: string;
