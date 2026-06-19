@@ -302,6 +302,28 @@ describe("credits integration", () => {
 });
 
 describe("payments integration", () => {
+  it("reuses an existing pending checkout for the same package", async () => {
+    const { createCheckout, db, payments } = await modules();
+    const testUser = await createTestUser();
+
+    const first = await createCheckout(testUser.id, TEST_PACKAGE_SLUG, {
+      name: testUser.name,
+      email: testUser.email,
+    });
+    const second = await createCheckout(testUser.id, TEST_PACKAGE_SLUG, {
+      name: testUser.name,
+      email: testUser.email,
+    });
+
+    expect(second.orderId).toBe(first.orderId);
+    expect(second.redirectUrl).toBe(first.redirectUrl);
+
+    const rows = await db.query.payments.findMany({
+      where: eq(payments.userId, testUser.id),
+    });
+    expect(rows).toHaveLength(1);
+  });
+
   it("creates mock checkout and credits paid webhooks idempotently", async () => {
     const {
       createCheckout,

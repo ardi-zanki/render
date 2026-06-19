@@ -2,7 +2,7 @@ import { Check, Gem } from "lucide-react";
 import type { Metadata } from "next";
 import Script from "next/script";
 
-import { BuyButton } from "@/components/app/buy-button";
+import { BuyButton, ResumePaymentButton } from "@/components/app/buy-button";
 import { PageHeader } from "@/components/app/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -149,6 +149,16 @@ export default async function PaymentsPage({
                     <div className="col-start-1 min-w-0 font-mono text-xs leading-5 text-muted-foreground">
                       {dateFmt.format(p.createdAt)}
                     </div>
+                    {p.status === "pending" && (p.snapToken || p.paymentUrl) && (
+                      <div className="col-start-2 row-span-2 mt-1 justify-self-end">
+                        <ResumePaymentButton
+                          orderId={p.orderId}
+                          provider={p.provider}
+                          token={p.snapToken}
+                          redirectUrl={p.paymentUrl}
+                        />
+                      </div>
+                    )}
                   </div>
                 );
               })}
