@@ -19,7 +19,7 @@ export default async function ResetPasswordPage({
       title={hasToken ? "Buat password baru" : "Tautan tidak valid"}
       subtitle={
         hasToken
-          ? "Gunakan password baru yang aman untuk melindungi akun RenderAI."
+          ? "Gunakan password baru yang aman untuk melindungi akun Render Studio."
           : "Tautan reset sudah kedaluwarsa atau tidak valid. Minta tautan baru untuk melanjutkan."
       }
     >

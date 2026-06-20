@@ -5,7 +5,7 @@ test.describe("auth pages", () => {
     await page.goto("/login");
 
     await expect(
-      page.getByRole("heading", { name: "Masuk ke RenderAI" }),
+      page.getByRole("heading", { name: "Masuk ke Render Studio" }),
     ).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
     await expect(page.locator("#password")).toBeVisible();
@@ -26,7 +26,7 @@ test.describe("auth pages", () => {
     await page.goto("/register");
 
     await expect(
-      page.getByRole("heading", { name: "Buat Akun RenderAI" }),
+      page.getByRole("heading", { name: "Buat akun Render Studio" }),
     ).toBeVisible();
     await expect(page.getByLabel("Nama lengkap")).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();

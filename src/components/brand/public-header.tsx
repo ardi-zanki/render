@@ -32,7 +32,7 @@ export function PublicHeader({
       >
         <Link
           href="/"
-          aria-label="RenderAI beranda"
+          aria-label="Render Studio beranda"
           className="shrink-0 justify-self-start"
         >
           <Logo size={28} />

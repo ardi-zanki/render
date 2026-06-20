@@ -11,9 +11,9 @@ import { blogPosts } from "@/lib/marketing";
 import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Blog RenderAI",
+  title: "Blog Render Studio",
   description:
-    "Artikel RenderAI tentang workflow render AI, review konsep, project visual, dan penggunaan kredit.",
+    "Artikel Render Studio tentang workflow render AI, review konsep, project visual, dan penggunaan kredit.",
 };
 
 export default async function BlogPage() {

@@ -30,8 +30,8 @@ const getMetadataBase = () => {
 export const metadata: Metadata = {
   metadataBase: getMetadataBase(),
   title: {
-    default: "RenderAI - Render Arsitektur Berbasis AI",
-    template: "%s · RenderAI",
+    default: "Render Studio - Render Arsitektur Berbasis AI",
+    template: "%s · Render Studio",
   },
   description:
     "Unggah gambar desain, pilih mode render, dan dapatkan visual arsitektur realistis dalam hitungan detik.",

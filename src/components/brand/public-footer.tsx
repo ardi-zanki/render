@@ -58,7 +58,7 @@ export function PublicFooter() {
       <div className="border-t border-border/70">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-5 text-xs text-muted-foreground sm:px-6">
           <p className="min-w-0">
-            © {new Date().getFullYear()} RenderAI. Seluruh hak cipta dilindungi.
+            © {new Date().getFullYear()} Render Studio. Seluruh hak cipta dilindungi.
           </p>
           <div className="shrink-0">
             <ModeToggle />

@@ -80,7 +80,7 @@ export function ProductPreview({ compact = false }: { compact?: boolean }) {
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md border border-border/70 bg-background px-3 py-2">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <Sparkles className="size-4 text-primary" />
-          RenderAI Studio
+          Render Studio
         </div>
         <span className="text-xs font-medium text-muted-foreground">
           Brief, render, review

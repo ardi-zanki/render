@@ -13,9 +13,9 @@ import { audience } from "@/lib/marketing";
 import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Tentang RenderAI",
+  title: "Tentang Render Studio",
   description:
-    "Tentang RenderAI, workspace render AI untuk membantu tim arsitektur dan interior mengeksplorasi visual dengan lebih rapi.",
+    "Tentang Render Studio, workspace render AI untuk membantu tim arsitektur dan interior mengeksplorasi visual dengan lebih rapi.",
 };
 
 const principles = [

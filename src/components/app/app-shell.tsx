@@ -155,7 +155,7 @@ export function AppShell({
         <div className="relative h-12 border-b border-border/75">
           <Link
             href="/dashboard"
-            aria-label="RenderAI dashboard"
+            aria-label="Render Studio dashboard"
             onClick={() => setOpen(false)}
             className={cn(
               "absolute left-6 top-1/2 min-w-0 -translate-y-1/2 whitespace-nowrap text-sm font-extrabold tracking-normal text-foreground transition-opacity duration-150 ease-out",
@@ -164,7 +164,7 @@ export function AppShell({
                 : "pointer-events-none opacity-0",
             )}
           >
-            RenderAI<span className="text-primary">.</span>
+            Render Studio
           </Link>
           <button
             type="button"

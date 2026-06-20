@@ -15,7 +15,7 @@ function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
   return (
     <div className="flex w-full max-w-[380px] flex-col gap-4">
       <div className="flex flex-col items-center gap-2.5">
-        <Link href="/" aria-label="RenderAI beranda">
+        <Link href="/" aria-label="Render Studio beranda">
           <Logo size={28} />
         </Link>
         <div className="flex flex-col items-center gap-1 text-center">

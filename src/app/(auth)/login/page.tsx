@@ -17,7 +17,7 @@ export default async function LoginPage({
 
   return (
     <AuthCard
-      title="Masuk ke RenderAI"
+      title="Masuk ke Render Studio"
       subtitle="Lanjutkan project visual, riwayat render, dan kredit studio Anda."
       footer={
         <>
