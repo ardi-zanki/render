@@ -203,6 +203,7 @@ export async function listRenders(
     projectId: r.projectId,
     projectName: projectById.get(r.projectId) ?? null,
     creditsUsed: r.creditsUsed,
+    archived: !!r.archivedAt,
     resultUrl: (() => {
       const asset = getLatestRenderableAsset(assetsByRender.get(r.id) ?? []);
       return asset ? browserAssetUrl(asset.fileUrl, asset.fileKey) : null;

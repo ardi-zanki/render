@@ -78,7 +78,7 @@ export function RenderActionsMenu({
           : "Render dipulihkan",
     );
     setConfirm(null);
-    router.push(kind === "delete" ? "/renders" : `/renders/${renderId}`);
+    if (kind === "delete") router.push("/renders");
     router.refresh();
   }
 
@@ -139,7 +139,12 @@ export function RenderActionsMenu({
         type="button"
         variant="ghost"
         size="icon"
-        onClick={() => setMenuOpen((open) => !open)}
+        onClick={(event) => {
+          // The menu often overlays a card link — don't trigger navigation.
+          event.preventDefault();
+          event.stopPropagation();
+          setMenuOpen((open) => !open);
+        }}
         aria-label="Aksi lainnya"
         aria-haspopup="menu"
         aria-expanded={menuOpen}

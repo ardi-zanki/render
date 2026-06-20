@@ -160,7 +160,7 @@ export function GlobalSearchCommand({
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => goTo(`/renders/${item.id}`)}
+                    onClick={() => goTo(`/renders/new?source=${item.id}`)}
                     className="grid w-full grid-cols-[44px_minmax(0,1fr)] items-center gap-3 rounded-md px-2 py-2 text-left transition-colors hover:bg-muted/80"
                   >
                     <span className="flex aspect-square size-11 items-center justify-center overflow-hidden rounded-md bg-muted text-muted-foreground">

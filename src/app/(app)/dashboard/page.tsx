@@ -249,7 +249,7 @@ export default async function DashboardPage() {
               return (
                 <Link
                   key={r.id}
-                  href={`/renders/${r.id}`}
+                  href={`/renders/new?source=${r.id}`}
                   className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted outline-none transition-colors hover:border-primary/35 focus-visible:ring-2 focus-visible:ring-ring/30"
                 >
                   {thumb && (
