@@ -29,9 +29,11 @@ function TextureSection({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-border/70 pb-5 last:border-b-0 last:pb-0">
-      <div className="mb-3 flex items-center">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="border-b border-border/70 pb-4 last:border-b-0 last:pb-0">
+      <div className="mb-2.5 flex items-center">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {title}
+        </h2>
       </div>
       <div className="flex flex-col gap-3">{children}</div>
     </section>
@@ -55,7 +57,7 @@ export function ChangeTexturePanel({
 
   return (
     <div className="flex h-fit flex-col overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-full">
-      <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border/70 bg-card/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border/70 bg-card/95 px-3 py-2.5 backdrop-blur">
         <h1 className="text-sm font-semibold text-foreground">Edit Texture</h1>
         {onCollapse && (
           <button
@@ -70,7 +72,7 @@ export function ChangeTexturePanel({
         )}
       </div>
 
-      <div className="flex flex-col gap-5 px-4 py-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+      <div className="flex flex-col gap-4 px-3 py-3.5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <TextureSection title="Area & Sumber">
           <p className="text-xs leading-5 text-muted-foreground">
             Pilih area pada gambar, lalu tentukan tekstur penggantinya.
@@ -202,7 +204,7 @@ export function ChangeTexturePanel({
 
       </div>
 
-      <div className="shrink-0 border-t border-border/70 bg-card p-3">
+      <div className="shrink-0 border-t border-border/70 bg-card p-2.5">
         <div className="flex flex-col gap-3">
           {state.textureSource !== "description" && (
             <div className="flex flex-col gap-1.5">

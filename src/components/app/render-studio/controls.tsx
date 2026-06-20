@@ -30,11 +30,13 @@ function ControlSection({
   children: ReactNode;
 }) {
   return (
-    <section className="border-b border-border/70 pb-5 last:border-b-0 last:pb-0">
-      <div className="mb-3 flex items-center">
-        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <section className="border-b border-border/70 pb-4 last:border-b-0 last:pb-0">
+      <div className="mb-2.5 flex items-center">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {title}
+        </h2>
       </div>
-      <div className="flex flex-col gap-3.5">{children}</div>
+      <div className="flex flex-col gap-3">{children}</div>
     </section>
   );
 }
@@ -101,7 +103,7 @@ export function RenderStudioControls({
     // the prompt/info columns (grows taller and scrolls when content overflows).
     <div className="h-fit max-w-full overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-0">
       <div className="flex min-h-0 min-w-0 flex-col overflow-visible lg:h-full">
-        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/70 bg-card px-4 py-3">
+        <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/70 bg-card px-3 py-2.5">
           <h1 className="text-sm font-semibold text-foreground">Konfigurasi</h1>
           {onCollapse && (
             <button
@@ -116,7 +118,7 @@ export function RenderStudioControls({
           )}
         </div>
 
-        <div className="flex flex-col gap-5 overflow-visible px-4 py-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto [&>*]:shrink-0">
+        <div className="flex flex-col gap-4 overflow-visible px-3 py-3.5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto [&>*]:shrink-0">
           <ControlSection title="Project">
             <div className="flex min-w-0 gap-2">
               <Select
@@ -157,7 +159,7 @@ export function RenderStudioControls({
                     icon={m.icon}
                     label={m.label}
                     aria-label={m.label}
-                    className="h-20 w-full min-w-0 flex-col justify-center gap-2 text-center [&>span]:items-center [&_svg]:size-5"
+                    className="h-16 w-full min-w-0 flex-col justify-center gap-1.5 text-center [&>span]:items-center [&_svg]:size-4"
                     onClick={() => {
                       setMode(m.value);
                       setStyle("auto");
@@ -271,7 +273,7 @@ export function RenderStudioControls({
           )}
         </div>
         {footer && (
-          <div className="shrink-0 border-t border-border/70 bg-card p-3">
+          <div className="shrink-0 border-t border-border/70 bg-card p-2.5">
             {footer}
           </div>
         )}

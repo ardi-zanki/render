@@ -32,7 +32,7 @@ export function RenderSceneList({
           Belum ada render di project ini.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-2.5 lg:min-h-0 lg:flex-1 lg:content-start lg:overflow-y-auto lg:pr-1">
+        <div className="grid grid-cols-2 gap-2 lg:min-h-0 lg:flex-1 lg:content-start lg:overflow-y-auto lg:pr-1">
           {visible.map((s) => (
             <SceneTile key={s.id} scene={s} />
           ))}
