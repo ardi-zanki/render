@@ -22,7 +22,6 @@ import {
 } from "react";
 
 import { RenderImage } from "@/components/app/render-image";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,7 +70,6 @@ export function RenderPreviewViewer({
   setStyleTransferStrength,
   negativePrompt,
   setNegativePrompt,
-  error,
   editAvailable = false,
   studioMode = "render",
   setStudioMode,
@@ -109,7 +107,6 @@ export function RenderPreviewViewer({
   setStyleTransferStrength: (value: number) => void;
   negativePrompt: string;
   setNegativePrompt: (value: string) => void;
-  error: string;
   /** Show the "Edit" (texture) toggle — only for a completed render w/ result. */
   editAvailable?: boolean;
   studioMode?: "render" | "texture";
@@ -795,12 +792,6 @@ export function RenderPreviewViewer({
               </div>
             </div>
           </div>
-        )}
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
         )}
     </div>
   );
