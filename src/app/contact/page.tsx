@@ -11,9 +11,9 @@ import { contactOptions } from "@/lib/marketing";
 import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Kontak RenderAI",
+  title: "Kontak Render Studio",
   description:
-    "Hubungi RenderAI untuk pertanyaan produk, akun, pembayaran, privasi, dan kebutuhan workflow render AI.",
+    "Hubungi Render Studio untuk pertanyaan produk, akun, pembayaran, privasi, dan kebutuhan workflow render AI.",
 };
 
 export default async function ContactPage() {

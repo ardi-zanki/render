@@ -8,7 +8,7 @@ import { getServerSession } from "@/lib/session";
 export const metadata: Metadata = {
   title: "Kebijakan Privasi",
   description:
-    "Kebijakan Privasi RenderAI tentang data akun, unggahan, hasil render, pembayaran, keamanan, dan hak pengguna.",
+    "Kebijakan Privasi Render Studio tentang data akun, unggahan, hasil render, pembayaran, keamanan, dan hak pengguna.",
 };
 
 const sections = [

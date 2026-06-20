@@ -17,9 +17,9 @@ import { formatCredits, formatPrice, packageCopy } from "@/lib/pricing";
 import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Harga RenderAI",
+  title: "Harga Render Studio",
   description:
-    "Paket kredit RenderAI untuk eksplorasi visual arsitektur dan interior berbasis AI.",
+    "Paket kredit Render Studio untuk eksplorasi visual arsitektur dan interior berbasis AI.",
 };
 
 export const revalidate = 3600;

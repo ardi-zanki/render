@@ -29,9 +29,9 @@ import {
 } from "@/lib/marketing";
 
 export const metadata: Metadata = {
-  title: "RenderAI - Workspace Render AI untuk Arsitektur & Interior",
+  title: "Render Studio - Workspace Render AI untuk Arsitektur & Interior",
   description:
-    "RenderAI membantu tim arsitektur dan interior membuat opsi visual dari draft desain, menata hasil per project, dan mempercepat review klien.",
+    "Render Studio membantu tim arsitektur dan interior membuat opsi visual dari draft desain, menata hasil per project, dan mempercepat review klien.",
 };
 
 export const revalidate = 3600;

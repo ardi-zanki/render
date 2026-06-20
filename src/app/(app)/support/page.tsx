@@ -42,7 +42,7 @@ export default function SupportPage() {
     <>
       <PageHeader
         title="Bantuan"
-        description="Pilih kanal yang paling nyaman untuk menghubungi tim RenderAI."
+        description="Pilih kanal yang paling nyaman untuk menghubungi tim Render Studio."
       />
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">

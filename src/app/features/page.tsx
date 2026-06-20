@@ -14,9 +14,9 @@ import { featureGroups, workflowSteps } from "@/lib/marketing";
 import { getServerSession } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Fitur RenderAI",
+  title: "Fitur Render Studio",
   description:
-    "Fitur RenderAI untuk membuat opsi visual, mengelola project, meninjau versi, dan mempercepat review desain.",
+    "Fitur Render Studio untuk membuat opsi visual, mengelola project, meninjau versi, dan mempercepat review desain.",
 };
 
 export default async function FeaturesPage() {

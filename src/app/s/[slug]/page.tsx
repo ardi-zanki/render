@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const render = await getPublicRender(slug);
   if (!render) return { title: "Render tidak ditemukan" };
 
-  const title = `Render ${MODE_LABEL[render.mode]} · RenderAI`;
+  const title = `Render ${MODE_LABEL[render.mode]} · Render Studio`;
   return {
     title: { absolute: title },
-    description: "Visual arsitektur dibuat dengan RenderAI.",
+    description: "Visual arsitektur dibuat dengan Render Studio.",
     openGraph: { title, images: [{ url: render.resultUrl }] },
     twitter: { card: "summary_large_image", images: [render.resultUrl] },
   };
@@ -73,7 +73,7 @@ export default async function PublicRenderPage({ params }: Params) {
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-7 sm:px-5">
         <div className="mb-4 flex items-center gap-2">
           <Badge variant="violet">
-            <Sparkles className="size-3" /> Dibuat dengan RenderAI
+            <Sparkles className="size-3" /> Dibuat dengan Render Studio
           </Badge>
           <Badge variant="secondary">{MODE_LABEL[render.mode]}</Badge>
         </div>
@@ -118,7 +118,7 @@ export default async function PublicRenderPage({ params }: Params) {
 
       <footer className="border-t border-border">
         <div className="mx-auto max-w-3xl px-6 py-6 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} RenderAI
+          © {new Date().getFullYear()} Render Studio
         </div>
       </footer>
     </div>

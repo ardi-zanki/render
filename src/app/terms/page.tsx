@@ -9,7 +9,7 @@ import { getServerSession } from "@/lib/session";
 export const metadata: Metadata = {
   title: "Ketentuan Layanan",
   description:
-    "Ketentuan layanan RenderAI untuk akun, kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan.",
+    "Ketentuan layanan Render Studio untuk akun, kredit, pembayaran, unggahan, hasil render, dan batasan penggunaan.",
 };
 
 const sections = [
