@@ -91,7 +91,7 @@ export default async function BlogDetailPage({ params }: BlogDetailProps) {
 
         <FinalCta
           title="Ubah wawasan menjadi workflow render yang lebih terarah"
-          description="Coba RenderAI untuk menyusun opsi visual project Anda berikutnya."
+          description="Coba Render Studio untuk menyusun opsi visual project Anda berikutnya."
           href={isAuthenticated ? "/dashboard" : "/register"}
           label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}
         />

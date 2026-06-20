@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 const principles = [
   {
     title: "Eksplorasi tetap terarah",
-    desc: "RenderAI membantu tim membuat opsi visual dari materi desain yang sudah ada tanpa kehilangan konteks brief.",
+    desc: "Render Studio membantu tim membuat opsi visual dari materi desain yang sudah ada tanpa kehilangan konteks brief.",
   },
   {
     title: "Keputusan lebih mudah dilacak",
@@ -43,9 +43,9 @@ export default async function AboutPage() {
 
       <main className="flex-1">
         <PageHero
-          eyebrow="Tentang RenderAI"
+          eyebrow="Tentang Render Studio"
           title="Workspace visual untuk tim desain"
-          description="RenderAI membantu tim membuat opsi visual dengan cepat, sambil menjaga referensi, hasil, dan revisi tetap rapi."
+          description="Render Studio membantu tim membuat opsi visual dengan cepat, sambil menjaga referensi, hasil, dan revisi tetap rapi."
         >
           <ProductPreview compact />
         </PageHero>
