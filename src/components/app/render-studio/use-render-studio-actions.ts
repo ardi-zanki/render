@@ -328,7 +328,7 @@ export function useRenderStudioActions({
     const cfg = version.config;
     state.setStyle(cfg?.style ?? "auto");
     state.setTime(
-      cfg?.time ?? (state.mode === "interior" ? "night" : "auto"),
+      cfg?.time ?? (state.mode === "interior" ? "mixed" : "auto"),
     );
     state.setWeather(cfg?.weather ?? "auto");
     state.setLightsOn(() => cfg?.lightsOn ?? false);

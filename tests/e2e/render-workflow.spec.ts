@@ -52,14 +52,15 @@ test("user can login and create a mock render", async ({ page }) => {
   await expect(page.locator("#location")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Pagi" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Siang" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Malam" })).toHaveAttribute(
+  await expect(page.getByRole("button", { name: "Mix", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await page.getByRole("button", { name: "Mix", exact: true }).click();
+  await page.getByRole("button", { name: "Malam", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Mix", exact: true }),
+    page.getByRole("button", { name: "Malam", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Mix", exact: true }).click();
 
   await expect(page.getByRole("tab", { name: "Asli" })).toBeVisible();
   await expect(
