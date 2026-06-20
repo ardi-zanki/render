@@ -327,7 +327,7 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
 
   const cursor =
     tool === "pan"
-      ? "grab"
+      ? "inherit"
       : tool === "wand"
         ? "cell"
         : "crosshair";
