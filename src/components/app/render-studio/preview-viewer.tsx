@@ -127,6 +127,7 @@ export function RenderPreviewViewer({
   const comparisonDraggingRef = useRef(false);
   const panDraggingRef = useRef(false);
   const panStartRef = useRef({ x: 0, y: 0, left: 0, top: 0 });
+  const [isCanvasPanning, setIsCanvasPanning] = useState(false);
   const [comparisonBounds, setComparisonBounds] =
     useState<ComparisonBounds | null>(null);
   const comparisonHandlePosition = clampComparisonPosition(comparisonPosition);
@@ -321,8 +322,11 @@ export function RenderPreviewViewer({
     hasCanvasContent &&
     view !== "comparison" &&
     (studioMode !== "texture" || texturePanActive);
-  const canvasCursorStyle =
-    canPanCanvas && zoom > 1
+  const canvasCursorStyle = texturePanActive
+    ? ({
+        cursor: isCanvasPanning ? "grabbing" : "grab",
+      } satisfies CSSProperties)
+    : canPanCanvas && zoom > 1
       ? ({
           cursor: "default",
         } satisfies CSSProperties)
@@ -335,6 +339,7 @@ export function RenderPreviewViewer({
       const canvas = canvasRef.current;
       if (!canvas) return;
       panDraggingRef.current = true;
+      setIsCanvasPanning(true);
       panStartRef.current = {
         x: event.clientX,
         y: event.clientY,
@@ -362,6 +367,7 @@ export function RenderPreviewViewer({
   const stopCanvasPan = useCallback((event: PointerEvent<HTMLDivElement>) => {
     if (!panDraggingRef.current) return;
     panDraggingRef.current = false;
+    setIsCanvasPanning(false);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
