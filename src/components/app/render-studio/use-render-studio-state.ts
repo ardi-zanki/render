@@ -7,7 +7,7 @@ import { validateImageFileClient } from "@/lib/uploads/validate-client";
 import type { Scene, StudioView } from "./types";
 
 export const clampZoom = (value: number) =>
-  Math.min(3, Math.max(0.5, Number(value.toFixed(2))));
+  Math.min(5, Math.max(0.25, Number(value.toFixed(2))));
 
 export function initialStudioView(initialResultUrl?: string | null): StudioView {
   return initialResultUrl ? "result" : "original";
