@@ -101,7 +101,7 @@ export function RenderStudioControls({
   return (
     // In the fixed-height studio, fill the column so its bottom lines up with
     // the prompt/info columns (grows taller and scrolls when content overflows).
-    <div className="h-fit max-w-full overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-0">
+    <div className="h-fit max-w-full overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-0 lg:rounded-none lg:border-y-0 lg:border-l-0">
       <div className="flex min-h-0 min-w-0 flex-col overflow-visible lg:h-full">
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/70 bg-card px-3 py-2.5">
           <h1 className="text-sm font-semibold text-foreground">Konfigurasi</h1>

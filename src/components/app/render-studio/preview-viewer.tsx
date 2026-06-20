@@ -422,17 +422,13 @@ export function RenderPreviewViewer({
   }, [hasCanvasContent, setZoom, view, zoom]);
 
   return (
-    <div className="flex flex-col gap-3 lg:h-full lg:min-h-0">
+    <div className="relative flex flex-col lg:h-full lg:min-h-0">
       {showTopToolbar && (
-        /* Sticky toolbar: view tabs (+ Edit) + canvas controls. */
-        <div
-          className={cn(
-            "flex flex-wrap items-start justify-between gap-2 sm:items-center sm:gap-3",
-            !panelsCollapsed &&
-              "rounded-lg border border-border/80 bg-card px-2.5 py-2 shadow-soft",
-          )}
-        >
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
+        /* Floating bottom-center toolbar (Framer/Figma style): view tabs (+ Edit)
+           and canvas controls / texture tools, content-sized so it never
+           stretches and stays centered when the panels are hidden. */
+        <div className="absolute bottom-3 left-1/2 z-30 inline-flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-1.5 overflow-x-auto rounded-xl border border-border/80 bg-card/95 px-1.5 py-1.5 shadow-floating backdrop-blur transition-all duration-200 ease-out">
+          <div className="flex min-w-0 flex-nowrap items-center gap-1.5">
             {panelsCollapsed && onExpandPanels && (
               // Reopen control, grouped with the view tabs (desktop only).
               <div className="hidden items-center rounded-md bg-muted/80 p-1 shadow-soft lg:inline-flex">
@@ -447,8 +443,9 @@ export function RenderPreviewViewer({
                 </button>
               </div>
             )}
-            {hasUploadedImage ? (
+            {hasUploadedImage && studioMode !== "texture" && (
               <Segmented
+                className="shrink-0"
                 options={viewerTabs}
                 value={view}
                 onChange={(value) => {
@@ -457,8 +454,6 @@ export function RenderPreviewViewer({
                 }}
                 size="sm"
               />
-            ) : (
-              <div />
             )}
             {editAvailable && (
               // Desktop/tablet keeps Edit near the view tabs; mobile gets it on
@@ -506,9 +501,7 @@ export function RenderPreviewViewer({
                   </button>
                 </div>
               )}
-              <div className="basis-full overflow-x-auto sm:min-w-0 sm:basis-auto">
-                {textureToolbar}
-              </div>
+              <div className="min-w-0 overflow-x-auto">{textureToolbar}</div>
             </>
           ) : (
             <div className="flex shrink-0 items-center">
