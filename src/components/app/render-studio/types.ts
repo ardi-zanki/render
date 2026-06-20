@@ -17,6 +17,8 @@ export type StudioVersion = {
   label: string;
   fileUrl: string;
   config: RenderConfig | null;
+  /** The source image (not a render output): maps to the "Asli" tab, never editable. */
+  isOriginal?: boolean;
 };
 
 export type RenderStudioProps = {

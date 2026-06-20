@@ -28,7 +28,11 @@ import { MaskCanvas } from "./render-studio/texture-edit/mask-canvas";
 import { SelectionToolbar } from "./render-studio/texture-edit/selection-toolbar";
 import type { MaskCanvasHandle } from "./render-studio/texture-edit/types";
 import { useTextureEditState } from "./render-studio/texture-edit/use-texture-edit-state";
-import { type RenderStudioProps, type ViewerTab } from "./render-studio/types";
+import {
+  type RenderStudioProps,
+  type StudioView,
+  type ViewerTab,
+} from "./render-studio/types";
 import { useRenderStudioActions } from "./render-studio/use-render-studio-actions";
 import { useRenderStudioState } from "./render-studio/use-render-studio-state";
 
@@ -125,8 +129,31 @@ export function RenderStudio({
     maskRef,
     router,
     startPolling,
+    studioMode,
     setStudioMode,
   });
+
+  // Keep the highlighted version in sync with the view tab: "Asli" ↔ Original,
+  // "Komparasi"/"Hasil" ↔ the active render/texture result. Picking a tab also
+  // drops out of Edit mode (the texture editor is entered via its own toggle).
+  function handleSelectView(view: StudioView) {
+    setStudioMode("render");
+    state.setView(view);
+    if (view === "original") {
+      const original = initialVersions.find((v) => v.isOriginal);
+      if (original) setSelectedBaseAssetId(original.id);
+      return;
+    }
+    const onResult = initialVersions.some(
+      (v) => v.id === selectedBaseAssetId && !v.isOriginal,
+    );
+    if (!onResult) {
+      const latestResult = [...initialVersions]
+        .reverse()
+        .find((v) => !v.isOriginal);
+      if (latestResult) setSelectedBaseAssetId(latestResult.id);
+    }
+  }
 
   const isProcessing =
     state.loading ||
@@ -271,7 +298,7 @@ export function RenderStudio({
             hasUploadedImage={hasUploadedImage}
             viewerTabs={viewerTabs}
             view={state.view}
-            setView={state.setView}
+            setView={handleSelectView}
             shownImage={shownImage}
             previewUrl={state.previewUrl}
             resultUrl={state.resultUrl}

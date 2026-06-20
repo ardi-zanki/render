@@ -44,6 +44,7 @@ export function useRenderStudioActions({
   maskRef,
   router,
   startPolling,
+  studioMode,
   setStudioMode,
 }: {
   projectId: string;
@@ -57,6 +58,7 @@ export function useRenderStudioActions({
   maskRef: RefObject<MaskCanvasHandle | null>;
   router: RouterLike;
   startPolling: (renderId: string, handlers?: PollHandlers) => void;
+  studioMode: StudioMode;
   setStudioMode: Dispatch<SetStateAction<StudioMode>>;
 }) {
   function switchProject(id: string) {
@@ -314,6 +316,15 @@ export function useRenderStudioActions({
 
   function loadVersion(version: StudioVersion) {
     setSelectedBaseAssetId(version.id);
+
+    // The original is the source image, not a render output: it can't be edited,
+    // so picking it drops out of Edit mode and shows the "Asli" tab.
+    if (version.isOriginal) {
+      setStudioMode("render");
+      state.setView("original");
+      return;
+    }
+
     const cfg = version.config;
     state.setStyle(cfg?.style ?? "auto");
     state.setTime(
@@ -326,7 +337,8 @@ export function useRenderStudioActions({
     state.setInstruction(cfg?.instruction ?? "");
     state.setResultUrl(version.fileUrl);
     state.setResultRenderId(sourceRenderId);
-    state.setView("result");
+    // Keep editing the picked version in Edit mode; otherwise show it as Hasil.
+    if (studioMode !== "texture") state.setView("result");
   }
 
   async function onApplyTexture() {
