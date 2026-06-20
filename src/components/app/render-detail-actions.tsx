@@ -134,23 +134,22 @@ export function RenderActionsMenu({
 
   return (
     <>
-      <Button
+      <button
         ref={menuRef}
         type="button"
-        variant="ghost"
-        size="icon"
         onClick={(event) => {
           // The menu often overlays a card link — don't trigger navigation.
           event.preventDefault();
           event.stopPropagation();
           setMenuOpen((open) => !open);
         }}
+        className="flex size-8 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-card/90 focus-visible:bg-card/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
         aria-label="Aksi lainnya"
         aria-haspopup="menu"
         aria-expanded={menuOpen}
       >
-        <MoreVertical />
-      </Button>
+        <MoreVertical className="size-4" />
+      </button>
 
       <Popover
         anchorRef={menuRef}

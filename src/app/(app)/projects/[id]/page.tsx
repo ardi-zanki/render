@@ -127,7 +127,7 @@ export default async function ProjectDetailPage({
                     </CardContent>
                   </Card>
                 </Link>
-                <div className="absolute right-2 top-2 z-10 rounded-md bg-background/85 shadow-soft backdrop-blur">
+                <div className="absolute right-2 top-2 z-10">
                   <RenderActionsMenu
                     renderId={r.id}
                     renderName={displayName}
