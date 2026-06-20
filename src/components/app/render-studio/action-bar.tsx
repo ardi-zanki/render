@@ -37,7 +37,7 @@ export function RenderActionBar({
             value={instruction}
             onChange={(e) => setInstruction(e.target.value)}
             placeholder="Melengkapi konfigurasi — mis. ganti warna sofa…"
-            className="min-h-16 resize-none text-sm"
+            className="min-h-16 resize-none text-xs"
           />
         </div>
       )}

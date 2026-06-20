@@ -74,7 +74,7 @@ export function ChangeTexturePanel({
 
       <div className="flex flex-col gap-4 px-3 py-3.5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         <TextureSection title="Area & Sumber">
-          <p className="text-xs leading-5 text-muted-foreground">
+          <p className="text-[11px] leading-5 text-muted-foreground">
             Pilih area pada gambar, lalu tentukan tekstur penggantinya.
           </p>
           <Segmented
@@ -101,7 +101,7 @@ export function ChangeTexturePanel({
         >
           {state.textureSource === "library" ? (
             <>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {TEXTURE_CATEGORIES.map((c) => (
                   <button
                     key={c}
@@ -110,7 +110,7 @@ export function ChangeTexturePanel({
                       setCategory((prev) => (prev === c ? null : c))
                     }
                     className={cn(
-                      "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                      "rounded-md px-2 py-1 text-[11px] font-medium leading-none transition-colors",
                       category === c
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary text-secondary-foreground hover:bg-muted",
@@ -140,7 +140,7 @@ export function ChangeTexturePanel({
                         className="h-12 w-full rounded-sm border border-border/60"
                         style={{ background: t.thumbnail ? undefined : t.swatch }}
                       />
-                      <span className="truncate text-xs font-medium text-foreground">
+                      <span className="truncate text-[11px] font-medium text-foreground">
                         {t.name}
                       </span>
                     </button>
@@ -180,7 +180,7 @@ export function ChangeTexturePanel({
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border px-3 py-6 text-sm text-muted-foreground hover:border-primary/40"
+                  className="flex w-full flex-col items-center justify-center gap-2 rounded-md border border-dashed border-border px-3 py-6 text-xs text-muted-foreground hover:border-primary/40"
                 >
                   <ImagePlus className="size-5" />
                   Unggah gambar tekstur
@@ -195,7 +195,7 @@ export function ChangeTexturePanel({
                 value={state.textureDescription}
                 onChange={(e) => state.setTextureDescription(e.target.value)}
                 placeholder="mis. marmer putih dengan urat abu-abu halus"
-                className="min-h-32 resize-none text-sm"
+                className="min-h-32 resize-none text-xs"
                 maxLength={1000}
               />
             </div>
@@ -219,7 +219,7 @@ export function ChangeTexturePanel({
                 value={state.instruction}
                 onChange={(e) => state.setInstruction(e.target.value)}
                 placeholder="mis. arah urat material, tingkat kilap, atau warna"
-                className="min-h-16 resize-none text-sm"
+                className="min-h-16 resize-none text-xs"
               />
             </div>
           )}

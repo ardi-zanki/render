@@ -89,7 +89,9 @@ export function SelectionToolbar({
   downloading?: boolean;
 }) {
   const isBrush = tool === "brush-add" || tool === "brush-erase";
-  const showSlider = isBrush || tool === "wand";
+  // Magic wand uses a fixed default tolerance so the toolbar stays compact
+  // (only the brush keeps its size slider).
+  const showSlider = isBrush;
 
   return (
     <div className="inline-flex flex-nowrap items-center gap-0.5 sm:gap-1">
