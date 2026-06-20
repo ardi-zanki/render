@@ -79,6 +79,9 @@ envVarGroups:
         sync: false
       - key: R2_PUBLIC_URL
         sync: false
+      # Comma-separated app origins applied by `pnpm cors:setup`.
+      - key: R2_CORS_ORIGINS
+        sync: false
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET
