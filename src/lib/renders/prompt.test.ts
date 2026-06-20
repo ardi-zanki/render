@@ -7,8 +7,7 @@ describe("buildPrompt", () => {
     "Convert this architectural interior screenshot into a realistic photograph, keeping everything exactly as it already appears in the image. " +
     "Reproduce every surface faithfully from the image — each material, color, tone and texture stays exactly as shown: each wood keeps its own real tone, grey stays grey, white stays white, marble stays marble, concrete stays concrete, fabric stays fabric, metal stays metal, every surface keeping its own original color and finish straight from the image, with their natural variety side by side. " +
     "Plain light-colored walls are smooth, flat, matte painted surfaces that keep their original off-white paint color and a clean, even, untextured finish. " +
-    "Keep the exact same layout, camera angle, framing, and every object and piece of furniture in the same position and quantity as the image; surfaces that are empty stay empty. " +
-    "Any glass-door wardrobe, cabinet or display unit is a piece of interior furniture that keeps its own interior contents — the shelves, hanging clothes and items inside — clearly visible behind its glass doors, lit from within the room. ";
+    "Keep the exact same layout, camera angle, framing, and every object and piece of furniture in the same position and quantity as the image; surfaces that are empty stay empty. ";
   const interiorSuffix =
     " Add only photographic realism — lifelike textures, soft natural shadows, and reflections that match each surface's existing finish in the image. Photorealistic, sharp focus, true to the original image.";
   const referenceLighting = {
@@ -17,7 +16,7 @@ describe("buildPrompt", () => {
     midday:
       "Bright, cool midday daylight at about 5500K fills the room evenly through the windows; the room is lit only by this daylight, and all interior lamps, cove strips and downlights stay off and dark.",
     night:
-      "Night outside the windows with a dark sky. The interior is warmly and comfortably well-lit at 2700K, clearly bright and inviting like a home at night with all its lamps on. Warm LED cove strips run softly along the ceiling edges and recessed warm downlights in the ceiling glow gently, together filling the whole room with even, warm, comfortable brightness and a soft glow across the ceiling. Every material keeps its own true color clearly visible under the warm light.",
+      "Any glass-door wardrobe, cabinet or display unit is a piece of interior furniture that keeps its own interior contents — the shelves, hanging clothes and items inside — clearly visible behind its glass doors, lit from within the room. Night outside the windows with a dark sky. The interior is warmly and comfortably well-lit at 2700K, clearly bright and inviting like a home at night with all its lamps on. Warm LED cove strips run softly along the ceiling edges and recessed warm downlights in the ceiling glow gently, together filling the whole room with even, warm, comfortable brightness and a soft glow across the ceiling. Every material keeps its own true color clearly visible under the warm light.",
     mixed:
       "Bright, cool, neutral natural daylight from the windows fills and dominates the room at around 5500K, giving a clean cool daylight look. The ceiling keeps its exact original shape and flat surface as in the image; only the light fixtures that already exist in the original ceiling glow softly and quietly, and the ceiling stays plain wherever the original has no fixture. The scene reads clearly as bright cool daylight, neutral and true to the original colors.",
   } as const;
@@ -84,6 +83,15 @@ describe("buildPrompt", () => {
     const prompt = buildPrompt({ mode: "interior", time: "midday", lightsOn: false });
     expect(prompt).toContain("cool midday daylight");
     expect(prompt).toContain("all interior lamps, cove strips and downlights stay off");
+    expect(prompt).not.toContain("glass-door wardrobe");
+  });
+
+  it("applies the glass wardrobe clause only at night", () => {
+    const night = buildPrompt({ mode: "interior", time: "night" });
+    const mixed = buildPrompt({ mode: "interior", time: "mixed" });
+
+    expect(night).toContain("Any glass-door wardrobe, cabinet or display unit");
+    expect(mixed).not.toContain("glass-door wardrobe");
   });
 
   it("ignores automatic and unknown optional values", () => {

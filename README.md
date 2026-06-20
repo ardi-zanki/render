@@ -260,7 +260,7 @@ normalizes the result to the requested output format. Defaults are
 `fal-ai/uso` for style transfer, and `fal-ai/aura-sr` for upscale; override them
 with `FAL_RENDER_MODEL`, `FAL_INPAINT_MODEL`, `FAL_STYLE_TRANSFER_MODEL`, and
 `FAL_UPSCALE_MODEL`. The Interior prompt is byte-equivalent to the four lighting
-modes in `../Documents/ruma_render_flux2pro.py`; Exterior follows the same
+modes in `../Documents/ruma_render_flux2pro_v1.2.py`; Exterior follows the same
 positive preservation structure. The FLUX.2 path passes inputs via `image_urls`
 and pins an explicit `image_size`
 (~2K longest edge, controlled by `FAL_RENDER_MAX_EDGE`); `FAL_RENDER_SAFETY_TOLERANCE`

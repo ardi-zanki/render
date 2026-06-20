@@ -56,7 +56,7 @@ export function useRenderStudioState({
       return saved as string;
     }
     if (saved === "evening" || saved === "auto") return "mixed";
-    return "night";
+    return "mixed";
   })();
   const [time, setTime] = useState(initialTime);
   const [weather, setWeather] = useState(initialConfig?.weather ?? "auto");

@@ -166,7 +166,7 @@ export function RenderStudioControls({
                       setSurrounding("auto");
                       setLightsOn(() => false);
                       setWeather("auto");
-                      setTime(m.value === "interior" ? "night" : "auto");
+                      setTime(m.value === "interior" ? "mixed" : "auto");
                     }}
                   />
                 );
