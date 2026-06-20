@@ -86,6 +86,9 @@ export function createR2Provider(): StorageProvider {
           Key: key,
           Body: body,
           ContentType: contentType,
+          // Each render asset has a unique, immutable URL — let browsers cache it
+          // so re-mounting the image (e.g. switching studio tabs) never refetches.
+          CacheControl: "public, max-age=31536000, immutable",
         }),
       );
       return { key, url: this.publicUrl(key) };

@@ -363,6 +363,13 @@ export function RenderPreviewViewer({
     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
     transformOrigin: "center center",
   } satisfies CSSProperties;
+  // Persistent backdrop image, kept on one stable <img> across mode/view changes
+  // so swapping subtrees (Edit ↔ Hasil/Komparasi) never shows a blank frame: the
+  // browser holds the old frame until the new src decodes.
+  const baseImageSrc =
+    studioMode === "texture" || view === "comparison"
+      ? resultUrl
+      : shownImage;
   const canvasCursorStyle = canPanCanvas
     ? ({
         cursor: isCanvasPanning ? "grabbing" : "grab",
@@ -590,6 +597,22 @@ export function RenderPreviewViewer({
         )}
         style={canvasCursorStyle}
       >
+        {baseImageSrc && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={canvasTransformStyle}
+          >
+            <RenderImage
+              src={baseImageSrc}
+              alt=""
+              draggable={false}
+              crossOrigin="anonymous"
+              loading="eager"
+              className="size-full select-none object-contain"
+            />
+          </div>
+        )}
         {studioMode === "texture" ? (
           textureCanvas ? (
             <div className="absolute inset-0" style={canvasTransformStyle}>
@@ -611,6 +634,8 @@ export function RenderPreviewViewer({
               src={previewUrl ?? ""}
               alt=""
               draggable={false}
+              crossOrigin="anonymous"
+              loading="eager"
               onLoad={measureComparisonBounds}
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 size-full select-none object-contain opacity-0"
@@ -622,6 +647,8 @@ export function RenderPreviewViewer({
                   src={previewUrl ?? ""}
                   alt="Gambar asli"
                   draggable={false}
+                  crossOrigin="anonymous"
+                  loading="eager"
                   className="size-full select-none object-contain"
                 />
                 <div
@@ -632,6 +659,8 @@ export function RenderPreviewViewer({
                     src={resultUrl ?? ""}
                     alt="Hasil render"
                     draggable={false}
+                    crossOrigin="anonymous"
+                    loading="eager"
                     className="size-full select-none object-contain"
                   />
                 </div>
@@ -676,6 +705,11 @@ export function RenderPreviewViewer({
               src={shownImage}
               alt={view === "result" ? "Hasil render" : "Gambar asli"}
               draggable={false}
+              // Match the texture canvas's CORS mode + eager loading so switching
+              // Edit ↔ Hasil/Komparasi reuses the cached image instead of
+              // re-fetching (the flicker).
+              crossOrigin="anonymous"
+              loading="eager"
               className="size-full select-none object-contain"
             />
           </div>
