@@ -6,7 +6,6 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
-  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from "react";
 
@@ -23,8 +22,6 @@ type Props = {
   tool: TextureTool;
   brushSize: number;
   tolerance: number;
-  /** Display zoom; pointer math stays correct via getBoundingClientRect. */
-  zoom?: number;
   onChange: (state: MaskState) => void;
   /** Surface a non-fatal issue (e.g. magic wand on a cross-origin image). */
   onError?: (message: string) => void;
@@ -39,7 +36,7 @@ type Props = {
  * add/erase paints circles. Undo/redo snapshots the mask (≥20 steps).
  */
 export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanvas(
-  { imageUrl, tool, brushSize, tolerance, zoom = 1, onChange, onError, className },
+  { imageUrl, tool, brushSize, tolerance, onChange, onError, className },
   ref,
 ) {
   const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -334,41 +331,33 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
       : tool === "wand"
         ? "cell"
         : "crosshair";
-  const zoomFrameStyle = {
-    width: `${Math.max(zoom, 1) * 100}%`,
-    height: `${Math.max(zoom, 1) * 100}%`,
-  } satisfies CSSProperties;
-  const zoomSurfaceStyle = {
-    width: `${Math.min(zoom, 1) * 100}%`,
-    height: `${Math.min(zoom, 1) * 100}%`,
-  } satisfies CSSProperties;
 
+  // Fills the viewer's pan/zoom transform wrapper at base (fit) size; the parent
+  // applies translate + scale. Pointer math stays correct because toSource()
+  // derives the scale from the canvas's live getBoundingClientRect().
   return (
     <div
       className={cn(
-        "relative flex min-h-full min-w-full shrink-0 items-center justify-center",
+        "relative flex size-full items-center justify-center",
         className,
       )}
-      style={zoomFrameStyle}
     >
-      <div className="relative shrink-0" style={zoomSurfaceStyle}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={imageUrl}
-          alt="Gambar yang diedit"
-          draggable={false}
-          className="block size-full select-none object-contain"
-        />
-        <canvas
-          ref={overlayRef}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerLeave={onPointerUp}
-          style={{ cursor, opacity: 0.5, touchAction: "none" }}
-          className="absolute inset-0 size-full"
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imageUrl}
+        alt="Gambar yang diedit"
+        draggable={false}
+        className="block size-full select-none object-contain"
+      />
+      <canvas
+        ref={overlayRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
+        style={{ cursor, opacity: 0.5, touchAction: "none" }}
+        className="absolute inset-0 size-full"
+      />
     </div>
   );
 });

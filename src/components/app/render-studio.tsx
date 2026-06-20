@@ -26,10 +26,7 @@ import { StudioVersionHistory } from "./render-studio/version-history";
 import { ChangeTexturePanel } from "./render-studio/texture-edit/change-texture-panel";
 import { MaskCanvas } from "./render-studio/texture-edit/mask-canvas";
 import { SelectionToolbar } from "./render-studio/texture-edit/selection-toolbar";
-import type {
-  MaskCanvasHandle,
-  TextureTool,
-} from "./render-studio/texture-edit/types";
+import type { MaskCanvasHandle } from "./render-studio/texture-edit/types";
 import { useTextureEditState } from "./render-studio/texture-edit/use-texture-edit-state";
 import { type RenderStudioProps, type ViewerTab } from "./render-studio/types";
 import { useRenderStudioActions } from "./render-studio/use-render-studio-actions";
@@ -113,12 +110,9 @@ export function RenderStudio({
   const handleMaskUndo = useCallback(() => maskRef.current?.undo(), []);
   const handleMaskRedo = useCallback(() => maskRef.current?.redo(), []);
   const handleMaskClear = useCallback(() => maskRef.current?.clear(), []);
-  function handleTextureToolChange(tool: TextureTool) {
-    texture.setTool(tool);
-    if (tool === "pan" && state.zoom <= 1) {
-      toast.info("Perbesar gambar di atas 100% untuk menggeser kanvas.");
-    }
-  }
+  // The Hand tool now pans at any zoom (transform-based canvas), so selecting it
+  // no longer needs a "zoom past 100% first" hint.
+  const handleTextureToolChange = texture.setTool;
   const actions = useRenderStudioActions({
     projectId,
     sourceRenderId: activeRenderId,
@@ -171,7 +165,6 @@ export function RenderStudio({
         tool={texture.tool}
         brushSize={texture.brushSize}
         tolerance={texture.tolerance}
-        zoom={state.zoom}
         onChange={texture.setMask}
         onError={(message) => toast.error(message)}
       />

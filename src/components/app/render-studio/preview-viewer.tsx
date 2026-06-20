@@ -30,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { RenderMode } from "@/db/schema";
 import { cn } from "@/lib/utils";
 import type { StudioView, ViewerTab } from "./types";
+import { clampZoom } from "./use-render-studio-state";
 
 const clampComparisonPosition = (position: number) =>
   Math.min(100, Math.max(0, position));
@@ -118,7 +119,7 @@ export function RenderPreviewViewer({
   /** Texture-edit canvas + toolbar, rendered by the studio (owns the ref). */
   textureCanvas?: ReactNode;
   textureToolbar?: ReactNode;
-  /** Let the Hand tool drag the scrollable texture canvas when zoomed. */
+  /** Let the Hand tool pan the texture canvas (drag to move at any zoom). */
   texturePanActive?: boolean;
 }) {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -126,8 +127,21 @@ export function RenderPreviewViewer({
   const comparisonImageRef = useRef<HTMLImageElement>(null);
   const comparisonDraggingRef = useRef(false);
   const panDraggingRef = useRef(false);
-  const panStartRef = useRef({ x: 0, y: 0, left: 0, top: 0 });
+  // Free pan offset (CSS px) applied as a transform — works at any zoom, unlike
+  // the old scroll model that needed the content to overflow (zoom > 100%).
+  const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+  const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isCanvasPanning, setIsCanvasPanning] = useState(false);
+
+  // Recenter when the content or view changes so a fresh image starts fitted.
+  // Adjusting state during render (React's documented pattern) avoids an extra
+  // effect pass — https://react.dev/learn/you-might-not-need-an-effect.
+  const panResetKey = `${shownImage}|${studioMode}|${view}`;
+  const [lastPanResetKey, setLastPanResetKey] = useState(panResetKey);
+  if (panResetKey !== lastPanResetKey) {
+    setLastPanResetKey(panResetKey);
+    setPan({ x: 0, y: 0 });
+  }
   const [comparisonBounds, setComparisonBounds] =
     useState<ComparisonBounds | null>(null);
   const comparisonHandlePosition = clampComparisonPosition(comparisonPosition);
@@ -310,57 +324,49 @@ export function RenderPreviewViewer({
   const canRemoveImage = Boolean(
     allowRemoveImage && hasUploadedImage && !isProcessing,
   );
+  // Comparison keeps the shrink-to-fit frame; the image/texture views pan & zoom
+  // through canvasTransformStyle instead.
   const zoomFrameStyle = {
     width: `${Math.max(zoom, 1) * 100}%`,
     height: `${Math.max(zoom, 1) * 100}%`,
-  } satisfies CSSProperties;
-  const zoomSurfaceStyle = {
-    width: `${Math.min(zoom, 1) * 100}%`,
-    height: `${Math.min(zoom, 1) * 100}%`,
   } satisfies CSSProperties;
   const canPanCanvas =
     hasCanvasContent &&
     view !== "comparison" &&
     (studioMode !== "texture" || texturePanActive);
-  const canvasCursorStyle = texturePanActive
+  const canvasTransformStyle = {
+    transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+    transformOrigin: "center center",
+  } satisfies CSSProperties;
+  const canvasCursorStyle = canPanCanvas
     ? ({
         cursor: isCanvasPanning ? "grabbing" : "grab",
       } satisfies CSSProperties)
-    : canPanCanvas && zoom > 1
-      ? ({
-          cursor: "default",
-        } satisfies CSSProperties)
-      : undefined;
+    : undefined;
 
   const startCanvasPan = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
-      if (!canPanCanvas || zoom <= 1 || event.button !== 0) return;
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+      if (!canPanCanvas || event.button !== 0) return;
       panDraggingRef.current = true;
       setIsCanvasPanning(true);
       panStartRef.current = {
         x: event.clientX,
         y: event.clientY,
-        left: canvas.scrollLeft,
-        top: canvas.scrollTop,
+        panX: pan.x,
+        panY: pan.y,
       };
       event.currentTarget.setPointerCapture(event.pointerId);
       event.preventDefault();
     },
-    [canPanCanvas, zoom],
+    [canPanCanvas, pan.x, pan.y],
   );
 
   const moveCanvasPan = useCallback((event: PointerEvent<HTMLDivElement>) => {
     if (!panDraggingRef.current) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    canvas.scrollLeft =
-      panStartRef.current.left - (event.clientX - panStartRef.current.x);
-    canvas.scrollTop =
-      panStartRef.current.top - (event.clientY - panStartRef.current.y);
+    setPan({
+      x: panStartRef.current.panX + (event.clientX - panStartRef.current.x),
+      y: panStartRef.current.panY + (event.clientY - panStartRef.current.y),
+    });
     event.preventDefault();
   }, []);
 
@@ -378,7 +384,6 @@ export function RenderPreviewViewer({
     if (!canvas || !hasCanvasContent) return;
 
     const handleCanvasWheel = (event: WheelEvent) => {
-      if (!hasCanvasContent) return;
       if (!event.ctrlKey && !event.metaKey) return;
       event.preventDefault();
       event.stopPropagation();
@@ -389,15 +394,32 @@ export function RenderPreviewViewer({
           : event.deltaX;
       if (delta === 0) return;
 
-      const speed = event.ctrlKey || event.metaKey ? 0.006 : 0.0025;
-      setZoom((value) => value - delta * speed);
+      const nextZoom = clampZoom(zoom - delta * 0.006);
+      if (nextZoom === zoom) return;
+
+      // Comparison has no pan — just zoom.
+      if (view === "comparison") {
+        setZoom(nextZoom);
+        return;
+      }
+
+      // Zoom toward the cursor: keep the point under it anchored.
+      const rect = canvas.getBoundingClientRect();
+      const cx = event.clientX - rect.left - rect.width / 2;
+      const cy = event.clientY - rect.top - rect.height / 2;
+      const ratio = nextZoom / zoom;
+      setPan((prev) => ({
+        x: cx - (cx - prev.x) * ratio,
+        y: cy - (cy - prev.y) * ratio,
+      }));
+      setZoom(nextZoom);
     };
 
     canvas.addEventListener("wheel", handleCanvasWheel, { passive: false });
     return () => {
       canvas.removeEventListener("wheel", handleCanvasWheel);
     };
-  }, [hasCanvasContent, setZoom]);
+  }, [hasCanvasContent, setZoom, view, zoom]);
 
   return (
     <div className="flex flex-col gap-3 lg:h-full lg:min-h-0">
@@ -586,7 +608,13 @@ export function RenderPreviewViewer({
         onPointerUp={stopCanvasPan}
         onPointerCancel={stopCanvasPan}
         className={cn(
-          "relative aspect-[4/3] overflow-auto rounded-lg overscroll-contain lg:aspect-auto lg:min-h-0 lg:flex-1",
+          "relative aspect-[4/3] rounded-lg overscroll-contain lg:aspect-auto lg:min-h-0 lg:flex-1",
+          // Comparison keeps its scrollable frame; image/texture views clip the
+          // transform so panned content disappears at the viewport edge, and
+          // claim touch gestures so a drag pans instead of scrolling the page.
+          view === "comparison"
+            ? "overflow-auto"
+            : "overflow-hidden touch-none",
           hasCanvasContent
             ? "bg-transparent"
             : "border border-dashed border-border bg-muted/35",
@@ -594,7 +622,11 @@ export function RenderPreviewViewer({
         style={canvasCursorStyle}
       >
         {studioMode === "texture" ? (
-          textureCanvas ?? (
+          textureCanvas ? (
+            <div className="absolute inset-0" style={canvasTransformStyle}>
+              {textureCanvas}
+            </div>
+          ) : (
             <p className="flex min-h-full min-w-full items-center justify-center px-4 text-center text-sm text-muted-foreground">
               Tidak ada gambar hasil untuk diedit.
             </p>
@@ -670,12 +702,12 @@ export function RenderPreviewViewer({
             )}
           </div>
         ) : shownImage ? (
-          <div className="relative min-h-full min-w-full" style={zoomFrameStyle}>
+          <div className="absolute inset-0" style={canvasTransformStyle}>
             <RenderImage
               src={shownImage}
               alt={view === "result" ? "Hasil render" : "Gambar asli"}
-              className="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 select-none object-contain"
-              style={zoomSurfaceStyle}
+              draggable={false}
+              className="size-full select-none object-contain"
             />
           </div>
         ) : (
