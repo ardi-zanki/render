@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import { cn } from "@/lib/utils";
+import { floodFillSelection } from "./magic-wand";
 import type { MaskCanvasHandle, MaskState, TextureTool } from "./types";
 
 const MASK_BLUE = "rgba(37, 99, 235, 1)";
@@ -232,35 +233,19 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
     }
     const { width: w, height: h } = src;
     if (sx < 0 || sy < 0 || sx >= w || sy >= h) return;
-    const px = src.data;
-    const start = (sy * w + sx) * 4;
-    const r0 = px[start];
-    const g0 = px[start + 1];
-    const b0 = px[start + 2];
-    const thr = tolerance * 3; // 0-100 → ~0-300 euclidean distance
-    const out = mctx.getImageData(0, 0, w, h);
+    const selected = floodFillSelection(src.data, w, h, sx, sy, tolerance);
+    // A normal Magic Wand click starts a fresh selection. Brush Add remains the
+    // explicit tool for extending it, so old lasso/brush masks cannot silently
+    // accumulate into an unexpectedly huge region.
+    const out = mctx.createImageData(w, h);
     const op = out.data;
-    const visited = new Uint8Array(w * h);
-    const stack = [sy * w + sx];
-    while (stack.length) {
-      const p = stack.pop() as number;
-      if (visited[p]) continue;
-      visited[p] = 1;
-      const i = p * 4;
-      const dr = px[i] - r0;
-      const dg = px[i + 1] - g0;
-      const db = px[i + 2] - b0;
-      if (Math.sqrt(dr * dr + dg * dg + db * db) > thr) continue;
-      op[i] = 255;
-      op[i + 1] = 255;
-      op[i + 2] = 255;
-      op[i + 3] = 255;
-      const x = p % w;
-      const y = (p / w) | 0;
-      if (x > 0) stack.push(p - 1);
-      if (x < w - 1) stack.push(p + 1);
-      if (y > 0) stack.push(p - w);
-      if (y < h - 1) stack.push(p + w);
+    for (let point = 0; point < selected.length; point += 1) {
+      if (!selected[point]) continue;
+      const offset = point * 4;
+      op[offset] = 255;
+      op[offset + 1] = 255;
+      op[offset + 2] = 255;
+      op[offset + 3] = 255;
     }
     mctx.putImageData(out, 0, 0);
     renderOverlay();

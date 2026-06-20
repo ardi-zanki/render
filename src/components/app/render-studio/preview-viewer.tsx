@@ -77,6 +77,7 @@ export function RenderPreviewViewer({
   onExpandPanels,
   textureCanvas,
   textureToolbar,
+  texturePanActive = false,
 }: {
   fileRef: RefObject<HTMLInputElement | null>;
   referenceRef: RefObject<HTMLInputElement | null>;
@@ -117,6 +118,8 @@ export function RenderPreviewViewer({
   /** Texture-edit canvas + toolbar, rendered by the studio (owns the ref). */
   textureCanvas?: ReactNode;
   textureToolbar?: ReactNode;
+  /** Let the Hand tool drag the scrollable texture canvas when zoomed. */
+  texturePanActive?: boolean;
 }) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const comparisonStageRef = useRef<HTMLDivElement>(null);
@@ -315,7 +318,9 @@ export function RenderPreviewViewer({
     height: `${Math.min(zoom, 1) * 100}%`,
   } satisfies CSSProperties;
   const canPanCanvas =
-    hasCanvasContent && studioMode !== "texture" && view !== "comparison";
+    hasCanvasContent &&
+    view !== "comparison" &&
+    (studioMode !== "texture" || texturePanActive);
   const canvasCursorStyle =
     canPanCanvas && zoom > 1
       ? ({
