@@ -24,7 +24,8 @@
     "smoke:payment": "tsx --env-file=.env.local scripts/smoke-payment.ts",
     "render:worker": "tsx --env-file=.env.local scripts/render-worker.ts",
     "worker": "tsx scripts/render-worker.ts",
-    "make:admin": "tsx --env-file=.env.local scripts/make-admin.ts"
+    "make:admin": "tsx --env-file=.env.local scripts/make-admin.ts",
+    "cors:setup": "tsx --env-file=.env.local scripts/setup-r2-cors.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1071.0",

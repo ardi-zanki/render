@@ -125,6 +125,9 @@ export const MaskCanvas = forwardRef<MaskCanvasHandle, Props>(function MaskCanva
   // (Re)load the base image whenever it changes; reset mask + history.
   useEffect(() => {
     const img = new Image();
+    // Magic Wand reads source pixels. Explicit CORS mode keeps the canvas
+    // readable for R2 assets when the bucket allows the application origin.
+    img.crossOrigin = "anonymous";
     let cancelled = false;
     img.onload = () => {
       if (cancelled) return;

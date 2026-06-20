@@ -49,6 +49,9 @@ const schema = z.object({
   R2_SECRET_ACCESS_KEY: optional,
   R2_BUCKET_NAME: optional,
   R2_PUBLIC_URL: optional,
+  // Comma-separated origins allowed to read R2 assets cross-origin (canvas
+  // pixel reads). Consumed by scripts/setup-r2-cors.ts; falls back to APP_URL.
+  R2_CORS_ORIGINS: optional,
 
   EMAIL_PROVIDER: z.enum(["resend"]).default("resend"),
   RESEND_API_KEY: optional,
