@@ -1,17 +1,16 @@
 import sharp from "sharp";
 
-export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
-// Low floor: the render provider reinterprets the input and pins the output to
-// ~2K (see editImageSize in providers/ai/fal.ts), so small design exports and
-// photos (e.g. 640x480) are fine. We only reject genuinely tiny thumbnails.
-export const MIN_IMAGE_DIMENSION = 256;
-export const MAX_IMAGE_DIMENSION = 6000;
+import {
+  ALLOWED_IMAGE_TYPES,
+  imageDimensionError,
+  imageTypeSizeError,
+} from "./image-constraints";
 
-const ALLOWED: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
+export {
+  MAX_IMAGE_BYTES,
+  MIN_IMAGE_DIMENSION,
+  MAX_IMAGE_DIMENSION,
+} from "./image-constraints";
 
 export interface ValidatedImageUpload {
   data: Buffer;
@@ -35,40 +34,20 @@ export class ImageUploadError extends Error {
 export async function validateImageFile(
   file: File,
 ): Promise<ValidatedImageUpload> {
-  if (file.size <= 0) {
-    throw new ImageUploadError("Gambar desain wajib diunggah");
+  const typeSizeError = imageTypeSizeError(file);
+  if (typeSizeError) {
+    throw new ImageUploadError(typeSizeError);
   }
 
-  if (file.size > MAX_IMAGE_BYTES) {
-    throw new ImageUploadError(
-      "Ukuran gambar maksimal 10 MB. Silakan kompres gambar atau upload versi yang lebih kecil.",
-    );
-  }
-
-  const ext = ALLOWED[file.type];
-  if (!ext) {
-    throw new ImageUploadError("Format gambar harus JPG, PNG, atau WebP");
-  }
-
+  const ext = ALLOWED_IMAGE_TYPES[file.type];
   const data = Buffer.from(await file.arrayBuffer());
   const meta = await sharp(data).metadata().catch(() => null);
   const width = meta?.width ?? 0;
   const height = meta?.height ?? 0;
 
-  if (!width || !height) {
-    throw new ImageUploadError("File gambar tidak dapat dibaca");
-  }
-
-  if (width < MIN_IMAGE_DIMENSION || height < MIN_IMAGE_DIMENSION) {
-    throw new ImageUploadError(
-      `Resolusi gambar minimal ${MIN_IMAGE_DIMENSION} x ${MIN_IMAGE_DIMENSION} px`,
-    );
-  }
-
-  if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
-    throw new ImageUploadError(
-      `Resolusi gambar maksimal ${MAX_IMAGE_DIMENSION} x ${MAX_IMAGE_DIMENSION} px`,
-    );
+  const dimensionError = imageDimensionError(width, height);
+  if (dimensionError) {
+    throw new ImageUploadError(dimensionError);
   }
 
   return {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
+import { validateImageFileClient } from "@/lib/uploads/validate-client";
 import type { Scene, StudioView } from "./types";
 
 const clampZoom = (value: number) =>
@@ -103,34 +104,52 @@ export function useRenderStudioState({
   >({});
   const [creatingProject, setCreatingProject] = useState(false);
 
-  function pickFile(f: File | null) {
+  async function pickFile(f: File | null) {
+    setError("");
+    if (!f) {
+      revokeObjectUrl(previewUrl);
+      setResultUrl(null);
+      setResultRenderId(null);
+      setShareUrl(null);
+      setRenderStatus(null);
+      setFile(null);
+      setPreviewUrl(null);
+      setView("original");
+      return;
+    }
+    // Pre-flight against the same limits the server enforces, so an oversized or
+    // wrong-resolution file is rejected before upload (keeps the current image).
+    const validationError = await validateImageFileClient(f);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     revokeObjectUrl(previewUrl);
     setResultUrl(null);
     setResultRenderId(null);
     setShareUrl(null);
     setRenderStatus(null);
-    setError("");
-    if (f) {
-      setFile(f);
-      setPreviewUrl(URL.createObjectURL(f));
-      setView("original");
-    } else {
-      setFile(null);
-      setPreviewUrl(null);
-      setView("original");
-    }
+    setFile(f);
+    setPreviewUrl(URL.createObjectURL(f));
+    setView("original");
   }
 
-  function pickReference(f: File | null) {
-    revokeObjectUrl(referencePreviewUrl);
+  async function pickReference(f: File | null) {
     setError("");
-    if (f) {
-      setReferenceFile(f);
-      setReferencePreviewUrl(URL.createObjectURL(f));
-    } else {
+    if (!f) {
+      revokeObjectUrl(referencePreviewUrl);
       setReferenceFile(null);
       setReferencePreviewUrl(null);
+      return;
     }
+    const validationError = await validateImageFileClient(f);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    revokeObjectUrl(referencePreviewUrl);
+    setReferenceFile(f);
+    setReferencePreviewUrl(URL.createObjectURL(f));
   }
 
   function setZoomValue(next: number | ((value: number) => number)) {
