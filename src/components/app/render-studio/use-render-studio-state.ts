@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
 import type { Scene, StudioView } from "./types";
@@ -10,6 +10,14 @@ const clampZoom = (value: number) =>
 
 export function initialStudioView(initialResultUrl?: string | null): StudioView {
   return initialResultUrl ? "result" : "original";
+}
+
+export function initialStudioPreview(initialImageUrl?: string | null) {
+  return initialImageUrl ?? null;
+}
+
+function revokeObjectUrl(url: string | null) {
+  if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
 }
 
 export function useRenderStudioState({
@@ -58,7 +66,12 @@ export function useRenderStudioState({
   const [styleTransferStrength, setStyleTransferStrength] = useState(0.65);
 
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // Existing renders can use their original asset URL directly. Fetching it
+  // into a File is unnecessary for edits (the server already owns the asset)
+  // and made the entire view toolbar depend on cross-origin R2 fetch headers.
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    initialStudioPreview(initialImageUrl),
+  );
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
   const [referencePreviewUrl, setReferencePreviewUrl] = useState<string | null>(
     null,
@@ -91,7 +104,7 @@ export function useRenderStudioState({
   const [creatingProject, setCreatingProject] = useState(false);
 
   function pickFile(f: File | null) {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    revokeObjectUrl(previewUrl);
     setResultUrl(null);
     setResultRenderId(null);
     setShareUrl(null);
@@ -109,7 +122,7 @@ export function useRenderStudioState({
   }
 
   function pickReference(f: File | null) {
-    if (referencePreviewUrl) URL.revokeObjectURL(referencePreviewUrl);
+    revokeObjectUrl(referencePreviewUrl);
     setError("");
     if (f) {
       setReferenceFile(f);
@@ -119,40 +132,6 @@ export function useRenderStudioState({
       setReferencePreviewUrl(null);
     }
   }
-
-  // "Open Studio": pull the source render's original image onto the canvas once,
-  // so the user can re-render without re-uploading. Failures (e.g. cross-origin
-  // storage) fall back silently to the empty uploader.
-  const loadedInitialImage = useRef(false);
-  useEffect(() => {
-    if (!initialImageUrl || loadedInitialImage.current) return;
-    // Guard against StrictMode double-invoke; no per-run cancel flag so the
-    // single fetch always applies (cancelling it would leave the canvas empty
-    // when the cleanup runs before the fetch resolves).
-    loadedInitialImage.current = true;
-    void (async () => {
-      try {
-        const res = await fetch(initialImageUrl);
-        if (!res.ok) return;
-        const blob = await res.blob();
-        const type = blob.type || "image/jpeg";
-        const ext = type.includes("png")
-          ? "png"
-          : type.includes("webp")
-            ? "webp"
-            : "jpg";
-        // Set the original directly (not via pickFile) so the pre-filled
-        // previous result is kept — enabling the Komparasi/Hasil tabs.
-        setFile(new File([blob], `source.${ext}`, { type }));
-        setPreviewUrl((current) => {
-          if (current) URL.revokeObjectURL(current);
-          return URL.createObjectURL(blob);
-        });
-      } catch {
-        // Original not reachable — leave the uploader empty.
-      }
-    })();
-  }, [initialImageUrl]);
 
   function setZoomValue(next: number | ((value: number) => number)) {
     setZoom((value) =>

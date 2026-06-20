@@ -46,6 +46,8 @@ production; the shared image keeps you free to move later (no lock-in).
 
 - **Neon PostgreSQL** (region Singapore) — use the **pooled** connection string.
 - **Cloudflare R2** bucket(s): `renderai-staging`, `renderai-production`.
+  Each bucket needs a **CORS policy** so the Render Studio canvas (Magic Wand)
+  can read source pixels cross-origin — see [§1a](#1a-r2-cors).
 - **Resend** API key + verified sender domain.
 - **Midtrans** server/client keys; set webhook → `https://<domain>/api/payments/webhook/midtrans`.
 - **fal.ai** API key with enough balance for storage uploads and inference.
@@ -53,6 +55,27 @@ production; the shared image keeps you free to move later (no lock-in).
 - Strong, **separate** `BETTER_AUTH_SECRET` and `JWT_SECRET`.
 
 Full variable list: `.env.example`.
+
+### 1a. R2 CORS
+
+The Render Studio canvas loads R2 assets with `crossOrigin="anonymous"` and reads
+their pixels (Magic Wand). The browser only allows that when R2 returns the right
+`Access-Control-Allow-Origin` header. List **explicit** origins (never `*`) so R2
+also emits `Vary: Origin` — otherwise a response cached for one origin gets
+replayed, without CORS headers, to another, which is what forced hard reloads.
+
+Apply per bucket with the env's R2 credentials:
+
+```bash
+# Origins from R2_CORS_ORIGINS (comma-separated) or APP_URL; extras via args.
+pnpm cors:setup
+pnpm cors:setup https://app.renderai.com https://render-g0hv.onrender.com
+pnpm cors:setup --print   # only print JSON to paste into the R2 dashboard
+```
+
+Dashboard path: R2 → bucket → **Settings → CORS Policy**. Re-run after adding a
+new app domain. List every origin that serves the app (production, staging, any
+preview/onrender host, and `http://localhost:3210` for local dev).
 
 > ⚠️ **Verify fal.ai live once after funding the account.** The API key can be
 > valid while the account is still locked for exhausted balance. Do one live
