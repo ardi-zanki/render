@@ -14,6 +14,7 @@ import {
   useEffect,
   useRef,
   useState,
+  type DragEvent,
   type KeyboardEvent,
   type PointerEvent,
   type CSSProperties,
@@ -132,6 +133,30 @@ export function RenderPreviewViewer({
   const panStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isCanvasPanning, setIsCanvasPanning] = useState(false);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+  // Drop-to-upload: allowed while the image can still be replaced (a fresh
+  // upload that hasn't been rendered yet), and never mid-render.
+  const dropEnabled = allowRemoveImage && !isProcessing && studioMode !== "texture";
+
+  function handleDragOver(event: DragEvent<HTMLDivElement>) {
+    if (!dropEnabled || !event.dataTransfer.types.includes("Files")) return;
+    event.preventDefault();
+    setIsDraggingFile(true);
+  }
+
+  function handleDragLeave(event: DragEvent<HTMLDivElement>) {
+    if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+    setIsDraggingFile(false);
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    if (!dropEnabled) return;
+    event.preventDefault();
+    setIsDraggingFile(false);
+    const file = event.dataTransfer.files?.[0];
+    if (file) pickFile(file);
+  }
 
   // Recenter when the content or view changes so a fresh image starts fitted.
   // Adjusting state during render (React's documented pattern) avoids an extra
@@ -427,7 +452,8 @@ export function RenderPreviewViewer({
         /* Floating bottom-center toolbar (Framer/Figma style): view tabs (+ Edit)
            and canvas controls / texture tools, content-sized so it never
            stretches and stays centered when the panels are hidden. */
-        <div className="absolute bottom-3 left-1/2 z-30 inline-flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-1.5 overflow-x-auto rounded-xl border border-border/80 bg-card/95 px-1.5 py-1.5 shadow-floating backdrop-blur transition-all duration-200 ease-out">
+        <div className="pointer-events-none absolute inset-x-0 bottom-3 z-30 flex justify-center px-3">
+          <div className="pointer-events-auto inline-flex max-w-full items-center gap-1.5 overflow-x-auto rounded-xl border border-border/80 bg-card/95 px-1.5 py-1.5 shadow-floating backdrop-blur transition-all duration-200 ease-out">
           <div className="flex shrink-0 flex-nowrap items-center gap-1.5">
             {panelsCollapsed && onExpandPanels && (
               // Reopen control, grouped with the view tabs (desktop only).
@@ -538,6 +564,7 @@ export function RenderPreviewViewer({
               </div>
             </>
           )}
+          </div>
         </div>
       )}
 
@@ -547,6 +574,9 @@ export function RenderPreviewViewer({
         onPointerMove={moveCanvasPan}
         onPointerUp={stopCanvasPan}
         onPointerCancel={stopCanvasPan}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
         className={cn(
           "relative aspect-[4/3] overscroll-contain rounded-lg lg:aspect-auto lg:min-h-0 lg:flex-1 lg:rounded-none",
           // Comparison keeps its scrollable frame; image/texture views clip the
@@ -659,11 +689,20 @@ export function RenderPreviewViewer({
               <ImagePlus className="size-5" />
             </div>
             <span className="text-sm font-medium">
-              Klik untuk mengunggah gambar desain
+              Klik atau seret gambar desain ke sini
             </span>
             <span className="text-xs">JPG, PNG, atau WebP · maks 10MB</span>
           </button>
         )}
+
+          {isDraggingFile && (
+            <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center border-2 border-dashed border-primary bg-primary/10 backdrop-blur-[1px]">
+              <span className="rounded-md bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-floating">
+                Lepaskan untuk {hasUploadedImage ? "mengganti" : "mengunggah"}{" "}
+                gambar
+              </span>
+            </div>
+          )}
 
           {isProcessing && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 backdrop-blur-sm">
