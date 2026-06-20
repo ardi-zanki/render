@@ -1,5 +1,7 @@
 "use client";
 
+import { CircleAlert } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
@@ -8,7 +10,6 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { useRenderStatusPolling } from "@/hooks/use-render-status-polling";
@@ -290,7 +291,6 @@ export function RenderStudio({
             setStyleTransferStrength={state.setStyleTransferStrength}
             negativePrompt={state.negativePrompt}
             setNegativePrompt={state.setNegativePrompt}
-            error={state.error}
             editAvailable={editAvailable}
             studioMode={studioMode}
             setStudioMode={setStudioMode}
@@ -310,6 +310,15 @@ export function RenderStudio({
           )}
         >
           {renderInfo && <StudioRenderInfo info={renderInfo} />}
+          {state.error && (
+            <p
+              role="alert"
+              className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-xs leading-5 text-destructive"
+            >
+              <CircleAlert className="mt-0.5 size-3.5 shrink-0" />
+              <span>{state.error}</span>
+            </p>
+          )}
           {initialVersions.length > 0 ? (
             <StudioVersionHistory
               versions={initialVersions}
