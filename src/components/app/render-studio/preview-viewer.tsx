@@ -607,7 +607,6 @@ export function RenderPreviewViewer({
               src={baseImageSrc}
               alt=""
               draggable={false}
-              crossOrigin="anonymous"
               loading="eager"
               className="size-full select-none object-contain"
             />
@@ -634,7 +633,6 @@ export function RenderPreviewViewer({
               src={previewUrl ?? ""}
               alt=""
               draggable={false}
-              crossOrigin="anonymous"
               loading="eager"
               onLoad={measureComparisonBounds}
               aria-hidden="true"
@@ -647,7 +645,6 @@ export function RenderPreviewViewer({
                   src={previewUrl ?? ""}
                   alt="Gambar asli"
                   draggable={false}
-                  crossOrigin="anonymous"
                   loading="eager"
                   className="size-full select-none object-contain"
                 />
@@ -659,7 +656,6 @@ export function RenderPreviewViewer({
                     src={resultUrl ?? ""}
                     alt="Hasil render"
                     draggable={false}
-                    crossOrigin="anonymous"
                     loading="eager"
                     className="size-full select-none object-contain"
                   />
@@ -705,10 +701,6 @@ export function RenderPreviewViewer({
               src={shownImage}
               alt={view === "result" ? "Hasil render" : "Gambar asli"}
               draggable={false}
-              // Match the texture canvas's CORS mode + eager loading so switching
-              // Edit ↔ Hasil/Komparasi reuses the cached image instead of
-              // re-fetching (the flicker).
-              crossOrigin="anonymous"
               loading="eager"
               className="size-full select-none object-contain"
             />
