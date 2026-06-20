@@ -103,6 +103,9 @@ test("user can login and create a mock render", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Edit", exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("tab", { name: "Hasil", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
 
   const detailResponse = await page.request.get(`/api/renders/${renderId}`);
   const createdRender = (await detailResponse.json()) as {
@@ -175,6 +178,9 @@ test("user can login and create a mock render", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: "Render Studio" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("tab", { name: "Hasil", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("tab", { name: "Komparasi" })).toBeVisible();
   await expect(page.locator("#style")).toHaveCount(0);
   await expect(page.locator("#location")).toHaveCount(0);

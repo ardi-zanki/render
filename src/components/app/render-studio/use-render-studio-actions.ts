@@ -28,7 +28,7 @@ type StudioMode = "render" | "texture";
 
 type RouterLike = {
   push: (href: string) => void;
-  replace: (href: string) => void;
+  replace: (href: string, options?: { scroll?: boolean }) => void;
   refresh: () => void;
 };
 
@@ -255,7 +255,16 @@ export function useRenderStudioActions({
             ),
           );
         },
-        () => router.replace(`/renders/new?source=${json.renderId}`),
+        () => {
+          // Paint the finished result before synchronising the canonical URL.
+          // The reopened page also starts on Result, avoiding an Original-tab
+          // flash while the App Router reconciles the new server props.
+          window.requestAnimationFrame(() =>
+            router.replace(`/renders/new?source=${json.renderId}`, {
+              scroll: false,
+            }),
+          );
+        },
       );
       router.refresh();
     } catch (err) {

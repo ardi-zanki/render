@@ -22,7 +22,7 @@ const TOOLS: { value: TextureTool; label: string; icon: LucideIcon }[] = [
   { value: "lasso", label: "Lasso", icon: Lasso },
   { value: "brush-add", label: "Brush tambah", icon: Paintbrush },
   { value: "brush-erase", label: "Brush hapus", icon: Eraser },
-  { value: "pan", label: "Geser", icon: Hand },
+  { value: "pan", label: "Geser kanvas (zoom > 100%)", icon: Hand },
 ];
 
 function ToolButton({

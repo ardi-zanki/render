@@ -8,6 +8,10 @@ import type { Scene, StudioView } from "./types";
 const clampZoom = (value: number) =>
   Math.min(3, Math.max(0.5, Number(value.toFixed(2))));
 
+export function initialStudioView(initialResultUrl?: string | null): StudioView {
+  return initialResultUrl ? "result" : "original";
+}
+
 export function useRenderStudioState({
   defaultRenderMode,
   defaultOutputFormat,
@@ -68,7 +72,9 @@ export function useRenderStudioState({
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [view, setView] = useState<StudioView>("original");
+  const [view, setView] = useState<StudioView>(
+    initialStudioView(initialResultUrl),
+  );
   const [comparisonPosition, setComparisonPosition] = useState(50);
   const [zoom, setZoom] = useState(1);
 

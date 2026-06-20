@@ -26,7 +26,10 @@ import { StudioVersionHistory } from "./render-studio/version-history";
 import { ChangeTexturePanel } from "./render-studio/texture-edit/change-texture-panel";
 import { MaskCanvas } from "./render-studio/texture-edit/mask-canvas";
 import { SelectionToolbar } from "./render-studio/texture-edit/selection-toolbar";
-import type { MaskCanvasHandle } from "./render-studio/texture-edit/types";
+import type {
+  MaskCanvasHandle,
+  TextureTool,
+} from "./render-studio/texture-edit/types";
 import { useTextureEditState } from "./render-studio/texture-edit/use-texture-edit-state";
 import { type RenderStudioProps, type ViewerTab } from "./render-studio/types";
 import { useRenderStudioActions } from "./render-studio/use-render-studio-actions";
@@ -110,6 +113,12 @@ export function RenderStudio({
   const handleMaskUndo = useCallback(() => maskRef.current?.undo(), []);
   const handleMaskRedo = useCallback(() => maskRef.current?.redo(), []);
   const handleMaskClear = useCallback(() => maskRef.current?.clear(), []);
+  function handleTextureToolChange(tool: TextureTool) {
+    texture.setTool(tool);
+    if (tool === "pan" && state.zoom <= 1) {
+      toast.info("Perbesar gambar di atas 100% untuk menggeser kanvas.");
+    }
+  }
   const actions = useRenderStudioActions({
     projectId,
     sourceRenderId: activeRenderId,
@@ -170,7 +179,7 @@ export function RenderStudio({
   const textureToolbar = inTextureMode ? (
     <SelectionToolbar
       tool={texture.tool}
-      setTool={texture.setTool}
+      setTool={handleTextureToolChange}
       brushSize={texture.brushSize}
       setBrushSize={texture.setBrushSize}
       tolerance={texture.tolerance}
@@ -298,6 +307,7 @@ export function RenderStudio({
             onExpandPanels={() => setPanelsCollapsed(false)}
             textureCanvas={textureCanvas}
             textureToolbar={textureToolbar}
+            texturePanActive={inTextureMode && texture.tool === "pan"}
           />
         </div>
 
