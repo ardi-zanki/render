@@ -30,8 +30,8 @@ export function StudioRenderInfo({
     { label: "Kredit", value: `${info.creditsUsed || 1} kredit` },
   ];
   return (
-    <div className="rounded-lg border border-border/80 bg-card p-4 shadow-soft">
-      <div className="mb-3 flex items-center justify-between gap-2">
+    <div className="rounded-lg border border-border/80 bg-card p-3 shadow-soft">
+      <div className="mb-2.5 flex items-center justify-between gap-2">
         <div className="flex items-center">
           <h2 className="text-sm font-semibold text-foreground">Info Render</h2>
         </div>
@@ -43,7 +43,7 @@ export function StudioRenderInfo({
         {rows.map(({ label, value }) => (
           <div
             key={label}
-            className="flex items-center justify-between gap-3 py-2 text-xs first:pt-0 last:pb-0"
+            className="flex items-center justify-between gap-3 py-1.5 text-xs first:pt-0 last:pb-0"
           >
             <dt className="text-muted-foreground">{label}</dt>
             <dd className="text-right font-medium text-foreground">{value}</dd>

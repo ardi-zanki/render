@@ -209,16 +209,16 @@ export function RenderStudio({
 
       <div
         className={cn(
-          "grid h-full grid-cols-1 gap-4",
+          "grid h-full grid-cols-1 gap-3",
           panelsCollapsed
             ? "lg:grid-cols-[minmax(0,1fr)]"
-            : "lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)_minmax(0,260px)] xl:grid-cols-[320px_minmax(0,1fr)_300px]",
+            : "lg:grid-cols-[minmax(0,232px)_minmax(0,1fr)_minmax(0,232px)] xl:grid-cols-[248px_minmax(0,1fr)_248px]",
         )}
       >
         {/* Column 1 — Configuration, or Change Texture panel in Edit mode. */}
         <div
           className={cn(
-            "order-2 flex flex-col gap-4 lg:order-none lg:min-h-0",
+            "order-2 flex flex-col gap-3 lg:order-none lg:min-h-0",
             // Texture panel manages its own internal scroll so Apply stays
             // pinned; the config form scrolls the whole column.
             inTextureMode ? "lg:overflow-hidden" : "lg:overflow-hidden",
@@ -308,7 +308,7 @@ export function RenderStudio({
           with Column 1 via the Column 1 toggle. */}
         <aside
           className={cn(
-            "order-3 flex flex-col gap-4 lg:order-none lg:min-h-0",
+            "order-3 flex flex-col gap-3 lg:order-none lg:min-h-0",
             panelsCollapsed && "lg:hidden",
           )}
         >
