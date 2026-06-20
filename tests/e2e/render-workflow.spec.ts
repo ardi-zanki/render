@@ -121,60 +121,28 @@ test("user can login and create a mock render", async ({ page }) => {
   expect(createdRender).not.toHaveProperty("enhancedPrompt");
   expect(createdRender).not.toHaveProperty("providerResponse");
 
-  // Render history carries a safe contextual return target into the detail.
+  // Render history lists the render; its card opens the studio directly and the
+  // ⋮ menu exposes the secondary actions (share/download/archive/delete).
   await page.goto("/renders");
-  const historyRenderLink = page.locator(
-    `a[href^="/renders/${renderId}?returnTo="]`,
+  const historyCard = page.locator(
+    `a[href="/renders/new?source=${renderId}"]`,
   );
-  await expect(historyRenderLink).toHaveCount(1);
-  await historyRenderLink.click();
-  const allRendersLink = page.getByRole("link", {
-    name: "Semua render",
-    exact: true,
-  });
-  await expect(allRendersLink).toHaveAttribute("href", "/renders");
-  await allRendersLink.click();
-  await expect(page).toHaveURL(/\/renders$/);
-
-  // A render opened from a project returns to that exact project instead.
-  await page.goto(`/projects/${createdRender.projectId}`);
-  const projectRenderLink = page.locator(
-    `a[href^="/renders/${renderId}?returnTo="]`,
-  );
-  await expect(projectRenderLink).toHaveCount(1);
-  await projectRenderLink.click();
-  const projectBackLink = page.getByRole("link", {
-    name: createdRender.projectName,
-    exact: true,
-  });
-  await expect(projectBackLink).toHaveAttribute(
-    "href",
-    `/projects/${createdRender.projectId}`,
-  );
-
-  await expect(page.getByRole("heading", { name: "Interior" })).toBeVisible();
-  // Secondary actions are grouped under the ⋮ menu; Open Studio is the primary.
-  await page.getByRole("button", { name: "Aksi lainnya" }).click();
-  await expect(page.getByRole("button", { name: "Unduh" })).toBeVisible();
+  await expect(historyCard).toHaveCount(1);
+  await page.getByRole("button", { name: "Aksi lainnya" }).first().click();
   await expect(page.getByRole("button", { name: "Bagikan" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Unduh" })).toBeVisible();
   await page.keyboard.press("Escape");
-  // Detail page reopens in the studio (renamed from "Reuse prompt") and no
-  // longer surfaces the prompt (treated as a company secret).
-  await expect(
-    page.getByRole("link", { name: "Open Studio" }),
-  ).toBeVisible();
-  await expect(page.getByText("Prompt", { exact: true })).toHaveCount(0);
 
-  // Clicking the original image opens a zoomable lightbox.
-  await page.getByRole("button", { name: /Perbesar Gambar asli/ }).click();
-  await expect(
-    page.getByRole("button", { name: "Perbesar", exact: true }),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Tutup" }).click();
+  // A render opened from a project also links straight to the studio.
+  await page.goto(`/projects/${createdRender.projectId}`);
+  const projectCard = page.locator(
+    `a[href="/renders/new?source=${renderId}"]`,
+  );
+  await expect(projectCard).toHaveCount(1);
+  await projectCard.click();
 
-  // Open Studio: reopens with config pre-filled and the original + previous
-  // result loaded, so all three viewer tabs are available.
-  await page.getByRole("link", { name: "Open Studio" }).click();
+  // Studio opens with config pre-filled and the original + previous result
+  // loaded, so all three viewer tabs are available.
   await expect(
     page.getByRole("link", { name: "Render Studio" }),
   ).toBeVisible();
@@ -235,12 +203,16 @@ test("user can login and create a mock render", async ({ page }) => {
     )
     .toBe("success");
 
-  // Dashboard recent renders are navigable just like project cards.
+  // Dashboard recent renders open the studio just like the list cards.
   await page.goto("/dashboard");
-  const dashboardRenderLink = page.locator(`a[href="/renders/${renderId}"]`).first();
+  const dashboardRenderLink = page
+    .locator(`a[href="/renders/new?source=${renderId}"]`)
+    .first();
   await expect(dashboardRenderLink).toBeVisible();
   await dashboardRenderLink.click();
-  await expect(page).toHaveURL(new RegExp(`/renders/${renderId}$`));
+  await expect(page).toHaveURL(
+    new RegExp(`/renders/new\\?source=${renderId}$`),
+  );
 
   // Sidebar search opens a command menu with recent renders and navigates to a
   // selected render. Filtering is automatic through the debounced input.
@@ -253,7 +225,9 @@ test("user can login and create a mock render", async ({ page }) => {
   });
   await expect(commandResult).toBeVisible();
   await commandResult.click();
-  await expect(page).toHaveURL(new RegExp(`/renders/${renderId}$`));
+  await expect(page).toHaveURL(
+    new RegExp(`/renders/new\\?source=${renderId}$`),
+  );
 
   // Bantuan is now an internal app page with clear contact channels.
   await page.goto("/support");

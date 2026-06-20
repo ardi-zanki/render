@@ -217,7 +217,7 @@ async function processLockedJob(jobId: string) {
         type: "render_success",
         title: "Render kamu sudah jadi",
         message: `Render ${render.mode} berhasil diproses.`,
-        actionUrl: `/renders/${render.id}`,
+        actionUrl: `/renders/new?source=${render.id}`,
       });
 
       const balance = await getBalance(render.userId);

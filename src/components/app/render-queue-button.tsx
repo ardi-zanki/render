@@ -35,14 +35,10 @@ export function RenderQueueButton() {
 
   async function onItem(item: RenderQueueItem) {
     setOpen(false);
-    if (item.status === "success") {
-      // Opening a finished render dismisses it from the queue, then lands in
-      // the studio to view the result.
-      await markSeen(item.renderId);
-      router.push(`/renders/new?source=${item.renderId}`);
-    } else {
-      router.push(`/renders/${item.renderId}`);
-    }
+    // A finished render is dismissed from the queue first; either way we land in
+    // the studio (which loads the render by source) to view or continue it.
+    if (item.status === "success") await markSeen(item.renderId);
+    router.push(`/renders/new?source=${item.renderId}`);
   }
 
   async function cancelRender(item: RenderQueueItem) {

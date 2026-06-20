@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { DebouncedSearchInput } from "@/components/app/debounced-search-input";
 import { PageHeader } from "@/components/app/page-header";
+import { RenderActionsMenu } from "@/components/app/render-detail-actions";
 import { RenderImage } from "@/components/app/render-image";
 import { RenderStatusBadge } from "@/components/app/render-status-badge";
 import { Button } from "@/components/ui/button";
@@ -76,13 +77,6 @@ export default async function RendersPage({
     }),
   ]);
   const totalPages = Math.ceil(total / pageSize);
-  const returnParams = new URLSearchParams();
-  if (showArchived) returnParams.set("archived", "1");
-  if (statusFilter) returnParams.set("status", statusFilter);
-  if (page > 1) returnParams.set("page", String(page));
-  if (query) returnParams.set("q", query);
-  const returnQuery = returnParams.toString();
-  const returnTo = `/renders${returnQuery ? `?${returnQuery}` : ""}`;
   const filterHref = (filter: (typeof FILTERS)[number]) => {
     const params = new URLSearchParams();
     if (filter.archived) params.set("archived", filter.archived);
@@ -162,35 +156,42 @@ export default async function RendersPage({
             const thumb = r.resultUrl ?? r.originalUrl;
             const displayName = r.name?.trim() || MODE_LABEL[r.mode];
             return (
-              <Link
-                key={r.id}
-                href={{ pathname: `/renders/${r.id}`, query: { returnTo } }}
-              >
-                <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
-                  <div className="relative flex aspect-video items-center justify-center bg-muted">
-                    {thumb ? (
-                      <RenderImage
-                        src={thumb}
-                        alt={r.mode}
-                        className="absolute inset-0 size-full"
-                      />
-                    ) : (
-                      <ImageIcon className="size-7 text-muted-foreground" />
-                    )}
-                    <RenderStatusBadge status={r.status} className="absolute left-2 top-2" />
-                  </div>
-                  <CardContent className="py-3.5">
-                    <p className="truncate font-semibold text-foreground">
-                      {displayName}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {MODE_LABEL[r.mode]} ·{" "}
-                      {r.projectName ? `${r.projectName} · ` : ""}
-                      {dateFmt.format(r.createdAt)}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
+              <div key={r.id} className="relative">
+                <Link href={`/renders/new?source=${r.id}`}>
+                  <Card className="gap-0 overflow-hidden p-0 transition-colors hover:border-primary/35">
+                    <div className="relative flex aspect-video items-center justify-center bg-muted">
+                      {thumb ? (
+                        <RenderImage
+                          src={thumb}
+                          alt={r.mode}
+                          className="absolute inset-0 size-full"
+                        />
+                      ) : (
+                        <ImageIcon className="size-7 text-muted-foreground" />
+                      )}
+                      <RenderStatusBadge status={r.status} className="absolute left-2 top-2" />
+                    </div>
+                    <CardContent className="py-3.5">
+                      <p className="truncate font-semibold text-foreground">
+                        {displayName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {MODE_LABEL[r.mode]} ·{" "}
+                        {r.projectName ? `${r.projectName} · ` : ""}
+                        {dateFmt.format(r.createdAt)}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+                <div className="absolute right-2 top-2 z-10 rounded-md bg-background/85 shadow-soft backdrop-blur">
+                  <RenderActionsMenu
+                    renderId={r.id}
+                    renderName={displayName}
+                    archived={r.archived}
+                    canDownload={r.status === "success" && !!r.resultUrl}
+                  />
+                </div>
+              </div>
             );
           })}
         </div>

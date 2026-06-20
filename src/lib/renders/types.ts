@@ -81,6 +81,7 @@ export interface RenderListItem {
   projectId: string;
   projectName: string | null;
   creditsUsed: number;
+  archived: boolean;
   resultUrl: string | null;
   originalUrl: string | null;
 }
