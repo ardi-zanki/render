@@ -53,6 +53,7 @@ export default async function CreateRenderPage({
             label: "Original",
             fileUrl: originalAsset.fileUrl,
             config: null,
+            isOriginal: true,
           },
         ]
       : []),
