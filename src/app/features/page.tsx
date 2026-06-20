@@ -29,7 +29,7 @@ export default async function FeaturesPage() {
 
       <main className="flex-1">
         <PageHero
-          eyebrow="Fitur RenderAI"
+          eyebrow="Fitur Render Studio"
           title="Fitur untuk eksplorasi visual yang terarah"
           description="Input, arahan visual, output, dan riwayat project tersimpan rapi dalam satu workspace yang mudah diikuti."
         >
@@ -101,7 +101,7 @@ export default async function FeaturesPage() {
         </section>
 
         <FinalCta
-          title="Coba RenderAI di project aktif"
+          title="Coba Render Studio di project aktif"
           description="Mulai dari materi desain yang sudah ada, lalu lihat opsi visualnya dalam hitungan menit."
           href={isAuthenticated ? "/dashboard" : "/register"}
           label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}

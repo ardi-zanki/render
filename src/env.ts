@@ -55,7 +55,7 @@ const schema = z.object({
 
   EMAIL_PROVIDER: z.enum(["resend"]).default("resend"),
   RESEND_API_KEY: optional,
-  EMAIL_FROM: z.string().default("RenderAI <onboarding@resend.dev>"),
+  EMAIL_FROM: z.string().default("Render Studio <onboarding@resend.dev>"),
 
   PAYMENT_PROVIDER: z.enum(["midtrans", "mock"]).default("midtrans"),
   MIDTRANS_SERVER_KEY: optional,

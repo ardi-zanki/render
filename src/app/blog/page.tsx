@@ -31,7 +31,7 @@ export default async function BlogPage() {
             <SectionHeader
               eyebrow="Blog"
               title="Catatan singkat untuk workflow visual"
-              description="Panduan praktis seputar review konsep, mengelola revisi, dan memanfaatkan RenderAI dalam workflow desain Anda."
+              description="Panduan praktis seputar review konsep, mengelola revisi, dan memanfaatkan Render Studio dalam workflow desain Anda."
             />
           </div>
         </section>

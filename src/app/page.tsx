@@ -103,7 +103,7 @@ export default async function LandingPage() {
 
         <section id="fitur" className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <SectionHeader
-            eyebrow="Workflow RenderAI"
+            eyebrow="Workflow Render Studio"
             title="Eksplorasi visual dalam satu alur"
             description="Unggah materi desain, atur arahan visual, lalu simpan dan bandingkan hasilnya — semuanya tertata dalam satu alur kerja."
           />
@@ -232,7 +232,7 @@ export default async function LandingPage() {
           <SectionHeader
             eyebrow="FAQ"
             title="Hal penting sebelum tim mulai"
-            description="Jawaban singkat tentang posisi RenderAI dalam workflow desain Anda, cara kerja kredit, dan hasil yang bisa diharapkan."
+            description="Jawaban singkat tentang posisi Render Studio dalam workflow desain Anda, cara kerja kredit, dan hasil yang bisa diharapkan."
           />
           <div className="mt-9 space-y-3">
             {faqs.map((item, index) => (
@@ -254,7 +254,7 @@ export default async function LandingPage() {
         </section>
 
         <FinalCta
-          title="Siap mencoba RenderAI?"
+          title="Siap mencoba Render Studio?"
           description="Buat opsi visual pertama dari materi desain yang sudah Anda miliki — tanpa perlu mengunggah ulang apa pun."
           href={primaryHref}
           label={isAuthenticated ? "Buka studio" : "Mulai sekarang"}

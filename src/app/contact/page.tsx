@@ -27,7 +27,7 @@ export default async function ContactPage() {
       <main className="flex-1">
         <PageHero
           eyebrow="Kontak"
-          title="Hubungi tim RenderAI"
+          title="Hubungi tim Render Studio"
           description="Punya pertanyaan seputar produk, akun, pembayaran, atau privasi? Tim kami siap membantu Anda."
         >
           <Card className="shadow-soft">

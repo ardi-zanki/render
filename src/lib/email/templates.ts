@@ -1,5 +1,5 @@
 /**
- * Minimal, dependency-free HTML email templates with RenderAI branding.
+ * Minimal, dependency-free HTML email templates with Render Studio branding.
  * All copy in Bahasa Indonesia (PRD §25).
  */
 
@@ -25,8 +25,8 @@ function layout(opts: {
         <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="width:100%;max-width:520px;background:#ffffff;border:1px solid ${BORDER};border-radius:8px;overflow:hidden;box-shadow:0 12px 32px rgba(15,23,42,0.08);">
           <tr><td style="height:6px;background:${BRAND_NAVY};font-size:0;line-height:0;">&nbsp;</td></tr>
           <tr><td style="padding:26px 30px 6px;">
-            <span style="display:inline-block;width:30px;height:30px;background:${BRAND_NAVY};border-radius:8px;vertical-align:middle;text-align:center;line-height:30px;color:#ffffff;font-size:17px;font-weight:800;letter-spacing:-4px;">//</span>
-            <span style="font-size:17px;font-weight:800;letter-spacing:0;vertical-align:middle;margin-left:9px;">RenderAI<span style="color:${BRAND_NAVY}">.</span></span>
+            <span style="display:inline-block;width:30px;height:30px;background:${BRAND_NAVY};border-radius:8px;vertical-align:middle;text-align:center;line-height:30px;color:#ffffff;font-size:15px;font-weight:800;letter-spacing:0;">D2</span>
+            <span style="font-size:17px;font-weight:800;letter-spacing:0;vertical-align:middle;margin-left:9px;">Render Studio</span>
           </td></tr>
           <tr><td style="padding:10px 30px 0;">
             <h1 style="font-size:22px;line-height:1.35;font-weight:700;letter-spacing:0;margin:10px 0;color:${INK};">${heading}</h1>
@@ -43,7 +43,7 @@ function layout(opts: {
               : ""
           }
           <tr><td style="padding:24px 30px 28px;">
-            <div style="font-size:12px;line-height:1.6;color:${MUTED};border-top:1px solid #eef2f7;padding-top:16px;">${footnote ?? "Email ini dikirim otomatis oleh RenderAI. Abaikan jika Anda tidak meminta."}</div>
+            <div style="font-size:12px;line-height:1.6;color:${MUTED};border-top:1px solid #eef2f7;padding-top:16px;">${footnote ?? "Email ini dikirim otomatis oleh Render Studio. Abaikan jika Anda tidak meminta."}</div>
           </td></tr>
         </table>
       </td></tr>
@@ -54,10 +54,10 @@ function layout(opts: {
 
 export function verificationEmail(params: { name?: string; url: string }) {
   return {
-    subject: "Verifikasi email RenderAI Anda",
+    subject: "Verifikasi email Render Studio Anda",
     html: layout({
       heading: `Halo${params.name ? ` ${params.name}` : ""}, verifikasi email Anda`,
-      body: "Klik tombol di bawah untuk mengaktifkan akun RenderAI dan mendapatkan kredit awal untuk mencoba workflow render pertama Anda.",
+      body: "Klik tombol di bawah untuk mengaktifkan akun Render Studio dan mendapatkan kredit awal untuk mencoba workflow render pertama Anda.",
       cta: { label: "Verifikasi Email", url: params.url },
       footnote: "Tautan ini berlaku 24 jam. Abaikan jika Anda tidak mendaftar.",
     }),
@@ -66,10 +66,10 @@ export function verificationEmail(params: { name?: string; url: string }) {
 
 export function resetPasswordEmail(params: { name?: string; url: string }) {
   return {
-    subject: "Atur ulang password RenderAI",
+    subject: "Atur ulang password Render Studio",
     html: layout({
       heading: "Atur ulang password Anda",
-      body: "Kami menerima permintaan untuk mengatur ulang password akun RenderAI Anda. Klik tombol di bawah untuk membuat password baru.",
+      body: "Kami menerima permintaan untuk mengatur ulang password akun Render Studio Anda. Klik tombol di bawah untuk membuat password baru.",
       cta: { label: "Atur Ulang Password", url: params.url },
       footnote:
         "Tautan ini berlaku 30 menit dan hanya bisa dipakai sekali. Abaikan jika bukan Anda.",
@@ -111,7 +111,7 @@ export function paymentSuccessEmail(params: { credits: number; url: string }) {
 
 export function lowCreditEmail(params: { balance: number; url: string }) {
   return {
-    subject: "Kredit RenderAI Anda menipis",
+    subject: "Kredit Render Studio Anda menipis",
     html: layout({
       heading: "Kredit Anda menipis",
       body: `Sisa kredit Anda tinggal <b>${params.balance}</b>. Top up sekarang agar bisa melanjutkan render tanpa terputus.`,

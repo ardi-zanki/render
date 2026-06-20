@@ -164,8 +164,8 @@ export const workflowSteps = [
 
 export const faqs = [
   {
-    q: "Apa itu RenderAI?",
-    a: "RenderAI adalah workspace render berbasis AI untuk membantu tim arsitektur dan interior membuat opsi visual, menata project, dan menyimpan hasil dalam satu alur kerja.",
+    q: "Apa itu Render Studio?",
+    a: "Render Studio adalah workspace render berbasis AI untuk membantu tim arsitektur dan interior membuat opsi visual, menata project, dan menyimpan hasil dalam satu alur kerja.",
   },
   {
     q: "Input seperti apa yang bisa digunakan?",
@@ -173,7 +173,7 @@ export const faqs = [
   },
   {
     q: "Apa bedanya dengan membuat render manual?",
-    a: "RenderAI mempercepat eksplorasi konsep dan komunikasi awal. Render manual tetap penting untuk visual final detail, sementara RenderAI membantu tim memilih arah visual lebih cepat.",
+    a: "Render Studio mempercepat eksplorasi konsep dan komunikasi awal. Render manual tetap penting untuk visual final detail, sementara Render Studio membantu tim memilih arah visual lebih cepat.",
   },
   {
     q: "Apakah hasilnya bisa dipakai untuk diskusi klien?",
@@ -181,7 +181,7 @@ export const faqs = [
   },
   {
     q: "Bagaimana sistem kreditnya?",
-    a: "RenderAI memakai kredit agar penggunaan lebih fleksibel. Anda bisa membeli paket saat diperlukan dan memakai kredit tersebut untuk proses render berikutnya.",
+    a: "Render Studio memakai kredit agar penggunaan lebih fleksibel. Anda bisa membeli paket saat diperlukan dan memakai kredit tersebut untuk proses render berikutnya.",
   },
 ];
 
@@ -196,7 +196,7 @@ export const blogPosts: BlogPost[] = [
     readTime: "5 menit",
     image: "/marketing/renderai-living.png",
     body: [
-      "Review konsep sering melambat bukan karena tim kekurangan ide, tetapi karena visual awal belum cukup jelas untuk dibandingkan. RenderAI membantu mengubah materi awal menjadi beberapa arah visual yang bisa dibahas lebih konkret.",
+      "Review konsep sering melambat bukan karena tim kekurangan ide, tetapi karena visual awal belum cukup jelas untuk dibandingkan. Render Studio membantu mengubah materi awal menjadi beberapa arah visual yang bisa dibahas lebih konkret.",
       "Mulai dengan satu screenshot model atau foto ruang yang paling representatif. Tambahkan arahan singkat tentang gaya, pencahayaan, elemen yang harus dipertahankan, dan mood yang ingin diuji.",
       "Setelah opsi keluar, pilih dua atau tiga visual terbaik untuk diskusi. Cara ini menjaga percakapan tetap fokus pada keputusan desain, bukan pada menebak maksud dari brief.",
     ],

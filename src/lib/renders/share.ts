@@ -77,6 +77,6 @@ export async function getPublicRender(
     mode: r.mode,
     resultUrl: browserAssetUrl(asset.fileUrl, asset.fileKey),
     createdAt: r.createdAt,
-    creatorName: owner?.name ?? "RenderAI user",
+    creatorName: owner?.name ?? "Render Studio user",
   };
 }

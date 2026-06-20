@@ -15,7 +15,7 @@ const sections = [
   {
     title: "1. Data yang Kami Kumpulkan",
     body: [
-      "RenderAI dapat mengumpulkan data akun seperti nama, email, status verifikasi, preferensi akun, dan aktivitas login.",
+      "Render Studio dapat mengumpulkan data akun seperti nama, email, status verifikasi, preferensi akun, dan aktivitas login.",
       "Kami juga memproses materi yang Anda unggah, arahan visual, hasil render, project, transaksi, dan aktivitas penggunaan aplikasi sejauh diperlukan untuk menyediakan layanan.",
     ],
   },
@@ -36,7 +36,7 @@ const sections = [
   {
     title: "4. Penyedia Pihak Ketiga",
     body: [
-      "RenderAI dapat menggunakan penyedia pihak ketiga untuk autentikasi, email, penyimpanan, pemrosesan AI, pembayaran, analitik, dan infrastruktur aplikasi.",
+      "Render Studio dapat menggunakan penyedia pihak ketiga untuk autentikasi, email, penyimpanan, pemrosesan AI, pembayaran, analitik, dan infrastruktur aplikasi.",
       "Penyedia tersebut hanya menerima data yang relevan untuk menjalankan fungsi layanan dan tunduk pada kebijakan serta standar keamanan masing-masing.",
     ],
   },
@@ -51,7 +51,7 @@ const sections = [
     title: "6. Retensi dan Penghapusan",
     body: [
       "Data disimpan selama akun aktif atau selama diperlukan untuk menyediakan layanan, menyelesaikan transaksi, memenuhi kewajiban hukum, audit, keamanan, dan penyelesaian sengketa.",
-      "Anda dapat menghubungi RenderAI untuk meminta bantuan terkait akses, koreksi, atau penghapusan data, dengan mempertimbangkan kewajiban operasional dan hukum yang berlaku.",
+      "Anda dapat menghubungi Render Studio untuk meminta bantuan terkait akses, koreksi, atau penghapusan data, dengan mempertimbangkan kewajiban operasional dan hukum yang berlaku.",
     ],
   },
   {
@@ -63,7 +63,7 @@ const sections = [
   {
     title: "8. Kontak",
     body: [
-      "Jika Anda memiliki pertanyaan tentang privasi atau pemrosesan data, hubungi tim RenderAI melalui halaman kontak.",
+      "Jika Anda memiliki pertanyaan tentang privasi atau pemrosesan data, hubungi tim Render Studio melalui halaman kontak.",
     ],
   },
 ];
@@ -85,7 +85,7 @@ export default async function PrivacyPage() {
             Kebijakan Privasi
           </h1>
           <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
-            Kebijakan ini menjelaskan bagaimana RenderAI mengumpulkan,
+            Kebijakan ini menjelaskan bagaimana Render Studio mengumpulkan,
             menggunakan, menyimpan, dan melindungi data saat Anda memakai
             layanan.
           </p>
