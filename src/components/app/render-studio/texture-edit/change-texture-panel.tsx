@@ -56,7 +56,7 @@ export function ChangeTexturePanel({
     : TEXTURE_LIBRARY;
 
   return (
-    <div className="flex h-fit flex-col overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-full">
+    <div className="flex h-fit flex-col overflow-hidden rounded-lg border border-border/80 bg-card lg:h-full lg:min-h-full lg:rounded-none lg:border-y-0 lg:border-l-0">
       <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border/70 bg-card/95 px-3 py-2.5 backdrop-blur">
         <h1 className="text-sm font-semibold text-foreground">Edit Texture</h1>
         {onCollapse && (

@@ -377,7 +377,7 @@ export function AppShell({
         <main
           className={cn(
             renderNewActive
-              ? "w-full px-4 py-4 sm:px-5"
+              ? "w-full"
               : "mx-auto max-w-6xl px-4 py-5 sm:px-5 sm:py-6",
           )}
         >

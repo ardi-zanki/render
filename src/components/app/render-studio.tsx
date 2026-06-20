@@ -199,7 +199,7 @@ export function RenderStudio({
   return (
     // Fixed-height studio: the three columns stay put and each scrolls on its
     // own (Config / Studio / Info) instead of the whole page scrolling.
-    <div className="relative pb-4 lg:h-[calc(100vh-5.5rem)] lg:pb-0">
+    <div className="relative pb-4 lg:h-[calc(100vh-3rem)] lg:overflow-hidden lg:pb-0">
       {/* Title lives in the global header's top-left slot. */}
       {headerSlot &&
         createPortal(
@@ -209,7 +209,7 @@ export function RenderStudio({
 
       <div
         className={cn(
-          "grid h-full grid-cols-1 gap-3",
+          "grid h-full grid-cols-1 gap-3 lg:gap-0",
           panelsCollapsed
             ? "lg:grid-cols-[minmax(0,1fr)]"
             : "lg:grid-cols-[minmax(0,232px)_minmax(0,1fr)_minmax(0,232px)] xl:grid-cols-[248px_minmax(0,1fr)_248px]",
@@ -263,7 +263,7 @@ export function RenderStudio({
         </div>
 
         {/* Column 2 — Studio canvas (title is in the header). */}
-        <div className="order-1 flex flex-col lg:order-none lg:min-h-0">
+        <div className="order-1 flex flex-col lg:order-none lg:min-h-0 lg:p-3">
           <RenderPreviewViewer
             fileRef={fileRef}
             referenceRef={referenceRef}
@@ -309,6 +309,9 @@ export function RenderStudio({
         <aside
           className={cn(
             "order-3 flex flex-col gap-3 lg:order-none lg:min-h-0",
+            // Flush right panel (Framer-style): edge-to-edge, full height,
+            // separated from the canvas by a single divider.
+            "lg:gap-4 lg:overflow-y-auto lg:border-l lg:border-border/80 lg:bg-card lg:p-3",
             panelsCollapsed && "lg:hidden",
           )}
         >

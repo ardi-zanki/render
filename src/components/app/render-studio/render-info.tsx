@@ -30,7 +30,7 @@ export function StudioRenderInfo({
     { label: "Kredit", value: `${info.creditsUsed || 1} kredit` },
   ];
   return (
-    <div className="rounded-lg border border-border/80 bg-card p-3 shadow-soft">
+    <div className="rounded-lg border border-border/80 bg-card p-3 shadow-soft lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
       <div className="mb-2.5 flex items-center justify-between gap-2">
         <div className="flex items-center">
           <h2 className="text-sm font-semibold text-foreground">Info Render</h2>
