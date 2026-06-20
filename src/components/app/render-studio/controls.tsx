@@ -125,7 +125,7 @@ export function RenderStudioControls({
                 id="project"
                 value={projectId}
                 onChange={(e) => onSwitchProject(e.target.value)}
-                className="h-8 min-w-0 flex-1"
+                className="h-8 min-w-0 flex-1 text-xs"
               >
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -175,12 +175,14 @@ export function RenderStudioControls({
 
             {mode !== "interior" && (
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="style">{styleLabel}</Label>
+                <Label htmlFor="style" className="text-xs">
+                  {styleLabel}
+                </Label>
                 <Select
                   id="style"
                   value={style}
                   onChange={(e) => setStyle(e.target.value)}
-                  className="h-9 rounded-md"
+                  className="h-9 rounded-md text-xs"
                 >
                   {styleOptions.map(([v, l]) => (
                     <option key={v} value={v}>
@@ -196,23 +198,27 @@ export function RenderStudioControls({
             {mode !== "interior" && (
               <>
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="location">Lokasi Proyek</Label>
+                  <Label htmlFor="location" className="text-xs">
+                    Lokasi Proyek
+                  </Label>
                   <Input
                     id="location"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="contoh: Bandung, Bali, Jakarta"
-                    className="h-9 rounded-md"
+                    className="h-9 rounded-md text-xs"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="surrounding">{surroundingLabel}</Label>
+                  <Label htmlFor="surrounding" className="text-xs">
+                    {surroundingLabel}
+                  </Label>
                   <Select
                     id="surrounding"
                     value={surrounding}
                     onChange={(e) => setSurrounding(e.target.value)}
-                    className="h-9 rounded-md"
+                    className="h-9 rounded-md text-xs"
                   >
                     {surroundingOptions.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -225,13 +231,15 @@ export function RenderStudioControls({
             )}
 
             <div className="flex flex-col gap-2">
-              <Label>{mode === "interior" ? "Mode Pencahayaan" : "Waktu"}</Label>
+              <Label className="text-xs">
+                {mode === "interior" ? "Mode Pencahayaan" : "Waktu"}
+              </Label>
               <ChipGroup options={timeOptions} value={time} onChange={setTime} />
             </div>
 
             {mode !== "interior" && (
               <div className="flex flex-col gap-2">
-                <Label>Cuaca</Label>
+                <Label className="text-xs">Cuaca</Label>
                 <ChipGroup
                   options={WEATHERS}
                   value={weather}
@@ -243,14 +251,16 @@ export function RenderStudioControls({
 
           <ControlSection title="Output">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="outputFormat">Format output</Label>
+              <Label htmlFor="outputFormat" className="text-xs">
+                Format output
+              </Label>
               <Select
                 id="outputFormat"
                 value={outputFormat}
                 onChange={(e) =>
                   setOutputFormat(e.target.value as RenderOutputFormat)
                 }
-                className="h-9 rounded-md"
+                className="h-9 rounded-md text-xs"
               >
                 {OUTPUT_FORMATS.map((format) => (
                   <option key={format.value} value={format.value}>

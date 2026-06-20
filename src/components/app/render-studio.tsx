@@ -263,7 +263,7 @@ export function RenderStudio({
         </div>
 
         {/* Column 2 — Studio canvas (title is in the header). */}
-        <div className="order-1 flex flex-col lg:order-none lg:min-h-0 lg:p-3">
+        <div className="order-1 flex flex-col lg:order-none lg:min-h-0">
           <RenderPreviewViewer
             fileRef={fileRef}
             referenceRef={referenceRef}

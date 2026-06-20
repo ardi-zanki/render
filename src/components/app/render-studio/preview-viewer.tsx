@@ -428,7 +428,7 @@ export function RenderPreviewViewer({
            and canvas controls / texture tools, content-sized so it never
            stretches and stays centered when the panels are hidden. */
         <div className="absolute bottom-3 left-1/2 z-30 inline-flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-1.5 overflow-x-auto rounded-xl border border-border/80 bg-card/95 px-1.5 py-1.5 shadow-floating backdrop-blur transition-all duration-200 ease-out">
-          <div className="flex min-w-0 flex-nowrap items-center gap-1.5">
+          <div className="flex shrink-0 flex-nowrap items-center gap-1.5">
             {panelsCollapsed && onExpandPanels && (
               // Reopen control, grouped with the view tabs (desktop only).
               <div className="hidden items-center rounded-md bg-muted/80 p-1 shadow-soft lg:inline-flex">
@@ -443,7 +443,7 @@ export function RenderPreviewViewer({
                 </button>
               </div>
             )}
-            {hasUploadedImage && studioMode !== "texture" && (
+            {hasUploadedImage && (
               <Segmented
                 className="shrink-0"
                 options={viewerTabs}
@@ -456,9 +456,7 @@ export function RenderPreviewViewer({
               />
             )}
             {editAvailable && (
-              // Desktop/tablet keeps Edit near the view tabs; mobile gets it on
-              // the right so the toolbar still feels balanced.
-              <div className="hidden items-center rounded-md bg-muted/80 p-1 sm:inline-flex">
+              <div className="inline-flex shrink-0 items-center rounded-md bg-muted/80 p-1">
                 <button
                   type="button"
                   onClick={() => {
@@ -479,54 +477,52 @@ export function RenderPreviewViewer({
             )}
           </div>
 
-          {studioMode === "texture" && textureToolbar ? (
+          {/* Edit tools (only in texture mode) and zoom controls live in the
+              same row; the pill scrolls horizontally rather than wrapping. */}
+          {studioMode === "texture" && textureToolbar && (
             <>
-              {editAvailable && (
-                <div className="inline-flex h-8 items-center rounded-md bg-muted/80 p-1 shadow-soft sm:hidden">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setView("result");
-                      setStudioMode?.("texture");
-                    }}
-                    aria-pressed={studioMode === "texture"}
-                    className={cn(
-                      "inline-flex h-6 items-center rounded-sm px-3 text-xs font-medium transition-colors",
-                      studioMode === "texture"
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-card hover:text-foreground",
-                    )}
-                  >
-                    Edit
-                  </button>
-                </div>
-              )}
-              <div className="min-w-0 overflow-x-auto">{textureToolbar}</div>
+              <span aria-hidden="true" className="h-5 w-px shrink-0 bg-border/70" />
+              <div className="shrink-0">{textureToolbar}</div>
             </>
-          ) : (
-            <div className="flex shrink-0 items-center">
-              {editAvailable && (
-                <div className="inline-flex h-8 items-center rounded-md bg-muted/80 p-1 shadow-soft sm:hidden">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setView("result");
-                      setStudioMode?.("texture");
-                    }}
-                    aria-pressed={studioMode === "texture"}
-                    className={cn(
-                      "inline-flex h-6 items-center rounded-sm px-3 text-xs font-medium transition-colors",
-                      studioMode === "texture"
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-card hover:text-foreground",
-                    )}
-                  >
-                    Edit
-                  </button>
-                </div>
-              )}
-              {!editAvailable && canRemoveImage && (
-                <div className="inline-flex h-8 items-center rounded-md bg-muted/80 p-1 shadow-soft sm:hidden">
+          )}
+
+          {showZoomControls && (
+            <>
+              <span aria-hidden="true" className="h-5 w-px shrink-0 bg-border/70" />
+              <div className="inline-flex shrink-0 items-center gap-0.5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={zoomOut}
+                  disabled={zoom <= 0.25}
+                  aria-label="Zoom out"
+                  title="Zoom out"
+                  className="size-6"
+                >
+                  <ZoomOut />
+                </Button>
+                <button
+                  type="button"
+                  onClick={resetZoom}
+                  className="h-6 min-w-11 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card"
+                  title="Reset zoom"
+                >
+                  {Math.round(zoom * 100)}%
+                </button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={zoomIn}
+                  disabled={zoom >= 5}
+                  aria-label="Zoom in"
+                  title="Zoom in"
+                  className="size-6"
+                >
+                  <ZoomIn />
+                </Button>
+                {canRemoveImage && (
                   <Button
                     type="button"
                     variant="ghost"
@@ -538,58 +534,9 @@ export function RenderPreviewViewer({
                   >
                     <X />
                   </Button>
-                </div>
-              )}
-              {showZoomControls && (
-                <div className="hidden h-8 items-center gap-0.5 rounded-md bg-muted/80 p-1 shadow-soft sm:inline-flex">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={zoomOut}
-                    disabled={zoom <= 0.5}
-                    aria-label="Zoom out"
-                    title="Zoom out"
-                    className="size-6"
-                  >
-                    <ZoomOut />
-                  </Button>
-                  <button
-                    type="button"
-                    onClick={resetZoom}
-                    className="h-6 min-w-10 rounded-md px-1.5 text-xs font-semibold text-foreground hover:bg-card sm:min-w-11"
-                    title="Reset zoom"
-                  >
-                    {Math.round(zoom * 100)}%
-                  </button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={zoomIn}
-                    disabled={zoom >= 3}
-                    aria-label="Zoom in"
-                    title="Zoom in"
-                    className="size-6"
-                  >
-                    <ZoomIn />
-                  </Button>
-                  {canRemoveImage && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => pickFile(null)}
-                      aria-label="Hapus gambar"
-                      title="Hapus gambar"
-                      className="size-6"
-                    >
-                      <X />
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}
@@ -601,16 +548,15 @@ export function RenderPreviewViewer({
         onPointerUp={stopCanvasPan}
         onPointerCancel={stopCanvasPan}
         className={cn(
-          "relative aspect-[4/3] rounded-lg overscroll-contain lg:aspect-auto lg:min-h-0 lg:flex-1",
+          "relative aspect-[4/3] overscroll-contain rounded-lg lg:aspect-auto lg:min-h-0 lg:flex-1 lg:rounded-none",
           // Comparison keeps its scrollable frame; image/texture views clip the
           // transform so panned content disappears at the viewport edge, and
           // claim touch gestures so a drag pans instead of scrolling the page.
           view === "comparison"
             ? "overflow-auto"
             : "overflow-hidden touch-none",
-          hasCanvasContent
-            ? "bg-transparent"
-            : "border border-dashed border-border bg-muted/35",
+          // No frame around the canvas — it runs flush to the panels and header.
+          hasCanvasContent ? "bg-transparent" : "bg-muted/20",
         )}
         style={canvasCursorStyle}
       >
