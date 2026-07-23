@@ -1,409 +1,194 @@
 # RenderAI
 
-Platform SaaS render arsitektur berbasis AI untuk pasar Indonesia. Brand &
-UX terinspirasi **Vrendr**, fungsionalitas mengacu **MyArchitectAI**. Lihat
-PRD lengkap di `../RenderAI_PRD_Final/`.
+RenderAI adalah platform render arsitektur berbasis AI untuk pasar Indonesia.
+Pengguna dapat mengunggah gambar desain, memilih mode render, lalu menghasilkan
+visual arsitektur realistis dalam hitungan detik.
 
-> Unggah gambar desain, pilih mode render, dan dapatkan visual arsitektur
-> realistis dalam hitungan detik.
+> Status: MVP selesai dan siap dikembangkan lebih lanjut sebagai project open source.
+
+## Fitur utama
+
+- Render interior dan eksterior berbasis AI
+- Edit tekstur dan riwayat versi
+- Manajemen project dan render
+- Sistem kredit dan pembayaran Midtrans
+- Login email/password dan Google OAuth
+- Penyimpanan aset melalui Cloudflare R2
+- Notifikasi dalam aplikasi dan email
+- Halaman berbagi render publik
+- Dashboard admin dan audit log
+- Unit test, integration test, E2E test, dan GitHub Actions
 
 ## Tech stack
 
-| Layer        | Teknologi                                          |
-| ------------ | -------------------------------------------------- |
-| Package mgr  | pnpm 11.5.2                                         |
-| Runtime      | Node.js 22 (Docker/CI)                              |
-| Framework    | Next.js 16.2.9 (App Router, Turbopack)             |
-| UI runtime   | React 19.2.7                                        |
-| Language     | TypeScript 6.0.3                                    |
-| CSS          | Tailwind CSS v4.3                                   |
-| Komponen     | Custom UI primitives di `src/components/ui`         |
-| Ikon         | `lucide-react` 1.20                                 |
-| Tema         | Local `ThemeProvider` (light/dark/system, class-based) |
-| Font         | Plus Jakarta Sans (teks) · Geist Mono (angka/kode) |
-| Testing      | Vitest 4.1 + Playwright 1.61                        |
+- **Framework:** Next.js 16, React 19, TypeScript
+- **UI:** Tailwind CSS 4, custom UI components
+- **Database:** PostgreSQL, Drizzle ORM
+- **Authentication:** Better Auth
+- **AI:** fal.ai melalui provider adapter
+- **Storage:** Cloudflare R2 atau local storage
+- **Payment:** Midtrans atau mock provider
+- **Email:** Resend
+- **Testing:** Vitest dan Playwright
+- **Package manager:** pnpm
 
-Stack lengkap (auth, DB, storage, payment, AI provider) ada di PRD §5.
+## Menjalankan secara lokal
 
-## Menjalankan
+### Prasyarat
+
+- Node.js 22
+- pnpm 11
+- PostgreSQL
+
+### Instalasi
 
 ```bash
-pnpm install   # sekali; build script sharp diizinkan via pnpm-workspace.yaml
-pnpm dev       # http://localhost:3210
-pnpm build     # build produksi
-pnpm lint      # eslint
-pnpm test      # unit test (Vitest)
-pnpm test:integration # integration test DB (credits + payments)
-pnpm test:e2e  # Playwright auth + Studio/render/navigation/share/support flow
+git clone <repository-url>
+cd renderai
+pnpm install
+cp .env.example .env.local
+pnpm db:migrate
+pnpm db:seed
+pnpm dev
 ```
 
-Dari folder induk (`RumAI/`): `pnpm --dir renderai dev`.
+Aplikasi berjalan di:
 
-## Design system
-
-Halaman `/design-system` adalah **showcase brand kit** — warna, tipografi,
-tombol, badge, form, kartu mode render, dan kartu harga.
-
-### Token warna (`src/app/globals.css`)
-
-Semua warna didefinisikan sebagai CSS variable di `:root` (light) dan `.dark`,
-lalu dipetakan ke utility Tailwind via `@theme inline`. Token utama:
-
-- **Brand:** `--primary` navy `#173b67` (dark mode `#91b8f2`) · `--brand-violet` (aksen AI) · `--foreground` ink
-- **Permukaan:** `--background`, `--card`, `--muted`, `--border`
-- **Semantik:** `--success`, `--warning`, `--destructive`, `--info`
-
-Gunakan via kelas: `bg-primary`, `text-foreground`, `border-border`, dll.
-Mode gelap mengikuti kelas `.dark` yang diatur oleh local
-`src/components/theme-provider.tsx`; tidak perlu menulis ulang warna, cukup
-pakai token.
-
-### Komponen
-
-```
-src/components/
-  ui/        button · card · input · textarea · label · badge ·
-             separator · slot · mode-toggle · modal · popover ·
-             select · checkbox · segmented · choice-card · toggle-row ·
-             avatar · alert · empty-state · pagination · confirm-dialog
-  brand/     logo (mark + wordmark) · credit-pill
-  theme-provider.tsx
-src/lib/utils.ts   # cn() — clsx + tailwind-merge
+```text
+http://localhost:3210
 ```
 
-Tombol `<Button>` memakai radius `rounded-md` (4px) sesuai kontrak design
-system; varian: `default` (navy), `inverse` (ink, auto-adaptif tema),
-`secondary`, `outline`, `ghost`, `destructive`, `link`. Dukung `asChild` untuk
-render sebagai `<Link>`.
+Untuk pengembangan tanpa layanan cloud, gunakan provider lokal dan mock:
 
-### Token tambahan
-
-- **Shadow:** `shadow-hairline` · `shadow-soft` · `shadow-floating` (kontrol
-  mengambang di atas gambar) · `shadow-elevated` (menu) · `shadow-dialog`
-  (modal). Jangan pakai `shadow-sm`/`shadow-md` default Tailwind.
-- **Type scale:** `text-display` (40px, headline landing) dan `text-micro`
-  (11px, counter/byline/badge mini) melengkapi skala Tailwind bawaan.
-
-## Backend foundation (Phase 1b)
-
+```env
+AI_PROVIDER=mock
+STORAGE_PROVIDER=local
+PAYMENT_PROVIDER=mock
+RENDER_PROCESSING_MODE=inline
 ```
+
+## Konfigurasi produksi
+
+Gunakan konfigurasi berikut saat deploy:
+
+```env
+AI_PROVIDER=fal
+FAL_KEY=
+
+STORAGE_PROVIDER=r2
+R2_ACCOUNT_ID=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_BUCKET_NAME=
+
+PAYMENT_PROVIDER=midtrans
+MIDTRANS_SERVER_KEY=
+MIDTRANS_CLIENT_KEY=
+
+RESEND_API_KEY=
+
+RENDER_PROCESSING_MODE=worker
+```
+
+Google OAuth dan URL aplikasi juga perlu dikonfigurasi sesuai lingkungan deploy.
+Lihat validasi environment di `src/env.ts` untuk daftar lengkap variabel yang
+didukung.
+
+## Perintah penting
+
+```bash
+pnpm dev               # menjalankan development server
+pnpm build             # membuat production build
+pnpm lint              # menjalankan ESLint
+pnpm test              # unit test
+pnpm test:integration  # integration test
+pnpm test:e2e          # end-to-end test
+pnpm worker            # menjalankan render worker
+```
+
+Perintah database:
+
+```bash
+pnpm db:generate
+pnpm db:migrate
+pnpm db:seed
+pnpm db:studio
+```
+
+## Cara kerja render
+
+Alur render utama:
+
+```text
+Validasi pengguna dan kredit
+→ simpan render
+→ kurangi kredit
+→ simpan gambar asli
+→ masukkan job ke antrean
+→ proses melalui AI provider
+→ simpan hasil
+→ tandai berhasil
+```
+
+Jika proses gagal secara permanen, kredit pengguna dikembalikan secara otomatis.
+
+Render dapat diproses dengan dua mode:
+
+- **`worker`** — direkomendasikan untuk produksi dan deployment multi-instance
+- **`inline`** — cocok untuk pengembangan atau deployment single-instance
+
+## Struktur project
+
+```text
 src/
-  env.ts                 # Zod-validated env (core required, creds optional)
-  db/
-    schema/{auth,app}.ts # Drizzle schema — full ERD (18 tables)
-    index.ts             # postgres-js + drizzle client
-    seed.ts              # payment_packages seed (PRD §23.2)
-  lib/
-    auth.ts              # Better Auth: email/pw + Google, verification, sessions
-    auth-client.ts       # client SDK
-    session.ts           # requireUser / requireVerifiedUser / requireAdmin
-    credits.ts           # idempotent credit ledger (row-locked, never negative)
-    provisioning.ts      # profile + balance + default project + 3 free credits
-    jwt.ts               # jose tokens w/ single-use auth_tokens (PRD §11)
-    rate-limit.ts        # DB-backed limiter, all PRD §12 rules
-    email/               # provider layer + Resend + templates + email_logs
-    storage/             # provider layer + R2 (S3) + render asset key builder
-    providers/{ai,payment}/  # adapter interfaces + mock/real providers
-    renders/             # create/edit, prompt, jobs, assets, queries, processor
-    validations/         # Zod schemas (Bahasa Indonesia errors)
-  proxy.ts               # edge auth guard for protected routes (Next 16 convention)
-  app/api/auth/[...all]/ # Better Auth route handler
+├── app/                 # halaman dan API routes
+├── components/          # komponen UI dan brand
+├── db/                  # schema, migration, dan database client
+├── lib/
+│   ├── auth/            # autentikasi dan session
+│   ├── renders/         # render pipeline dan job processing
+│   ├── payments/        # pembayaran dan kredit
+│   ├── providers/       # adapter AI dan payment
+│   ├── storage/         # local dan R2 storage
+│   └── notifications/   # notifikasi aplikasi dan email
+└── env.ts               # validasi environment variables
 ```
 
-Database commands:
+Setiap domain mengekspos API publik melalui `service.ts`. Hindari mengimpor file
+internal domain secara langsung dari luar modul tersebut.
 
-```bash
-pnpm db:generate   # create migration from schema
-pnpm db:migrate    # apply migrations
-pnpm db:seed       # seed credit packages
-pnpm db:studio     # Drizzle Studio
-pnpm smoke:auth    # runtime test: signup → provisioning → credits → rate limit
-pnpm test          # unit test cepat (co-located di src)
-pnpm test:integration # test DB untuk credits + payments
-pnpm test:e2e      # Playwright; auth + render memakai mock provider
-```
+## Testing
 
-Auth wiring: a new user gets a profile, a 0 credit balance, and a default
-project ("Project Saya") on creation; the **3 free credits** are granted
-(idempotently) once the email is verified — or immediately for Google OAuth
-users (already verified). Without `RESEND_API_KEY`, verification/reset links
-are printed to the dev console instead of emailed.
+Project ini menggunakan:
 
-## Konvensi kode & istilah
+- **Vitest** untuk unit dan integration test
+- **Playwright** untuk E2E test
+- **Mock provider** agar alur render dan pembayaran dapat diuji tanpa kredensial cloud
 
-**`service.ts` = pintu publik domain.** Setiap modul `src/lib/<domain>/`
-mengekspos API-nya lewat `service.ts`. Untuk domain kecil, `service.ts` berisi
-implementasinya langsung (`projects`, `payments`, `account`, `admin`). Untuk
-domain yang dipecah ke banyak file (`renders`), `service.ts` adalah **barrel**
-yang me-`re-export` dari `create.ts`, `jobs.ts`, `queries.ts`, dst. Konsumen di
-luar domain mengimpor dari `service.ts`, bukan dari file internalnya.
+GitHub Actions menjalankan lint, migration, unit test, integration test, E2E test,
+dan production build.
 
-**Error API.** Petakan error domain ke HTTP lewat `errorResponse()` di
-`src/lib/api/errors.ts` agar status & payload konsisten antar-route.
+## Kontribusi
 
-**Label status.** Satu sumber kebenaran per domain: render di
-`src/lib/renders/labels.ts`, pembayaran di `src/lib/payments/labels.ts`. Jangan
-menduplikasi map status di halaman.
+Kontribusi sangat diterima.
 
-**Server action vs API route.** Pakai **server action** (`actions.ts` co-located
-dengan page) untuk mutasi yang dipicu dari form di halaman itu sendiri — mis.
-rename/arsip project, simpan pengaturan. Pakai **API route** (`src/app/api/...`)
-saat endpoint perlu dipanggil dari client lewat `fetch` (upload multipart,
-polling status, aksi yang dipakai dari beberapa tempat) atau oleh pihak luar
-(webhook provider). Singkatnya: form internal halaman → server action; kontrak
-HTTP yang dipanggil JS/eksternal → API route.
+1. Fork repository ini.
+2. Buat branch baru.
+3. Lakukan perubahan dan tambahkan test bila diperlukan.
+4. Pastikan lint dan seluruh test berhasil.
+5. Kirim pull request dengan penjelasan yang jelas.
 
-### Glosarium istilah UI
+Sebelum mulai, baca `CONTRIBUTING.md` dan `CODE_OF_CONDUCT.md` jika tersedia.
 
-Indonesia-first, formal tapi ramah ("Anda", tanpa slang seperti "nyalain"/"dulu
-ya"). Pakai kolom kiri, hindari kolom kanan:
+## Keamanan
 
-| Pakai | Hindari |
-| ----- | ------- |
-| Project | Proyek |
-| Unggah | Upload |
-| Render | Generate |
-| Kredit | Credit / koin |
-| Top up | Beli Kredit / Beli Paket |
-| Segera hadir | Coming Soon |
+Jangan membuka laporan kerentanan melalui issue publik. Gunakan petunjuk di
+`SECURITY.md` untuk melaporkan masalah keamanan secara privat.
 
-Status: render memakai **Antri/Antrean**, pembayaran memakai **Menunggu** —
-keduanya warna `warning`, dibedakan karena beda konteks (antrean vs. transaksi).
+## Lisensi
 
-## Auth & app UI
+Project ini dilisensikan dengan **Apache License 2.0**.
 
-Working pages on top of the Phase 1b backend:
-
-- **Public:** `/` (landing), `/features`, `/pricing`, `/about`, `/contact`,
-  `/blog`, `/blog/[slug]`, `/privacy`, `/terms`, `/design-system` (brand kit),
-  halaman auth, dan `/s/[slug]` (public render share).
-- **Protected** (app shell w/ sidebar + topbar): `/dashboard`, `/projects`,
-  `/projects/[id]`, `/renders`, `/renders/new`, `/renders/[id]`, `/payments`,
-  `/notifications`, `/support`, and `/settings`.
-- **Admin:** `/admin`, `/admin/users`, `/admin/projects`, `/admin/renders`,
-  `/admin/payments`, `/admin/credits`, `/admin/packages`,
-  `/admin/notifications`, `/admin/settings`, and `/admin/audit`.
-
-Full flow works in the browser: register → (dev: verification link printed to
-the server console) → click link → auto sign-in → dashboard shows the 3 free
-credits + "Project Saya". Forms use the `authClient` (`signUp`, `signIn`,
-`requestPasswordReset`, `resetPassword`, `sendVerificationEmail`, `signOut`).
-Smoke scripts or E2E flows that use `demo@renderai.test` require that user to
-exist in the local/test database first.
-
-Sidebar behavior:
-
-- Header uses a compact text-only **RenderAI.** wordmark with a panel toggle.
-- **Buat render** opens the Studio.
-- **Cari render** opens a command menu with a quick **Buat Render** action and recent
-  renders. Search is global across render data only; selecting a result opens
-  `/renders/[id]`.
-- Page-level search on `/projects`, `/projects/[id]`, and `/renders` is
-  debounced, auto-submits, and includes a clear button that restores the default
-  list.
-- Detail Project dan Detail Render memakai back link kontekstual. Render yang
-  dibuka dari Project kembali ke Project asal; render yang dibuka dari Riwayat
-  Render kembali ke daftar beserta filter, pencarian, dan pagination sebelumnya.
-
-Profile menu:
-
-- **Support** opens the in-app `/support` page, which provides Email, WhatsApp,
-  and Instagram contact channels.
-- **Logout** closes the menu immediately and shows a short loading overlay
-  before redirecting to `/login`.
-
-## Render core & Render Studio (Phase 2)
-
-The render pipeline (`src/lib/renders/`) is split by concern: `create`, `jobs`,
-`assets`, `queries`, `archive-delete`, and `processor`. Flow: check balance →
-create render row → deduct credit (idempotent) → store original → enqueue job →
-worker/process job → call AI provider → persist result asset → mark success. On
-final failure the render is marked failed and the credit is refunded. Entry
-point: `POST /api/renders` (multipart upload). Processing is controlled by
-`RENDER_PROCESSING_MODE`:
-
-- `worker` (recommended for production) — the web service only enqueues jobs and
-  a dedicated `pnpm worker` process drains the queue. Scales to multiple
-  instances and survives web restarts.
-- `inline` — the web process renders in-band right after the request commits
-  (same processing path, no separate service). The default locally, and a valid
-  choice for **single-instance deploys without a worker service** (e.g. Render
-  Free). Fine for low volume; switch to `worker` once you scale out, since inline
-  has no background poller to retry jobs orphaned by a restart.
-
-- **Render Studio** (`/renders/new`) — workspace dengan nama render editable,
-  unggah gambar, format output, **Render**, perbandingan before/after,
-  wheel/trackpad zoom, texture edit, dan version history. Interior memakai empat
-  mode pencahayaan referensi (**Pagi / Siang / Malam / Mix**) tanpa style,
-  lokasi, view, toggle lampu, atau instruksi tambahan yang dapat mengubah prompt.
-  Exterior menyediakan style arsitektur, lokasi, lingkungan, waktu, cuaca,
-  lampu, dan instruksi tambahan.
-- **Open Studio** from a render detail or share page opens `/renders/new` with
-  the source render loaded, config pre-filled, and prior versions available.
-- **Edit Texture** lets users select a region and apply a texture from Library,
-  Upload, or Deskripsi. Library/Deskripsi memakai masked FLUX Fill; Upload
-  memakai FLUX.2 multi-reference dengan base image, referensi material, dan mask
-  guide. Setiap edit menjadi versi baru pada render yang sama.
-- **Riwayat Render** (`/renders`) and **Project** (`/projects`) show real data;
-  dashboard recent renders are clickable cards that open render details.
-
-Prompt komposit dibangun server-side dan disimpan untuk pemrosesan/search.
-Browser hanya mengirim pilihan Studio dan input user; response API tidak
-mengekspos `prompt`, `enhancedPrompt`, `texturePrompt`, atau `providerResponse`.
-
-**AI provider** (`src/lib/providers/ai/`): `fal` is the production provider. It
-uses the official `@fal-ai/client`: it uploads local/R2 image bytes to fal
-storage, calls queue-based model inference, fetches result URLs immediately, and
-normalizes the result to the requested output format. Defaults are
-`fal-ai/flux-2-pro/edit` for interior/exterior and uploaded-texture edits,
-`fal-ai/flux-pro/v1/fill` for masked Library/Deskripsi texture edits,
-`fal-ai/uso` for style transfer, and `fal-ai/aura-sr` for upscale; override them
-with `FAL_RENDER_MODEL`, `FAL_INPAINT_MODEL`, `FAL_STYLE_TRANSFER_MODEL`, and
-`FAL_UPSCALE_MODEL`. The Interior prompt is byte-equivalent to the four lighting
-modes in `../Documents/ruma_render_flux2pro_v1.2.py`; Exterior follows the same
-positive preservation structure. The FLUX.2 path passes inputs via `image_urls`
-and pins an explicit `image_size`
-(~2K longest edge, controlled by `FAL_RENDER_MAX_EDGE`); `FAL_RENDER_SAFETY_TOLERANCE`
-(1 strict – 5 permissive) and an optional `FAL_RENDER_SEED` tune it further.
-A `mock` provider (sharp-based) and a `local` storage provider make the full
-flow testable locally without any cloud credentials. For local smoke tests and
-CI, use `AI_PROVIDER=mock` and `STORAGE_PROVIDER=local`. For production set
-`AI_PROVIDER=fal` + `FAL_KEY`, plus `STORAGE_PROVIDER=r2` + R2 creds.
-
-```bash
-pnpm smoke:render   # render pipeline test (credit, storage, provider, assets)
-```
-
-> **Port:** the dev server runs on **3210** (`pnpm dev`) because port 3000 is
-> used by another local project; `APP_URL`/`BETTER_AUTH_URL` match it.
-
-## Credit purchase & payment (Phase 3)
-
-Buy-credits flow (`src/lib/payments/service.ts`): pick package → create a pending
-`payments` row + provider checkout → provider webhook → **idempotent** credit
-top-up (`applyCreditChange` keyed by `payment:<id>`; a payment already `paid` is
-a no-op, so duplicate webhooks never double-credit).
-
-- `/payments` — package cards with **Top up**, live balance, transaction
-  history; `/payments/finish` (result) and `/payments/simulate` (dev mock).
-- `POST /api/payments/checkout` (auth) → Snap token / redirect URL.
-- `POST /api/payments/webhook` (public; provider signature verified).
-
-**Payment provider** (`src/lib/providers/payment/`): `midtrans` implements Snap
-(`POST {app[.sandbox].midtrans.com}/snap/v1/transactions`, Basic auth) and
-webhook verification (`sha512(order_id + status_code + gross_amount + serverKey)`).
-A `mock` provider routes checkout to the in-app simulate page so the full
-checkout → webhook → credit flow runs locally. For local development use
-`PAYMENT_PROVIDER=mock`.
-For production set `PAYMENT_PROVIDER=midtrans` + `MIDTRANS_SERVER_KEY` /
-`MIDTRANS_CLIENT_KEY` and point the Midtrans notification URL at
-`/api/payments/webhook`.
-
-```bash
-pnpm smoke:payment   # checkout → webhook → idempotent top-up
-```
-
-## Testing & GitHub CI/CD
-
-Testing strategy is intentionally MVP-sized:
-
-- **Unit tests (Vitest, co-located):** validations, prompt builder, API helpers,
-  exact Interior prompt parity, provider request mapping, texture prompts,
-  navigation safety, pricing, status mapping, rate-limit helper, dan UI utility.
-- **Integration tests (Vitest):** credits, payments, project ownership/move,
-  render queue/edit/refund, dan notification routing against PostgreSQL dengan
-  test-only data serta cleanup.
-- **E2E tests (Playwright):** public auth pages plus login → Render Studio →
-  pilih pencahayaan Interior → upload → create/edit menggunakan
-  `AI_PROVIDER=mock`, memastikan prompt internal tidak terekspos, menguji back
-  link Riwayat/Project, dashboard, sidebar Search, Support, dan share-page
-  **Open Studio**.
-
-Local commands:
-
-```bash
-pnpm test
-pnpm test:integration
-pnpm test:e2e
-```
-
-Playwright memakai port 3210 secara default. Jika port itu sedang dipakai oleh
-server development, jalankan pada port lain, misalnya
-`PLAYWRIGHT_PORT=3211 pnpm test:e2e`. Cache Next.js E2E terisolasi di
-`.next-e2e`, sehingga test dapat berjalan bersamaan dengan `pnpm dev`.
-
-GitHub Actions lives in `.github/workflows/ci.yml`. It starts a temporary
-PostgreSQL service, runs migrations, then runs lint, unit tests, integration
-tests, Playwright E2E, and production build. CI uses safe test env values:
-`AI_PROVIDER=mock`, `PAYMENT_PROVIDER=mock`, `STORAGE_PROVIDER=local`, and
-`RATE_LIMIT_ENABLED=false`; production secrets are not needed for CI.
-
-For deployment, prefer Render.com Blueprint `autoDeploy` from the protected
-`main` branch. If you disable Render auto-deploy, the workflow can optionally
-trigger deploy hooks after CI passes by setting GitHub secrets:
-
-- `RENDER_WEB_DEPLOY_HOOK_URL`
-- `RENDER_WORKER_DEPLOY_HOOK_URL`
-
-## Notifications & account settings (Phase 4)
-
-- **Notifications** (`src/lib/notifications/service.ts`): `notifyUser` selalu
-  membuat notifikasi in-app. Render success/failed dan low-credit tetap in-app;
-  event transaksional seperti pembayaran dapat menyertakan payload email.
-  Kegagalan email tidak menggagalkan flow utama. UI: topbar bell dengan unread
-  badge + panel (mark read / mark all), halaman `/notifications`, dan
-  `POST /api/notifications/read`.
-- **Account settings** (`/settings`): edit profile (name via Better Auth
-  `updateUser`, display name in `user_profiles`), preferences (email
-  notifications, default render mode/format) via server actions, and change
-  password via Better Auth `changePassword`.
-
-## Admin (Phase 5)
-
-Admin area at `/admin` (guarded by `requireAdmin` in the admin layout; only
-admins see the sidebar link): overview stats, **Users** (disable/enable —
-revokes sessions; promote/demote role), all **Renders**, all **Payments**, and
-the **Audit Log**. Mutations are recorded in `admin_audit_logs`. Disabled users
-are blocked by an `isDisabled` check in `requireUser` (→ `/login?disabled=1`).
-
-```bash
-pnpm make:admin [email] [password]   # promote/create an admin (default admin@renderai.test)
-```
-
-## Extras (beyond the PRD MVP)
-
-- **Public render sharing** — a successful render can be shared via a public,
-  no-auth page at `/s/<slug>` (Open Graph + Twitter card meta for nice link
-  previews). The page shows creator/date metadata; authenticated users see
-  **Open Studio**, while visitors are guided to create an account. The Studio
-  has a **Bagikan** button that calls `POST /api/renders/share` (idempotent;
-  stores a `share_slug` on the render) and copies the link. Public viewer:
-  `getPublicRender` in `src/lib/renders/share.ts`.
-- **Admin analytics** — the `/admin` overview adds dependency-free charts
-  (`src/components/app/charts.tsx`): renders & revenue over the last 14 days,
-  plus render breakdowns by mode and status (`getAdminAnalytics`).
-- **Full project management** — the Render Studio has a project picker (+ inline
-  "create"); renders go to the selected project (`/renders/new?project=<id>`).
-  Project detail `/projects/[id]` lists that project's renders; daftar Project
-  mendukung rename dan archive (default project tidak dapat diarsipkan).
-  `POST /api/projects` creates a project; `renameProject` / `archiveProject` ada
-  di project service.
-
-## Status
-
-- [x] **Phase 1a** — Scaffold + design system + dark mode
-- [x] **Phase 1b** — Better Auth, PostgreSQL/Drizzle, R2, Resend, rate limiter, JWT
-- [x] **Auth UI + dashboard** — login/register/verify/reset, app shell, dashboard
-- [x] **Phase 2** — Project & Render core, Render Studio, AI provider layer
-- [x] **Phase 3** — Credit purchase + Midtrans payment (Snap + webhook)
-- [x] **Phase 4** — Notifications (in-app + email) + account settings
-- [x] **Phase 5** — Admin (users, renders, payments, audit log)
-
-The MVP feature set is complete. Before production, supply real credentials and
-flip providers: Google OAuth (`GOOGLE_CLIENT_*`), email (`RESEND_API_KEY`),
-`STORAGE_PROVIDER=r2` (+ R2 creds), `AI_PROVIDER=fal` (+ `FAL_KEY`),
-`PAYMENT_PROVIDER=midtrans` (+ Midtrans keys and notification URL). Render
-execution uses the DB-backed `render_jobs` queue, drained either by a dedicated
-`pnpm worker` (`RENDER_PROCESSING_MODE=worker`, recommended) or by the web
-process itself (`RENDER_PROCESSING_MODE=inline`, for single-instance deploys
-without a worker). `pnpm render:worker` is the local `.env.local` helper.
+Anda boleh menggunakan, memodifikasi, dan mendistribusikan project ini,
+termasuk untuk kebutuhan komersial, selama mengikuti ketentuan lisensi.
+Lihat file [`LICENSE`](LICENSE) untuk informasi lengkap.
