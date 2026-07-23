@@ -460,7 +460,7 @@ export function RenderPreviewViewer({
            and canvas controls / texture tools, content-sized so it never
            stretches and stays centered when the panels are hidden. */
         <div className="pointer-events-none absolute inset-x-0 bottom-3 z-30 flex justify-center px-3">
-          <div className="pointer-events-auto inline-flex max-w-full items-center gap-1.5 overflow-x-auto rounded-xl border border-border/80 bg-card/95 px-1.5 py-1.5 shadow-floating backdrop-blur transition-all duration-200 ease-out">
+          <div className="pointer-events-auto inline-flex max-w-full items-center gap-1.5 overflow-x-auto rounded-md border border-border/80 bg-card/95 px-1.5 py-1.5 shadow-floating backdrop-blur transition-all duration-200 ease-out">
           <div className="flex shrink-0 flex-nowrap items-center gap-1.5">
             {panelsCollapsed && onExpandPanels && (
               // Reopen control, grouped with the view tabs (desktop only).
