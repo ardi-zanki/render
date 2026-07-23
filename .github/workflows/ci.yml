@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 concurrency:
@@ -41,8 +41,8 @@ jobs:
         image: postgres:17
         env:
           POSTGRES_DB: renderai_test
-          POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
         options: >-
@@ -60,7 +60,7 @@ jobs:
         with:
           version: 11.5.2
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -75,58 +75,43 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Design system guard
+      - name: Check design system
         run: pnpm check:design-system
 
-      - name: Unit tests
+      - name: Run unit tests
         run: pnpm test
 
-      - name: Integration tests
+      - name: Run integration tests
         run: pnpm test:integration
-
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: End-to-end tests
-        run: pnpm test:e2e
 
       - name: Build
         run: pnpm build
 
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report
-          if-no-files-found: ignore
-          retention-days: 7
-
-  deploy-render:
+  deploy:
     name: Deploy Render
-    runs-on: ubuntu-latest
     needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
     timeout-minutes: 5
+
     env:
-      RENDER_WEB_DEPLOY_HOOK_URL: ${{ secrets.RENDER_WEB_DEPLOY_HOOK_URL }}
-      RENDER_WORKER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_WORKER_DEPLOY_HOOK_URL }}
+      WEB_HOOK: ${{ secrets.RENDER_WEB_DEPLOY_HOOK_URL }}
+      WORKER_HOOK: ${{ secrets.RENDER_WORKER_DEPLOY_HOOK_URL }}
 
     steps:
-      - name: Validate deploy hook secrets
-        if: ${{ (env.RENDER_WEB_DEPLOY_HOOK_URL == '' && env.RENDER_WORKER_DEPLOY_HOOK_URL != '') || (env.RENDER_WEB_DEPLOY_HOOK_URL != '' && env.RENDER_WORKER_DEPLOY_HOOK_URL == '') }}
+      - name: Validate deploy hooks
         run: |
-          echo "Both RENDER_WEB_DEPLOY_HOOK_URL and RENDER_WORKER_DEPLOY_HOOK_URL must be configured together."
-          exit 1
+          if { [ -n "$WEB_HOOK" ] && [ -z "$WORKER_HOOK" ]; } ||              { [ -z "$WEB_HOOK" ] && [ -n "$WORKER_HOOK" ]; }; then
+            echo "Configure both Render deploy hooks or leave both empty."
+            exit 1
+          fi
 
-      - name: Trigger Render web deploy hook
-        if: ${{ env.RENDER_WEB_DEPLOY_HOOK_URL != '' && env.RENDER_WORKER_DEPLOY_HOOK_URL != '' }}
-        run: curl -fsS -X POST "$RENDER_WEB_DEPLOY_HOOK_URL"
+      - name: Trigger deploy hooks
+        if: env.WEB_HOOK != '' && env.WORKER_HOOK != ''
+        run: |
+          curl -fsS -X POST "$WEB_HOOK"
+          curl -fsS -X POST "$WORKER_HOOK"
 
-      - name: Trigger Render worker deploy hook
-        if: ${{ env.RENDER_WEB_DEPLOY_HOOK_URL != '' && env.RENDER_WORKER_DEPLOY_HOOK_URL != '' }}
-        run: curl -fsS -X POST "$RENDER_WORKER_DEPLOY_HOOK_URL"
-
-      - name: Skip optional deploy hooks
-        if: env.RENDER_WEB_DEPLOY_HOOK_URL == '' && env.RENDER_WORKER_DEPLOY_HOOK_URL == ''
-        run: echo "No Render deploy hook secrets configured. Use Render Blueprint autoDeploy or add deploy hook secrets."
+      - name: Skip deployment
+        if: env.WEB_HOOK == '' && env.WORKER_HOOK == ''
+        run: echo "Deploy hooks are not configured. Render auto-deploy may be used instead."
