@@ -7,6 +7,7 @@ import {
   renderQueueReadSchema,
   renderDeleteSchema,
   renderMoveProjectSchema,
+  storageDeleteSchema,
 } from "./api";
 
 describe("api validation", () => {
@@ -41,6 +42,14 @@ describe("api validation", () => {
 
     const blank = renderDeleteSchema.safeParse({ confirmationName: "   " });
     expect(blank.success).toBe(false);
+  });
+
+  it("validates optional storage deletion password", () => {
+    expect(storageDeleteSchema.safeParse({}).success).toBe(true);
+    expect(storageDeleteSchema.safeParse({ password: "secret123" }).success).toBe(
+      true,
+    );
+    expect(storageDeleteSchema.safeParse({ password: "" }).success).toBe(false);
   });
 
   it("accepts a render move project payload", () => {

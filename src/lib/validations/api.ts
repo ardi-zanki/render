@@ -33,6 +33,10 @@ export const renderDeleteSchema = z.object({
   confirmationName: requiredText("Nama render", 120),
 });
 
+export const storageDeleteSchema = z.object({
+  password: z.string().min(1, "Password wajib diisi").max(128).optional(),
+});
+
 export const renderMoveProjectSchema = z.object({
   targetProjectId: uuidSchema,
 });
@@ -84,5 +88,6 @@ export const projectIdSchema = uuidSchema;
 export type NotificationReadInput = z.infer<typeof notificationReadSchema>;
 export type RenderShareInput = z.infer<typeof renderShareSchema>;
 export type RenderDeleteInput = z.infer<typeof renderDeleteSchema>;
+export type StorageDeleteInput = z.infer<typeof storageDeleteSchema>;
 export type RenderMoveProjectInput = z.infer<typeof renderMoveProjectSchema>;
 export type ProfileUploadInput = z.infer<typeof profileUploadSchema>;

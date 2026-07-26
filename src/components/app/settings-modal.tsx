@@ -21,6 +21,7 @@ import {
   PreferencesForm,
   ProfileForm,
 } from "@/components/app/settings-forms";
+import { PasswordInput } from "@/components/auth/password-input";
 import { useTheme, type Theme } from "@/components/theme-provider";
 import { AvatarUpload } from "@/components/app/avatar-upload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -30,7 +31,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/ui/modal";
 import { Select } from "@/components/ui/select";
-import { apiErrorMessage, apiJson } from "@/lib/client-api";
+import {
+  ApiClientError,
+  apiErrorMessage,
+  apiJson,
+  jsonInit,
+} from "@/lib/client-api";
 import type {
   StorageUsageCategory,
   UserStorageUsage,
@@ -111,6 +117,8 @@ export function SettingsModal({
   const [refreshingStorage, setRefreshingStorage] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteText, setDeleteText] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
   const [deletingStorage, setDeletingStorage] = useState(false);
   const [storageError, setStorageError] = useState("");
   const { theme, setTheme } = useTheme();
@@ -135,18 +143,29 @@ export function SettingsModal({
 
   async function removeAllStorage() {
     setDeletingStorage(true);
-    setStorageError("");
+    setDeleteError("");
     try {
       const json = await apiJson<ClearStorageResponse>("/api/account/storage", {
+        ...jsonInit({ password: passwordReady ? deletePassword : undefined }),
         method: "DELETE",
       });
       setUsage(json.usage);
       setDeleteOpen(false);
       setDeleteText("");
+      setDeletePassword("");
       toast.success("Penyimpanan render dikosongkan");
       router.refresh();
     } catch (err) {
-      setStorageError(apiErrorMessage(err, "Gagal menghapus penyimpanan"));
+      if (err instanceof ApiClientError && err.code === "REAUTH_REQUIRED") {
+        setDeleteOpen(false);
+        router.push("/login?reauth=sensitive&redirect=%2Fdashboard");
+        router.refresh();
+        return;
+      }
+      if (err instanceof ApiClientError && err.code === "INVALID_PASSWORD") {
+        setDeletePassword("");
+      }
+      setDeleteError(apiErrorMessage(err, "Gagal menghapus penyimpanan"));
     } finally {
       setDeletingStorage(false);
     }
@@ -394,6 +413,8 @@ export function SettingsModal({
                   onClick={() => {
                     setDeleteOpen(true);
                     setDeleteText("");
+                    setDeletePassword("");
+                    setDeleteError("");
                   }}
                   disabled={usage.assetCount === 0}
                 >
@@ -425,6 +446,12 @@ export function SettingsModal({
             referensi, hasil render, dan hasil edit akan dihapus dari penyimpanan
             dan render terkait tidak akan tampil lagi di riwayat.
           </p>
+          {deleteError && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTriangle />
+              <AlertDescription>{deleteError}</AlertDescription>
+            </Alert>
+          )}
           <div className="mt-4 flex flex-col gap-1.5">
             <Label htmlFor="deleteStorageConfirm">
               Ketik {DELETE_CONFIRM_TEXT} untuk konfirmasi
@@ -436,6 +463,21 @@ export function SettingsModal({
               disabled={deletingStorage}
             />
           </div>
+          {passwordReady && (
+            <div className="mt-4 flex flex-col gap-1.5">
+              <Label htmlFor="deleteStoragePassword">Password saat ini</Label>
+              <PasswordInput
+                id="deleteStoragePassword"
+                value={deletePassword}
+                onChange={(event) => {
+                  setDeletePassword(event.target.value);
+                  setDeleteError("");
+                }}
+                autoComplete="current-password"
+                disabled={deletingStorage}
+              />
+            </div>
+          )}
           <div className="mt-5 flex justify-end gap-2">
             <Button
               type="button"
@@ -449,7 +491,11 @@ export function SettingsModal({
               type="button"
               variant="destructive"
               onClick={removeAllStorage}
-              disabled={deletingStorage || deleteText !== DELETE_CONFIRM_TEXT}
+              disabled={
+                deletingStorage ||
+                deleteText !== DELETE_CONFIRM_TEXT ||
+                (passwordReady && deletePassword.length === 0)
+              }
             >
               {deletingStorage ? (
                 <Loader2 className="animate-spin" />
