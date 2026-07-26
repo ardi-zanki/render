@@ -1,194 +1,108 @@
 # RenderAI
 
-RenderAI adalah platform render arsitektur berbasis AI untuk pasar Indonesia.
-Pengguna dapat mengunggah gambar desain, memilih mode render, lalu menghasilkan
-visual arsitektur realistis dalam hitungan detik.
-
-> Status: MVP selesai dan siap dikembangkan lebih lanjut sebagai project open source.
+RenderAI adalah aplikasi open-source untuk membuat dan mengelola visual arsitektur berbasis AI.
 
 ## Fitur utama
 
 - Render interior dan eksterior berbasis AI
 - Edit tekstur dan riwayat versi
-- Manajemen project dan render
+- Manajemen proyek dan hasil render
 - Sistem kredit dan pembayaran Midtrans
-- Login email/password dan Google OAuth
-- Penyimpanan aset melalui Cloudflare R2
-- Notifikasi dalam aplikasi dan email
-- Halaman berbagi render publik
-- Dashboard admin dan audit log
-- Unit test, integration test, E2E test, dan GitHub Actions
+- Autentikasi email/password dan Google OAuth
+- Penyimpanan lokal atau Cloudflare R2
+- Dashboard admin, notifikasi, dan audit log
 
-## Tech stack
+## Teknologi
 
-- **Framework:** Next.js 16, React 19, TypeScript
-- **UI:** Tailwind CSS 4, custom UI components
-- **Database:** PostgreSQL, Drizzle ORM
-- **Authentication:** Better Auth
-- **AI:** fal.ai melalui provider adapter
-- **Storage:** Cloudflare R2 atau local storage
-- **Payment:** Midtrans atau mock provider
-- **Email:** Resend
-- **Testing:** Vitest dan Playwright
-- **Package manager:** pnpm
+- Next.js 16, React 19, dan TypeScript
+- Tailwind CSS 4
+- PostgreSQL dan Drizzle ORM
+- Better Auth
+- fal.ai, Cloudflare R2, Midtrans, dan Resend
+- Vitest dan Playwright
 
-## Menjalankan secara lokal
+## Mulai cepat
 
 ### Prasyarat
 
 - Node.js 22
 - pnpm 11
-- PostgreSQL
+- Docker, atau PostgreSQL yang berjalan secara lokal
 
 ### Instalasi
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/ardi-zanki/render.git renderai
 cd renderai
 pnpm install
 cp .env.example .env.local
-pnpm db:migrate
-pnpm db:seed
-pnpm dev
 ```
 
-Aplikasi berjalan di:
+Untuk menjalankan PostgreSQL melalui Docker:
 
-```text
-http://localhost:3210
+```bash
+docker compose -f docker-compose.local.yml up -d db
 ```
 
-Untuk pengembangan tanpa layanan cloud, gunakan provider lokal dan mock:
+Sesuaikan nilai berikut di `.env.local`:
 
 ```env
+DATABASE_URL=postgresql://renderai:renderai@localhost:5433/renderai
+BETTER_AUTH_SECRET=<secret-acak-minimal-16-karakter>
+JWT_SECRET=<secret-acak-lain-minimal-16-karakter>
+
 AI_PROVIDER=mock
 STORAGE_PROVIDER=local
 PAYMENT_PROVIDER=mock
 RENDER_PROCESSING_MODE=inline
 ```
 
-## Konfigurasi produksi
-
-Gunakan konfigurasi berikut saat deploy:
-
-```env
-AI_PROVIDER=fal
-FAL_KEY=
-
-STORAGE_PROVIDER=r2
-R2_ACCOUNT_ID=
-R2_ACCESS_KEY_ID=
-R2_SECRET_ACCESS_KEY=
-R2_BUCKET_NAME=
-
-PAYMENT_PROVIDER=midtrans
-MIDTRANS_SERVER_KEY=
-MIDTRANS_CLIENT_KEY=
-
-RESEND_API_KEY=
-
-RENDER_PROCESSING_MODE=worker
-```
-
-Google OAuth dan URL aplikasi juga perlu dikonfigurasi sesuai lingkungan deploy.
-Lihat validasi environment di `src/env.ts` untuk daftar lengkap variabel yang
-didukung.
-
-## Perintah penting
+Kemudian siapkan database dan jalankan aplikasi:
 
 ```bash
-pnpm dev               # menjalankan development server
-pnpm build             # membuat production build
-pnpm lint              # menjalankan ESLint
-pnpm test              # unit test
-pnpm test:integration  # integration test
-pnpm test:e2e          # end-to-end test
-pnpm worker            # menjalankan render worker
-```
-
-Perintah database:
-
-```bash
-pnpm db:generate
 pnpm db:migrate
 pnpm db:seed
-pnpm db:studio
+pnpm dev
 ```
 
-## Cara kerja render
+Buka [http://localhost:3210](http://localhost:3210). Dalam mode development, email verifikasi ditampilkan di terminal jika `RESEND_API_KEY` tidak diisi.
 
-Alur render utama:
+## Perintah utama
 
-```text
-Validasi pengguna dan kredit
-→ simpan render
-→ kurangi kredit
-→ simpan gambar asli
-→ masukkan job ke antrean
-→ proses melalui AI provider
-→ simpan hasil
-→ tandai berhasil
-```
+| Perintah | Kegunaan |
+|---|---|
+| `pnpm dev` | Menjalankan development server |
+| `pnpm build` | Membuat production build |
+| `pnpm lint` | Menjalankan ESLint |
+| `pnpm test` | Menjalankan unit test |
+| `pnpm test:integration` | Menjalankan integration test |
+| `pnpm test:e2e` | Menjalankan E2E test secara lokal |
+| `pnpm worker` | Menjalankan render worker |
+| `pnpm db:migrate` | Menjalankan migration database |
+| `pnpm db:seed` | Mengisi data awal |
 
-Jika proses gagal secara permanen, kredit pengguna dikembalikan secara otomatis.
+## Pemrosesan render
 
-Render dapat diproses dengan dua mode:
+Web menyimpan render ke antrean PostgreSQL. Render kemudian diproses oleh worker atau langsung oleh web, sesuai `RENDER_PROCESSING_MODE`.
 
-- **`worker`** — direkomendasikan untuk produksi dan deployment multi-instance
-- **`inline`** — cocok untuk pengembangan atau deployment single-instance
+- `worker` direkomendasikan untuk production dan deployment multi-instance.
+- `inline` hanya cocok untuk development atau satu instance web.
 
-## Struktur project
+Lihat [DEPLOYMENT.md](DEPLOYMENT.md) untuk konfigurasi production, Render.com, dan VPS.
 
-```text
-src/
-├── app/                 # halaman dan API routes
-├── components/          # komponen UI dan brand
-├── db/                  # schema, migration, dan database client
-├── lib/
-│   ├── auth/            # autentikasi dan session
-│   ├── renders/         # render pipeline dan job processing
-│   ├── payments/        # pembayaran dan kredit
-│   ├── providers/       # adapter AI dan payment
-│   ├── storage/         # local dan R2 storage
-│   └── notifications/   # notifikasi aplikasi dan email
-└── env.ts               # validasi environment variables
-```
+## Pengujian
 
-Setiap domain mengekspos API publik melalui `service.ts`. Hindari mengimpor file
-internal domain secara langsung dari luar modul tersebut.
-
-## Testing
-
-Project ini menggunakan:
-
-- **Vitest** untuk unit dan integration test
-- **Playwright** untuk E2E test
-- **Mock provider** agar alur render dan pembayaran dapat diuji tanpa kredensial cloud
-
-GitHub Actions menjalankan lint, migration, unit test, integration test, E2E test,
-dan production build.
+GitHub Actions menjalankan migration, lint, pemeriksaan design system, unit test, integration test, dan production build. E2E test tersedia untuk dijalankan secara lokal dengan Playwright.
 
 ## Kontribusi
 
-Kontribusi sangat diterima.
+Kontribusi melalui issue dan pull request sangat diterima.
 
-1. Fork repository ini.
-2. Buat branch baru.
-3. Lakukan perubahan dan tambahkan test bila diperlukan.
-4. Pastikan lint dan seluruh test berhasil.
-5. Kirim pull request dengan penjelasan yang jelas.
-
-Sebelum mulai, baca `CONTRIBUTING.md` dan `CODE_OF_CONDUCT.md` jika tersedia.
-
-## Keamanan
-
-Jangan membuka laporan kerentanan melalui issue publik. Gunakan petunjuk di
-`SECURITY.md` untuk melaporkan masalah keamanan secara privat.
+1. Fork repository dan buat branch baru.
+2. Lakukan perubahan beserta test yang relevan.
+3. Jalankan lint dan test.
+4. Kirim pull request dengan penjelasan yang ringkas dan jelas.
 
 ## Lisensi
 
-Project ini dilisensikan dengan **Apache License 2.0**.
-
-Anda boleh menggunakan, memodifikasi, dan mendistribusikan project ini,
-termasuk untuk kebutuhan komersial, selama mengikuti ketentuan lisensi.
-Lihat file [`LICENSE`](LICENSE) untuk informasi lengkap.
+RenderAI tersedia di bawah [Apache License 2.0](LICENSE).
