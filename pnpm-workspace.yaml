@@ -23,7 +23,7 @@ overrides:
   kysely: 0.28.17
   # Keep Next's optional image dependency aligned with the root sharp version so
   # only one libvips binary is loaded during production builds.
-  sharp: 0.35.1
+  sharp: 0.35.3
 minimumReleaseAgeExclude:
   - '@aws-sdk/checksums@3.1000.4'
   - '@aws-sdk/client-s3@3.1065.0'
@@ -51,20 +51,20 @@ minimumReleaseAgeExclude:
   - '@better-fetch/fetch@1.2.2'
   - better-auth@1.6.16
   - better-call@1.3.6
-  - '@img/sharp-darwin-arm64@0.35.1'
-  - '@img/sharp-darwin-x64@0.35.1'
-  - '@img/sharp-freebsd-wasm32@0.35.1'
-  - '@img/sharp-linux-arm64@0.35.1'
-  - '@img/sharp-linux-arm@0.35.1'
-  - '@img/sharp-linux-ppc64@0.35.1'
-  - '@img/sharp-linux-riscv64@0.35.1'
-  - '@img/sharp-linux-s390x@0.35.1'
-  - '@img/sharp-linux-x64@0.35.1'
-  - '@img/sharp-linuxmusl-arm64@0.35.1'
-  - '@img/sharp-linuxmusl-x64@0.35.1'
-  - '@img/sharp-wasm32@0.35.1'
-  - '@img/sharp-webcontainers-wasm32@0.35.1'
-  - '@img/sharp-win32-arm64@0.35.1'
-  - '@img/sharp-win32-ia32@0.35.1'
-  - '@img/sharp-win32-x64@0.35.1'
-  - sharp@0.35.1
+  - '@img/sharp-darwin-arm64@0.35.3'
+  - '@img/sharp-darwin-x64@0.35.3'
+  - '@img/sharp-freebsd-wasm32@0.35.3'
+  - '@img/sharp-linux-arm64@0.35.3'
+  - '@img/sharp-linux-arm@0.35.3'
+  - '@img/sharp-linux-ppc64@0.35.3'
+  - '@img/sharp-linux-riscv64@0.35.3'
+  - '@img/sharp-linux-s390x@0.35.3'
+  - '@img/sharp-linux-x64@0.35.3'
+  - '@img/sharp-linuxmusl-arm64@0.35.3'
+  - '@img/sharp-linuxmusl-x64@0.35.3'
+  - '@img/sharp-wasm32@0.35.3'
+  - '@img/sharp-webcontainers-wasm32@0.35.3'
+  - '@img/sharp-win32-arm64@0.35.3'
+  - '@img/sharp-win32-ia32@0.35.3'
+  - '@img/sharp-win32-x64@0.35.3'
+  - sharp@0.35.3
