@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -90,7 +90,7 @@ jobs:
   deploy:
     name: Deploy Render
     needs: verify
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
