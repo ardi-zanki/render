@@ -15,6 +15,7 @@ import {
 } from "@/lib/notifications/service";
 import { requireVerifiedUser } from "@/lib/session";
 import { getUserStorageUsage } from "@/lib/storage/usage";
+import { browserUserImageUrl } from "@/lib/storage";
 
 export default async function AppLayout({
   children,
@@ -42,13 +43,15 @@ export default async function AppLayout({
       getUserStorageUsage(session.user.id),
     ]);
 
+  const userImage = await browserUserImageUrl(session.user.image);
+
   return (
     <AppShell
       user={{
         name: session.user.name,
         email: session.user.email,
         emailVerified: session.user.emailVerified,
-        image: session.user.image ?? null,
+        image: userImage,
       }}
       preferences={{
         displayName: profile?.displayName ?? "",

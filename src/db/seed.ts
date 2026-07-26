@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+import { notInArray } from "drizzle-orm";
 
 config({ path: ".env.local" });
 
@@ -25,25 +26,34 @@ async function main() {
   const { db } = await import("@/db");
   const { paymentPackages } = await import("@/db/schema");
 
-  for (const p of packages) {
-    await db
-      .insert(paymentPackages)
-      .values({ ...p, currency: "IDR" })
-      .onConflictDoUpdate({
-        target: paymentPackages.slug,
-        set: {
-          name: p.name,
-          price: p.price,
-          credits: p.credits,
-          bonusCredits: 0,
-          sortOrder: p.sortOrder,
-          isActive: true,
-          updatedAt: new Date(),
-        },
-      });
-  }
+  await db.transaction(async (tx) => {
+    for (const p of packages) {
+      await tx
+        .insert(paymentPackages)
+        .values({ ...p, currency: "IDR" })
+        .onConflictDoUpdate({
+          target: paymentPackages.slug,
+          set: {
+            name: p.name,
+            price: p.price,
+            currency: "IDR",
+            credits: p.credits,
+            bonusCredits: 0,
+            sortOrder: p.sortOrder,
+            isActive: true,
+            updatedAt: new Date(),
+          },
+        });
+    }
 
-  console.log(`✓ Seeded ${packages.length} payment packages`);
+    // Keep the database catalog aligned with this authoritative list.
+    await tx
+      .update(paymentPackages)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(notInArray(paymentPackages.slug, packages.map((p) => p.slug)));
+  });
+
+  console.log(`✓ Synced ${packages.length} payment packages`);
 }
 
 main()

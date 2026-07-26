@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { contactOptions } from "@/lib/marketing";
 import { getServerSession } from "@/lib/session";
+import { supportContact } from "@/lib/support";
 
 export const metadata: Metadata = {
   title: "Kontak Render Studio",
@@ -42,7 +43,9 @@ export default async function ContactPage() {
                 Sertakan konteks akun atau project bila relevan.
               </p>
               <Button asChild className="mt-5 w-full">
-                <Link href="mailto:support@renderai.id">support@renderai.id</Link>
+                <Link href={`mailto:${supportContact.email}`}>
+                  {supportContact.email}
+                </Link>
               </Button>
             </CardContent>
           </Card>

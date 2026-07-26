@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
 import { assertRateLimit, RateLimitError } from "@/lib/rate-limit";
-import { storage } from "@/lib/storage";
+import {
+  browserAssetUrl,
+  privateAssetReference,
+  storage,
+} from "@/lib/storage";
 import { profileUploadSchema } from "@/lib/validations/api";
 
 export const runtime = "nodejs";
@@ -42,6 +46,7 @@ export async function POST(req: Request) {
   }
   const { name, avatar } = parsed.data;
 
+  let imageReference: string | undefined;
   let imageUrl: string | undefined;
   if (avatar && avatar.size > 0) {
     const ext = ALLOWED[avatar.type];
@@ -64,11 +69,17 @@ export async function POST(req: Request) {
       body: buffer,
       contentType: avatar.type,
     });
-    imageUrl = stored.url;
+    if (storage().name === "r2") {
+      imageReference = privateAssetReference(stored.key);
+      imageUrl = await browserAssetUrl(stored.url, stored.key);
+    } else {
+      imageReference = stored.url;
+      imageUrl = stored.url;
+    }
   }
 
   await auth.api.updateUser({
-    body: { name, ...(imageUrl ? { image: imageUrl } : {}) },
+    body: { name, ...(imageReference ? { image: imageReference } : {}) },
     headers: req.headers,
   });
 

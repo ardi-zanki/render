@@ -18,6 +18,8 @@ const optional = z
   .optional()
   .transform((v) => (v && v.length > 0 ? v : undefined));
 
+const optionalUrl = optional.pipe(z.string().url().optional());
+
 const schema = z.object({
   APP_URL: z.string().url().default("http://localhost:3210"),
   NODE_ENV: z
@@ -56,6 +58,12 @@ const schema = z.object({
   EMAIL_PROVIDER: z.enum(["resend"]).default("resend"),
   RESEND_API_KEY: optional,
   EMAIL_FROM: z.string().default("Render Studio <onboarding@resend.dev>"),
+
+  SUPPORT_EMAIL: z.string().email().default("support@renderai.id"),
+  SUPPORT_WHATSAPP_URL: optionalUrl,
+  SUPPORT_WHATSAPP_LABEL: optional,
+  SUPPORT_INSTAGRAM_URL: optionalUrl,
+  SUPPORT_INSTAGRAM_LABEL: optional,
 
   PAYMENT_PROVIDER: z.enum(["midtrans", "mock"]).default("midtrans"),
   MIDTRANS_SERVER_KEY: optional,
