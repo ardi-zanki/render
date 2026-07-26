@@ -35,7 +35,12 @@ export function PublicHeader({
           aria-label="Render Studio beranda"
           className="shrink-0 justify-self-start"
         >
-          <Logo size={28} />
+          <Logo
+            size={28}
+            className={cn(
+              !authenticated && "[&>span]:hidden min-[420px]:[&>span]:flex",
+            )}
+          />
         </Link>
         {hasNav && (
           <nav className="hidden items-center justify-center gap-7 text-sm font-medium text-muted-foreground md:flex">
@@ -55,12 +60,12 @@ export function PublicHeader({
             <Button
               variant="ghost"
               asChild
-              className="hidden h-9 px-4 sm:inline-flex"
+              className="h-9 px-2 sm:px-4"
             >
               <Link href="/login">Masuk</Link>
             </Button>
           )}
-          <Button asChild className="h-9 px-4 text-sm">
+          <Button asChild className="h-9 px-3 text-sm sm:px-4">
             <Link href={authenticated ? "/dashboard" : "/register"}>
               {authenticated ? "Buka studio" : "Buat akun"}
             </Link>

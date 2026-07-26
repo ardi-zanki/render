@@ -22,6 +22,7 @@ export const RATE_LIMITS = {
   payment_sync: { limit: 30, windowSec: 60 },
   payment_webhook: { limit: 120, windowSec: 60 },
   admin_action: { limit: 60, windowSec: 60 },
+  sensitive_action: { limit: 5, windowSec: 900 },
   public_api: { limit: 60, windowSec: 60 },
 } as const satisfies Record<string, RateLimitRule>;
 

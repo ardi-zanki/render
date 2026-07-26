@@ -35,6 +35,14 @@ function sessionAgeSeconds(createdAt: Date | string) {
   return (Date.now() - new Date(createdAt).getTime()) / 1000;
 }
 
+export function isRecentAuthentication(
+  createdAt: Date | string,
+  maxAgeSec: number = env.SENSITIVE_ACTION_MAX_AGE,
+) {
+  const age = sessionAgeSeconds(createdAt);
+  return Number.isFinite(age) && age >= 0 && age <= maxAgeSec;
+}
+
 /**
  * Require an admin; non-admins are sent back to the dashboard. Admin sessions
  * also have a shorter effective lifetime than normal sessions (PRD §10.1):
@@ -60,7 +68,7 @@ export async function requireRecentAuth(
   maxAgeSec: number = env.SENSITIVE_ACTION_MAX_AGE,
 ) {
   const session = await requireUser();
-  if (sessionAgeSeconds(session.session.createdAt) > maxAgeSec) {
+  if (!isRecentAuthentication(session.session.createdAt, maxAgeSec)) {
     redirect("/login?reauth=sensitive");
   }
   return session;
