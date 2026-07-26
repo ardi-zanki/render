@@ -3,39 +3,36 @@ import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent } from "@/components/ui/card";
+import { supportContact } from "@/lib/support";
 
 export const metadata: Metadata = { title: "Bantuan" };
-
-const SUPPORT_EMAIL = "support@renderai.app";
-const WHATSAPP_SUPPORT = "https://wa.me/6200012340001";
-const INSTAGRAM_SUPPORT = "https://www.instagram.com/renderai.app";
 
 const contacts = [
   {
     label: "Email",
     description: "Kirim pertanyaan detail, kendala akun, pembayaran, atau hasil render.",
-    value: SUPPORT_EMAIL,
-    href: `mailto:${SUPPORT_EMAIL}`,
+    value: supportContact.email,
+    href: `mailto:${supportContact.email}`,
     icon: Mail,
     external: false,
   },
-  {
+  ...(supportContact.whatsapp ? [{
     label: "WhatsApp",
     description: "Hubungi kami untuk bantuan cepat terkait workflow dan status layanan.",
-    value: "+62 000 1234 0001",
-    href: WHATSAPP_SUPPORT,
+    value: supportContact.whatsapp.label,
+    href: supportContact.whatsapp.href,
     icon: MessageCircle,
     external: true,
-  },
-  {
+  }] : []),
+  ...(supportContact.instagram ? [{
     label: "Instagram",
     description: "Ikuti update produk, contoh hasil render, dan pengumuman terbaru.",
-    value: "@renderai.app",
-    href: INSTAGRAM_SUPPORT,
+    value: supportContact.instagram.label,
+    href: supportContact.instagram.href,
     icon: AtSign,
     external: true,
-  },
-] as const;
+  }] : []),
+];
 
 export default function SupportPage() {
   return (

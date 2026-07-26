@@ -46,6 +46,8 @@ envVarGroups:
         value: "43200"
       - key: SENSITIVE_ACTION_MAX_AGE
         value: "900"
+      - key: SUPPORT_EMAIL
+        value: support@renderai.id
       - key: MIDTRANS_IS_PRODUCTION
         value: "true"
       # Secrets — set these in the Render dashboard (Neon DB URL + credentials):
@@ -76,8 +78,6 @@ envVarGroups:
       - key: R2_SECRET_ACCESS_KEY
         sync: false
       - key: R2_BUCKET_NAME
-        sync: false
-      - key: R2_PUBLIC_URL
         sync: false
       # Comma-separated app origins applied by `pnpm cors:setup`.
       - key: R2_CORS_ORIGINS

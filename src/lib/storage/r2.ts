@@ -86,9 +86,7 @@ export function createR2Provider(): StorageProvider {
           Key: key,
           Body: body,
           ContentType: contentType,
-          // Each render asset has a unique, immutable URL — let browsers cache it
-          // so re-mounting the image (e.g. switching studio tabs) never refetches.
-          CacheControl: "public, max-age=31536000, immutable",
+          CacheControl: "private, max-age=3600",
         }),
       );
       return { key, url: this.publicUrl(key) };
@@ -109,8 +107,8 @@ export function createR2Provider(): StorageProvider {
     },
 
     publicUrl(key) {
-      const base = env.R2_PUBLIC_URL?.replace(/\/$/, "");
-      return base ? `${base}/${key}` : key;
+      // R2 is a private object store. Browser access must use a signed URL.
+      return key;
     },
   };
 }

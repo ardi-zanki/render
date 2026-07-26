@@ -24,6 +24,10 @@ overrides:
   # Keep Next's optional image dependency aligned with the root sharp version so
   # only one libvips binary is loaded during production builds.
   sharp: 0.35.3
+  # Next 16.2.x still pins vulnerable PostCSS 8.4.x internally.
+  postcss: 8.5.23
+  # better-auth's optional drizzle-kit path pulls an outdated esbuild release.
+  '@esbuild-kit/core-utils>esbuild': 0.28.1
 minimumReleaseAgeExclude:
   - '@aws-sdk/checksums@3.1000.4'
   - '@aws-sdk/client-s3@3.1065.0'

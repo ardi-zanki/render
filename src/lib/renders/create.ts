@@ -117,7 +117,7 @@ export async function createRender(
     return {
       renderId: render.id,
       status: "queued",
-      originalUrl: browserAssetUrl(original.fileUrl, original.fileKey),
+      originalUrl: await browserAssetUrl(original.fileUrl, original.fileKey),
       balance: balanceAfterDeduction,
     };
   } catch (err) {
@@ -251,7 +251,7 @@ export async function createRenderEdit(
     return {
       renderId,
       status: "queued",
-      originalUrl: browserAssetUrl(original.fileUrl, original.fileKey),
+      originalUrl: await browserAssetUrl(original.fileUrl, original.fileKey),
       balance: deduction.balance,
     };
   } catch (err) {
@@ -418,7 +418,7 @@ export async function createRenderTextureEdit(
     return {
       renderId,
       status: "queued",
-      originalUrl: browserAssetUrl(original.fileUrl, original.fileKey),
+      originalUrl: await browserAssetUrl(original.fileUrl, original.fileKey),
       balance: deduction.balance,
     };
   } catch (err) {

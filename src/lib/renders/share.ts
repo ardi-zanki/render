@@ -75,7 +75,7 @@ export async function getPublicRender(
   // Share page (principle of least privilege: return only what the UI needs).
   return {
     mode: r.mode,
-    resultUrl: browserAssetUrl(asset.fileUrl, asset.fileKey),
+    resultUrl: await browserAssetUrl(asset.fileUrl, asset.fileKey),
     createdAt: r.createdAt,
     creatorName: owner?.name ?? "Render Studio user",
   };

@@ -230,18 +230,13 @@ test("user can login and create a mock render", async ({ page }) => {
     new RegExp(`/renders/new\\?source=${renderId}$`),
   );
 
-  // Bantuan is now an internal app page with clear contact channels.
+  // Bantuan only shows production-ready contact channels.
   await page.goto("/support");
   await expect(page.getByRole("heading", { name: "Bantuan" })).toBeVisible();
   await expect(
-    page.locator('a[href="mailto:support@renderai.app"]'),
+    page.locator('a[href="mailto:support@renderai.id"]'),
   ).toContainText("Email");
-  await expect(page.locator('a[href^="https://wa.me/"]')).toContainText(
-    "WhatsApp",
-  );
-  await expect(
-    page.locator('a[href^="https://www.instagram.com/"]'),
-  ).toContainText("Instagram");
+  await expect(page.locator('a[href*="6200012340001"]')).toHaveCount(0);
 
   // A logged-in visitor on the public share page should see creator metadata
   // and land in a fully hydrated studio when choosing Open Studio.

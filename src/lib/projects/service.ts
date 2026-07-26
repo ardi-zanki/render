@@ -218,7 +218,7 @@ export async function coverImagesByProject(
     if (latestAsset) {
       cover.set(
         projectId,
-        browserAssetUrl(latestAsset.fileUrl, latestAsset.fileKey),
+        await browserAssetUrl(latestAsset.fileUrl, latestAsset.fileKey),
       );
     }
   }

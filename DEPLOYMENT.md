@@ -93,7 +93,9 @@ Antrean menggunakan PostgreSQL dan mendukung beberapa worker tanpa Redis.
 
 ## Cloudflare R2 CORS
 
-Bucket R2 harus mengizinkan origin aplikasi agar Render Studio dapat membaca pixel gambar.
+Bucket R2 harus privat. Jangan aktifkan `r2.dev` atau custom public domain. Aplikasi memberikan akses melalui signed URL yang berlaku satu jam.
+
+Bucket juga harus mengizinkan origin aplikasi agar Render Studio dapat membaca pixel gambar.
 
 ```bash
 pnpm cors:setup
@@ -122,6 +124,8 @@ Sebelum migration production:
 - Jangan gunakan database yang sama untuk staging dan production.
 - Jalankan seed hanya saat data awal perlu diperbarui.
 
+`pnpm db:seed` menyinkronkan katalog paket secara idempoten dan menonaktifkan paket yang tidak lagi terdaftar di seed.
+
 ## CI/CD
 
 Workflow [.github/workflows/ci.yml](.github/workflows/ci.yml) berjalan untuk pull request dan push ke `main`. CI menjalankan:
@@ -140,6 +144,10 @@ Job deploy berjalan setelah verifikasi berhasil. Gunakan salah satu metode deplo
 - [ ] Web dan worker menggunakan mode pemrosesan yang benar.
 - [ ] Registrasi dan verifikasi email berhasil.
 - [ ] Render berhasil diproses dan disimpan di R2.
+- [ ] Bucket R2 tidak memiliki akses publik.
+- [ ] Halaman harga sesuai dengan katalog dari `pnpm db:seed`.
+- [ ] Email dukungan valid; WhatsApp dan Instagram hanya muncul jika dikonfigurasi.
+- [ ] Response aplikasi memuat CSP dan security header lainnya.
 - [ ] Kredit dikembalikan saat render gagal.
 - [ ] Pembayaran dan webhook Midtrans berhasil.
 - [ ] Dashboard admin dapat diakses oleh admin.

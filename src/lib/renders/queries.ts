@@ -79,10 +79,10 @@ export async function getRenderDetail(
     orderBy: asc(renderAssets.createdAt),
   });
 
-  const views = assets.map((a) => ({
+  const views = await Promise.all(assets.map(async (a) => ({
     id: a.id,
     type: a.type,
-    fileUrl: browserAssetUrl(a.fileUrl, a.fileKey),
+    fileUrl: await browserAssetUrl(a.fileUrl, a.fileKey),
     fileKey: a.fileKey,
     fileName: a.fileName,
     fileSize: a.fileSize,
@@ -91,7 +91,7 @@ export async function getRenderDetail(
     height: a.height,
     createdAt: a.createdAt,
     config: publicRenderConfig(a.config),
-  }));
+  })));
   const latestResult = getLatestRenderableAsset(views);
   const updatedAt = [
     render.createdAt,
@@ -177,7 +177,7 @@ export async function listRenders(
   ]);
 
   const assetsByRender = new Map<string, Array<(typeof assets)[number]>>();
-  const originalByRender = new Map<string, string>();
+  const originalByRender = new Map<string, (typeof assets)[number]>();
   for (const a of assets) {
     const groupedAssets = assetsByRender.get(a.renderId);
     if (groupedAssets) {
@@ -186,29 +186,38 @@ export async function listRenders(
       assetsByRender.set(a.renderId, [a]);
     }
     if (a.type === "original" && !originalByRender.has(a.renderId)) {
-      originalByRender.set(
-        a.renderId,
-        browserAssetUrl(a.fileUrl, a.fileKey),
-      );
+      originalByRender.set(a.renderId, a);
     }
   }
   const projectById = new Map(projectRows.map((p) => [p.id, p.name]));
 
-  return rows.map((r) => ({
-    id: r.id,
-    mode: r.mode,
-    name: r.name ?? null,
-    status: r.status,
-    createdAt: r.createdAt,
-    projectId: r.projectId,
-    projectName: projectById.get(r.projectId) ?? null,
-    creditsUsed: r.creditsUsed,
-    archived: !!r.archivedAt,
-    resultUrl: (() => {
+  return Promise.all(rows.map(async (r) => {
+    const resultAsset = (() => {
       const asset = getLatestRenderableAsset(assetsByRender.get(r.id) ?? []);
-      return asset ? browserAssetUrl(asset.fileUrl, asset.fileKey) : null;
-    })(),
-    originalUrl: originalByRender.get(r.id) ?? null,
+      return asset ?? null;
+    })();
+    const originalAsset = originalByRender.get(r.id);
+    const [resultUrl, originalUrl] = await Promise.all([
+      resultAsset
+        ? browserAssetUrl(resultAsset.fileUrl, resultAsset.fileKey)
+        : null,
+      originalAsset
+        ? browserAssetUrl(originalAsset.fileUrl, originalAsset.fileKey)
+        : null,
+    ]);
+    return {
+      id: r.id,
+      mode: r.mode,
+      name: r.name ?? null,
+      status: r.status,
+      createdAt: r.createdAt,
+      projectId: r.projectId,
+      projectName: projectById.get(r.projectId) ?? null,
+      creditsUsed: r.creditsUsed,
+      archived: !!r.archivedAt,
+      resultUrl,
+      originalUrl,
+    };
   }));
 }
 
