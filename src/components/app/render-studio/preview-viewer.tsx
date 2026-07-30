@@ -366,10 +366,34 @@ export function RenderPreviewViewer({
   // Persistent backdrop image, kept on one stable <img> across mode/view changes
   // so swapping subtrees (Edit ↔ Hasil/Komparasi) never shows a blank frame: the
   // browser holds the old frame until the new src decodes.
+  const inComparison = canCompare && view === "comparison";
   const baseImageSrc =
-    studioMode === "texture" || view === "comparison"
-      ? resultUrl
-      : shownImage;
+    studioMode === "texture" || inComparison ? resultUrl : shownImage;
+  // Comparison zooms by growing the stage and centering a shrink-to-fit frame
+  // inside it, so a backdrop scaled by canvasTransformStyle lands somewhere else
+  // above 100% and reads as a second copy of the result next to the real one.
+  // Keep the backdrop only until the overlay is measured, and never scale it
+  // while comparing — the overlay owns the zoomed pixels.
+  const showBaseImage = Boolean(
+    baseImageSrc && (!inComparison || !canShowComparisonOverlay),
+  );
+  const baseImageStyle = inComparison ? undefined : canvasTransformStyle;
+
+  // Zooming past 100% grows the comparison stage past the viewport, and the
+  // fitted frame sits in the middle of it. Center the scroll on every zoom step
+  // so the image stays put instead of drifting out of view at the top-left.
+  useEffect(() => {
+    if (!inComparison) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      canvas.scrollLeft = (canvas.scrollWidth - canvas.clientWidth) / 2;
+      canvas.scrollTop = (canvas.scrollHeight - canvas.clientHeight) / 2;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [inComparison, zoom]);
+
   const canvasCursorStyle = canPanCanvas
     ? ({
         cursor: isCanvasPanning ? "grabbing" : "grab",
@@ -597,11 +621,11 @@ export function RenderPreviewViewer({
         )}
         style={canvasCursorStyle}
       >
-        {baseImageSrc && (
+        {showBaseImage && baseImageSrc && (
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0"
-            style={canvasTransformStyle}
+            style={baseImageStyle}
           >
             <RenderImage
               src={baseImageSrc}
