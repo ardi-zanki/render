@@ -1,71 +1,71 @@
-# Deployment RenderAI
+# RenderAI Deployment
 
-RenderAI menggunakan satu Docker image untuk dua proses:
+RenderAI uses one Docker image for two processes:
 
-- **Web** menjalankan aplikasi Next.js.
-- **Worker** memproses antrean render.
+- **Web** runs the Next.js app.
+- **Worker** processes the render queue.
 
-Konfigurasi lengkap tersedia di [.env.example](.env.example).
+The full configuration reference is in [.env.example](.env.example).
 
-## Mode pemrosesan
+## Processing mode
 
-Gunakan worker untuk production:
+Use the worker in production:
 
 ```env
 RENDER_PROCESSING_MODE=worker
 ```
 
-Web akan membuat job dan worker akan memprosesnya. Jika worker tidak aktif, job tetap berstatus `queued`.
+The web app creates jobs and the worker processes them. If the worker is not running, jobs stay `queued`.
 
-Mode `inline` memproses render melalui web dan hanya cocok untuk satu instance:
+The `inline` mode processes renders inside the web app and only works with a single instance:
 
 ```env
 RENDER_PROCESSING_MODE=inline
 ```
 
-## Layanan yang diperlukan
+## Required services
 
 - PostgreSQL
 - Cloudflare R2
 - Resend
 - Midtrans
 - fal.ai
-- Google OAuth, jika diperlukan
+- Google OAuth, if needed
 
-Gunakan credential terpisah untuk staging dan production. `BETTER_AUTH_SECRET` dan `JWT_SECRET` harus kuat, berbeda, dan tidak disimpan di repository.
+Use separate credentials for staging and production. `BETTER_AUTH_SECRET` and `JWT_SECRET` must be strong, different from each other, and never committed to the repository.
 
 ## Render.com
 
-File [render.yaml](render.yaml) membuat satu web service dan satu worker dengan Docker image yang sama.
+[render.yaml](render.yaml) creates one web service and one worker from the same Docker image.
 
-1. Push repository ke GitHub.
-2. Buat Blueprint baru dari `render.yaml`.
-3. Isi seluruh environment variable yang ditandai sebagai secret.
-4. Pastikan web dan worker menggunakan `RENDER_PROCESSING_MODE=worker`.
-5. Jalankan migration dan seed satu kali melalui Render Shell:
+1. Push the repository to GitHub.
+2. Create a new Blueprint from `render.yaml`.
+3. Fill in every environment variable marked as a secret.
+4. Make sure both web and worker use `RENDER_PROCESSING_MODE=worker`.
+5. Run the migration and seed once from the Render Shell:
 
 ```bash
 pnpm db:migrate
 pnpm db:seed
 ```
 
-Blueprint membuat layanan berikut:
+The Blueprint creates these services:
 
 - `renderai-web`
 - `renderai-worker`
 
-Jangan menjalankan seed pada setiap deployment karena seed memperbarui konfigurasi paket kredit.
+Do not run the seed on every deployment, because it updates the credit package configuration.
 
 ## VPS
 
-Deployment VPS menggunakan [docker-compose.yml](docker-compose.yml) dan [Caddyfile](Caddyfile). Caddy menyediakan HTTPS otomatis setelah DNS domain mengarah ke server.
+VPS deployment uses [docker-compose.yml](docker-compose.yml) and the [Caddyfile](Caddyfile). Caddy handles HTTPS automatically once the domain's DNS points to the server.
 
-Kebutuhan awal yang disarankan:
+Recommended starting size:
 
 - 2 vCPU
 - 4 GB RAM
 
-Langkah deployment:
+Deployment steps:
 
 ```bash
 git clone https://github.com/ardi-zanki/render.git renderai
@@ -73,7 +73,7 @@ cd renderai
 cp .env.example .env.production
 ```
 
-Isi `.env.production`, lalu jalankan:
+Fill in `.env.production`, then run:
 
 ```bash
 export DOMAIN=app.example.com
@@ -83,71 +83,71 @@ docker compose run --rm web pnpm db:seed
 docker compose up -d
 ```
 
-Tambahkan worker saat kapasitas render perlu ditingkatkan:
+Add more workers when you need more render capacity:
 
 ```bash
 docker compose up -d --scale worker=2
 ```
 
-Antrean menggunakan PostgreSQL dan mendukung beberapa worker tanpa Redis.
+The queue runs on PostgreSQL and supports multiple workers without Redis.
 
 ## Cloudflare R2 CORS
 
-Bucket R2 harus privat. Jangan aktifkan `r2.dev` atau custom public domain. Aplikasi memberikan akses melalui signed URL yang berlaku satu jam.
+The R2 bucket must stay private. Do not enable `r2.dev` or a custom public domain. The app grants access through signed URLs that expire after one hour.
 
-Bucket juga harus mengizinkan origin aplikasi agar Render Studio dapat membaca pixel gambar.
+The bucket also needs to allow the app's origin so Render Studio can read image pixels.
 
 ```bash
 pnpm cors:setup
 ```
 
-Untuk menambahkan origin lain:
+To add other origins:
 
 ```bash
 pnpm cors:setup https://app.example.com https://staging.example.com
 ```
 
-Daftarkan setiap origin secara eksplisit dan hindari wildcard `*`.
+List every origin explicitly and avoid the `*` wildcard.
 
 ## Database
 
-Jalankan migration pada setiap perubahan schema:
+Run migrations after every schema change:
 
 ```bash
 pnpm db:migrate
 ```
 
-Sebelum migration production:
+Before migrating production:
 
-- Uji migration di staging.
-- Buat backup sebelum perubahan destruktif.
-- Jangan gunakan database yang sama untuk staging dan production.
-- Jalankan seed hanya saat data awal perlu diperbarui.
+- Test the migration on staging.
+- Back up the database before destructive changes.
+- Do not share one database between staging and production.
+- Run the seed only when the initial data needs updating.
 
-`pnpm db:seed` menyinkronkan katalog paket secara idempoten dan menonaktifkan paket yang tidak lagi terdaftar di seed.
+`pnpm db:seed` syncs the package catalog idempotently and disables any package no longer listed in the seed.
 
 ## CI/CD
 
-Workflow [.github/workflows/ci.yml](.github/workflows/ci.yml) berjalan untuk pull request dan push ke `main`. CI menjalankan:
+The [.github/workflows/ci.yml](.github/workflows/ci.yml) workflow runs on pull requests and pushes to `main`. CI runs:
 
-- Migration database
-- Lint dan pemeriksaan design system
-- Unit test dan integration test
+- Database migrations
+- Lint and design system checks
+- Unit and integration tests
 - Production build
 
-Job deploy berjalan setelah verifikasi berhasil. Gunakan salah satu metode deployment: auto-deploy Render atau deploy hook.
+The deploy job runs after those checks pass. Pick one deployment method: Render auto-deploy or a deploy hook.
 
-## Pemeriksaan setelah deployment
+## Post-deployment checks
 
-- [ ] HTTPS aktif.
-- [ ] `/api/health` mengembalikan `ok: true`.
-- [ ] Web dan worker menggunakan mode pemrosesan yang benar.
-- [ ] Registrasi dan verifikasi email berhasil.
-- [ ] Render berhasil diproses dan disimpan di R2.
-- [ ] Bucket R2 tidak memiliki akses publik.
-- [ ] Halaman harga sesuai dengan katalog dari `pnpm db:seed`.
-- [ ] Email dukungan valid; WhatsApp dan Instagram hanya muncul jika dikonfigurasi.
-- [ ] Response aplikasi memuat CSP dan security header lainnya.
-- [ ] Kredit dikembalikan saat render gagal.
-- [ ] Pembayaran dan webhook Midtrans berhasil.
-- [ ] Dashboard admin dapat diakses oleh admin.
+- [ ] HTTPS is active.
+- [ ] `/api/health` returns `ok: true`.
+- [ ] Web and worker use the correct processing mode.
+- [ ] Sign-up and email verification work.
+- [ ] Renders complete and are stored in R2.
+- [ ] The R2 bucket has no public access.
+- [ ] The pricing page matches the catalog from `pnpm db:seed`.
+- [ ] The support email is valid; WhatsApp and Instagram appear only when configured.
+- [ ] Responses include the CSP and other security headers.
+- [ ] Credits are refunded when a render fails.
+- [ ] Midtrans payments and webhooks work.
+- [ ] Admins can access the admin dashboard.
