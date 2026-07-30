@@ -25,7 +25,7 @@ RenderAI is an open-source app for creating and managing AI-generated architectu
 
 ### Requirements
 
-- Node.js 22
+- Node.js 24 (LTS)
 - pnpm 11
 - Docker, or a local PostgreSQL instance
 

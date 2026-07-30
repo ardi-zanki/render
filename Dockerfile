@@ -5,7 +5,7 @@
 # Same image deploys to: a VPS (docker compose), Render (docker runtime), or
 # Cloudflare Containers — no code differences (12-factor, config via env).
 
-FROM node:22-bookworm-slim AS base
+FROM node:24-bookworm-slim AS base
 RUN npm install -g pnpm@11.5.2
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1

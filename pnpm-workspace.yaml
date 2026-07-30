@@ -25,7 +25,7 @@ overrides:
   # only one libvips binary is loaded during production builds.
   sharp: 0.35.3
   # Next 16.2.x still pins vulnerable PostCSS 8.4.x internally.
-  postcss: 8.5.23
+  postcss: 8.5.25
   # better-auth's optional drizzle-kit path pulls an outdated esbuild release.
   '@esbuild-kit/core-utils>esbuild': 0.28.1
 minimumReleaseAgeExclude:
@@ -72,3 +72,4 @@ minimumReleaseAgeExclude:
   - '@img/sharp-win32-ia32@0.35.3'
   - '@img/sharp-win32-x64@0.35.3'
   - sharp@0.35.3
+  - postcss@8.5.25
