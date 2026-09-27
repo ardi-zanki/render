@@ -35,17 +35,17 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
-    "jose": "^6.2.4",
-    "lucide-react": "^1.27.0",
+    "jose": "^6.2.12",
+    "lucide-react": "^1.48.0",
     "next": "16.2.12",
     "postgres": "^3.4.9",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "resend": "^6.18.1",
+    "resend": "^6.30.0",
     "sharp": "0.35.3",
-    "sonner": "^2.0.7",
-    "tailwind-merge": "^3.6.0",
-    "zod": "^4.4.3"
+    "sonner": "^2.0.8",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^4.6.5"
   },
   "optionalDependencies": {
     "@img/sharp-libvips-linux-x64": "1.3.2",
