@@ -42,14 +42,14 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "resend": "^6.30.0",
-    "sharp": "0.35.3",
+    "sharp": "0.35.4",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.5"
   },
   "optionalDependencies": {
-    "@img/sharp-libvips-linux-x64": "1.3.2",
-    "@img/sharp-linux-x64": "0.35.3"
+    "@img/sharp-libvips-linux-x64": "1.3.3",
+    "@img/sharp-linux-x64": "0.35.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
