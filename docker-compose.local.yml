@@ -1,5 +1,7 @@
 # Local test stack — run the production Docker image on your machine.
-# Self-contained Postgres + mock AI/payment + local storage → no external keys.
+# Postgres + mock AI/payment + local storage. Production-mode email still
+# needs Resend credentials for sign-up; use pnpm dev for console-only email.
+#   cp .env.example .env.docker   # generate two secrets; see DEPLOYMENT.md
 #
 #   docker compose -f docker-compose.local.yml build
 #   docker compose -f docker-compose.local.yml up -d db
@@ -20,29 +22,62 @@ services:
       - "5433:5432" # host 5433 so it won't clash with your local Postgres on 5432
     volumes:
       - renderai_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U renderai -d renderai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
   web:
     build:
       context: .
+      args:
+        APP_URL: http://localhost:3000
     image: renderai-local:latest
-    env_file: .env.docker
+    env_file:
+      - path: .env.docker
+        required: false # allows starting only db before creating the app env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      APP_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3000
+      DATABASE_URL: postgresql://renderai:renderai@db:5432/renderai
+      AI_PROVIDER: mock
+      PAYMENT_PROVIDER: mock
+      STORAGE_PROVIDER: local
+      RENDER_PROCESSING_MODE: worker
     ports:
       - "3000:3000"
     volumes:
       - renderai_uploads:/app/public/uploads
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   worker:
     image: renderai-local:latest
     command: pnpm worker
-    env_file: .env.docker
+    env_file:
+      - path: .env.docker
+        required: false # allows starting only db before creating the app env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      APP_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3000
+      DATABASE_URL: postgresql://renderai:renderai@db:5432/renderai
+      AI_PROVIDER: mock
+      PAYMENT_PROVIDER: mock
+      STORAGE_PROVIDER: local
+      RENDER_PROCESSING_MODE: worker
     volumes:
       - renderai_uploads:/app/public/uploads
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

@@ -87,6 +87,9 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Typecheck with the native compiler
+        run: pnpm typecheck
+
   deploy:
     name: Deploy Render
     needs: verify

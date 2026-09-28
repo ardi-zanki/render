@@ -1,9 +1,11 @@
 # Render.com Blueprint — RenderAI (same Docker image as the VPS path).
-# Database = Neon (set DATABASE_URL as a secret). The worker is mandatory:
-# without it, render jobs stay "queued" (deployment PRD §13).
+# PostgreSQL is external (for example Neon). Set DATABASE_URL in the secrets
+# group. The worker is mandatory:
+# without it, render jobs stay "queued".
 #
-# First deploy: fill all sync:false secrets, then run migrations + seed once
-# from a Render Shell (see DEPLOYMENT.md).
+# Before creating the Blueprint, create the renderai-secrets environment group
+# in the Dashboard and populate it as described in DEPLOYMENT.md. Shared secrets
+# must be identical for web and worker. sync:false is not supported in groups.
 
 envVarGroups:
   - name: renderai-shared
@@ -38,8 +40,6 @@ envVarGroups:
         value: renderai
       - key: JWT_AUDIENCE
         value: renderai-app
-      - key: SESSION_DEFAULT_MAX_AGE
-        value: "604800"
       - key: SESSION_REMEMBER_ME_MAX_AGE
         value: "2592000"
       - key: ADMIN_SESSION_MAX_AGE
@@ -50,42 +50,6 @@ envVarGroups:
         value: support@renderai.id
       - key: MIDTRANS_IS_PRODUCTION
         value: "true"
-      # Secrets — set these in the Render dashboard (Neon DB URL + credentials):
-      - key: DATABASE_URL
-        sync: false
-      - key: APP_URL
-        sync: false
-      - key: BETTER_AUTH_URL
-        sync: false
-      - key: BETTER_AUTH_SECRET
-        sync: false
-      - key: JWT_SECRET
-        sync: false
-      - key: FAL_KEY
-        sync: false
-      - key: MIDTRANS_SERVER_KEY
-        sync: false
-      - key: MIDTRANS_CLIENT_KEY
-        sync: false
-      - key: RESEND_API_KEY
-        sync: false
-      - key: EMAIL_FROM
-        sync: false
-      - key: R2_ACCOUNT_ID
-        sync: false
-      - key: R2_ACCESS_KEY_ID
-        sync: false
-      - key: R2_SECRET_ACCESS_KEY
-        sync: false
-      - key: R2_BUCKET_NAME
-        sync: false
-      # Comma-separated app origins applied by `pnpm cors:setup`.
-      - key: R2_CORS_ORIGINS
-        sync: false
-      - key: GOOGLE_CLIENT_ID
-        sync: false
-      - key: GOOGLE_CLIENT_SECRET
-        sync: false
 
 services:
   - type: web
@@ -98,6 +62,7 @@ services:
     autoDeploy: true
     envVars:
       - fromGroup: renderai-shared
+      - fromGroup: renderai-secrets
 
   - type: worker
     name: renderai-worker
@@ -109,3 +74,4 @@ services:
     autoDeploy: true
     envVars:
       - fromGroup: renderai-shared
+      - fromGroup: renderai-secrets

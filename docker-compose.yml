@@ -1,25 +1,20 @@
-# VPS deployment (deployment PRD §3, §7, §8). One image, two roles + Caddy.
-#
-#   cp .env.example .env.production   # fill PRODUCTION values
-#   export DOMAIN=app.renderai.com
-#   docker compose build
-#   docker compose run --rm web pnpm db:migrate   # first deploy only
-#   docker compose run --rm web pnpm db:seed      # first deploy only
-#   docker compose up -d
-#   # scale workers (deployment PRD §13): docker compose up -d --scale worker=2
-#
-# Queue is PostgreSQL-backed, so no Redis container is required. A Redis service
-# is left commented for a future BullMQ migration.
+# VPS: use --env-file .env.production for Compose interpolation as well as
+# container env. See DEPLOYMENT.md for build, migration and startup commands.
+# PostgreSQL is external; this stack does not create a database service.
 name: renderai
 
 services:
   web:
     build:
       context: .
+      args:
+        APP_URL: ${APP_URL:?set APP_URL to your public HTTPS origin}
     image: renderai:latest
     env_file: .env.production
     environment:
       PORT: "3000"
+      NODE_ENV: production
+      RENDER_PROCESSING_MODE: worker
     expose:
       - "3000"
     restart: unless-stopped
@@ -28,6 +23,9 @@ services:
     image: renderai:latest
     command: pnpm worker
     env_file: .env.production
+    environment:
+      NODE_ENV: production
+      RENDER_PROCESSING_MODE: worker
     restart: unless-stopped
     depends_on:
       - web
@@ -46,11 +44,6 @@ services:
     depends_on:
       - web
     restart: unless-stopped
-
-  # redis:                       # only needed if you migrate the queue to BullMQ
-  #   image: redis:7-alpine
-  #   command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "noeviction"]
-  #   restart: unless-stopped
 
 volumes:
   caddy_data:

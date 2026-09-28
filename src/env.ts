@@ -9,7 +9,7 @@ import { z } from "zod";
  */
 const boolish = (def: boolean) =>
   z
-    .string()
+    .enum(["true", "false", ""])
     .optional()
     .transform((v) => (v == null || v === "" ? def : v === "true"));
 
@@ -40,10 +40,9 @@ const schema = z.object({
   RATE_LIMIT_DRIVER: z.literal("database").default("database"),
   RATE_LIMIT_ENABLED: boolish(true),
 
-  SESSION_DEFAULT_MAX_AGE: z.coerce.number().int().default(604800),
-  SESSION_REMEMBER_ME_MAX_AGE: z.coerce.number().int().default(2592000),
-  ADMIN_SESSION_MAX_AGE: z.coerce.number().int().default(43200),
-  SENSITIVE_ACTION_MAX_AGE: z.coerce.number().int().default(900),
+  SESSION_REMEMBER_ME_MAX_AGE: z.coerce.number().int().positive().default(2592000),
+  ADMIN_SESSION_MAX_AGE: z.coerce.number().int().positive().default(43200),
+  SENSITIVE_ACTION_MAX_AGE: z.coerce.number().int().positive().default(900),
 
   STORAGE_PROVIDER: z.enum(["r2", "local"]).default("r2"),
   R2_ACCOUNT_ID: optional,
@@ -89,7 +88,10 @@ const schema = z.object({
   FAL_RENDER_SAFETY_TOLERANCE: z
     .enum(["1", "2", "3", "4", "5"])
     .default("2"),
-  FAL_RENDER_SEED: z.coerce.number().int().optional(),
+  FAL_RENDER_SEED: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.coerce.number().int().optional(),
+  ),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -99,7 +101,7 @@ if (!parsed.success) {
     .map((i) => `  • ${i.path.join(".")}: ${i.message}`)
     .join("\n");
   throw new Error(
-    `Environment variable tidak valid. Periksa .env.local:\n${issues}`,
+    `Environment variable tidak valid. Periksa environment proses atau file env yang dimuat:\n${issues}`,
   );
 }
 

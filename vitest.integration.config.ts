@@ -9,6 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    clearMocks: true,
     include: ["tests/integration/**/*.test.ts"],
     hookTimeout: 30_000,
     testTimeout: 30_000,

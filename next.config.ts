@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
   // Playwright can use an isolated cache so E2E does not collide with a
   // developer's running `.next/dev/lock`.
   distDir: process.env.NEXT_DIST_DIR || ".next",
-  // Standalone server output → small, portable Docker image (deployment PRD §9).
+  // Standalone server output used by scripts/start-standalone.mjs.
   output: "standalone",
   poweredByHeader: false,
   async headers() {
@@ -61,9 +61,8 @@ const nextConfig: NextConfig = {
     "kysely",
     "sharp",
   ],
-  outputFileTracingIncludes: {
-    "/*": ["./node_modules/sharp/**/*", "./node_modules/@img/**/*"],
-  },
+  // Next traces sharp automatically. Broad @img globs also match directory
+  // symlinks in pnpm installations and can crash Turbopack tracing.
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },

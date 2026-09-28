@@ -2,8 +2,7 @@
 #
 # One portable image for RenderAI. Runs as the WEB server by default, or as the
 # render WORKER when the command is overridden with `pnpm worker`.
-# Same image deploys to: a VPS (docker compose), Render (docker runtime), or
-# Cloudflare Containers — no code differences (12-factor, config via env).
+# Used by docker-compose.yml and render.yaml; runtime configuration comes from env.
 
 FROM node:24-bookworm-slim AS base
 RUN npm install -g pnpm@11.5.2
@@ -20,7 +19,13 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN pnpm build
+# APP_URL is public build metadata; never pass service credentials as build args.
+ARG APP_URL=http://localhost:3000
+RUN APP_URL="$APP_URL" BETTER_AUTH_URL="$APP_URL" \
+    DATABASE_URL=postgresql://build:build@127.0.0.1:1/build \
+    BETTER_AUTH_SECRET=build-only-secret-not-for-runtime-00001 \
+    JWT_SECRET=build-only-jwt-not-for-runtime-0000002 \
+    AI_PROVIDER=mock PAYMENT_PROVIDER=mock STORAGE_PROVIDER=local pnpm build
 
 # ---- runner: production runtime (serves both web and worker roles).
 FROM base AS runner
@@ -37,6 +42,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --chown=nextjs:nodejs \
   package.json pnpm-lock.yaml pnpm-workspace.yaml \
   next.config.ts tsconfig.json drizzle.config.ts ./
+
+# Initialize the local uploads mount with the runtime user as owner.
+RUN mkdir -p /app/public/uploads && chown nextjs:nodejs /app/public/uploads
 
 USER nextjs
 ENV PORT=3000
