@@ -1,3 +1,5 @@
+// Compatibility facade for existing integration callers. Application entry points
+// import focused modules directly to keep their dependency graphs explicit.
 export {
   LOW_CREDIT_THRESHOLD,
   RENDER_COST,
@@ -19,7 +21,8 @@ export {
   createRenderTextureEdit,
 } from "./create";
 export { startInlineRenderProcessing } from "./inline-processing";
-export { cancelRenderJob, listActiveRenderQueue } from "./jobs";
+export { cancelRenderJob } from "./jobs";
+export { listActiveRenderQueue } from "./queue";
 export {
   buildPrompt,
   buildTexturePrompt,

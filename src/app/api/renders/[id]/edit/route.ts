@@ -3,12 +3,10 @@ import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
 import { assertRateLimit } from "@/lib/rate-limit";
-import {
-  buildPrompt,
-  createRenderEdit,
-  getRenderDetail,
-  startInlineRenderProcessing,
-} from "@/lib/renders/service";
+import { buildPrompt } from "@/lib/renders/prompt";
+import { createRenderEdit } from "@/lib/renders/create";
+import { getRenderDetail } from "@/lib/renders/queries";
+import { startInlineRenderProcessing } from "@/lib/renders/inline-processing";
 import { renderIdSchema } from "@/lib/validations/api";
 import { createRenderSchema } from "@/lib/validations/render";
 

@@ -17,7 +17,7 @@ vi.mock("@/lib/rate-limit", () => ({
   },
 }));
 
-vi.mock("@/lib/renders/jobs", () => ({
+vi.mock("@/lib/renders/queue", () => ({
   markRenderQueueSeen: mocks.markRenderQueueSeen,
 }));
 

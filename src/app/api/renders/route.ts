@@ -3,11 +3,9 @@ import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
 import { getDefaultProject, getProject } from "@/lib/projects/service";
-import {
-  buildPrompt,
-  createRender,
-  startInlineRenderProcessing,
-} from "@/lib/renders/service";
+import { buildPrompt } from "@/lib/renders/prompt";
+import { createRender } from "@/lib/renders/create";
+import { startInlineRenderProcessing } from "@/lib/renders/inline-processing";
 import { assertRateLimit } from "@/lib/rate-limit";
 import { validateImageFile } from "@/lib/uploads/images";
 import { createRenderSchema } from "@/lib/validations/render";

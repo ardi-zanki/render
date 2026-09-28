@@ -14,7 +14,8 @@ import { renderAssets, renders, user } from "@/db/schema";
 import { getBalance } from "@/lib/credits";
 import { grantSignupBonus } from "@/lib/provisioning";
 import { getDefaultProject } from "@/lib/projects/service";
-import { createRender, processRenderJob } from "@/lib/renders/service";
+import { createRender } from "@/lib/renders/create";
+import { processRenderJob } from "@/lib/renders/processor";
 
 const EMAIL = "demo@renderai.test";
 

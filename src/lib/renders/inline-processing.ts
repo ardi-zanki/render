@@ -1,9 +1,9 @@
 import { env } from "@/env";
 
 /**
- * Local-development convenience: when render processing runs inline, kick the
- * worker after the request commits the render row. Production keeps this a no-op
- * because the dedicated worker process owns the queue.
+ * When inline mode is explicitly selected, schedule processing after enqueue.
+ * This is a best-effort in-process timer, not a durable execution guarantee.
+ * Worker mode leaves execution to the dedicated process (the production default).
  */
 export function startInlineRenderProcessing(
   renderId: string,

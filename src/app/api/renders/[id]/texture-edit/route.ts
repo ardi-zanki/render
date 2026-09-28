@@ -3,12 +3,10 @@ import { NextResponse } from "next/server";
 import { errorResponse } from "@/lib/api/errors";
 import { auth } from "@/lib/auth";
 import { assertRateLimit } from "@/lib/rate-limit";
-import {
-  buildTexturePrompt,
-  createRenderTextureEdit,
-  findLibraryTexture,
-  startInlineRenderProcessing,
-} from "@/lib/renders/service";
+import { buildTexturePrompt } from "@/lib/renders/prompt";
+import { createRenderTextureEdit } from "@/lib/renders/create";
+import { findLibraryTexture } from "@/lib/renders/texture-library";
+import { startInlineRenderProcessing } from "@/lib/renders/inline-processing";
 import { validateImageFile } from "@/lib/uploads/images";
 import { renderIdSchema } from "@/lib/validations/api";
 import { textureEditSchema } from "@/lib/validations/render";
