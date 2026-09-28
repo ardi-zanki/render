@@ -1,36 +1,25 @@
 /**
- * DB-backed render worker. Run with:
- *   pnpm render:worker        # continuous
- *   pnpm render:worker --once # process one available job
+ * Queue process entry point: pnpm worker [--once].
+ * Runtime env is loaded by the package script; queue logic lives in src/lib/renders.
  */
-import { processNextRenderJob } from "@/lib/renders/service";
+import { dbClient } from "@/db";
+import { runRenderWorker } from "@/lib/renders/worker";
 
+const shutdown = new AbortController();
 const once = process.argv.includes("--once");
-const workerId = `worker-${process.pid}`;
 
-async function tick() {
-  const result = await processNextRenderJob(workerId);
-  if (result.processed) {
-    console.log("processed", result);
-    return true;
-  }
-  return false;
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.once(signal, () => {
+    console.log(`${signal}: stopping after the current render job finishes`);
+    shutdown.abort();
+  });
 }
 
-async function main() {
-  if (once) {
-    await tick();
-    return;
-  }
+if (!once) console.log("Render worker started");
 
-  console.log(`Render worker started (${workerId})`);
-  for (;;) {
-    const processed = await tick();
-    await new Promise((resolve) => setTimeout(resolve, processed ? 250 : 2000));
-  }
-}
-
-main().catch((err) => {
-  console.error("Render worker failed:", err);
-  process.exit(1);
-});
+runRenderWorker({ once, signal: shutdown.signal })
+  .finally(() => dbClient.end({ timeout: 5 }))
+  .catch((error) => {
+    console.error("Render worker failed:", error);
+    process.exitCode = 1;
+  });
