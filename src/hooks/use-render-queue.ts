@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import type { RenderMode } from "@/db/schema";
+import type { RenderMode } from "@/domain/types";
 import { apiErrorMessage, apiJson } from "@/lib/client-api";
 
 export type RenderQueueItem = {

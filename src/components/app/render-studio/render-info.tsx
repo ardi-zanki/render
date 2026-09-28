@@ -1,6 +1,6 @@
 "use client";
 
-import type { RenderMode } from "@/db/schema";
+import type { RenderMode } from "@/domain/types";
 import { Badge } from "@/components/ui/badge";
 import { MODE_LABEL } from "@/lib/renders/labels";
 

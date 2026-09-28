@@ -6,7 +6,7 @@ import { AdminTable } from "@/components/app/admin-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/ui/pagination";
-import type { RenderMode, RenderStatus } from "@/db/schema";
+import type { RenderMode, RenderStatus } from "@/domain/types";
 import { countAllRenders, listAllRenders } from "@/lib/admin/service";
 import { MODE_LABEL, STATUS_LABEL, statusBadgeVariant } from "@/lib/renders/labels";
 import { requireAdmin } from "@/lib/session";

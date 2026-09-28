@@ -3,7 +3,8 @@ import { randomBytes } from "node:crypto";
 import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { renderAssets, renders, user, type RenderMode } from "@/db/schema";
+import { renderAssets, renders, user } from "@/db/schema";
+import type { RenderMode } from "@/domain/types";
 import { env } from "@/env";
 import { browserAssetUrl } from "@/lib/storage";
 import { getLatestRenderableAsset } from "./types";

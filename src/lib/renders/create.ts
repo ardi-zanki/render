@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import { renderAssets, renderJobs, renders, type RenderConfig } from "@/db/schema";
+import { renderAssets, renderJobs, renders } from "@/db/schema";
+import type { RenderConfig } from "@/domain/types";
 import { env } from "@/env";
 import {
   applyCreditChange,

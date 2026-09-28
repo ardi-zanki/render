@@ -1,4 +1,4 @@
-import type { PaymentStatus } from "@/db/schema";
+import type { PaymentStatus } from "@/domain/types";
 
 /** Map a Midtrans `transaction_status` (+ fraud_status) to our PaymentStatus. */
 export function mapMidtransStatus(

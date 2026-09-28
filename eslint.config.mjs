@@ -19,6 +19,21 @@ const eslintConfig = defineConfig([
       },
     },
   },
+  {
+    files: ["src/domain/**/*.ts"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        patterns: [{
+          group: [
+            "@/db", "@/db/**", "@/env", "@/lib/**", "@/app/**",
+            "@/components/**", "@/hooks/**", "next", "next/**",
+            "drizzle-orm", "drizzle-orm/**", "node:*",
+          ],
+          message: "Domain contracts must stay independent of framework, UI, and infrastructure modules.",
+        }],
+      }],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

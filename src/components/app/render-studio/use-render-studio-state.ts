@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
+import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/domain/types";
 import { validateImageFileClient } from "@/lib/uploads/validate-client";
 import type { Scene, StudioView } from "./types";
 

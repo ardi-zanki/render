@@ -1,12 +1,8 @@
 import { and, asc, count, desc, eq, ilike, or } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  paymentPackages,
-  payments,
-  user,
-  type PaymentStatus,
-} from "@/db/schema";
+import { paymentPackages, payments, user } from "@/db/schema";
+import type { PaymentStatus } from "@/domain/types";
 
 export type AdminPaymentFilters = {
   q?: string;

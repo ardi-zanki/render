@@ -1,4 +1,4 @@
-import type { RenderConfig } from "@/db/schema";
+import type { RenderConfig } from "@/domain/types";
 
 type VersionAsset = {
   config: RenderConfig | null;

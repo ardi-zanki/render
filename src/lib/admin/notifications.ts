@@ -1,7 +1,8 @@
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
 import { db } from "@/db";
-import { notifications, user, type NotificationType } from "@/db/schema";
+import { notifications, user } from "@/db/schema";
+import type { NotificationType } from "@/domain/types";
 
 export type AdminNotificationFilters = {
   q?: string;

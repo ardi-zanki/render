@@ -4,7 +4,7 @@ import { AdminDataToolbar } from "@/components/app/admin-data-toolbar";
 import { AdminTable } from "@/components/app/admin-table";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
-import type { CreditTxType } from "@/db/schema";
+import type { CreditTxType } from "@/domain/types";
 import {
   countCreditTransactions,
   listCreditTransactions,

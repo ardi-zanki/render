@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { ToggleRow } from "@/components/ui/toggle-row";
-import type { RenderMode, RenderOutputFormat } from "@/db/schema";
+import type { RenderMode, RenderOutputFormat } from "@/domain/types";
 import {
   MODES,
   EXTERIOR_TIMES,

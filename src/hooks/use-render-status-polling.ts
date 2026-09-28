@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-import type { RenderStatus } from "@/db/schema";
+import type { RenderStatus } from "@/domain/types";
 import { apiJson } from "@/lib/client-api";
 
 export type PolledRender = {

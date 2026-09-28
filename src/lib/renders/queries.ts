@@ -12,13 +12,8 @@ import {
 } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  projects,
-  renderAssets,
-  renders,
-  type RenderConfig,
-  type RenderStatus,
-} from "@/db/schema";
+import { projects, renderAssets, renders } from "@/db/schema";
+import type { RenderConfig, RenderStatus } from "@/domain/types";
 import { browserAssetUrl } from "@/lib/storage";
 import {
   getLatestRenderableAsset,

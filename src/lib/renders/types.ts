@@ -4,7 +4,7 @@ import type {
   RenderMode,
   RenderOutputFormat,
   RenderStatus,
-} from "@/db/schema";
+} from "@/domain/types";
 import type { ValidatedImageUpload } from "@/lib/uploads/images";
 
 export const RENDER_COST = 1;

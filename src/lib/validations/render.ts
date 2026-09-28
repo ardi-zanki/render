@@ -1,19 +1,9 @@
 import { z } from "zod";
 
-export const outputFormatEnum = z.enum([
-  "jpg",
-  "png",
-  "webp",
-  "avif",
-  "original",
-]);
+import { RENDER_MODES, RENDER_OUTPUT_FORMATS } from "@/domain/types";
 
-export const renderModeEnum = z.enum([
-  "interior",
-  "exterior",
-  "style_transfer",
-  "upscale",
-]);
+export const outputFormatEnum = z.enum(RENDER_OUTPUT_FORMATS);
+export const renderModeEnum = z.enum(RENDER_MODES);
 
 export const createRenderSchema = z.object({
   projectId: z.uuid().optional(),

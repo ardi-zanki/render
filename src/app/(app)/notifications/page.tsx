@@ -15,7 +15,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
-import type { NotificationType } from "@/db/schema";
+import type { NotificationType } from "@/domain/types";
 import {
   countNotifications,
   getUnreadCount,

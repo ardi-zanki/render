@@ -1,4 +1,4 @@
-import type { NotificationType } from "@/db/schema";
+import type { NotificationType } from "@/domain/types";
 
 /** Serializable notification shape passed to client components. */
 export interface NotificationItem {

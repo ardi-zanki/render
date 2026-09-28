@@ -1,6 +1,6 @@
 import { Building2, Sofa, type LucideIcon } from "lucide-react";
 
-import type { RenderMode, RenderOutputFormat } from "@/db/schema";
+import type { RenderMode, RenderOutputFormat } from "@/domain/types";
 
 export const MODES: {
   value: RenderMode;

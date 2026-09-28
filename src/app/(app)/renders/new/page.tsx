@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { RenderStudio } from "@/components/app/render-studio";
-import type { RenderOutputFormat } from "@/db/schema";
+import type { RenderOutputFormat } from "@/domain/types";
 import { getUserProfile } from "@/lib/account/service";
 import { getBalance } from "@/lib/credits";
 import {

@@ -1,4 +1,4 @@
-import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/db/schema";
+import type { RenderConfig, RenderMode, RenderOutputFormat } from "@/domain/types";
 import type { RenderListItem } from "@/lib/renders/types";
 
 export type Scene = Pick<RenderListItem, "id" | "mode" | "status" | "resultUrl">;

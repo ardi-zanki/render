@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Segmented } from "@/components/ui/segmented";
 import { Textarea } from "@/components/ui/textarea";
-import type { RenderMode } from "@/db/schema";
+import type { RenderMode } from "@/domain/types";
 import { cn } from "@/lib/utils";
 import type { StudioView, ViewerTab } from "./types";
 import { clampZoom } from "./use-render-studio-state";

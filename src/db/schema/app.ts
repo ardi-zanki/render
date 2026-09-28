@@ -12,73 +12,17 @@ import {
 
 import { user } from "./auth";
 
-// ── Shared string unions (stored as text, typed in TS) ──────────────
-export type RenderMode = "interior" | "exterior" | "style_transfer" | "upscale";
-// "original" keeps the provider's native output as-is (no app-side re-encode).
-export type RenderOutputFormat = "jpg" | "png" | "webp" | "avif" | "original";
-
-/**
- * Raw Render Studio selections, persisted so a render can be reopened in the
- * studio with every control pre-filled (the composed `prompt` is not reversible
- * and is treated as a secret, so we store the inputs instead).
- */
-export type RenderConfig = {
-  style?: string;
-  time?: string;
-  weather?: string;
-  lightsOn?: boolean;
-  location?: string;
-  surrounding?: string;
-  instruction?: string;
-  /** Marks a version produced by the region/texture editor (vs a normal render). */
-  editKind?: "texture";
-  /** Human-readable texture name (library item or "uploaded") for the marker. */
-  textureLabel?: string;
-  /** The composed inpaint prompt for this texture edit. */
-  texturePrompt?: string;
-};
-export type RenderStatus =
-  | "queued"
-  | "processing"
-  | "success"
-  | "failed"
-  | "cancelled"
-  | "refunded";
-export type JobStatus = "queued" | "processing" | "success" | "failed";
-export type RenderAssetType =
-  | "original"
-  | "reference"
-  | "result"
-  | "edit"
-  | "upscale"
-  | "mask";
-export type CreditTxType =
-  | "purchase"
-  | "usage"
-  | "refund"
-  | "bonus"
-  | "adjustment";
-export type PaymentStatus =
-  | "pending"
-  | "paid"
-  | "failed"
-  | "expired"
-  | "cancelled"
-  | "refunded";
-export type NotificationType =
-  | "render_success"
-  | "render_failed"
-  | "payment_success"
-  | "payment_failed"
-  | "low_credit"
-  | "email_verification"
-  | "system";
-export type AuthTokenType =
-  | "email_verification"
-  | "password_reset"
-  | "signed_download"
-  | "temporary_upload"
-  | "api_access";
+import type {
+  RenderMode,
+  RenderConfig,
+  RenderStatus,
+  JobStatus,
+  RenderAssetType,
+  CreditTxType,
+  PaymentStatus,
+  NotificationType,
+  AuthTokenType,
+} from "@/domain/types";
 
 // ── user_profiles ───────────────────────────────────────────────────
 export const userProfiles = pgTable("user_profiles", {

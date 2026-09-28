@@ -1,11 +1,10 @@
 import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  creditBalances,
-  creditTransactions,
-  type CreditTxType,
-} from "@/db/schema";
+import { creditBalances, creditTransactions } from "@/db/schema";
+import type { CreditTxType } from "@/domain/types";
+import { InsufficientCreditsError } from "@/domain/errors";
+export { InsufficientCreditsError } from "@/domain/errors";
 
 export async function getBalance(userId: string): Promise<number> {
   const row = await db.query.creditBalances.findFirst({
@@ -34,12 +33,6 @@ export interface ApplyCreditParams {
   idempotencyKey?: string;
 }
 
-export class InsufficientCreditsError extends Error {
-  constructor() {
-    super("Credit Anda tidak cukup untuk membuat render");
-    this.name = "InsufficientCreditsError";
-  }
-}
 
 /**
  * Atomically apply a credit change and record the transaction. Balance is

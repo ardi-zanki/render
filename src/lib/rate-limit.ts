@@ -3,6 +3,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { rateLimits } from "@/db/schema";
 import { env } from "@/env";
+import { RateLimitError } from "@/domain/errors";
+export { RateLimitError } from "@/domain/errors";
 
 export interface RateLimitRule {
   limit: number;
@@ -35,15 +37,6 @@ export interface RateLimitResult {
   resetAt: Date;
 }
 
-export class RateLimitError extends Error {
-  readonly code = "RATE_LIMIT_EXCEEDED";
-  readonly resetAt: Date;
-  constructor(resetAt: Date) {
-    super("Terlalu banyak percobaan. Silakan coba lagi beberapa saat.");
-    this.name = "RateLimitError";
-    this.resetAt = resetAt;
-  }
-}
 
 /**
  * Database-backed fixed-window rate limiter (PRD §12.3 — MVP driver). Keyed by

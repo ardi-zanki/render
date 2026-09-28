@@ -4,7 +4,8 @@ import { and, eq, isNull } from "drizzle-orm";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 
 import { db } from "@/db";
-import { authTokens, type AuthTokenType } from "@/db/schema";
+import { authTokens } from "@/db/schema";
+import type { AuthTokenType } from "@/domain/types";
 import { env } from "@/env";
 
 const secret = new TextEncoder().encode(env.JWT_SECRET);

@@ -5,6 +5,8 @@ import {
   imageDimensionError,
   imageTypeSizeError,
 } from "./image-constraints";
+import { ImageUploadError } from "@/domain/errors";
+export { ImageUploadError } from "@/domain/errors";
 
 export {
   MAX_IMAGE_BYTES,
@@ -22,14 +24,6 @@ export interface ValidatedImageUpload {
   height: number;
 }
 
-export class ImageUploadError extends Error {
-  readonly status: number;
-  constructor(message: string, status = 400) {
-    super(message);
-    this.name = "ImageUploadError";
-    this.status = status;
-  }
-}
 
 export async function validateImageFile(
   file: File,

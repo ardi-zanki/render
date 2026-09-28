@@ -1,4 +1,4 @@
-import type { RenderMode } from "@/db/schema";
+import type { RenderMode } from "@/domain/types";
 
 export interface RenderOptions {
   mode: RenderMode;

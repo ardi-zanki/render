@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import type { RenderAssetType } from "@/db/schema";
+import type { RenderAssetType } from "@/domain/types";
 import { createLocalProvider } from "./local";
 import { createR2Provider } from "./r2";
 import type { StorageProvider } from "./types";

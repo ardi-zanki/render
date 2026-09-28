@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Popover } from "@/components/ui/popover";
-import type { NotificationType } from "@/db/schema";
+import type { NotificationType } from "@/domain/types";
 import { postJson } from "@/lib/client-api";
 import { timeAgo, type NotificationItem } from "@/lib/notifications/ui";
 import { cn } from "@/lib/utils";

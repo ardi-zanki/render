@@ -1,4 +1,4 @@
-import type { RenderMode } from "@/db/schema";
+import type { RenderMode } from "@/domain/types";
 
 export const MODE_LABEL: Record<RenderMode, string> = {
   interior: "Interior",

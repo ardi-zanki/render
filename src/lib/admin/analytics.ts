@@ -1,7 +1,8 @@
 import { count, eq, isNotNull, isNull, sql, sum } from "drizzle-orm";
 
 import { db } from "@/db";
-import { payments, renders, user, type RenderMode } from "@/db/schema";
+import { payments, renders, user } from "@/db/schema";
+import type { RenderMode } from "@/domain/types";
 
 export async function getAdminStats() {
   const [users] = await db.select({ v: count() }).from(user);

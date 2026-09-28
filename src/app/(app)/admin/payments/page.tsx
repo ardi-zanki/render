@@ -4,7 +4,7 @@ import { AdminDataToolbar } from "@/components/app/admin-data-toolbar";
 import { AdminTable } from "@/components/app/admin-table";
 import { Badge } from "@/components/ui/badge";
 import { Pagination } from "@/components/ui/pagination";
-import type { PaymentStatus } from "@/db/schema";
+import type { PaymentStatus } from "@/domain/types";
 import { countAllPayments, listAllPayments } from "@/lib/admin/service";
 import { PAYMENT_STATUS, paymentStatusBadge } from "@/lib/payments/labels";
 import { requireAdmin } from "@/lib/session";

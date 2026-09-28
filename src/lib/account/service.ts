@@ -1,12 +1,8 @@
 import { and, eq, isNotNull } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  account,
-  userProfiles,
-  type RenderMode,
-  type RenderOutputFormat,
-} from "@/db/schema";
+import { account, userProfiles } from "@/db/schema";
+import type { RenderMode, RenderOutputFormat } from "@/domain/types";
 
 export type UserPreferencesUpdate = {
   defaultRenderMode: RenderMode;

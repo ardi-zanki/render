@@ -1,4 +1,4 @@
-import type { RenderStatus } from "@/db/schema";
+import type { RenderStatus } from "@/domain/types";
 import { STATUS_LABEL } from "@/lib/renders/labels";
 import { cn } from "@/lib/utils";
 

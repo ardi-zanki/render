@@ -1,12 +1,8 @@
 import sharp from "sharp";
 
 import { db } from "@/db";
-import {
-  renderAssets,
-  type RenderAssetType,
-  type RenderConfig,
-  type RenderOutputFormat,
-} from "@/db/schema";
+import { renderAssets } from "@/db/schema";
+import type { RenderAssetType, RenderConfig, RenderOutputFormat } from "@/domain/types";
 import { renderAssetKey, storage } from "@/lib/storage";
 import type { UploadedFile } from "./types";
 

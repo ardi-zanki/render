@@ -1,4 +1,5 @@
-import type { RenderMode, RenderOutputFormat } from "@/db/schema";
+import type { RenderMode, RenderOutputFormat } from "@/domain/types";
+export { AiProviderError } from "@/domain/errors";
 
 export interface AiRenderInput {
   mode: RenderMode;
@@ -40,14 +41,6 @@ export interface AiRenderResult {
   raw?: unknown;
 }
 
-export class AiProviderError extends Error {
-  readonly code: string;
-  constructor(message: string, code = "AI_PROVIDER_ERROR") {
-    super(message);
-    this.name = "AiProviderError";
-    this.code = code;
-  }
-}
 
 /** Pluggable AI render provider (PRD §6.1). fal is the MVP provider. */
 export interface AiProvider {

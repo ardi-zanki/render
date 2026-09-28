@@ -1,13 +1,8 @@
 import { and, count, desc, eq, ilike, isNull, or, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  renderJobs,
-  renders,
-  user,
-  type RenderMode,
-  type RenderStatus,
-} from "@/db/schema";
+import { renderJobs, renders, user } from "@/db/schema";
+import type { RenderMode, RenderStatus } from "@/domain/types";
 import { writeAuditLog } from "./audit";
 
 export interface AdminRenderRow {

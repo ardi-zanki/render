@@ -1,4 +1,4 @@
-import type { PaymentStatus } from "@/db/schema";
+import type { PaymentStatus } from "@/domain/types";
 
 export interface CreatePaymentInput {
   /** Our internal order id, sent to the provider as the order reference. */

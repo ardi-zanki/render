@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-
-import { InsufficientCreditsError } from "@/lib/credits";
-import { AiProviderError } from "@/lib/providers/ai";
-import { RateLimitError } from "@/lib/rate-limit";
-import { StorageQuotaExceededError } from "@/lib/storage/usage";
-import { ImageUploadError } from "@/lib/uploads/images";
+import {
+  AiProviderError,
+  ImageUploadError,
+  InsufficientCreditsError,
+  RateLimitError,
+  StorageQuotaExceededError,
+} from "@/domain/errors";
 
 /**
  * Maps a known domain error to its JSON `NextResponse`, so every route reports

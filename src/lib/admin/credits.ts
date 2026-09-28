@@ -1,7 +1,8 @@
 import { and, count, desc, eq, ilike, or } from "drizzle-orm";
 
 import { db } from "@/db";
-import { creditTransactions, user, type CreditTxType } from "@/db/schema";
+import { creditTransactions, user } from "@/db/schema";
+import type { CreditTxType } from "@/domain/types";
 import { applyCreditChange } from "@/lib/credits";
 import { writeAuditLog } from "./audit";
 

@@ -1,13 +1,11 @@
 import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import {
-  renderAssets,
-  renderJobs,
-  renders,
-  type RenderAssetType,
-} from "@/db/schema";
+import { renderAssets, renderJobs, renders } from "@/db/schema";
+import type { RenderAssetType } from "@/domain/types";
 import { storage } from "@/lib/storage";
+import { StorageQuotaExceededError } from "@/domain/errors";
+export { StorageQuotaExceededError } from "@/domain/errors";
 
 export const USER_STORAGE_LIMIT_BYTES = 1024 * 1024 * 1024;
 
@@ -24,15 +22,6 @@ export type UserStorageUsage = {
   categories: StorageUsageCategory[];
 };
 
-export class StorageQuotaExceededError extends Error {
-  readonly code = "STORAGE_QUOTA_EXCEEDED";
-  readonly status = 413;
-
-  constructor() {
-    super("Penyimpanan kamu sudah mencapai batas 1 GB. Hapus file lama dulu.");
-    this.name = "StorageQuotaExceededError";
-  }
-}
 
 const CATEGORY_ORDER: RenderAssetType[] = [
   "original",
