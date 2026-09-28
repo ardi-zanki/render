@@ -28,6 +28,10 @@ pnpm dev
 
 The example `DATABASE_URL` matches this Docker database at `localhost:5433`. Adjust it if you use another database. Open [http://localhost:3210](http://localhost:3210). Without `RESEND_API_KEY`, verification/reset email links are printed to the terminal in development.
 
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the module map, dependency boundaries, render/payment flows, and where to add a feature.
+
 ## Configuration
 
 [.env.example](.env.example) lists supported variables; [src/env.ts](src/env.ts) validates server configuration. Do not import it from client components.

@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Optimistic auth guard for protected routes (PRD §10). Only checks for the
- * presence of a session cookie at the edge — full session validation plus
+ * presence of a session cookie before routing — full session validation plus
  * email-verified / admin-role checks happen in server components via
  * `requireUser` / `requireVerifiedUser` / `requireAdmin`.
  *
