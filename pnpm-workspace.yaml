@@ -23,27 +23,10 @@ overrides:
   kysely: 0.28.17
   # Keep Next's optional image dependency aligned with the root sharp version so
   # only one libvips binary is loaded during production builds.
-  sharp: 0.35.4
+  sharp: 0.35.5
   # Keep transitive PostCSS copies aligned with this patched version.
   postcss: 8.5.25
   # better-auth's optional drizzle-kit path pulls an outdated esbuild release.
   '@esbuild-kit/core-utils>esbuild': 0.28.1
 minimumReleaseAgeExclude:
-  - '@img/sharp-darwin-arm64@0.35.4'
-  - '@img/sharp-darwin-x64@0.35.4'
-  - '@img/sharp-freebsd-wasm32@0.35.4'
-  - '@img/sharp-linux-arm64@0.35.4'
-  - '@img/sharp-linux-arm@0.35.4'
-  - '@img/sharp-linux-ppc64@0.35.4'
-  - '@img/sharp-linux-riscv64@0.35.4'
-  - '@img/sharp-linux-s390x@0.35.4'
-  - '@img/sharp-linux-x64@0.35.4'
-  - '@img/sharp-linuxmusl-arm64@0.35.4'
-  - '@img/sharp-linuxmusl-x64@0.35.4'
-  - '@img/sharp-wasm32@0.35.4'
-  - '@img/sharp-webcontainers-wasm32@0.35.4'
-  - '@img/sharp-win32-arm64@0.35.4'
-  - '@img/sharp-win32-ia32@0.35.4'
-  - '@img/sharp-win32-x64@0.35.4'
-  - sharp@0.35.4
   - postcss@8.5.25
